@@ -1,0 +1,128 @@
+.workout-ticket {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--ticket-height);
+  padding: 14px;
+  border: 0;
+  border-radius: var(--radius-ticket);
+  background-color: var(--workout-color-soft);
+  box-shadow: inset 0 0 0 var(--border-width-thin) color-mix(in srgb, var(--workout-color) 18%, transparent);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-lane) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.workout-ticket:active {
+  transform: scale(var(--press-scale));
+}
+
+.workout-ticket-letter {
+  position: absolute;
+  inset-block-end: -18px;
+  inset-inline-start: -4px;
+  z-index: -1;
+  font-family: var(--font-numeric);
+  font-size: var(--text-ticket-letter);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
+  color: var(--workout-color);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+/* On its tint the name takes the darker solid shade of the color (contrast). */
+.workout-ticket-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--text-ticket);
+  line-height: 0.95;
+  color: color-mix(in srgb, var(--workout-color-solid) 75%, var(--color-ink));
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.workout-ticket-meta {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.workout-ticket-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  height: 26px;
+  margin-block-start: auto;
+  padding: 0 10px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+/* Done: the solid color (white text only on a solid fill). */
+.workout-ticket-done {
+  background-color: var(--workout-color-solid);
+  box-shadow: none;
+  color: var(--on-pink);
+}
+
+.workout-ticket-done .workout-ticket-name {
+  color: var(--on-pink);
+}
+
+.workout-ticket-done .workout-ticket-meta {
+  color: var(--color-on-workout-muted);
+}
+
+.workout-ticket-done .workout-ticket-letter {
+  color: var(--on-pink);
+  opacity: 0.18;
+}
+
+.workout-ticket-done .workout-ticket-chip {
+  background-color: color-mix(in srgb, var(--on-pink) 22%, transparent);
+  color: var(--on-pink);
+}
+
+/* Today (or open): white with a 2px ring in the color. */
+.workout-ticket-today {
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 var(--border-width-medium) var(--workout-color);
+}
+
+.workout-ticket-today .workout-ticket-chip {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+/* Missed: the tint, a little quieter. */
+.workout-ticket-missed .workout-ticket-name {
+  opacity: var(--opacity-muted);
+}
+
+.workout-ticket:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workout-ticket:hover {
+    transform: translateY(-3px);
+  }
+
+  .workout-ticket:active {
+    transform: scale(var(--press-scale));
+  }
+}

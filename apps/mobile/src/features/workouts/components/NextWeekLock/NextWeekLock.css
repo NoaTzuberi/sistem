@@ -1,0 +1,48 @@
+.next-week-lock {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 14px;
+  border-radius: var(--radius-block);
+  background-color: var(--color-fill-soft);
+}
+
+.next-week-lock-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-notice-icon);
+  background-color: var(--color-card);
+  color: var(--color-text-muted);
+}
+
+.next-week-lock-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.next-week-lock-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.next-week-lock-note {
+  font-size: var(--text-xs);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+.next-week-range {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.next-week-ticket {
+  width: var(--ticket-width);
+}

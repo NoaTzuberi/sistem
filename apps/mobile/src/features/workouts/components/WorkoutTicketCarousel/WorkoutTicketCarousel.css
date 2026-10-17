@@ -1,0 +1,25 @@
+/* Full-bleed: the row scrolls under the screen's gutters, and the first ticket lines up with them. */
+.workout-ticket-carousel {
+  display: grid;
+  grid-auto-columns: var(--ticket-width);
+  grid-auto-flow: column;
+  gap: 10px;
+  margin: 0;
+  margin-inline: calc(-1 * (var(--home-gutter) + var(--safe-inline-start))) calc(-1 * (var(--home-gutter) + var(--safe-inline-end)));
+  padding-block: var(--space-1) 10px;
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  scroll-snap-type: x mandatory;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.workout-ticket-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.workout-ticket-carousel-item {
+  scroll-snap-align: start;
+}

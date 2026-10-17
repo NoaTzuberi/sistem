@@ -1,0 +1,27 @@
+.large-title-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-overlay);
+  padding-block: calc(var(--space-3) + var(--safe-top)) var(--space-3);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  background-color: var(--surface-header-frost);
+  -webkit-backdrop-filter: var(--blur-header);
+  backdrop-filter: var(--blur-header);
+}
+
+.large-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.large-title {
+  margin: 0;
+  font-family: var(--font-family-home);
+  font-size: var(--text-workouts-title);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-display);
+  line-height: var(--line-height-tight);
+  color: var(--color-ink);
+}

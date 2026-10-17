@@ -1,0 +1,51 @@
+.week-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+}
+
+.week-header-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Hebrew "השבוע" falls back to Rubik from the numeric stack; English reads THIS WEEK in Barlow italic. */
+.week-header-label {
+  font-family: var(--font-numeric);
+  font-size: var(--text-week-label);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  line-height: var(--line-height-numeric);
+  text-transform: uppercase;
+}
+
+:root:lang(he) .week-header-label {
+  font-style: normal;
+}
+
+.week-header-range {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.week-header-pips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  margin-inline-start: auto;
+}
+
+.week-header-pip {
+  width: var(--week-pip-width);
+  height: var(--week-pip-height);
+  border-radius: var(--radius-pip);
+  background-color: var(--workout-color-soft);
+}
+
+.week-header-pip-done {
+  background-color: var(--workout-color);
+}

@@ -1,0 +1,124 @@
+/* Trainee Workouts: a white screen, ink type, Rubik for Hebrew (as Home B). */
+.workouts-screen {
+  min-height: 100%;
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  font-family: var(--font-family-home);
+}
+
+.workouts-panel {
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  animation: workouts-panel-in 320ms var(--ease-press) both;
+}
+
+/* Switching tabs: the new content fades in with an 8px rise. */
+@keyframes workouts-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.workouts-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.workouts-section-title {
+  margin: 0;
+  font-family: var(--font-family-home);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+/* Small pink text on white = Cherry Rose; a 44px hit area around the words. */
+.workouts-section-link {
+  min-height: var(--touch-target-min);
+  margin-block: calc((var(--touch-target-min) - 1lh) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.workouts-section-link:active {
+  transform: scale(var(--press-scale));
+}
+
+.workouts-empty {
+  margin-block-start: var(--space-3);
+}
+
+.workouts-note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.workouts-sentinel {
+  height: 1px;
+}
+
+/* "+ Free workout": an ink pill with a pink plus. */
+.workouts-free-pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--touch-target-min);
+  padding-inline: 10px 14px;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.workouts-free-pill-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--on-pink);
+}
+
+.workouts-free-pill:active {
+  transform: scale(var(--press-scale));
+}
+
+.workouts-screen :focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workouts-free-pill:hover {
+    background-color: var(--color-ink-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workouts-panel {
+    animation: none;
+  }
+}

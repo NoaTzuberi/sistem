@@ -1,0 +1,196 @@
+.month-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: 10px;
+}
+
+.month-calendar-title {
+  margin: 0;
+  font-family: var(--font-family-home);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+.month-calendar-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.month-calendar-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.month-calendar-arrow:disabled {
+  color: var(--color-text-muted);
+  opacity: var(--opacity-disabled-strong);
+  cursor: default;
+}
+
+.month-calendar-arrow:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.month-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.month-calendar-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+}
+
+.month-calendar-weekday {
+  padding-block-end: var(--space-1);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.month-calendar-cell {
+  display: flex;
+}
+
+.month-calendar-day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-calendar-day);
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-numeric);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    box-shadow var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.month-calendar-day {
+  cursor: pointer;
+}
+
+.month-calendar-day-out {
+  opacity: var(--opacity-faint);
+}
+
+/* A workout day: its workout's solid color (white digits only on a solid fill). */
+.month-calendar-day-has {
+  background-color: var(--workout-color-solid);
+  color: var(--on-pink);
+}
+
+/* A workout no longer in her plans: plain ink. */
+.month-calendar-day-unplanned {
+  --workout-color-solid: var(--color-ink);
+  --workout-color: var(--color-ink);
+}
+
+.month-calendar-day-free {
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-ink);
+}
+
+.month-calendar-day-today {
+  box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-primary);
+}
+
+.month-calendar-day-has.month-calendar-day-today {
+  box-shadow:
+    inset 0 0 0 var(--border-width-medium) var(--color-primary),
+    inset 0 0 0 4px var(--color-card);
+}
+
+/* More than one workout that day: a small dot. */
+.month-calendar-day-multi::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 4px;
+  inset-inline-end: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: 0 0 0 1.5px var(--workout-color, var(--color-ink));
+}
+
+.month-calendar-day[aria-pressed='true'] {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-day-selected);
+}
+
+button.month-calendar-day:active {
+  transform: scale(var(--press-scale));
+}
+
+.month-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+  list-style: none;
+}
+
+.month-calendar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.month-calendar-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background-color: var(--workout-color);
+}
+
+.month-calendar-swatch-free {
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 1.5px var(--color-ink);
+}
+
+.month-calendar :focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .month-calendar-arrow:not(:disabled):hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .month-calendar-day[aria-pressed='true'] {
+    transform: none;
+  }
+}

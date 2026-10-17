@@ -1,0 +1,180 @@
+.free-sheet-title {
+  margin: 6px 0 var(--space-1);
+  font-family: var(--font-family-home);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-ink);
+}
+
+.free-sheet-intro {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+.free-sheet-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-end: var(--space-2);
+}
+
+.free-sheet-option {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: var(--radius-block);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    box-shadow var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.free-sheet-option[aria-checked='true'] {
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 var(--border-width-medium) var(--workout-color);
+}
+
+/* White icons on the solid shade of the option's color. */
+.free-sheet-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-option-icon);
+  background-color: var(--workout-color-solid);
+  color: var(--on-pink);
+}
+
+.free-sheet-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.free-sheet-option-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.free-sheet-option-note,
+.free-sheet-note {
+  font-size: var(--text-xs);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+.free-sheet-note {
+  margin: 0;
+}
+
+.free-sheet-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-block: 6px var(--space-3);
+}
+
+.free-sheet-log {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) 14px;
+  border: 0;
+  border-radius: var(--radius-row);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+}
+
+.free-sheet-log[aria-checked='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.free-sheet-log-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-lg);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.free-sheet-log-date {
+  flex: none;
+  font-size: var(--text-xs);
+  opacity: 0.75;
+}
+
+.free-sheet-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--cta-height);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-button);
+  color: var(--on-pink);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.free-sheet-start:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-ink);
+  box-shadow: none;
+  cursor: default;
+}
+
+.free-sheet-option:active,
+.free-sheet-log:active,
+.free-sheet-start:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.free-sheet-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--color-error);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .free-sheet-option:not([aria-checked='true']):hover,
+  .free-sheet-log:not([aria-checked='true']):hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+
+  .free-sheet-start:not(:disabled):hover {
+    background-color: var(--color-primary-deep);
+  }
+}

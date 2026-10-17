@@ -1,0 +1,264 @@
+/* The ink stage of the Plan tab: a glow in the workout's color and faint vertical grid lines. */
+.up-next-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-block-start: var(--space-3);
+  padding: var(--space-4) calc(var(--space-4) - var(--space-1));
+  border-radius: var(--radius-up-next);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.up-next-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(90deg, var(--color-ink-grid) 0 1px, transparent 1px var(--up-next-grid-step));
+  -webkit-mask-image: linear-gradient(to left, var(--color-ink), transparent 70%); /* physical: the grid fades across the card, same in both directions */
+  mask-image: linear-gradient(to left, var(--color-ink), transparent 70%); /* physical: as above */
+}
+
+.up-next-card::after {
+  content: '';
+  position: absolute;
+  inset-block-start: calc(var(--up-next-glow) * -0.4);
+  inset-inline-end: calc(var(--up-next-glow) * -0.3);
+  z-index: -1;
+  width: var(--up-next-glow);
+  height: var(--up-next-glow);
+  border-radius: var(--radius-round);
+  background-color: var(--workout-color);
+  filter: var(--blur-glow);
+  opacity: 0.55;
+}
+
+.up-next-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* White bold 12px on Neon Pink is under 4.5:1 — the live pill uses the solid pink. */
+.up-next-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--space-4);
+  padding: 0 10px;
+  border-radius: var(--radius-round);
+  background-color: var(--solid-pink);
+  color: var(--on-pink);
+}
+
+.up-next-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-round);
+  background-color: var(--on-pink);
+  animation: up-next-blink var(--loop-pulse) ease-in-out infinite;
+}
+
+@keyframes up-next-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.up-next-day {
+  color: var(--color-on-ink-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.up-next-name {
+  margin: var(--space-3) 0 var(--space-1);
+  color: var(--color-on-ink);
+  font-size: var(--text-up-next);
+  line-height: var(--line-height-numeric);
+  overflow-wrap: anywhere;
+  /* A long Latin name wraps; past three lines it is clamped. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.up-next-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-on-ink-muted);
+}
+
+.up-next-exercises {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-3) 0;
+  padding: 0;
+  border-block-start: var(--border-width-thin) solid var(--color-on-ink-rule);
+  list-style: none;
+}
+
+.up-next-exercise,
+.up-next-more {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-1);
+  border-block-end: var(--border-width-thin) solid var(--color-on-ink-rule);
+  font-size: var(--text-sm);
+}
+
+.up-next-exercise-index {
+  width: 20px;
+  flex: none;
+  font-family: var(--font-numeric);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-ink-faint);
+}
+
+.up-next-exercise-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.up-next-exercise-target {
+  flex: none;
+  font-family: var(--font-numeric);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-pink-on-ink);
+}
+
+.up-next-more {
+  color: var(--color-on-ink-muted);
+}
+
+.up-next-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.up-next-start {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: var(--cta-height);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-button);
+  color: var(--on-pink);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.up-next-start:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-ink);
+  box-shadow: none;
+  cursor: default;
+}
+
+.up-next-preview {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cta-height);
+  height: var(--cta-height);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-ink-rule);
+  color: var(--color-on-ink);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.up-next-start:active:not(:disabled),
+.up-next-preview:active,
+.up-next-done-link:active {
+  transform: scale(var(--press-scale));
+}
+
+.up-next-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-pink-on-ink);
+}
+
+/* Every workout of the week done. */
+.up-next-card-done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.up-next-done-text {
+  margin: 0;
+  color: var(--color-on-ink);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+}
+
+.up-next-done-link {
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-ink-rule);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.up-next-card :focus-visible {
+  outline: var(--border-width-medium) solid var(--color-pink-on-ink);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .up-next-start:not(:disabled):hover {
+    background-color: var(--color-primary-deep);
+  }
+
+  .up-next-preview:hover,
+  .up-next-done-link:hover {
+    background-color: var(--color-on-ink-rule-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .up-next-live-dot {
+    animation: none;
+  }
+}

@@ -1,5 +1,5 @@
 import type { Language, LastPerformance, SetType, TraineePlanWorkout } from '@sistem/types';
-import { fill, formatDuration, formatPlural, isolateLtr, sharedCopy } from '@sistem/shared';
+import { fill, formatDuration, formatPlural, sharedCopy } from '@sistem/shared';
 import type { BadgeVariant } from '../../../components/common/Badge/Badge';
 import type { workoutCopy } from '../copy';
 
@@ -10,11 +10,6 @@ type WorkoutCopy = (typeof workoutCopy)['he'];
 
 export function exerciseCountLabel(count: number, copy: WorkoutCopy, language: Language): string {
   return formatPlural(language, copy.list.exerciseCount, count);
-}
-
-export function doneCountLabel(workouts: TraineePlanWorkout[], copy: WorkoutCopy): string {
-  const done = workouts.filter((workout) => workout.status === 'done').length;
-  return fill(copy.list.doneCount, { done: isolateLtr(`${done} / ${workouts.length}`) });
 }
 
 /** The badge of a workout row. The status itself always comes from the server. */

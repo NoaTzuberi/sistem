@@ -1,0 +1,33 @@
+.history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--space-3) 0 0;
+}
+
+/* The number on top, its label under it (dt follows dd visually). */
+.history-summary-item {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.history-summary-item + .history-summary-item {
+  padding-inline-start: 14px;
+  border-inline-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.history-summary-value {
+  margin: 0;
+  font-family: var(--font-numeric);
+  font-size: var(--text-history-stat);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+}
+
+.history-summary-label {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
