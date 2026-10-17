@@ -18,6 +18,9 @@ describe('parseClientOrigins', () => {
 
   it('unset: the local apps in development, nothing in production', () => {
     expect(parseClientOrigins(undefined, 'development')).toEqual(DEV_CLIENT_ORIGINS);
+    expect(DEV_CLIENT_ORIGINS).toEqual(
+      expect.arrayContaining(['http://localhost:5173', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174']),
+    );
     expect(parseClientOrigins('', 'production')).toEqual([]);
   });
 });

@@ -2,8 +2,13 @@
 // Auth is a Bearer header (no cookies), so no credentials are involved; the list is still exact:
 // '*' is never accepted.
 
-// `npm run dev` / `dev:all`: the mobile app and the coach dashboard.
-export const DEV_CLIENT_ORIGINS = ['http://localhost:5173', 'http://localhost:5174'];
+// `npm run dev` / `dev:all`: the mobile app and the coach dashboard. Both host names, because the
+// browser sends the one in the address bar: http://127.0.0.1:5173 is a different origin from localhost.
+const DEV_PORTS = [5173, 5174];
+export const DEV_CLIENT_ORIGINS = DEV_PORTS.flatMap((port) => [
+  `http://localhost:${port}`,
+  `http://127.0.0.1:${port}`,
+]);
 
 /**
  * An origin is scheme + host + port, with no path: 'https://name.github.io/sistem/' is read as
