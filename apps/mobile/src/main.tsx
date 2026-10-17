@@ -4,6 +4,7 @@ import '@sistem/tokens/tokens.css'
 import './styles/globals.css'
 import './styles/typography.css'
 import './styles/animations.css'
+import './styles/workoutColors.css'
 import App from './App.tsx'
 import { AppProviders } from './app/providers/AppProviders'
 

@@ -50,10 +50,3 @@
   outline: var(--border-width-medium) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
 }
-
-/* Workout identity colors, by the workout's place in the plan (as in the plan builder). */
-.workout-color-1 { --workout-color: var(--color-workout-1); --workout-color-solid: var(--color-workout-1-solid); }
-.workout-color-2 { --workout-color: var(--color-workout-2); --workout-color-solid: var(--color-workout-2-solid); }
-.workout-color-3 { --workout-color: var(--color-workout-3); --workout-color-solid: var(--color-workout-3-solid); }
-.workout-color-4 { --workout-color: var(--color-workout-4); --workout-color-solid: var(--color-workout-4-solid); }
-.workout-color-5 { --workout-color: var(--color-workout-5); --workout-color-solid: var(--color-workout-5-solid); }

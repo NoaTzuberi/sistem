@@ -73,3 +73,20 @@ p {
   font-weight: var(--font-weight-regular);
   color: var(--color-text-muted);
 }
+
+/* A workout name in the "training OS" display face (Barlow Condensed italic 800, uppercase). A Hebrew
+   name (data-script="he", see nameScript) falls back to Rubik, upright — Hebrew has no italic or case. */
+.display-name {
+  font-family: var(--font-numeric);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  text-transform: uppercase;
+  unicode-bidi: isolate;
+}
+
+.display-name[data-script='he'] {
+  font-family: var(--font-family-home);
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  text-transform: none;
+}
