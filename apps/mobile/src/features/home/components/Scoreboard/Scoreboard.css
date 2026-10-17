@@ -1,0 +1,45 @@
+.scoreboard {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 0;
+}
+
+.scoreboard-cell {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+  padding-block: var(--space-1);
+}
+
+.scoreboard-cell + .scoreboard-cell {
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.scoreboard-value {
+  align-self: flex-start;
+  margin: 0;
+  font-family: var(--font-numeric);
+  font-size: var(--text-score);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  white-space: nowrap;
+  unicode-bidi: isolate;
+  color: var(--color-ink);
+}
+
+.scoreboard-sup {
+  margin-inline-start: calc(var(--space-1) / 2);
+  font-size: var(--text-score-sup);
+  vertical-align: top;
+  /* Large bold Neon Pink on white (≥ 18px bold: 3:1 is enough). */
+  color: var(--color-primary);
+}
+
+.scoreboard-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}

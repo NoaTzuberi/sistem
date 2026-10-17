@@ -1,0 +1,62 @@
+.coach-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.coach-note-avatar {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-5) + var(--space-2));
+  height: calc(var(--space-5) + var(--space-2));
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.coach-note-avatar::after {
+  content: '';
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: calc(var(--space-2) + var(--space-1) * 0.75);
+  height: calc(var(--space-2) + var(--space-1) * 0.75);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  box-shadow: var(--ring-on-card);
+}
+
+.coach-note-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.coach-note-head {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--space-1) * 1.5);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.coach-note-name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.coach-note-time {
+  margin-inline-start: auto;
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+.coach-note-text {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-base);
+  line-height: var(--line-height-base);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-align: start;
+}

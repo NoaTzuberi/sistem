@@ -1,0 +1,35 @@
+/* Fills from the reading direction's start, like every other progress in the app. */
+.achievement-ticks {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--tick-gap);
+  margin-block-start: var(--space-2);
+}
+
+.achievement-tick {
+  height: var(--tick-height);
+  border-radius: var(--tick-gap);
+  background-color: var(--color-fill-soft);
+}
+
+.achievement-tick-done {
+  background-color: var(--color-ink);
+}
+
+.achievement-tick-next {
+  background-color: var(--color-primary);
+  animation: achievement-tick-blink var(--loop-tick) ease-in-out infinite;
+}
+
+@keyframes achievement-tick-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-tick-next {
+    animation: none;
+  }
+}

@@ -1,18 +1,58 @@
-// Her Home. PLACEHOLDER copy — the owner sends the final text. DRAFT Hebrew (phase-15 report).
+// Her Home (direction B, docs/design/trainee-home-b.html). The wording comes from the owner's design;
+// the rest is PLACEHOLDER copy — the owner sends the final text. DRAFT Hebrew (phase-15 report).
 export const he = {
-  greeting: 'היי, {firstName}',
-  weekOf: 'השבוע של',
+  greeting: 'בוקר טוב, {firstName}',
   nextWorkout: 'האימון הבא',
-  startNextWorkout: 'התחלת האימון הבא',
+  todayWorkout: 'האימון של היום',
   resumeWorkout: 'המשך אימון · {title}',
-  thisWeek: 'השבוע',
   noPlanThisWeek: 'עדיין אין תוכנית לשבוע הזה.',
   noWorkoutsInPlan: 'אין אימונים בתוכנית הזו.',
   allDone: 'כל האימונים של השבוע הושלמו.',
   intervalTimer: 'טיימר אינטרוולים',
   loading: 'טוען…',
   loadError: 'לא הצלחנו לטעון את השבוע שלך.',
-  startingPhotoReminder: 'הוסיפי תמונת התחלה כדי לראות את השינוי',
-  addStartingPhoto: 'תמונת התחלה',
   dismissStartingPhotoReminder: 'סגירת התזכורת לתמונת התחלה',
+  stage: {
+    dragToRotate: 'גררי לסובב',
+    facts: 'פרטי האימון',
+    exercises: 'תרגילים',
+    thisWeek: 'השבוע',
+    slideToStart: 'החליקי להתחלת אימון',
+    startWorkout: 'התחלת אימון',
+    restDay: 'יום מנוחה',
+  },
+  photo: {
+    title: 'תמונת התחלה',
+    subtitle: 'כדי לראות את השינוי שלך',
+    take: 'צילום',
+  },
+  week: {
+    title: 'השבוע · {range}',
+    openPlan: 'התוכנית',
+    days: 'ימי השבוע',
+    done: '✓ בוצע',
+    today: 'היום · {exercises}',
+    planned: 'מתוכנן',
+    rest: 'יום מנוחה · התאוששות',
+  },
+  score: {
+    title: 'המספרים שלך',
+    workoutsThisWeek: 'אימונים השבוע',
+    weeksInRow: 'שבועות ברצף',
+    totalVolume: 'נפח כולל',
+    tonnes: 'טון',
+  },
+  coach: {
+    title: 'מהמאמנת',
+    planReady: 'שבוע {range} מוכן',
+  },
+  achievement: {
+    title: 'ההישג הבא',
+    all: 'כל ההישגים',
+    others: 'הישגים קרובים',
+  },
+  fuel: {
+    title: 'תזונה היום',
+    logMeal: 'סימון ארוחה',
+  },
 } as const;

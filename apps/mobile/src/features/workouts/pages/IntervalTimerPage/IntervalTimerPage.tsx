@@ -8,38 +8,22 @@ import { IntervalTimer } from '../../components/IntervalTimer/IntervalTimer';
 import { buildFreePhases } from '../../data/intervalTimeline';
 import { playTestSound } from '../../data/intervalSounds';
 import {
-  FREE_TIMER_DEFAULTS,
   FREE_TIMER_MAX_ROUNDS,
   FREE_TIMER_MAX_SEC,
   FREE_TIMER_MIN_WORK_SEC,
   FREE_TIMER_STEP_SEC,
 } from '../../data/sessionConfig';
+import {
+  type FreeTimerSettings as Settings,
+  loadFreeTimerSettings as loadSettings,
+  saveFreeTimerSettings as saveSettings,
+} from '../../data/freeTimerSettings';
 import { formatClock } from '../../data/workoutDisplay';
 import { workoutCopy } from '../../copy';
 import { useIntervalRun } from '../../hooks/useIntervalRun';
 import './IntervalTimerPage.css';
 
-const SETTINGS_KEY = 'sistem.interval.free.settings';
 const RUN_KEY = 'sistem.interval.free';
-
-type Settings = typeof FREE_TIMER_DEFAULTS;
-
-function loadSettings(): Settings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...FREE_TIMER_DEFAULTS, ...(JSON.parse(raw) as Partial<Settings>) } : FREE_TIMER_DEFAULTS;
-  } catch {
-    return FREE_TIMER_DEFAULTS;
-  }
-}
-
-function saveSettings(settings: Settings): void {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  } catch {
-    // Remembered for this visit only.
-  }
-}
 
 interface SetupRowProps {
   label: string;

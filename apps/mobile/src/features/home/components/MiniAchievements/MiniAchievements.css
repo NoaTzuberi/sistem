@@ -1,0 +1,74 @@
+/* Scrolls sideways under the gutter, edge to edge. */
+.mini-achievements {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-3) calc(var(--home-gutter) * -1) 0;
+  padding: 0 var(--home-gutter);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.mini-achievements::-webkit-scrollbar {
+  display: none;
+}
+
+.mini-achievement {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding-block: 0;
+  padding-inline: calc(var(--space-1) * 1.5) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mini-achievement:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+.mini-achievement-ring {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--ring-mini);
+  height: var(--ring-mini);
+  border-radius: var(--radius-round);
+  background: conic-gradient(var(--workout-color) calc(var(--progress, 0) * 1%), var(--color-ring-track) 0);
+}
+
+.mini-achievement-ring::after {
+  content: '';
+  width: var(--ring-mini-hole);
+  height: var(--ring-mini-hole);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.mini-achievement-progress {
+  color: var(--color-text-muted);
+}
+
+.mini-achievement:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: calc(var(--focus-ring-offset) * -1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mini-achievement:hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}

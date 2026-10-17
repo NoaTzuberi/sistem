@@ -1,0 +1,67 @@
+/* Group colors: the nutrition tab's own portion colors (protein pink, carb purple, fat orange, snack blue). */
+.fuel-today {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.fuel-today-protein { --fuel-color: var(--color-portion-protein); }
+.fuel-today-carb { --fuel-color: var(--color-portion-carb); }
+.fuel-today-fat { --fuel-color: var(--color-portion-fat); }
+.fuel-today-snack { --fuel-color: var(--color-portion-snack); }
+
+.fuel-today-row {
+  display: grid;
+  grid-template-columns: var(--fuel-label-width) minmax(0, 1fr) var(--fuel-count-width);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.fuel-today-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.fuel-today-pips {
+  display: flex;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.fuel-today-pip {
+  flex: 1;
+  height: var(--pip-height);
+  border-radius: var(--radius-pip);
+  background-color: var(--color-fill-soft);
+}
+
+.fuel-today-pip-half {
+  flex: 0.5;
+}
+
+.fuel-today-pip-on {
+  background-color: var(--fuel-color);
+}
+
+/* Half of a whole pip marked: filled from the reading direction's start. */
+.fuel-today-pip-part {
+  background: linear-gradient(to var(--fuel-part-side), var(--fuel-color) 50%, var(--color-fill-soft) 50%);
+}
+
+.fuel-today {
+  --fuel-part-side: right;
+}
+
+:root[dir='rtl'] .fuel-today {
+  --fuel-part-side: left;
+}
+
+.fuel-today-count {
+  margin: 0;
+  font-family: var(--font-numeric);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}

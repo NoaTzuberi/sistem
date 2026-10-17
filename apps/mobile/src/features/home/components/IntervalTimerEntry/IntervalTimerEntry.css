@@ -1,0 +1,47 @@
+.interval-timer-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: calc(100% - 2 * var(--home-gutter));
+  height: var(--timer-bar-height);
+  margin: var(--space-4) var(--home-gutter) 0;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-block);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.interval-timer-entry:active {
+  transform: scale(var(--press-scale));
+}
+
+.interval-timer-entry-label {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.interval-timer-entry-last {
+  font-family: var(--font-numeric);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-pink-on-ink);
+}
+
+.interval-timer-entry:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interval-timer-entry:hover {
+    background-color: var(--color-ink-raised);
+  }
+}

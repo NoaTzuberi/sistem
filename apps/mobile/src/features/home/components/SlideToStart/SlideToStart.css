@@ -1,0 +1,132 @@
+/* --slide-x (px, from useSlideToStart) moves the knob toward the reading direction's end. */
+.slide-to-start {
+  --slide-x: 0px;
+  --slide-dir: 1;
+  --slide-inset: calc((var(--slide-height) - var(--slide-knob)) / 2);
+  position: relative;
+  height: var(--slide-height);
+  margin-block-start: var(--space-3);
+  border-radius: var(--radius-round);
+  background-color: var(--surface-slide-track);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+:root[dir='rtl'] .slide-to-start {
+  --slide-dir: -1;
+}
+
+.slide-to-start-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: calc(var(--slide-height) + var(--space-1));
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-stage);
+  pointer-events: none;
+}
+
+.slide-to-start-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.slide-to-start-arrow {
+  display: flex;
+  flex: none;
+  opacity: var(--opacity-muted);
+  animation: slide-to-start-nudge var(--loop-nudge) ease-in-out infinite;
+}
+
+/* The arrow leans toward where the knob goes (its wrapper moves; the icon inside is flipped in RTL). */
+@keyframes slide-to-start-nudge {
+  50% {
+    transform: translateX(calc(var(--space-1) * var(--slide-dir)));
+    opacity: 1;
+  }
+}
+
+.slide-to-start-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--slide-x) + var(--slide-height));
+  border-radius: var(--radius-round);
+  background-color: var(--surface-on-stage);
+}
+
+.slide-to-start-knob {
+  position: absolute;
+  inset-block-start: var(--slide-inset);
+  inset-inline-start: var(--slide-inset);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--slide-knob);
+  height: var(--slide-knob);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-stage);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-knob);
+  transform: translateX(calc(var(--slide-x) * var(--slide-dir)));
+  touch-action: none;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slide-to-start-dragging .slide-to-start-knob {
+  cursor: grabbing;
+}
+
+.slide-to-start-knob:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-on-stage);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Let go early: it springs back. Only transform / width move. */
+.slide-to-start-snapping .slide-to-start-knob {
+  transition: transform var(--transition-snap) var(--ease-spring);
+}
+
+.slide-to-start-snapping .slide-to-start-fill {
+  transition: width var(--transition-snap) var(--ease-spring);
+}
+
+.slide-to-start-done .slide-to-start-knob {
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.slide-to-start-done .slide-to-start-fill {
+  transition: width var(--transition-press) var(--ease-press);
+}
+
+.slide-to-start-spinner {
+  animation: slide-to-start-spin 0.8s linear infinite;
+}
+
+@keyframes slide-to-start-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-to-start-arrow,
+  .slide-to-start-spinner {
+    animation: none;
+  }
+
+  .slide-to-start-snapping .slide-to-start-knob,
+  .slide-to-start-snapping .slide-to-start-fill {
+    transition-duration: 1ms;
+  }
+}

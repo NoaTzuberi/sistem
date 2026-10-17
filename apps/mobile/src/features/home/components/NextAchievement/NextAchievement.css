@@ -1,0 +1,41 @@
+.next-achievement-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.next-achievement-target {
+  min-width: 0;
+  font-family: var(--font-numeric);
+  font-size: var(--text-ach-target);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.next-achievement-target-he {
+  font-family: var(--font-family-home);
+  font-size: var(--text-2xl);
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Large bold Neon Pink (≥ 18px bold) on white. */
+.next-achievement-progress {
+  flex: none;
+  margin-inline-start: auto;
+  font-family: var(--font-numeric);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.next-achievement-hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}

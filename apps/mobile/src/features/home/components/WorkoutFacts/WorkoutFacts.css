@@ -1,0 +1,39 @@
+.workout-facts {
+  display: flex;
+  margin: var(--space-3) 0 0;
+  border-block-start: var(--border-width-thin) solid var(--color-stage-rule);
+}
+
+/* The number on top, its label under it (dt follows dd visually). */
+.workout-facts-item {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+  padding-block-start: var(--space-2);
+}
+
+.workout-facts-item + .workout-facts-item {
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--border-width-thin) solid var(--color-stage-rule);
+}
+
+.workout-facts-value {
+  margin: 0;
+  font-family: var(--font-numeric);
+  font-size: var(--text-fact);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: start;
+  /* dir="ltr" for the digits; the cell still lines up with the page's start. */
+  unicode-bidi: isolate;
+  align-self: flex-start;
+  color: var(--color-on-stage);
+}
+
+.workout-facts-label {
+  font-size: var(--text-2xs);
+  color: var(--color-on-stage-muted);
+}
