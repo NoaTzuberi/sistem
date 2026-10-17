@@ -459,11 +459,22 @@
   --color-pulse-ring-out: color-mix(in srgb, var(--color-primary) 0%, transparent);
   --color-fill-soft-hover: #ece8ee;
   --color-tint-pink-hover: #ffd3e5;
-  /* The kettlebell's contact shadow on the stage (drawn into a canvas, read by JS). */
-  --color-kettlebell-shadow: #46001e;
-  --color-kettlebell-label: #ff2a85;    /* The pink "12 KG" print on the iron */
-  --color-kettlebell-iron: #26232a;     /* Its label band's base (the iron under the print) */
-  --color-kettlebell-grip: #2e2b31;
+  --color-stage-shadow: #46001e;        /* Shadows cast on the pink stage (the slider knob) */
+  /* The Home stage's 3D "object of the day" (read by JS — plain hex only, three.js parses them).
+     Soft-touch palette. The values are the design's look as rendered (its three.js r128 treated these
+     colors as linear), so the app matches docs/design/trainee-home-b.html. */
+  --color-object-matte: #fbfafb;        /* Soft-touch matte white */
+  --color-object-blush: #ffe2ee;
+  --color-object-ink: #716a78;          /* The stopwatch face, the dumbbell grip */
+  --color-object-chrome: #f5f3f6;       /* Satin chrome details */
+  --color-object-accent: #ff71bf;       /* Pink accents */
+  --color-object-shadow: #5a0028;       /* The contact shadow under the object */
+  /* The studio the objects reflect (PMREM) and its lights. */
+  --color-studio-room: #837d89;
+  --color-studio-softbox: #ffffff;
+  --color-studio-bounce: #ff86c4;       /* The pink bounce card below */
+  --color-studio-warm: #ffeee2;         /* The warm card behind */
+  --color-studio-rim: #ffeae1;          /* The warm rim light */
   /* Workout identity colors as fills UNDER white text (a done day): the light ones take their --solid-*. */
   --color-workout-1-solid: var(--solid-pink);
   --color-workout-2-solid: var(--solid-purple);
@@ -661,7 +672,7 @@
     0 16px 36px color-mix(in srgb, var(--color-ink) 35%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-on-primary) 8%, transparent);
   --shadow-dock-active: 0 6px 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
-  --shadow-knob: 0 6px 16px color-mix(in srgb, var(--color-kettlebell-shadow) 30%, transparent);
+  --shadow-knob: 0 6px 16px color-mix(in srgb, var(--color-stage-shadow) 30%, transparent);
   --ring-hairline: 0 0 0 1px var(--color-hairline);
   --ring-on-pink: 0 0 0 2px var(--color-primary);
   --ring-on-card: 0 0 0 2px var(--color-card);
@@ -799,7 +810,7 @@
   --dock-label-max: 96px;
   --app-column-max: 480px;       /* Wider screens: the app column is centered at this width */
   --home-gutter: 20px;           /* Trainee Home's side margin */
-  --kettlebell-height: 250px;
+  --daily-object-height: 210px;   /* The Home stage's 3D object of the day */
   --slide-height: 62px;
   --slide-knob: 52px;
   --lane-height: 92px;

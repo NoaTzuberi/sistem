@@ -1,12 +1,9 @@
 import { type RefObject, useEffect, useState } from 'react';
-import {
-  createKettlebellScene,
-  KETTLEBELL_LABEL_FONT,
-  type KettlebellColors,
-  type KettlebellScene,
-} from '../data/kettlebellScene';
+import type { DailyObjectScene } from '../data/dailyObjectScene';
+import type { DailyObjectId } from '../data/objects/objectOfDay';
+import type { StudioColors } from '../data/objects/studio';
 
-export type KettlebellStatus = 'loading' | 'ready' | 'unavailable';
+export type DailyObjectStatus = 'loading' | 'ready' | 'unavailable';
 
 const MAX_PIXEL_RATIO = 2;
 /** Radians per pixel dragged. */
@@ -26,16 +23,21 @@ function hasWebGl(): boolean {
   }
 }
 
-function readColors(element: HTMLElement): KettlebellColors {
+export function readStudioColors(element: HTMLElement): StudioColors {
   const styles = getComputedStyle(element);
   const token = (name: string) => styles.getPropertyValue(name).trim();
   return {
-    label: token('--color-kettlebell-label'),
-    iron: token('--color-kettlebell-iron'),
-    grip: token('--color-kettlebell-grip'),
-    shadow: token('--color-kettlebell-shadow'),
-    bounce: token('--color-stage'),
-    softbox: token('--color-on-stage'),
+    matte: token('--color-object-matte'),
+    blush: token('--color-object-blush'),
+    ink: token('--color-object-ink'),
+    chrome: token('--color-object-chrome'),
+    accent: token('--color-object-accent'),
+    shadow: token('--color-object-shadow'),
+    room: token('--color-studio-room'),
+    softbox: token('--color-studio-softbox'),
+    bounce: token('--color-studio-bounce'),
+    warm: token('--color-studio-warm'),
+    rim: token('--color-studio-rim'),
   };
 }
 
@@ -56,13 +58,14 @@ function afterFirstPaint(callback: () => void): () => void {
 }
 
 /**
- * The live kettlebell on the Home stage. three.js is imported only after first paint (its own chunk —
- * the scene code itself only imports three's types); until then — and without WebGL — the static render shows. Drag horizontally to turn it (inertia);
- * it floats and sways unless reduced motion is on (then it stays still but still turns by hand). The
- * loop runs only while the stage is on screen and the page is visible; everything is disposed on unmount.
+ * The live object of the day on the Home stage. three.js and the object builders are imported only
+ * after first paint (their own chunk); until then — and without WebGL — the static render shows. Drag
+ * horizontally to turn it (inertia); it floats and sways unless reduced motion is on (then it stays still
+ * but still turns by hand). The loop runs only while the stage is on screen and the page is visible;
+ * everything is disposed on unmount.
  */
-export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null>, labelText: string): KettlebellStatus {
-  const [status, setStatus] = useState<KettlebellStatus>('loading');
+export function useDailyObjectScene(containerRef: RefObject<HTMLDivElement | null>, objectId: DailyObjectId): DailyObjectStatus {
+  const [status, setStatus] = useState<DailyObjectStatus>('loading');
 
   useEffect(() => {
     const container = containerRef.current;
@@ -73,7 +76,7 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
     }
 
     let cancelled = false;
-    let scene: KettlebellScene | null = null;
+    let scene: DailyObjectScene | null = null;
     let frame = 0;
     let isOnScreen = true;
     let isPageVisible = document.visibilityState === 'visible';
@@ -111,7 +114,7 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
       } catch {
         // The pointer is already gone: nothing to capture.
       }
-      container.classList.add('kettlebell-grabbing');
+      container.classList.add('daily-object-grabbing');
       kick();
     };
     const onPointerMove = (event: PointerEvent) => {
@@ -125,7 +128,7 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
     const onPointerEnd = (event: PointerEvent) => {
       if (event.pointerId !== pointerId) return;
       pointerId = null;
-      container.classList.remove('kettlebell-grabbing');
+      container.classList.remove('daily-object-grabbing');
       // Reduced motion: no coasting — it stops where she let go.
       if (!animate) velocity = 0;
       kick();
@@ -149,17 +152,17 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
     });
 
     const cancelStart = afterFirstPaint(() => {
-      void import('three')
-        .then((THREE) => {
+      void Promise.all([import('three'), import('../data/dailyObjectScene')])
+        .then(([THREE, { createDailyObjectScene }]) => {
           if (cancelled) return;
-          scene = createKettlebellScene(THREE, {
+          scene = createDailyObjectScene(THREE, {
             width: Math.max(1, container.clientWidth),
             height: Math.max(1, container.clientHeight),
             pixelRatio: Math.min(MAX_PIXEL_RATIO, window.devicePixelRatio || 1),
-            labelText,
-            colors: readColors(container),
+            objectId,
+            colors: readStudioColors(container),
           });
-          scene.canvas.className = 'kettlebell-canvas';
+          scene.canvas.className = 'daily-object-canvas';
           scene.canvas.setAttribute('aria-hidden', 'true');
           container.prepend(scene.canvas);
           container.addEventListener('pointerdown', onPointerDown);
@@ -172,15 +175,6 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
           resize.observe(container);
           setStatus('ready');
           kick();
-          // The print's face may not be loaded yet: redraw once it is.
-          document.fonts
-            ?.load(KETTLEBELL_LABEL_FONT)
-            .then(() => {
-              if (cancelled || !scene) return;
-              scene.redrawLabel();
-              kick();
-            })
-            .catch(() => undefined);
         })
         .catch(() => {
           if (!cancelled) setStatus('unavailable');
@@ -205,7 +199,7 @@ export function useKettlebellScene(containerRef: RefObject<HTMLDivElement | null
         scene = null;
       }
     };
-  }, [containerRef, labelText]);
+  }, [containerRef, objectId]);
 
   return status;
 }

@@ -14,7 +14,16 @@ export const en: CopyShape<typeof he> = {
   loadError: "Couldn't load your week.",
   dismissStartingPhotoReminder: 'Dismiss starting photo reminder',
   stage: {
-    dragToRotate: 'Drag to rotate',
+    objectToday: 'Today:',
+    objects: {
+      kettlebell: 'Kettlebell',
+      dumbbell: 'Dumbbell',
+      weightPlate: 'Weight plate',
+      medicineBall: 'Medicine ball',
+      jumpRope: 'Jump rope',
+      shakerBottle: 'Shaker bottle',
+      stopwatch: 'Stopwatch',
+    },
     facts: 'Workout details',
     exercises: 'exercises',
     thisWeek: 'this week',
@@ -40,8 +49,6 @@ export const en: CopyShape<typeof he> = {
     title: 'Your numbers',
     workoutsThisWeek: 'Workouts this week',
     weeksInRow: 'Weeks in a row',
-    totalVolume: 'Total volume',
-    tonnes: 't',
   },
   coach: {
     title: 'From your coach',

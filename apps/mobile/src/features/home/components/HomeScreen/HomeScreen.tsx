@@ -6,7 +6,6 @@ import { ROUTES, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { useStartWorkout } from '../../../workouts/hooks/useStartWorkout';
 import { StartConflictModal } from '../../../workouts/components/StartConflictModal/StartConflictModal';
-import { KETTLEBELL_BRAND_WEIGHT } from '../../data/homeDisplay';
 import { useHomeData } from '../../hooks/useHomeData';
 import { homeCopy } from '../../copy';
 import { HomeStage } from '../HomeStage/HomeStage';
@@ -76,7 +75,6 @@ export function HomeScreen() {
         today={data?.today}
         stage={stage}
         weekCount={home.weekCount}
-        kettlebellWeight={home.kettlebellWeight ?? KETTLEBELL_BRAND_WEIGHT}
         activeLog={activeLog}
         onStart={handleStart}
         isStarting={starter.isStarting}
@@ -107,11 +105,7 @@ export function HomeScreen() {
 
       {home.achievements && (
         <section className="home-section">
-          <Scoreboard
-            week={home.weekCount}
-            streak={home.achievements.streak.current}
-            totalVolume={home.achievements.stats.totalVolume}
-          />
+          <Scoreboard week={home.weekCount} streak={home.achievements.streak.current} />
         </section>
       )}
 

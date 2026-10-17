@@ -1,32 +1,32 @@
-/* Full stage width (the stage pads its sides; the bell bleeds through them). */
-.kettlebell {
+/* Full stage width (the stage pads its sides; the object bleeds through them). */
+.daily-object {
   position: relative;
-  height: var(--kettlebell-height);
+  height: var(--daily-object-height);
   margin-block-start: var(--space-1);
   margin-inline: calc(var(--home-gutter) * -1);
-  /* Vertical swipes still scroll the screen; horizontal drags turn the bell. */
+  /* Vertical swipes still scroll the screen; horizontal drags turn the object. */
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   cursor: grab;
 }
 
-.kettlebell.kettlebell-grabbing {
+.daily-object.daily-object-grabbing {
   cursor: grabbing;
 }
 
-.kettlebell:not(.kettlebell-ready) {
+.daily-object:not(.daily-object-ready) {
   cursor: default;
 }
 
-.kettlebell-canvas {
+.daily-object-canvas {
   display: block;
   width: 100%;
   height: 100%;
 }
 
 /* The static render: same framing as the live scene, so the swap is invisible. */
-.kettlebell-fallback {
+.daily-object-fallback {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -35,7 +35,8 @@
   pointer-events: none;
 }
 
-.kettlebell-hint {
+/* "Today: Kettlebell" under the object. */
+.daily-object-label {
   position: absolute;
   inset-block-end: var(--space-1);
   inset-inline-start: var(--home-gutter);
@@ -48,7 +49,11 @@
   pointer-events: none;
 }
 
-/* Only the live bell turns: no hint over the static render. */
-.kettlebell:not(.kettlebell-ready) .kettlebell-hint {
+.daily-object-name {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Only the live object turns: no drag icon over the static render. */
+.daily-object:not(.daily-object-ready) .daily-object-drag-icon {
   display: none;
 }

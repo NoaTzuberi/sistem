@@ -7,7 +7,7 @@ import { workoutCopy } from '../../../workouts/copy';
 import { exerciseCountLabel } from '../../../workouts/data/workoutDisplay';
 import { type StageState, initialsOf, isHebrewText, twoDigits } from '../../data/homeDisplay';
 import { homeCopy } from '../../copy';
-import { Kettlebell3D } from '../Kettlebell3D/Kettlebell3D';
+import { DailyObject3D } from '../DailyObject3D/DailyObject3D';
 import { TodayWorkoutHeadline } from '../TodayWorkoutHeadline/TodayWorkoutHeadline';
 import { type WorkoutFact, WorkoutFacts } from '../WorkoutFacts/WorkoutFacts';
 import { SlideToStart } from '../SlideToStart/SlideToStart';
@@ -19,7 +19,6 @@ interface HomeStageProps {
   today?: string;
   stage: StageState | null;
   weekCount: { done: number; planned: number } | null;
-  kettlebellWeight: number;
   activeLog: ActiveWorkoutRef | null;
   onStart: () => void;
   isStarting: boolean;
@@ -35,9 +34,9 @@ function todayLabel(today: string, language: Language): string {
   return `${weekday} · ${dayMonth}`;
 }
 
-/** The full-bleed pink stage: greeting, the live kettlebell, today's workout and slide-to-start. */
+/** The full-bleed pink stage: greeting, the live object of the day, today's workout and slide-to-start. */
 export function HomeStage(props: HomeStageProps) {
-  const { name, today, stage, weekCount, kettlebellWeight, activeLog, onStart, isStarting, startError, status } = props;
+  const { name, today, stage, weekCount, activeLog, onStart, isStarting, startError, status } = props;
   const copy = useCopy(homeCopy);
   const workoutText = useCopy(workoutCopy);
   const language = useLanguage();
@@ -82,7 +81,7 @@ export function HomeStage(props: HomeStageProps) {
         </div>
       </div>
 
-      <Kettlebell3D weight={kettlebellWeight} />
+      <DailyObject3D />
 
       {status}
       {kicker && <TodayWorkoutHeadline kicker={kicker} title={title} />}

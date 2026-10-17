@@ -10,7 +10,7 @@ import { useMyAchievements } from '../../achievements/hooks/useMyAchievements';
 import { celebrate } from '../../achievements/celebration';
 import { readSavedFreeTimerSettings } from '../../workouts/data/freeTimerSettings';
 import { useStartingPhotoReminder } from './useStartingPhotoReminder';
-import { buildWeekDays, kettlebellWeightOf, pickNextAchievements, stageState, weekCount } from '../data/homeDisplay';
+import { buildWeekDays, pickNextAchievements, stageState, weekCount } from '../data/homeDisplay';
 import { homeCopy } from '../copy';
 
 /** Recent notifications looked at for "the coach's latest update". */
@@ -108,8 +108,6 @@ export function useHomeData() {
       .catch(() => undefined);
   }, []);
 
-  const nextWorkout = stage && (stage.kind === 'workout' || stage.kind === 'rest') ? stage.next?.workout : undefined;
-
   return {
     user,
     week,
@@ -125,6 +123,5 @@ export function useHomeData() {
     planUpdate,
     markUpdateSeen,
     lastInterval,
-    kettlebellWeight: kettlebellWeightOf(stage?.kind === 'workout' ? nextWorkout : undefined),
   };
 }

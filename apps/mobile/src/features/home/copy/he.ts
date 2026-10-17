@@ -13,7 +13,16 @@ export const he = {
   loadError: 'לא הצלחנו לטעון את השבוע שלך.',
   dismissStartingPhotoReminder: 'סגירת התזכורת לתמונת התחלה',
   stage: {
-    dragToRotate: 'גררי לסובב',
+    objectToday: 'היום:',
+    objects: {
+      kettlebell: 'קטלבל',
+      dumbbell: 'משקולת',
+      weightPlate: 'פלטה',
+      medicineBall: 'כדור כוח',
+      jumpRope: 'חבל קפיצה',
+      shakerBottle: 'שייקר',
+      stopwatch: 'סטופר',
+    },
     facts: 'פרטי האימון',
     exercises: 'תרגילים',
     thisWeek: 'השבוע',
@@ -39,8 +48,6 @@ export const he = {
     title: 'המספרים שלך',
     workoutsThisWeek: 'אימונים השבוע',
     weeksInRow: 'שבועות ברצף',
-    totalVolume: 'נפח כולל',
-    tonnes: 'טון',
   },
   coach: {
     title: 'מהמאמנת',

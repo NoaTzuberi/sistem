@@ -1,5 +1,5 @@
 import type { AchievementProgress, TraineePlan, TraineePlanWorkout, TraineeWeek } from '@sistem/types';
-import { addDaysToDate } from '@sistem/shared';
+import { addDaysToDate, isVolumeAchievement } from '@sistem/shared';
 
 // Home (direction B) as plain functions. Every status here is the server's (done / missed / today
 // come from /plans/week in her zone); these only arrange them for the screen.
@@ -11,8 +11,6 @@ const WORKOUT_COLOR_COUNT = 5;
 export const MAX_TICKS = 30;
 /** Close achievements shown as mini chips under the next one. */
 const OTHER_ACHIEVEMENTS = 3;
-/** The kettlebell's print when her plan has no kettlebell weight today (a brand value, not her data). */
-export const KETTLEBELL_BRAND_WEIGHT = 12;
 
 const HEBREW = /[֐-׿]/;
 
@@ -102,21 +100,9 @@ export function twoDigits(value: number): string {
   return String(value).padStart(2, '0');
 }
 
-/**
- * The kettlebell's print: her target weight on a kettlebell exercise of this workout, if there is one.
- * Otherwise null (the caller uses the brand value).
- */
-export function kettlebellWeightOf(workout: TraineePlanWorkout | undefined): number | null {
-  for (const exercise of workout?.exercises ?? []) {
-    if (!exercise.exercise?.equipment.includes('kettlebell')) continue;
-    const weights = exercise.resolvedSets.map((set) => set.targetWeight).filter((weight): weight is number => weight !== undefined && weight > 0);
-    if (weights.length > 0) return Math.max(...weights);
-    if (exercise.targetWeight) return exercise.targetWeight;
-  }
-  return null;
-}
-
+// Home shows no volume (owner decision): lifetime-volume achievements stay on the Achievements screen.
 function isOpenTarget(progress: AchievementProgress): progress is AchievementProgress & { threshold: number } {
+  if (isVolumeAchievement(progress.type)) return false;
   return !progress.repeatable && progress.count === 0 && progress.threshold !== undefined && progress.threshold > 0;
 }
 

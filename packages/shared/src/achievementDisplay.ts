@@ -91,6 +91,11 @@ export function streakWeekFraction(streak: StreakSummary): number {
 
 const VOLUME_TYPES: ReadonlySet<AchievementType> = new Set(['volume_10k', 'volume_50k', 'volume_100k', 'volume_500k', 'volume_1m']);
 
+/** A lifetime-volume (kg) achievement. */
+export function isVolumeAchievement(type: AchievementType): boolean {
+  return VOLUME_TYPES.has(type);
+}
+
 /** '12,400 kg' */
 export function formatVolume(kg: number, language: Language): string {
   return `${formatNumber(Math.round(kg), language)} ${sharedCopy[language].units.kg}`;
