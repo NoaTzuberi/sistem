@@ -1,0 +1,111 @@
+/* A floating ink pill, centered above the home indicator. */
+.app-dock {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: max(var(--dock-offset), var(--safe-bottom));
+  z-index: var(--z-tab-bar);
+  display: flex;
+  gap: var(--space-1);
+  width: fit-content;
+  margin-inline: auto;
+  padding: var(--dock-padding);
+  border-radius: var(--radius-dock);
+  background-color: var(--color-ink);
+  box-shadow: var(--shadow-dock);
+  font-family: var(--font-family-home);
+}
+
+.app-dock-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: var(--dock-item);
+  min-width: var(--dock-item);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-round);
+  color: var(--color-on-ink-faint);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-base) var(--ease-press),
+    color var(--transition-hover) ease,
+    padding var(--transition-dock) var(--ease-spring),
+    gap var(--transition-dock) var(--ease-spring),
+    transform var(--transition-press) var(--ease-press);
+}
+
+.app-dock-icon {
+  position: relative;
+  display: flex;
+  flex: none;
+  transition: transform var(--transition-dock) var(--ease-spring);
+}
+
+/* Collapsed but still read: max-width 0 + opacity, never display: none. */
+.app-dock-label {
+  max-width: 0;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    max-width var(--transition-dock) var(--ease-spring),
+    opacity var(--transition-base) ease;
+}
+
+/* White on Neon Pink: the label is bold 14px (≥ 3:1 for bold 14px+). */
+.app-dock-tab[aria-current='page'] {
+  gap: var(--space-2);
+  padding: 0 calc(var(--space-3) + var(--space-1) / 2);
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-dock-active);
+  color: var(--color-on-primary);
+}
+
+.app-dock-tab[aria-current='page'] .app-dock-label {
+  max-width: var(--dock-label-max);
+  opacity: 1;
+}
+
+.app-dock-tab[aria-current='page'] .app-dock-icon {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.app-dock-tab:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+.app-dock-tab:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* The badges sit on the icon's corner, ringed in ink. */
+.app-dock .tab-update-dot,
+.app-dock .unread-badge {
+  top: var(--space-2);
+  inset-inline-start: calc(50% + var(--space-1));
+  border-color: var(--color-ink);
+}
+
+.app-dock-tab[aria-current='page'] .tab-update-dot {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app-dock-tab:not([aria-current='page']):hover {
+    background-color: var(--surface-on-stage);
+    color: var(--color-on-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-dock-tab,
+  .app-dock-icon,
+  .app-dock-label {
+    transition-duration: 1ms;
+  }
+}

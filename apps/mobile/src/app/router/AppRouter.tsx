@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, type Location } from 'react-router-dom';
 import {
   ROUTES,
   COACH_TRAINEE_PATH,
@@ -39,13 +39,12 @@ import { InboxPage } from '../../features/coach/pages/InboxPage/InboxPage';
 import { TraineesPage } from '../../features/coach/pages/TraineesPage/TraineesPage';
 import { TraineeDetailPage } from '../../features/coach/pages/TraineeDetailPage/TraineeDetailPage';
 import { CoachProfilePage } from '../../features/coach/pages/CoachProfilePage/CoachProfilePage';
+import { ScreenTransition } from '../../components/layout/ScreenTransition/ScreenTransition';
 
-export function AppRouter() {
+/** Every route, for one location: a screen leaving in a tab transition keeps rendering its own. */
+function AppRoutes({ location }: { location: Location }) {
   return (
-    <>
-      {/* One celebration sheet for the whole app (Phase 11) — trainees only. */}
-      <AchievementCelebration />
-      <Routes>
+      <Routes location={location}>
         {/* No homepage: "/" redirects by the server-decided app state (PRD §4.2). */}
         <Route path={ROUTES.HOME} element={<RootRedirect />} />
         <Route path={ROUTES.LOGIN} element={<Login />} />
@@ -94,6 +93,16 @@ export function AppRouter() {
 
         <Route path="*" element={<RootRedirect />} />
       </Routes>
+  );
+}
+
+export function AppRouter() {
+  return (
+    <>
+      {/* One celebration sheet for the whole app (Phase 11) — trainees only. */}
+      <AchievementCelebration />
+      {/* The screens + the one dock; tab changes get the depth transition. */}
+      <ScreenTransition renderScreen={(location) => <AppRoutes location={location} />} />
     </>
   );
 }

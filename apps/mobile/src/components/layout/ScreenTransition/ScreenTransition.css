@@ -1,0 +1,81 @@
+/* --screen-dir: which way "forward" (a higher tab index) moves on screen. The dock reads from the
+   reading direction's start, so it mirrors with the language. */
+.screen-stack {
+  --screen-dir: -1;
+}
+
+:root[dir='rtl'] .screen-stack {
+  --screen-dir: 1;
+}
+
+.screen-stack-back {
+  --screen-turn: -1;
+}
+
+.screen-stack-forward {
+  --screen-turn: 1;
+}
+
+/* During a transition both screens are fixed to the viewport (scrolled inside to where they were)
+   and nothing under them takes taps. perspective() is in the transform rather than on the stack:
+   a perspective on an ancestor would become the containing block of the fixed screens. */
+.screen-enter,
+.screen-exit {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.screen-stack-busy .screen {
+  pointer-events: none;
+}
+
+.screen-exit {
+  z-index: var(--z-raised);
+  animation: screen-out var(--transition-screen-out) var(--ease-exit) both;
+}
+
+.screen-enter {
+  z-index: var(--z-overlay);
+  animation: screen-in var(--transition-screen-in) var(--ease-drawer) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translateX(calc(-30% * var(--screen-dir) * var(--screen-turn)))
+      rotateY(calc(-16deg * var(--screen-dir) * var(--screen-turn))) scale(0.92);
+  }
+}
+
+@keyframes screen-out {
+  to {
+    opacity: 0;
+    filter: brightness(0.92);
+    transform: perspective(1200px) translateX(calc(24% * var(--screen-dir) * var(--screen-turn)))
+      rotateY(calc(12deg * var(--screen-dir) * var(--screen-turn))) scale(0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-enter {
+    animation: screen-fade-in var(--transition-screen-fade) ease both;
+  }
+
+  .screen-exit {
+    animation: screen-fade-out var(--transition-screen-fade) ease both;
+  }
+
+  @keyframes screen-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes screen-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+}
