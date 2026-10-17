@@ -98,3 +98,19 @@ export function describeInterval(exercise: Pick<PlanExercise, 'interval' | 'reso
     fill(copy.workRest, { work: formatDuration(first.durationSec ?? 0, language), rest: formatDuration(first.restSec ?? 0, language) }),
   ].join(' · ');
 }
+
+/**
+ * The short target of one exercise for a list ('3 × 10', '3 × 45 שנ׳'): its working sets when they
+ * all ask for the same thing (warm-ups / drops left out), otherwise just the set count ('5 sets').
+ */
+export function describeSetsShort(sets: ResolvedPlanSet[], language: Language): string {
+  const working = sets.filter((set) => set.type === 'working');
+  const base = working.length > 0 ? working : sets;
+  const first = base[0];
+  if (first && base.every((set) => isSameAmount(set, first))) return timesAmount(base.length, formatAmount(first, language));
+  return formatPlural(language, sharedCopy[language].plan.setCount, sets.length);
+}
+
+function isSameAmount(a: PlanSetTarget, b: PlanSetTarget): boolean {
+  return a.reps === b.reps && a.repsMax === b.repsMax && a.durationSec === b.durationSec;
+}

@@ -62,6 +62,7 @@ export const he = {
     interval: 'אינטרוולים',
     rounds: plural({ one: 'סבב אחד', two: 'שני סבבים', other: '{count} סבבים' }),
     workRest: '{work} עבודה / {rest} מנוחה',
+    setCount: plural({ one: 'סט אחד', two: '2 סטים', other: '{count} סטים' }),
   },
   log: {
     reps: '{reps} חזרות',

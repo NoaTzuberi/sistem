@@ -59,6 +59,7 @@ export const en: CopyShape<typeof he> = {
     interval: 'Interval',
     rounds: plural({ one: '{count} round', other: '{count} rounds' }),
     workRest: '{work} work / {rest} rest',
+    setCount: plural({ one: '{count} set', other: '{count} sets' }),
   },
   log: {
     reps: '{reps} reps',

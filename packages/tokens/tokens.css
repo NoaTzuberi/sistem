@@ -482,6 +482,22 @@
   --color-workout-4-solid: var(--solid-blue);
   --color-workout-5-solid: var(--color-workout-5);
 
+  /* Trainee Workouts (docs/design/trainee-workouts.html), same "training OS" language as Home B. */
+  --surface-header-frost: color-mix(in srgb, var(--color-card) 88%, transparent);   /* The sticky large title */
+  --blur-header: blur(20px) saturate(180%);
+  --color-sheet-scrim: color-mix(in srgb, var(--color-ink) 35%, transparent);        /* Behind a bottom sheet */
+  --color-sheet-handle: #d8d3db;                                                     /* A bottom sheet's grab pill */
+  --color-on-ink-rule: color-mix(in srgb, var(--color-on-primary) 12%, transparent);  /* Hairlines / a round button on ink */
+  --color-on-ink-rule-hover: color-mix(in srgb, var(--color-on-primary) 20%, transparent);
+  --color-on-ink-muted: color-mix(in srgb, var(--color-on-primary) 72%, transparent); /* Captions on the up-next card */
+  --color-ink-grid: color-mix(in srgb, var(--color-on-primary) 12%, transparent);     /* Its faint vertical grid */
+  --color-rating-on: #ff9f0a;           /* A filled rating dot (not text) */
+  --color-rating-off: #e2dee5;
+  --shadow-sheet: 0 -20px 50px color-mix(in srgb, var(--color-ink) 25%, transparent);
+  --shadow-segment: 0 3px 8px color-mix(in srgb, var(--color-ink) 8%, transparent), 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  --shadow-day-selected: 0 6px 14px color-mix(in srgb, var(--workout-color, var(--color-ink)) 40%, transparent);
+  --blur-glow: blur(60px);              /* The workout-color glow on the up-next card */
+
   /* Third-party button colors fixed by the provider's guidelines (social sign-in, Phase 5c). */
   --color-apple-button: #000000;
 
@@ -533,6 +549,15 @@
   --text-ach-target: 34px;        /* The next achievement's target */
   --text-lane-date: 22px;         /* A day's date in its lane; the selected day's workout name */
   --text-score-sup: 18px;         /* "/4" next to a scoreboard number */
+  /* Trainee Workouts — Barlow Condensed sizes. */
+  --text-workouts-title: 34px;    /* The sticky large title (Rubik) */
+  --text-up-next: 54px;           /* The next workout's name on the up-next card */
+  --text-ticket: 24px;            /* A workout ticket's name */
+  --text-ticket-letter: 120px;    /* The faint letter behind a ticket */
+  --text-preview-title: 40px;     /* The preview sheet's header */
+  --text-history-stat: 40px;      /* A history summary number */
+  --text-log-name: 22px;          /* A log row's workout name */
+  --text-week-label: 26px;        /* "This week" next to the pips */
   --line-height-numeric: 0.9;     /* Condensed display numbers sit tight */
 
   --font-weight-light: 300;      /* The dashboard's large numbers */
@@ -593,6 +618,12 @@
   --radius-lane: 14px;          /* … a day column of the week track */
   --radius-dock: 34px;          /* … the floating ink dock */
   --radius-pip: 4px;            /* … a portion pip, a tick */
+  --radius-up-next: 30px;       /* Trainee Workouts: the up-next card */
+  --radius-ticket: 22px;        /* … a workout ticket */
+  --radius-entry: 24px;         /* … the free-workout card, the preview header */
+  --radius-sheet: 32px;         /* A bottom sheet's top corners */
+  --radius-calendar-day: 12px;  /* A calendar day */
+  --radius-option-icon: 15px;   /* An option's icon tile in a sheet */
   --cut-size: 12px;
   /* One corner cut at the top-end (the card / tile pattern). */
   --cut-corner: polygon(0 0, calc(100% - var(--cut-size)) 0, 100% var(--cut-size), 100% 100%, 0 100%);
@@ -822,6 +853,20 @@
   --fuel-count-width: 40px;
   --ring-mini: 28px;             /* A close achievement's conic ring … */
   --ring-mini-hole: 20px;        /* … and its hole */
+  /* Trainee Workouts. */
+  --ticket-width: 148px;
+  --ticket-height: 170px;
+  --week-pip-width: 22px;
+  --week-pip-height: 8px;
+  --up-next-glow: 220px;
+  --up-next-grid-step: 40px;
+  --cta-height: 54px;            /* The pink start button */
+  --log-bar-width: 6px;          /* A log row's color bar */
+  --log-bar-height: 40px;
+  --rating-dot: 5px;
+  --sheet-max-height: 86dvh;
+  --sheet-handle-width: 40px;
+  --sheet-handle-height: 5px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
