@@ -1,0 +1,59 @@
+Fix: CORS for http://127.0.0.1 in development
+==============================================
+
+Summary
+-------
+Opening the trainee app at http://127.0.0.1:5173 failed the API preflight ("No
+Access-Control-Allow-Origin header"). CLIENT_ORIGINS is not set in the local apps/server/.env, so the
+development default applied, and it listed only http://localhost:5173 / :5174. The browser sends the
+host name from the address bar, so 127.0.0.1 is a different origin. The development default now
+lists both host names for both apps (5173 mobile, 5174 dashboard).
+Not changed: `cors()` is already registered before every /api router, so OPTIONS preflights are
+handled everywhere. No `credentials` (auth is a Bearer header; no client uses withCredentials).
+'*' is still never accepted. Production stays strict: render.yaml sets CLIENT_ORIGINS to the
+GitHub Pages origin, and an empty list in production allows no website.
+Vite host (optional step 4) left as is: the mobile app needs `host: true` for `npm run dev:phone`,
+and both host names now work anyway.
+
+Files changed
+-------------
+Modified:
+- apps/server/src/config/clientOrigins.ts — DEV_CLIENT_ORIGINS = localhost + 127.0.0.1 × 5173, 5174
+- apps/server/src/config/__tests__/clientOrigins.test.ts — checks the 127.0.0.1 defaults
+- apps/server/.env.example — CLIENT_ORIGINS left empty by default, comment explains the defaults
+Added:
+- docs/phase-reports/fix-cors-127-0-0-1.txt
+
+Dependencies
+------------
+None.
+
+How to test
+-----------
+- npm test (or: npx vitest run src/config --root apps/server)
+- With the server running (npm run dev):
+  curl -si -X OPTIONS http://localhost:5002/api/auth/login -H "Origin: http://127.0.0.1:5173" \
+    -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type,authorization"
+  → 204 with Access-Control-Allow-Origin: http://127.0.0.1:5173 (same for localhost:5173, :5174).
+  An unknown origin gets no Access-Control-Allow-Origin header.
+- Log in from http://127.0.0.1:5173 and http://localhost:5173 (seed: trainee1@sistem.dev).
+  Checked with curl: POST /api/auth/login → 200 with the matching allow-origin header for both.
+
+Known issues / TODOs
+--------------------
+- If CLIENT_ORIGINS is ever set in a local .env, it REPLACES the defaults: list every origin you open.
+
+Suggested commits
+-----------------
+1. fix(server): allow 127.0.0.1 dev origins in CORS
+   - apps/server/src/config/clientOrigins.ts
+   - apps/server/src/config/__tests__/clientOrigins.test.ts
+   - apps/server/.env.example
+2. docs: CORS 127.0.0.1 fix note
+   - docs/phase-reports/fix-cors-127-0-0-1.txt
+
+git add -A -- apps/server/src/config/clientOrigins.ts apps/server/src/config/__tests__/clientOrigins.test.ts apps/server/.env.example
+git commit -m "fix(server): allow 127.0.0.1 dev origins in CORS"
+
+git add -A -- docs/phase-reports/fix-cors-127-0-0-1.txt
+git commit -m "docs: CORS 127.0.0.1 fix note"
