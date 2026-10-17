@@ -1,4 +1,6 @@
 @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800&f[]=satoshi@400,500,600,700&display=swap');
+/* Trainee Home (direction B): scoreboard numerals + Hebrew (tokens --font-numeric / --font-family-home). */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Rubik:wght@400;500;600;700&display=swap');
 
 /* Depends on @sistem/tokens (imported first in main.tsx). */
 

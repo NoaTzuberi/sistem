@@ -439,6 +439,38 @@
   --disabled-bg: var(--tint-pink);
   --disabled-ink: var(--ink-pink);
 
+  /* Trainee Home, direction B ("training OS", docs/design/trainee-home-b.html): white screen, ink type,
+     one hot-pink stage, the ink dock. Light only by design. */
+  --color-ink: #141116;                 /* The dock, today's lane, the timer bar, the coach avatar */
+  --color-ink-raised: #2a2530;          /* … under a fine pointer */
+  --color-on-ink: var(--color-on-primary);
+  --color-on-ink-faint: color-mix(in srgb, var(--color-on-primary) 55%, transparent);  /* an inactive dock icon */
+  --color-pink-on-ink: #ff8fc0;         /* Pink numbers on ink (the timer's last interval) — 7.9:1 */
+  --color-stage: var(--color-primary);  /* The full-bleed pink stage at the top of Home */
+  --color-on-stage: var(--color-on-primary);
+  --color-on-stage-muted: color-mix(in srgb, var(--color-on-primary) 85%, transparent);
+  --color-stage-rule: color-mix(in srgb, var(--color-on-primary) 30%, transparent);     /* hairlines on the stage */
+  --color-stage-grid: color-mix(in srgb, var(--color-on-primary) 16%, transparent);     /* the faint grid lines */
+  --surface-on-stage: color-mix(in srgb, var(--color-on-primary) 18%, transparent);     /* the bell, the slider fill */
+  --surface-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 28%, transparent);
+  --surface-slide-track: color-mix(in srgb, var(--color-ink) 22%, transparent);         /* the slide-to-start track */
+  --color-lane-line: color-mix(in srgb, var(--color-ink) 5%, transparent);              /* lane lines in a week column */
+  --color-pulse-ring: color-mix(in srgb, var(--color-primary) 30%, transparent);        /* today's pulsing dot */
+  --color-pulse-ring-out: color-mix(in srgb, var(--color-primary) 0%, transparent);
+  --color-fill-soft-hover: #ece8ee;
+  --color-tint-pink-hover: #ffd3e5;
+  /* The kettlebell's contact shadow on the stage (drawn into a canvas, read by JS). */
+  --color-kettlebell-shadow: #46001e;
+  --color-kettlebell-label: #ff2a85;    /* The pink "12 KG" print on the iron */
+  --color-kettlebell-iron: #26232a;     /* Its label band's base (the iron under the print) */
+  --color-kettlebell-grip: #2e2b31;
+  /* Workout identity colors as fills UNDER white text (a done day): the light ones take their --solid-*. */
+  --color-workout-1-solid: var(--solid-pink);
+  --color-workout-2-solid: var(--solid-purple);
+  --color-workout-3-solid: var(--solid-orange);
+  --color-workout-4-solid: var(--solid-blue);
+  --color-workout-5-solid: var(--color-workout-5);
+
   /* Third-party button colors fixed by the provider's guidelines (social sign-in, Phase 5c). */
   --color-apple-button: #000000;
 
@@ -454,9 +486,17 @@
   /* Small technical labels (the onboarding "Q.01"). System monospace — no font file. */
   --font-family-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
+  /* Trainee Home (direction B): scoreboard numerals and Latin workout names in Barlow Condensed
+     (italic 700 / 800, tabular), Hebrew in Rubik. Loaded from Google Fonts in globals.css. Hebrew
+     glyphs fall back from Barlow to Rubik on their own. */
+  --font-numeric: "Barlow Condensed", "Rubik", system-ui, sans-serif;
+  --font-home-he: "Rubik", var(--font-body-he);
+  --font-home-en: "Rubik", var(--font-body-en);
+
   /* Hebrew is the default (also before <html lang> is set). */
   --font-family-display: var(--font-heading-he);
   --font-family-body: var(--font-body-he);
+  --font-family-home: var(--font-home-he);
 
   /* ═══ 3. Type scale — mobile-first. Inputs stay >= 16px (no zoom on focus). ═════ */
   --text-xs: 12px;
@@ -475,12 +515,21 @@
   --text-panel-title: 24px;       /* The notifications panel's title */
   --text-profile-name: 36px;      /* A trainee's name on her profile header */
   --text-hero-title: 30px;        /* The selected workout's title on its hero band (plan builder) */
+  /* Trainee Home (direction B) — Barlow Condensed sizes. */
+  --text-home-title: 64px;        /* Today's workout name on the stage */
+  --text-score: 44px;             /* A scoreboard number */
+  --text-fact: 30px;              /* A fact on the stage (exercises, this week) */
+  --text-ach-target: 34px;        /* The next achievement's target */
+  --text-lane-date: 22px;         /* A day's date in its lane; the selected day's workout name */
+  --text-score-sup: 18px;         /* "/4" next to a scoreboard number */
+  --line-height-numeric: 0.9;     /* Condensed display numbers sit tight */
 
   --font-weight-light: 300;      /* The dashboard's large numbers */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+  --font-weight-extrabold: 800;  /* Barlow Condensed italic display (Trainee Home) */
 
   --line-height-tight: 1.15;
   --line-height-snug: 1.35;      /* A question on the onboarding card */
@@ -529,6 +578,10 @@
   --radius-qv-tile: 20px;       /* Its fact tiles, notes and grouped list */
   --radius-qv-icon: 9px;        /* A small colored icon square */     /* The glass tooltip on a chart */
   --radius-field: 12px;         /* A field of an open exercise row, a menu item */
+  --radius-stage: 40px;         /* Trainee Home: the pink stage's bottom corners */
+  --radius-lane: 14px;          /* … a day column of the week track */
+  --radius-dock: 34px;          /* … the floating ink dock */
+  --radius-pip: 4px;            /* … a portion pip, a tick */
   --cut-size: 12px;
   /* One corner cut at the top-end (the card / tile pattern). */
   --cut-corner: polygon(0 0, calc(100% - var(--cut-size)) 0, 100% var(--cut-size), 100% 100%, 0 100%);
@@ -603,6 +656,17 @@
   --shadow-qv-lift: 0 12px 26px color-mix(in srgb, var(--color-text) 8%, transparent);  /* a quick-view fact tile under the pointer */
   --shadow-qv-late: 0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent);  /* the late spotlight's pink hairline */
   --shadow-menu: 0 20px 50px color-mix(in srgb, var(--color-text) 16%, transparent);    /* a small menu under its button */
+  /* Trainee Home (direction B). */
+  --shadow-dock:
+    0 16px 36px color-mix(in srgb, var(--color-ink) 35%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-on-primary) 8%, transparent);
+  --shadow-dock-active: 0 6px 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --shadow-knob: 0 6px 16px color-mix(in srgb, var(--color-kettlebell-shadow) 30%, transparent);
+  --ring-hairline: 0 0 0 1px var(--color-hairline);
+  --ring-on-pink: 0 0 0 2px var(--color-primary);
+  --ring-on-card: 0 0 0 2px var(--color-card);
+  --ring-pulse: 0 0 0 4px var(--color-pulse-ring);
+  --ring-pulse-out: 0 0 0 7px var(--color-pulse-ring-out);
   --ring-panel: 0 0 0 2px var(--color-card);            /* The notification dot on its round button */
   --ring-center: 0 0 0 1.5px var(--color-primary);      /* The centered wheel item */
   --ring-field: 0 0 0 1.5px var(--color-primary);       /* A focused field / a selected card in a sheet */
@@ -670,6 +734,20 @@
   --intro-xp: 900ms;               /* The achievements XP bar growing, once */
   --intro-meter: 900ms;            /* A tile's meter growing */   /* An exercise card's chevron turning as it opens */
   --loop-slow: 2s;               /* Repeating hints (scroll bounce) */
+  /* Trainee Home (direction B) and the tab screens' depth transition. */
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);   /* The dock pill opening, the slider snapping back */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);            /* A screen leaving */
+  --transition-screen-in: 440ms;
+  --transition-screen-out: 300ms;
+  --transition-screen-fade: 160ms;                    /* Reduced motion: opacity only */
+  --transition-dock: 420ms;
+  --transition-snap: 380ms;
+  --transition-lane: 200ms;
+  --press-scale: 0.97;
+  --press-scale-strong: 0.96;
+  --loop-pulse: 1.8s;            /* Today's dot */
+  --loop-nudge: 1.6s;            /* The slider's arrow */
+  --loop-tick: 1.4s;             /* The next achievement tick */
 
   /* ═══ 8. Opacity ══════════════════════════════════════════════════════════════ */
   --opacity-disabled: 0.5;
@@ -713,6 +791,26 @@
   --sidebar-width-sheet: 272px;
   --drawer-width: 460px;
   --tab-bar-height: 64px;
+  /* The floating ink dock (replaces the tab bar): 54px items + 6px padding, above the home indicator. */
+  --dock-item: 54px;
+  --dock-padding: 6px;
+  --dock-height: calc(var(--dock-item) + 2 * var(--dock-padding));
+  --dock-offset: 14px;
+  --dock-label-max: 96px;
+  --app-column-max: 480px;       /* Wider screens: the app column is centered at this width */
+  --home-gutter: 20px;           /* Trainee Home's side margin */
+  --kettlebell-height: 250px;
+  --slide-height: 62px;
+  --slide-knob: 52px;
+  --lane-height: 92px;
+  --timer-bar-height: 60px;
+  --tick-height: 26px;           /* A tick of the next achievement */
+  --tick-gap: 3px;
+  --pip-height: 12px;            /* A portion pip (Nutrition today) */
+  --fuel-label-width: 60px;
+  --fuel-count-width: 40px;
+  --ring-mini: 28px;             /* A close achievement's conic ring … */
+  --ring-mini-hole: 20px;        /* … and its hole */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -726,6 +824,7 @@
 :root:lang(en) {
   --font-family-display: var(--font-heading-en);
   --font-family-body: var(--font-body-en);
+  --font-family-home: var(--font-home-en);
 }
 
 /* Right-to-left: the same shapes, mirrored (polygons have no logical form). */
