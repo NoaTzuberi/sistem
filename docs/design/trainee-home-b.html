@@ -1,14 +1,14 @@
 <title>Sistem Trainee Home</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Rubik:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: "training OS". White screen, ink type, one hot-pink stage with a live 3D kettlebell (the brand mark). Scoreboard numerals in condensed italic, hairline rules instead of cards, slide-to-start. Light-only by design. */
+/* Layout: "training OS ". White screen, ink type, one hot-pink stage with a live 3D kettlebell (the brand mark). Scoreboard numerals in condensed italic, hairline rules instead of cards, slide-to-start. Light-only by design. */
 :root {
   --bg: #FFFFFF; --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6;
   --pink: #FF006E; --pink2: #FF4E9A; --cherry: #A50047; --blush: #FFE3EF;
   --w1: #FF006E; --w2: #7C4DFF; --w3: #FF7A00; --w4: #0094FF;
-  --num: 'Barlow Condensed', 'Rubik', sans-serif; --font: 'Rubik', 'Heebo', system-ui, sans-serif;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', 'Heebo', system-ui, sans-serif;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.42,.64,1);
   color-scheme: light;
 }
@@ -68,7 +68,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .sh button { border: 0; background: none; padding: 0; font-size: 13px; font-weight: 600; color: var(--pink); }
 .photo { display: flex; align-items: center; gap: 12px; margin: 16px 20px 0; padding: 12px 14px; border-radius: 18px; background: var(--soft); }
 .photo .pi { width: 36px; height: 36px; border-radius: 12px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
-.photo div { flex: 1; min-width: 0; } .photo b { display: block; font-size: 13px; font-weight: 600; } .photo span { font-size: 12px; color: var(--muted); }
+.photo div { flex: 1; min-width: 0; } .photo b { display: block; font-family: var(--he); font-size: 22px; font-weight: 700; line-height: 1; } .photo span { font-size: 12px; color: var(--muted); }
 .photo .go { height: 32px; padding: 0 12px; border: 0; border-radius: 16px; background: #fff; font-size: 12px; font-weight: 700; box-shadow: 0 0 0 1px var(--rule); }
 .photo .x { width: 28px; height: 28px; border: 0; border-radius: 50%; background: none; color: var(--faint); display: flex; align-items: center; justify-content: center; }
 
@@ -111,6 +111,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cm { flex: 1; min-width: 0; }
 .cm-h { display: flex; gap: 6px; align-items: baseline; font-size: 13px; } .cm-h b { font-weight: 600; } .cm-h time { margin-inline-start: auto; font-size: 11px; color: var(--faint); }
 .cm p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+.cm-h b { font-family: var(--he); font-size: 22px !important; line-height: 1; }
 .chip-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .chip { height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: var(--soft); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: background-color 150ms ease, transform 140ms var(--ease-out); }
 .chip.pk { background: var(--blush); color: var(--cherry); }
@@ -118,7 +119,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* next achievement */
 .ach-h { display: flex; align-items: baseline; gap: 8px; }
-.ach-h b { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 34px; text-transform: uppercase; line-height: 1; }
+.ach-h b { font-family: var(--he); font-weight: 700; font-size: 48px; line-height: 0.85; }
+.ach-h b .d { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 42px; margin-inline-end: 6px; }
 .ach-h span { margin-inline-start: auto; font-family: var(--num); font-weight: 700; font-size: 22px; color: var(--pink); }
 .ticks { display: grid; grid-template-columns: repeat(25, minmax(0, 1fr)); gap: 3px; margin-top: 10px; direction: rtl; }
 .ticks i { height: 26px; border-radius: 3px; background: var(--soft); transform-origin: bottom; }
@@ -135,11 +137,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* fuel */
 .fuel { display: flex; flex-direction: column; gap: 10px; }
+.fr > span:first-child { font-family: var(--he); font-size: 20px; font-weight: 700; }
 .fr { display: grid; grid-template-columns: 60px minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: 13px; font-weight: 500; }
 .segs { display: flex; gap: 4px; } .segs i { flex: 1; height: 12px; border-radius: 4px; background: var(--soft); } .segs i.on { background: var(--c); }
 .fr b { font-family: var(--num); font-weight: 700; font-size: 18px; text-align: left; }
 .timer { display: flex; align-items: center; gap: 12px; width: calc(100% - 40px); margin: 22px 20px 0; height: 60px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--ink); color: #fff; text-align: start; transition: transform 160ms var(--ease-out); }
-.timer b { flex: 1; font-size: 15px; font-weight: 600; } .timer span { font-family: var(--num); font-weight: 700; font-size: 24px; color: #FF8FC0; }
+.timer b { flex: 1; font-family: var(--he); font-size: 26px; font-weight: 700; line-height: 1; } .timer span { font-family: var(--num); font-weight: 700; font-size: 24px; color: #FF8FC0; }
 .timer:active { transform: scale(0.98); }
 
 /* other views */
@@ -186,6 +189,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .slide .lbl em, .ticks i.nx, .lane.today .col::before { animation: none; }
   .dk, .dk .l, .dk svg { transition-duration: 1ms; }
 }
+
+/* Hebrew display system: Karantina for Hebrew headlines, Barlow for numbers/Latin, mono Latin eyebrows */
+.he { font-family: var(--he); font-weight: 700; letter-spacing: 0; line-height: 0.86; }
+.eyb { display: inline-flex; align-items: baseline; gap: 8px; }
+.eyb code { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.sh h2 { font-size: 13px !important; font-weight: 600 !important; letter-spacing: 0 !important; color: var(--ink2) !important; }
 :focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
 </style>
 
@@ -194,17 +203,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
   <div class="views" id="views">
     <main class="view" data-v="0">
       <section class="top">
-        <div class="bar"><div class="me"><span class="av">מכ</span><div><b>בוקר טוב, מאיה</b><small>יום ה׳ · 15 באוקטובר</small></div></div>
+        <div class="bar"><div class="me"><span class="av">מכ</span><div><b class="he" style="font-size:30px;font-weight:700;display:block">בוקר טוב, מאיה</b><small><span style="font-family:var(--mono);font-size:10px;letter-spacing:1px" aria-hidden="true">THU 15.10</span> · יום ה׳</small></div></div>
           <button class="bell" type="button" aria-label="התראות, 2 חדשות"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i></i></button></div>
         <div class="kb" id="kb"><div class="fb" id="fb"><span></span></div><span class="hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span>היום: <b id="objName">קטלבל</b></span></span><div class="odots" id="objDots" aria-label="אובייקט היום"></div></div>
-        <div class="today"><div><small>האימון של היום · שבוע 6</small><h1>Full Body C</h1></div></div>
+        <div class="today"><div><small><span style="font-family:var(--mono);font-size:10px;letter-spacing:1.2px;opacity:.8" aria-hidden="true">TODAY · WK06</span> &nbsp;האימון של היום</small><h1>Full Body C</h1></div></div>
         <div class="facts"><div><b class="n">05</b><span>תרגילים</span></div><div><b class="n">45′</b><span>דקות בערך</span></div><div><b class="n">3/4</b><span>השבוע</span></div></div>
         <div class="slide" id="slide"><span class="fill"></span><span class="lbl" id="slbl">החליקי להתחלת אימון<em>←</em></span><button class="knob" type="button" id="knob" aria-label="התחלת אימון"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></button></div>
       </section>
 
       <div class="photo" id="photo"><span class="pi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span><div><b>תמונת התחלה</b><span>כדי לראות את השינוי שלך</span></div><button class="go" type="button">צילום</button><button class="x" type="button" aria-label="לא עכשיו" id="px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
 
-      <section class="sec"><div class="sh"><h2>השבוע · 11–17 באוק׳</h2><button type="button">התוכנית</button></div>
+      <section class="sec"><div class="sh"><h2 class="eyb"><code aria-hidden="true">WEEK 06</code>השבוע · 11–17 באוק׳</h2><button type="button">התוכנית</button></div>
         <div class="track" id="track" role="tablist" aria-label="ימי השבוע"></div><div id="dline"></div></section>
 
       <section class="sec"><div class="score">
@@ -214,17 +223,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
       <button class="timer" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><b>טיימר אינטרוולים</b><span class="n">00:40</span></button>
 
-      <section class="sec"><div class="sh"><h2>מהמאמנת</h2></div>
+      <section class="sec"><div class="sh"><h2 class="eyb"><code aria-hidden="true">COACH</code>מהמאמנת</h2></div>
         <div class="coach"><span class="cav">שק</span><div class="cm"><div class="cm-h"><b>שקד</b><time>לפני שעה</time></div>
           <p>כל הכבוד על השבוע! העליתי קצת משקל בסקוואט. אם הברך מציקה, תורידי ותכתבי לי.</p>
           <div class="chip-row"><button class="chip pk" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg>שבוע 7 מוכן</button><button class="chip" type="button">👍 תודה!</button><button class="chip" type="button">תשובה</button></div></div></div></section>
 
-      <section class="sec"><div class="sh"><h2>ההישג הבא</h2><button type="button">כל ההישגים</button></div>
-        <div class="ach-h"><b class="n" dir="ltr">25 Workouts</b><span class="n" dir="ltr">21/25</span></div>
+      <section class="sec"><div class="sh"><h2 class="eyb"><code aria-hidden="true">NEXT GOAL</code>ההישג הבא</h2><button type="button">כל ההישגים</button></div>
+        <div class="ach-h"><b class="he"><span class="n d">25</span>אימונים</b><span class="n" dir="ltr">21/25</span></div>
         <div class="ticks" id="ticks"></div><div class="ach-s">עוד 4 אימונים. האימון של היום מקרב אותך לאחד.</div>
         <div class="others"><button class="ob" type="button" style="--c:var(--w3);--p:75"><i></i>רצף 4 שבועות · 3/4</button><button class="ob" type="button" style="--c:var(--w2);--p:75"><i></i>שבוע מושלם · 3/4</button></div></section>
 
-      <section class="sec"><div class="sh"><h2>תזונה היום</h2><button type="button">סימון ארוחה</button></div>
+      <section class="sec"><div class="sh"><h2 class="eyb"><code aria-hidden="true">FUEL</code>תזונה היום</h2><button type="button">סימון ארוחה</button></div>
         <div class="fuel" id="fuel"></div></section>
     </main>
     <main class="view" data-v="1" hidden><div class="vh"><small>שבוע 6 · 4 אימונים</small><h1 class="he">אימונים</h1></div><div class="ghost" style="--c:var(--w2)"><i></i><i></i><i></i><p>המסך הזה בסבב הבא. כאן רואים את המעבר בין הדפים.</p></div></main>
@@ -365,18 +374,18 @@ button { font: inherit; color: inherit; cursor: pointer; }
     var sh = document.createElement('canvas'); sh.width = sh.height = 256; var sx2 = sh.getContext('2d'), gr = sx2.createRadialGradient(128, 128, 0, 128, 128, 128);
     gr.addColorStop(0, 'rgba(90,0,40,0.4)'); gr.addColorStop(0.5, 'rgba(90,0,40,0.16)'); gr.addColorStop(1, 'rgba(90,0,40,0)'); sx2.fillStyle = gr; sx2.fillRect(0, 0, 256, 256);
     var shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sh), transparent: true, depthWrite: false })); shadow.rotation.x = -Math.PI / 2; shadow.position.y = -1.25; sc.add(shadow);
-    var cur = null, swap = 1, idx = new Date().getDay();
+    var curObj = null, swap = 1, idx = new Date().getDay();
     function show(type) {
       var next = B[type](); var wrap = new THREE.Group(); wrap.add(next);
-      if (cur) { var old = cur; old.userData.out = 1; }
-      wrap.userData.in = 0; holder.add(wrap); cur = wrap; swap = 0;
+      if (curObj) { var old = curObj; old.userData.out = 1; }
+      wrap.userData.in = 0; holder.add(wrap); curObj = wrap; swap = 0;
       document.getElementById('objName').textContent = NAMES[type];
       document.querySelectorAll('.od').forEach(function (d) { d.setAttribute('aria-pressed', d.dataset.o === type); });
     }
     var dots = document.getElementById('objDots');
     dots.innerHTML = ORDER.map(function (k) { return '<button type="button" class="od" data-o="' + k + '" aria-label="' + NAMES[k] + '"></button>'; }).join('');
-    dots.addEventListener('click', function (e) { var b = e.target.closest('[data-o]'); if (b && cur && b.dataset.o !== cur.userData.t) { show(b.dataset.o); cur.userData.t = b.dataset.o; } });
-    var first = ORDER[idx]; show(first); cur.userData.t = first;
+    dots.addEventListener('click', function (e) { var b = e.target.closest('[data-o]'); if (b && curObj && b.dataset.o !== curObj.userData.t) { show(b.dataset.o); curObj.userData.t = b.dataset.o; } });
+    var first = ORDER[idx]; show(first); curObj.userData.t = first;
 
     var base0 = 0.4, vy = 0, dragX = null, last = 0, t0 = performance.now();
     box.addEventListener('pointerdown', function (e) { if (e.target.closest('.od')) return; dragX = e.clientX; last = e.clientX; box.setPointerCapture(e.pointerId); box.style.cursor = 'grabbing'; });
