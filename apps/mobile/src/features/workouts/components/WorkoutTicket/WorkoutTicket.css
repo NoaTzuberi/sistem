@@ -28,7 +28,7 @@
   inset-block-end: -18px;
   inset-inline-start: -4px;
   z-index: -1;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-ticket-letter);
   font-style: italic;
   font-weight: var(--font-weight-extrabold);

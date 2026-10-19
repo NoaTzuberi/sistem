@@ -21,7 +21,7 @@ export function FuelToday({ day }: FuelTodayProps) {
     <dl className="fuel-today">
       {GROUPS.filter((group) => day.planned[group] > 0).map((group) => (
         <div key={group} className={`fuel-today-row fuel-today-${group}`}>
-          <dt className="fuel-today-label">{groups[group]}</dt>
+          <dt className="fuel-today-label display-title">{groups[group]}</dt>
           <dd className="fuel-today-pips" aria-hidden="true">
             {circlesFor(day.planned[group], day.eaten[group]).map((pip, index) => (
               <span

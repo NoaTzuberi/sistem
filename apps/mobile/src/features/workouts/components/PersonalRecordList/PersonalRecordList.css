@@ -6,8 +6,7 @@
 
 .personal-record-list-title {
   margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-xs);
 }
 
 .personal-record-list-items {

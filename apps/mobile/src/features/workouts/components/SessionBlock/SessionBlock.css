@@ -46,7 +46,7 @@
   border-top: var(--border-width-thin) solid var(--color-border);
   background: transparent;
   color: var(--color-text);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   text-align: start;
   cursor: pointer;

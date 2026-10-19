@@ -21,7 +21,7 @@
 }
 
 .streak-summary-value {
-  font-family: var(--font-family-display);
+  font-family: var(--font-num);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
 }

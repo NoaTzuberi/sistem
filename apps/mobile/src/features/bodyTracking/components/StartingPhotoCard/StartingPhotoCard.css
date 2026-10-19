@@ -16,7 +16,7 @@
 
 .starting-photo-card-title {
   margin: 0;
-  font-size: var(--text-lg);
+  font-size: var(--text-display-sm);
 }
 
 .starting-photo-card-privacy,

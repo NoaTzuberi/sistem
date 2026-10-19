@@ -24,6 +24,7 @@ import { RestBar } from '../../components/RestBar/RestBar';
 import { SessionBlock } from '../../components/SessionBlock/SessionBlock';
 import { SessionClock } from '../../components/SessionClock/SessionClock';
 import { FocusTip } from '../../components/FocusTip/FocusTip';
+import { nameScript } from '../../data/weekPlanDisplay';
 import './WorkoutSessionPage.css';
 
 type Dialog = 'menu' | 'confirmDiscard' | 'confirmFinish' | 'nothingDone';
@@ -329,7 +330,11 @@ export function WorkoutSessionPage() {
             </svg>
           </button>
           <div className="workout-session-heading">
-            <h1 className="workout-session-title">{session.log.workoutTitle}</h1>
+            <h1 className="workout-session-title">
+              <bdi className="display-name" {...nameScript(session.log.workoutTitle)}>
+                {session.log.workoutTitle}
+              </bdi>
+            </h1>
             <span className="workout-session-meta">
               <SessionClock startedAt={session.log.startedAt} serverOffsetMs={serverOffsetMs} /> ·{' '}
               {fill(copy.session.setsProgress, { progress: isolateLtr(`${doneSets} / ${totalSets}`) })}

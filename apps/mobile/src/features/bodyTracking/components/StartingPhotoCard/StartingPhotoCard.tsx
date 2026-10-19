@@ -26,7 +26,7 @@ export function StartingPhotoCard({ date, photoDate, photo, onDayChange, onLinkE
   return (
     <section className="starting-photo-card" aria-labelledby="starting-photo-title">
       <div className="starting-photo-card-copy">
-        <h2 id="starting-photo-title" className="starting-photo-card-title">{copy.startingPhotoTitle}</h2>
+        <h2 id="starting-photo-title" className="starting-photo-card-title display-title">{copy.startingPhotoTitle}</h2>
         <p className="starting-photo-card-privacy">{copy.startingPhotoPrivacy}</p>
         {photo && <p className="starting-photo-card-date">{formatDateOnly(shownDate, language)}</p>}
       </div>

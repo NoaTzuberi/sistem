@@ -130,7 +130,7 @@ export function ProgressPhotoSlot({ date, pose, photo, onDayChange, onLinkExpire
       </div>
 
       <div className="progress-photo-slot-body">
-        <h2 className="progress-photo-slot-title">{label}</h2>
+        <h2 className="progress-photo-slot-title display-title">{label}</h2>
         {status && (
           <p className="progress-photo-slot-status" role="status">
             {status}

@@ -35,7 +35,7 @@ a.week-day-detail-row:active {
 .week-day-detail-name {
   min-width: 0;
   overflow: hidden;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-lane-date);
   font-style: italic;
   font-weight: var(--font-weight-bold);
@@ -45,9 +45,10 @@ a.week-day-detail-row:active {
 }
 
 .week-day-detail-name-he {
-  font-family: var(--font-family-home);
-  font-size: var(--text-lg);
+  font-family: var(--font-display-he);
+  font-size: var(--text-display-xs);
   font-style: normal;
+  line-height: var(--line-height-display);
   text-transform: none;
 }
 

@@ -22,7 +22,7 @@ export function SubPageHeader({ title, fallbackPath, action }: SubPageHeaderProp
       <button className="sub-page-header-back" type="button" onClick={goBack} aria-label={copy.back}>
         <IconChevronLeft className="flip-rtl" size={24} aria-hidden="true" />
       </button>
-      <h1 className="sub-page-header-title">{title}</h1>
+      <h1 className="sub-page-header-title display-title">{title}</h1>
       {action && <div className="sub-page-header-action">{action}</div>}
     </header>
   );

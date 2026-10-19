@@ -55,7 +55,7 @@
   position: relative;
   z-index: var(--z-raised);
   padding-block-end: calc(var(--space-1) * 1.5);
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-lane-date);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

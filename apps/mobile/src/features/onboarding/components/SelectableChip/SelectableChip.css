@@ -10,7 +10,7 @@
   border: 1.5px solid var(--color-border);
   background-color: transparent;
   color: var(--color-text);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: var(--font-weight-medium);
   font-variant-numeric: tabular-nums;

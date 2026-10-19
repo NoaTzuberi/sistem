@@ -45,7 +45,7 @@
   height: 46px;
   border-radius: var(--radius-option-icon);
   background-color: var(--workout-color-soft);
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-extrabold);
   color: color-mix(in srgb, var(--workout-color-solid) 75%, var(--color-ink));
@@ -72,7 +72,7 @@
 
 .preview-sheet-target {
   flex: none;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

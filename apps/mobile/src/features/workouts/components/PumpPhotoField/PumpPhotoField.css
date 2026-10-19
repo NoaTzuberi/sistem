@@ -6,8 +6,7 @@
 
 .pump-photo-field-title {
   margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-xs);
 }
 
 .pump-photo-field-actions {

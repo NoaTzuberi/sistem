@@ -43,7 +43,7 @@
 }
 
 .coach-note-name {
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-display-xs);
 }
 
 .coach-note-time {

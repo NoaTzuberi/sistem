@@ -55,7 +55,7 @@
   align-items: center;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-none);
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
@@ -91,7 +91,7 @@
   background-color: var(--color-surface);
   border: var(--border-width-thin) solid var(--color-border);
   color: var(--color-text-muted);
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
@@ -106,7 +106,7 @@
 }
 
 .exercise-detail-difficulty-label {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -178,7 +178,7 @@
 
 .exercise-detail-section h2 {
   margin-bottom: var(--space-3);
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.04em;

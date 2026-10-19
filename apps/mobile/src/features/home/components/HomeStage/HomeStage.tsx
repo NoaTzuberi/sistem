@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { ActiveWorkoutRef, Language } from '@sistem/types';
 import { dateFormat, dayName, fill, useCopy, useLanguage } from '@sistem/shared';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import { workoutPath } from '../../../../app/config/routes';
 import { workoutCopy } from '../../../workouts/copy';
 import { exerciseCountLabel } from '../../../workouts/data/workoutDisplay';
@@ -34,10 +36,18 @@ function todayLabel(today: string, language: Language): string {
   return `${weekday} · ${dayMonth}`;
 }
 
+/** "THU 15.10" for the date's eyebrow: read off the 'YYYY-MM-DD' string, no locale involved. */
+function todayEyebrow(today: string, weekdays: readonly string[]): string {
+  const [, month, day] = today.split('-');
+  const weekday = weekdays[new Date(`${today}T00:00:00Z`).getUTCDay()] ?? '';
+  return `${weekday} ${day}.${month}`;
+}
+
 /** The full-bleed pink stage: greeting, the live object of the day, today's workout and slide-to-start. */
 export function HomeStage(props: HomeStageProps) {
   const { name, today, stage, weekCount, activeLog, onStart, isStarting, startError, status } = props;
   const copy = useCopy(homeCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const workoutText = useCopy(workoutCopy);
   const language = useLanguage();
   const firstName = name.trim().split(' ')[0] ?? '';
@@ -74,19 +84,24 @@ export function HomeStage(props: HomeStageProps) {
           {initialsOf(name)}
         </span>
         <div className="home-stage-hello">
-          <p className="home-stage-greeting" id="home-stage-greeting">
+          <p className="home-stage-greeting display-title" id="home-stage-greeting">
             {fill(copy.greeting, { firstName })}
           </p>
-          {today && <p className="home-stage-date">{todayLabel(today, language)}</p>}
+          {today && (
+            <p className="home-stage-date">
+              <Eyebrow>{todayEyebrow(today, eyebrow.weekdays)}</Eyebrow>
+              {todayLabel(today, language)}
+            </p>
+          )}
         </div>
       </div>
 
       <DailyObject3D />
 
       {status}
-      {kicker && <TodayWorkoutHeadline kicker={kicker} title={title} />}
+      {kicker && <TodayWorkoutHeadline kicker={kicker} eyebrow={stage ? eyebrow.today : undefined} title={title} />}
       {!kicker && message && (
-        <p className="home-stage-message">{message}</p>
+        <p className="home-stage-message display-title">{message}</p>
       )}
 
       {stage?.kind === 'rest' && next && (

@@ -18,7 +18,7 @@
   border: 0;
   background: none;
   color: var(--color-text);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-snug);

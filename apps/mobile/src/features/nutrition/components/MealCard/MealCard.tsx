@@ -24,7 +24,7 @@ export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealC
 
   return (
     <article className="meal-card">
-      <h2 className="meal-card-name" dir="auto">
+      <h2 className="meal-card-name display-title" dir="auto">
         <bdi>{meal.name}</bdi>
       </h2>
 

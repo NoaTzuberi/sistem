@@ -1,5 +1,6 @@
 import { IconLock } from '@tabler/icons-react';
 import { formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
+import { DisplayText } from '../../../../components/common/DisplayText/DisplayText';
 import type { PlannedWorkout } from '../../data/weekPlanDisplay';
 import { WorkoutTicket } from '../WorkoutTicket/WorkoutTicket';
 import { workoutCopy } from '../../copy';
@@ -35,7 +36,9 @@ export function NextWeekLock({ weekStartDate, firstWorkout, onOpen }: NextWeekLo
         <IconLock size={18} stroke={2} />
       </span>
       <div className="next-week-lock-text">
-        <span className="next-week-lock-title">{range}</span>
+        <span className="next-week-lock-title display-title">
+          <DisplayText text={range} />
+        </span>
         <span className="next-week-lock-note">{copy.plan.nextWeekLocked}</span>
       </div>
     </div>

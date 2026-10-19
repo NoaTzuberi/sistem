@@ -96,7 +96,7 @@ export function IntervalTimer({
 
       {showDone ? (
         <div className="interval-timer-main">
-          <span className="interval-timer-phase">{copy.interval.doneTitle}</span>
+          <span className="interval-timer-phase display-title">{copy.interval.doneTitle}</span>
           <span className="interval-timer-subtitle">
             {fill(copy.interval.roundsDone, { progress: isolateLtr(`${countRoundsDone(run)} / ${phase.rounds}`) })}
           </span>
@@ -112,7 +112,7 @@ export function IntervalTimer({
       ) : (
         <>
           <div className="interval-timer-main" role="timer" aria-live="off">
-            <span className="interval-timer-phase">{copy.interval.phase[phase.kind]}</span>
+            <span className="interval-timer-phase display-title">{copy.interval.phase[phase.kind]}</span>
             <span className="interval-timer-clock">{formatClock(Math.ceil(remainingMs / 1000))}</span>
             {isPaused && <span className="interval-timer-paused">{copy.interval.paused}</span>}
             {subtitle && <span className="interval-timer-subtitle">{subtitle}</span>}

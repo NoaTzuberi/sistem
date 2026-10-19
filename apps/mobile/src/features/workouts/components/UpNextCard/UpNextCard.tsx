@@ -3,6 +3,8 @@ import { describeSetsShort, formatPlural, useCopy, useLanguage } from '@sistem/s
 import { exerciseCountLabel } from '../../data/workoutDisplay';
 import { nameScript, setTotal, workoutDayLabel, type PlannedWorkout } from '../../data/weekPlanDisplay';
 import { workoutCopy } from '../../copy';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import './UpNextCard.css';
 
 /** Exercises listed on the card; the rest are "+N more" (all of them are in the preview sheet). */
@@ -25,6 +27,7 @@ interface UpNextCardProps {
  */
 export function UpNextCard({ next, onStart, onPreview, isStarting, error, onFreeWorkout }: UpNextCardProps) {
   const copy = useCopy(workoutCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const language = useLanguage();
 
   if (!next) {
@@ -51,6 +54,7 @@ export function UpNextCard({ next, onStart, onPreview, isStarting, error, onFree
           <span className="up-next-live-dot" aria-hidden="true" />
           {copy.plan.upNext}
         </span>
+        <Eyebrow>{eyebrow.upNext}</Eyebrow>
         <span className="up-next-day">{workoutDayLabel(workout, language, copy)}</span>
       </div>
 

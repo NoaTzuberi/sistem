@@ -35,7 +35,7 @@ export function AuthScreen({ title, switchLabel, switchTo, footer, children }: A
         <div className="auth-screen-rise" ref={riseRef}>
           <section className="auth-glass-card">
             <div className="auth-glass-head">
-              <h1 className="auth-glass-title">{title}</h1>
+              <h1 className="auth-glass-title display-title">{title}</h1>
               <Link className="auth-glass-switch" to={switchTo}>
                 {switchLabel}
               </Link>

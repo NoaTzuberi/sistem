@@ -7,7 +7,7 @@
   border: 0;
   border-radius: var(--radius-button);
   background: none;
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);

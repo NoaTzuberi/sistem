@@ -23,12 +23,11 @@
 
 .interval-timer-entry-label {
   flex: 1;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-display-sm);
 }
 
 .interval-timer-entry-last {
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

@@ -15,7 +15,7 @@ export function PersonalRecordList({ log, title }: PersonalRecordListProps) {
   const names = logExerciseNames(log);
   return (
     <section className="personal-record-list" aria-label={title}>
-      <h2 className="personal-record-list-title">{title}</h2>
+      <h2 className="personal-record-list-title display-title">{title}</h2>
       <ul className="personal-record-list-items">
         {records.map((record) => (
           <li key={record.exerciseId} className="personal-record-list-item">

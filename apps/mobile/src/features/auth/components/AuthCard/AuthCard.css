@@ -21,7 +21,7 @@
 
 .auth-card-title {
   margin-bottom: var(--space-4);
-  font-size: var(--text-2xl);
+  font-size: var(--text-display-lg);
   text-align: center;
 }
 

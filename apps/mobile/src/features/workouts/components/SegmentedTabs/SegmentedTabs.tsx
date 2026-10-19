@@ -51,7 +51,7 @@ export function SegmentedTabs<T extends string>({ tabs, selected, onSelect, labe
           tabIndex={tab.id === selected ? 0 : -1}
           onClick={() => onSelect(tab.id)}
         >
-          {tab.label}
+          <span className="segmented-tabs-label display-title">{tab.label}</span>
         </button>
       ))}
     </div>

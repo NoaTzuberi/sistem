@@ -7,9 +7,7 @@
 
 .month-calendar-title {
   margin: 0;
-  font-family: var(--font-family-home);
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-md);
   color: var(--color-ink);
 }
 
@@ -82,7 +80,7 @@
   border-radius: var(--radius-calendar-day);
   background: none;
   color: var(--color-ink);
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-base);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

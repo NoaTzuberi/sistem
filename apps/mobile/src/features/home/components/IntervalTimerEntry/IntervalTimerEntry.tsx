@@ -16,7 +16,7 @@ export function IntervalTimerEntry({ lastWorkSec, onOpen }: IntervalTimerEntryPr
   return (
     <button type="button" className="interval-timer-entry" onClick={onOpen}>
       <IconStopwatch size={20} stroke={2} aria-hidden="true" />
-      <span className="interval-timer-entry-label">{copy.intervalTimer}</span>
+      <span className="interval-timer-entry-label display-title">{copy.intervalTimer}</span>
       {lastWorkSec !== null && (
         <span className="interval-timer-entry-last" dir="ltr">
           {formatClock(lastWorkSec).padStart(5, '0')}

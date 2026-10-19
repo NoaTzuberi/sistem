@@ -20,7 +20,7 @@
 .scoreboard-value {
   align-self: flex-start;
   margin: 0;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-score);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

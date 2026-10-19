@@ -28,7 +28,7 @@ export function StepHeading({ progress, title, titleId, hints = [] }: StepHeadin
           </span>
         </>
       )}
-      <h1 id={titleId} className="step-heading-title" data-deck-rise>
+      <h1 id={titleId} className="step-heading-title display-title" data-deck-rise>
         {title}
       </h1>
       {hints.map((hint) => (

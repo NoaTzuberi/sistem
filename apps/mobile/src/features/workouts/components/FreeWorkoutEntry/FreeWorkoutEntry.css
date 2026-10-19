@@ -41,8 +41,7 @@
 }
 
 .free-workout-entry-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-md);
 }
 
 .free-workout-entry-note {

@@ -18,10 +18,6 @@
 
 .large-title {
   margin: 0;
-  font-family: var(--font-family-home);
-  font-size: var(--text-workouts-title);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-display);
-  line-height: var(--line-height-tight);
+  font-size: var(--text-display-2xl);
   color: var(--color-ink);
 }

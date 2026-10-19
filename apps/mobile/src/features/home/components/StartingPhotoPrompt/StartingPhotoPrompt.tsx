@@ -18,7 +18,7 @@ export function StartingPhotoPrompt({ onTake, onDismiss }: StartingPhotoPromptPr
         <IconCamera size={17} stroke={2} />
       </span>
       <div className="starting-photo-prompt-text">
-        <p className="starting-photo-prompt-title" id="starting-photo-prompt-title">
+        <p className="starting-photo-prompt-title display-title" id="starting-photo-prompt-title">
           {copy.photo.title}
         </p>
         <p className="starting-photo-prompt-subtitle">{copy.photo.subtitle}</p>

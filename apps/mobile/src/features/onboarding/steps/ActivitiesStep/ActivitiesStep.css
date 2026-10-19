@@ -18,7 +18,7 @@
 }
 
 .activities-step-header .step-heading .step-heading-title {
-  font-size: var(--text-2xl);
+  font-size: var(--text-display-lg);
 }
 
 .activities-step-header .step-heading-hint {

@@ -55,7 +55,7 @@
   border: 0;
   background: transparent;
   color: var(--color-text);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
 }
 

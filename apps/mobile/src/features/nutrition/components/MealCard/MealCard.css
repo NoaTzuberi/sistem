@@ -9,9 +9,7 @@
 
 .meal-card-name {
   margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--text-lg);
-  line-height: var(--line-height-tight);
+  font-size: var(--text-display-sm);
 }
 
 .meal-card-portions {
@@ -29,7 +27,7 @@
   border: var(--border-width-thin) solid var(--color-primary-deep);
   border-radius: var(--radius-none);
   color: var(--color-primary-deep);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
   cursor: pointer;

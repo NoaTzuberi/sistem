@@ -97,7 +97,7 @@
 }
 
 .workout-log-row-minutes-value {
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

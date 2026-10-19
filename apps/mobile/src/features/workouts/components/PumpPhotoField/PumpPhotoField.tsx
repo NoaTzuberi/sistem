@@ -111,7 +111,7 @@ export function PumpPhotoField({ log, onLogChange, onLinkExpired }: PumpPhotoFie
 
   return (
     <section className="pump-photo-field" aria-labelledby="pump-photo-title">
-      <h2 id="pump-photo-title" className="pump-photo-field-title">
+      <h2 id="pump-photo-title" className="pump-photo-field-title display-title">
         {copy.pumpPhoto.title}
       </h2>
 

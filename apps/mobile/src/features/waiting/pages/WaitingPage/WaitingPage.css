@@ -109,10 +109,7 @@
 
 .waiting-title {
   margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--text-2xl);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--text-display-xl);
 }
 
 .waiting-message {

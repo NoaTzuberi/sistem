@@ -70,16 +70,12 @@
 }
 
 .interval-timer-phase {
-  font-family: var(--font-family-display);
-  font-size: var(--text-2xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
+  font-size: var(--text-display-lg);
 }
 
 /* As big as the phone allows: read from across the room. */
 .interval-timer-clock {
-  font-family: var(--font-family-display);
+  font-family: var(--font-num);
   font-size: min(34vw, 30dvh);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
@@ -128,7 +124,7 @@
   border: var(--border-width-medium) solid currentColor;
   background: transparent;
   color: inherit;
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
   cursor: pointer;

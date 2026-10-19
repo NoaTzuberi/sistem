@@ -207,7 +207,7 @@ export function ProfilePage() {
                       {initial}
                     </span>
                     <div className="profile-header-text">
-                      <span className="profile-header-name" dir="auto">{user?.name}</span>
+                      <span className="profile-header-name display-title" dir="auto">{user?.name}</span>
                       {summaryLine && <span className="profile-header-summary">{summaryLine}</span>}
                     </div>
                   </div>
@@ -222,12 +222,12 @@ export function ProfilePage() {
               )}
 
               <GlassCard variant="flat" className="profile-section-card profile-body-card">
-                <h2>{copy.bodyTitle}</h2>
+                <h2 className="display-title">{copy.bodyTitle}</h2>
                 <BodySummary list={body.list} error={body.error} units={units} onRetry={body.reload} />
               </GlassCard>
 
               <GlassCard variant="flat" className="profile-section-card profile-training-card">
-                <h2>{copy.trainingProfile}</h2>
+                <h2 className="display-title">{copy.trainingProfile}</h2>
 
                 {isLoading && (
                   <div className="profile-loading-inline">
@@ -325,7 +325,7 @@ export function ProfilePage() {
 
             <div className="profile-side-column">
               <GlassCard variant="flat" className="profile-section-card profile-stats-card">
-                <h2>{achievementText.statsTitle}</h2>
+                <h2 className="display-title">{achievementText.statsTitle}</h2>
 
                 {!progress && !progressError && (
                   <div className="profile-loading-inline">

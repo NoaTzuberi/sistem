@@ -25,7 +25,7 @@ export function UnlockedAchievements({ achievements }: UnlockedAchievementsProps
   if (achievements.length === 0) return null;
   return (
     <section className="unlocked-achievements" aria-labelledby="unlocked-achievements-title">
-      <h2 className="unlocked-achievements-title" id="unlocked-achievements-title">
+      <h2 className="unlocked-achievements-title display-title" id="unlocked-achievements-title">
         {copy.unlockedThisWorkout}
       </h2>
       <ul className="unlocked-achievements-list" ref={listRef}>

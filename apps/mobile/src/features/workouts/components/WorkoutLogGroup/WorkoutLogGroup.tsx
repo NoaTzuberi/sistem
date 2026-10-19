@@ -1,5 +1,6 @@
 import { fill, formatPlural, formatWeekSpan, useCopy, useLanguage } from '@sistem/shared';
 import { formatTotalTime, type LogWeekGroup } from '../../data/historyDisplay';
+import { DisplayText } from '../../../../components/common/DisplayText/DisplayText';
 import { WorkoutLogRow } from '../WorkoutLogRow/WorkoutLogRow';
 import { workoutCopy } from '../../copy';
 import './WorkoutLogGroup.css';
@@ -20,7 +21,9 @@ export function WorkoutLogGroup({ group, currentWeekStart, timeZone }: WorkoutLo
   return (
     <section className="workout-log-group" aria-labelledby={titleId}>
       <h3 className="workout-log-group-head">
-        <span id={titleId}>{title}</span>
+        <span className="workout-log-group-title display-title" id={titleId}>
+          <DisplayText text={title} />
+        </span>
         <span className="workout-log-group-summary">
           {fill(copy.history.groupSummary, {
             count: formatPlural(language, copy.history.workoutCount, group.items.length),

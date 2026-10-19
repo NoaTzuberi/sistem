@@ -1,4 +1,5 @@
 import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
+import { DisplayText } from '../../../../components/common/DisplayText/DisplayText';
 import type { PlannedWorkout } from '../../data/weekPlanDisplay';
 import { workoutCopy } from '../../copy';
 import './WeekHeader.css';
@@ -20,7 +21,9 @@ export function WeekHeader({ weekStartDate, workouts, doneCount }: WeekHeaderPro
   return (
     <div className="week-header">
       <div className="week-header-text">
-        <span className="week-header-label">{copy.list.thisWeek}</span>
+        <span className="week-header-label display-title">
+          <DisplayText text={copy.list.thisWeek} />
+        </span>
         <span className="week-header-range">{formatWeekRange(weekStartDate, language)}</span>
       </div>
       {workouts.length > 0 && (

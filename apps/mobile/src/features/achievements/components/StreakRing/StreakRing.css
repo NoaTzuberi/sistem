@@ -44,7 +44,7 @@
 }
 
 .streak-ring-value {
-  font-family: var(--font-family-display);
+  font-family: var(--font-num);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
   line-height: 1;

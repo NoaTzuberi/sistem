@@ -27,7 +27,7 @@
   border: var(--border-width-thin) solid var(--color-primary-deep);
   border-radius: var(--radius-none);
   color: var(--color-primary-deep);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
   cursor: pointer;

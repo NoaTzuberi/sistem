@@ -1,5 +1,7 @@
 import { IconUser } from '@tabler/icons-react';
 import { formatTimeAgo, useCopy, useLanguage } from '@sistem/shared';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import { homeCopy } from '../../copy';
 import { type QuickReply, QuickReplies } from '../QuickReplies/QuickReplies';
 import './CoachNote.css';
@@ -20,6 +22,7 @@ interface CoachNoteProps {
  */
 export function CoachNote({ message, at, nowMs, replies }: CoachNoteProps) {
   const copy = useCopy(homeCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const language = useLanguage();
   return (
     <div className="coach-note">
@@ -28,7 +31,8 @@ export function CoachNote({ message, at, nowMs, replies }: CoachNoteProps) {
       </span>
       <div className="coach-note-body">
         <p className="coach-note-head">
-          <span className="coach-note-name">{copy.coach.title}</span>
+          <Eyebrow>{eyebrow.coach}</Eyebrow>
+          <span className="coach-note-name display-title">{copy.coach.title}</span>
           <time className="coach-note-time" dateTime={at}>
             {formatTimeAgo(at, nowMs, language)}
           </time>

@@ -34,8 +34,7 @@
   background: none;
   color: var(--color-text-muted);
   font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-display-xs);
   cursor: pointer;
   transition:
     color var(--transition-fast) ease,
@@ -61,4 +60,9 @@
   .segmented-tabs-thumb {
     transition: none;
   }
+}
+
+/* The label is a display heading (Karantina / Barlow); the button keeps its height and hit area. */
+.segmented-tabs-label {
+  display: block;
 }

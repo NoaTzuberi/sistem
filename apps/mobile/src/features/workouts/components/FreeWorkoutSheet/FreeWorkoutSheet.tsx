@@ -51,7 +51,7 @@ export function FreeWorkoutSheet({ isOpen, onClose, free }: FreeWorkoutSheetProp
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} labelledBy="free-sheet-title" footer={footer}>
-      <h2 className="free-sheet-title" id="free-sheet-title">
+      <h2 className="free-sheet-title display-title" id="free-sheet-title">
         {copy.screen.freeWorkout}
       </h2>
       <p className="free-sheet-intro">{copy.free.intro}</p>
@@ -70,7 +70,7 @@ export function FreeWorkoutSheet({ isOpen, onClose, free }: FreeWorkoutSheetProp
               {option.icon}
             </span>
             <span className="free-sheet-option-text">
-              <span className="free-sheet-option-title">{option.title}</span>
+              <span className="free-sheet-option-title display-title">{option.title}</span>
               <span className="free-sheet-option-note">{option.text}</span>
             </span>
           </button>

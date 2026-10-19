@@ -21,7 +21,7 @@
 
 .workout-facts-value {
   margin: 0;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-fact);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

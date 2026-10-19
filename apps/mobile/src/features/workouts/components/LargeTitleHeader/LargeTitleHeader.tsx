@@ -14,7 +14,7 @@ export function LargeTitleHeader({ title, action, children }: LargeTitleHeaderPr
   return (
     <header className="large-title-header">
       <div className="large-title-row">
-        <h1 className="large-title">{title}</h1>
+        <h1 className="large-title display-title">{title}</h1>
         {action}
       </div>
       {children}

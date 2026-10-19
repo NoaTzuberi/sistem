@@ -5,29 +5,18 @@
   margin: 0;
 }
 
+/* "25 אימונים": the number in Barlow, the word in Karantina (DisplayText). */
 .next-achievement-target {
   min-width: 0;
-  font-family: var(--font-numeric);
-  font-size: var(--text-ach-target);
-  font-style: italic;
-  font-weight: var(--font-weight-extrabold);
-  line-height: 1;
-  text-transform: uppercase;
+  font-size: var(--text-display-xl);
   color: var(--color-ink);
-}
-
-.next-achievement-target-he {
-  font-family: var(--font-family-home);
-  font-size: var(--text-2xl);
-  font-style: normal;
-  font-weight: var(--font-weight-bold);
 }
 
 /* Large bold Neon Pink (≥ 18px bold) on white. */
 .next-achievement-progress {
   flex: none;
   margin-inline-start: auto;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

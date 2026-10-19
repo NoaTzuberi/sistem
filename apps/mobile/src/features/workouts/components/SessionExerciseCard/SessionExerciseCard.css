@@ -11,10 +11,9 @@
 }
 
 .session-exercise-name {
+  line-height: var(--line-height-numeric);
   margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--text-xl);
-  line-height: var(--line-height-tight);
+  font-size: var(--text-ticket);
   overflow-wrap: anywhere;
 }
 

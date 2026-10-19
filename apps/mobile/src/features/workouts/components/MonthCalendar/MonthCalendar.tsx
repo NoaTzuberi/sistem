@@ -2,6 +2,7 @@ import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { formatDateOnly, formatPlural, useCopy, useLanguage, weekdayName } from '@sistem/shared';
 import { dayNumber, formatMonthTitle, type CalendarDay, type MonthKey } from '../../data/historyDisplay';
 import { workoutCopy } from '../../copy';
+import { DisplayText } from '../../../../components/common/DisplayText/DisplayText';
 import './MonthCalendar.css';
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -39,8 +40,8 @@ export function MonthCalendar({ month, days, canGoNext, canGoPrevious, onPreviou
   return (
     <div className="month-calendar">
       <div className="month-calendar-head">
-        <h3 className="month-calendar-title" aria-live="polite">
-          {formatMonthTitle(month, language)}
+        <h3 className="month-calendar-title display-title" aria-live="polite">
+          <DisplayText text={formatMonthTitle(month, language)} />
         </h3>
         <div className="month-calendar-nav">
           <button type="button" className="month-calendar-arrow" onClick={onPrevious} disabled={!canGoPrevious} aria-label={copy.history.previousMonth}>

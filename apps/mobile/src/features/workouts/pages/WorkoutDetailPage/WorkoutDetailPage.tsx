@@ -13,6 +13,7 @@ import { BackButton } from '../../components/BackButton/BackButton';
 import { PlanExerciseList } from '../../components/PlanExerciseList/PlanExerciseList';
 import { exerciseCountLabel, workoutStatusBadge } from '../../data/workoutDisplay';
 import { workoutCopy } from '../../copy';
+import { nameScript } from '../../data/weekPlanDisplay';
 import './WorkoutDetailPage.css';
 
 // One planned workout (PRD §5.4): exercises, the server's resolved sets and the coach's
@@ -34,7 +35,11 @@ export function WorkoutDetailPage() {
           <BackButton />
           {plan && workout && badge && (
             <div className="workout-detail-heading">
-              <h1 className="workout-detail-title" dir="auto">{workout.title}</h1>
+              <h1 className="workout-detail-title">
+                <bdi className="display-name" {...nameScript(workout.title)}>
+                  {workout.title}
+                </bdi>
+              </h1>
               <span className="workout-detail-meta">
                 {workout.dayOfWeek !== undefined && `${dayName(workout.dayOfWeek, language)} · `}
                 {formatWeekRange(plan.weekStartDate, language)} · {exerciseCountLabel(workout.exercises.length, copy, language)}

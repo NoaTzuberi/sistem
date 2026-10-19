@@ -19,8 +19,10 @@
 }
 
 .fuel-today-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  font-size: var(--text-display-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fuel-today-pips {
@@ -59,7 +61,7 @@
 
 .fuel-today-count {
   margin: 0;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;

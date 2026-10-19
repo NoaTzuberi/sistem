@@ -5,6 +5,7 @@ import { lastTimeLabel, setTag } from '../../data/workoutDisplay';
 import { workoutCopy } from '../../copy';
 import { ExerciseMediaSlot } from '../ExerciseMediaSlot/ExerciseMediaSlot';
 import { SessionSetRow } from '../SessionSetRow/SessionSetRow';
+import { nameScript } from '../../data/weekPlanDisplay';
 import './SessionExerciseCard.css';
 
 export interface SetHandlers {
@@ -65,7 +66,9 @@ export function SessionExerciseCard({
       <header className="session-exercise-header">
         <h3 className="session-exercise-name">
           {position && <span className="session-exercise-position">{position}</span>}
-          <bdi>{facts?.name ?? shared.log.exercise}</bdi>
+          <bdi className="display-name" {...nameScript(facts?.name ?? shared.log.exercise)}>
+            {facts?.name ?? shared.log.exercise}
+          </bdi>
         </h3>
         {factsLine && <span className="session-exercise-facts">{factsLine}</span>}
       </header>

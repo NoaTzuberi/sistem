@@ -7,8 +7,7 @@
 /* Same as the summary's "Personal records" title. */
 .unlocked-achievements-title {
   margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-sm);
 }
 
 .unlocked-achievements-list {

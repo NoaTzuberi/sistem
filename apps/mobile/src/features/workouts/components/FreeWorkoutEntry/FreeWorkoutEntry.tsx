@@ -12,7 +12,7 @@ export function FreeWorkoutEntry({ onOpen }: { onOpen: () => void }) {
         <IconPlus size={24} stroke={2} />
       </span>
       <span className="free-workout-entry-text">
-        <span className="free-workout-entry-title">{copy.screen.freeWorkout}</span>
+        <span className="free-workout-entry-title display-title">{copy.screen.freeWorkout}</span>
         <span className="free-workout-entry-note">{copy.plan.freeEntryText}</span>
       </span>
       <span className="free-workout-entry-arrow" aria-hidden="true">

@@ -12,6 +12,7 @@ import { PersonalRecordList } from '../../components/PersonalRecordList/Personal
 import { SummaryStats } from '../../components/SummaryStats/SummaryStats';
 import { workoutCopy } from '../../copy';
 import type { SummaryLocationState } from '../WorkoutSummaryPage/WorkoutSummaryPage';
+import { nameScript } from '../../data/weekPlanDisplay';
 import './WorkoutLogPage.css';
 
 // One workout log, read-only (PRD §5.4): what was performed, the summary and the Daily
@@ -39,7 +40,11 @@ export function WorkoutLogPage() {
           <BackButton />
           {log && (
             <div className="workout-log-page-heading">
-              <h1 className="workout-log-page-title">{log.workoutTitle}</h1>
+              <h1 className="workout-log-page-title">
+                <bdi className="display-name" {...nameScript(log.workoutTitle)}>
+                  {log.workoutTitle}
+                </bdi>
+              </h1>
               <span className="workout-log-page-date">{formatDateTime(log.finishedAt ?? log.startedAt, language)}</span>
             </div>
           )}

@@ -25,7 +25,7 @@ export function NutritionPage() {
   return (
     <AppShell>
       <div className="nutrition-page">
-        <h1 className="nutrition-page-title">{copy.title}</h1>
+        <h1 className="nutrition-page-title display-title">{copy.title}</h1>
         <NutritionContent key={userId} userId={userId} />
       </div>
     </AppShell>

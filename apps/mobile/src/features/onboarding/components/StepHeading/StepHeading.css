@@ -8,7 +8,7 @@
 }
 
 .step-heading-number {
-  font-family: var(--font-family-mono);
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
@@ -17,11 +17,7 @@
 /* Beats the global h1 size (typography.css). */
 .step-heading .step-heading-title {
   margin-block-start: var(--space-2);
-  font-family: var(--font-family-body);
-  font-size: var(--text-xl);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-snug);
-  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--text-display-md);
 }
 
 .step-heading-hint {

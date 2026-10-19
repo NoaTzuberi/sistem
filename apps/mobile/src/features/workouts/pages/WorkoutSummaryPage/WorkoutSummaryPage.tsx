@@ -91,7 +91,7 @@ export function WorkoutSummaryPage() {
             <IconX size={24} aria-hidden="true" />
           </button>
           <div className="workout-summary-heading">
-            <h1 className="workout-summary-title">{copy.summary.title}</h1>
+            <h1 className="workout-summary-title display-title">{copy.summary.title}</h1>
             {log && (
               <span className="workout-summary-meta">
                 {log.workoutTitle} · {formatDateTime(log.finishedAt ?? log.startedAt, language)}
@@ -111,14 +111,14 @@ export function WorkoutSummaryPage() {
             <UnlockedAchievements achievements={log.achievements ?? []} />
 
             <section className="workout-summary-section" aria-labelledby="summary-rating">
-              <h2 id="summary-rating" className="workout-summary-section-title">
+              <h2 id="summary-rating" className="workout-summary-section-title display-title">
                 {copy.summary.ratingQuestion}
               </h2>
               <RatingPicker value={rating} label={copy.summary.ratingQuestion} onChange={setRating} />
             </section>
 
             <section className="workout-summary-section">
-              <label htmlFor="summary-notes" className="workout-summary-section-title">
+              <label htmlFor="summary-notes" className="workout-summary-section-title display-title">
                 {copy.summary.notes}
               </label>
               <textarea

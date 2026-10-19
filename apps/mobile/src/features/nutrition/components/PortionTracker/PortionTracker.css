@@ -15,8 +15,7 @@
 .portion-tracker-title {
   flex: 1;
   margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-sm);
   text-align: center;
 }
 
@@ -53,7 +52,7 @@
   border: var(--border-width-thin) solid var(--color-border);
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
@@ -114,7 +113,7 @@
   border: var(--border-width-thin) solid var(--color-primary-deep);
   background-color: var(--color-bg);
   color: var(--color-primary-deep);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
   text-align: start;
@@ -190,7 +189,7 @@
   border: var(--border-width-thin) solid var(--color-border);
   background-color: var(--color-bg);
   color: var(--color-primary-deep);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
@@ -223,7 +222,7 @@
   border: var(--border-width-thin) solid var(--color-primary-deep);
   background-color: var(--color-bg);
   color: var(--color-primary-deep);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
 }

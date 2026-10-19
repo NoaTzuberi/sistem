@@ -1,6 +1,7 @@
 import type { AchievementProgress } from '@sistem/types';
 import { describeAchievement, describeAchievementProgress, useLanguage } from '@sistem/shared';
-import { achievementTicks, isHebrewText } from '../../data/homeDisplay';
+import { DisplayText } from '../../../../components/common/DisplayText/DisplayText';
+import { achievementTicks } from '../../data/homeDisplay';
 import { AchievementTicks } from '../AchievementTicks/AchievementTicks';
 import './NextAchievement.css';
 
@@ -17,9 +18,9 @@ export function NextAchievement({ achievement }: NextAchievementProps) {
   return (
     <div className="next-achievement">
       <p className="next-achievement-head">
-        <bdi className={'next-achievement-target' + (isHebrewText(name) ? ' next-achievement-target-he' : '')} dir="auto">
-          {name}
-        </bdi>
+        <span className="next-achievement-target display-title">
+          <DisplayText text={name} />
+        </span>
         {progress && <span className="next-achievement-progress">{progress}</span>}
       </p>
       <AchievementTicks ticks={achievementTicks(achievement.current, achievement.threshold)} />

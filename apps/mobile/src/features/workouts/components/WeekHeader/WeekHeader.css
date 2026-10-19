@@ -11,18 +11,10 @@
   min-width: 0;
 }
 
-/* Hebrew "השבוע" falls back to Rubik from the numeric stack; English reads THIS WEEK in Barlow italic. */
+/* Hebrew "השבוע" in Karantina; English reads THIS WEEK in Barlow italic (.display-title). A future
+   "שבוע 6" gets its number in Barlow through DisplayText. */
 .week-header-label {
-  font-family: var(--font-numeric);
-  font-size: var(--text-week-label);
-  font-style: italic;
-  font-weight: var(--font-weight-extrabold);
-  line-height: var(--line-height-numeric);
-  text-transform: uppercase;
-}
-
-:root:lang(he) .week-header-label {
-  font-style: normal;
+  font-size: var(--text-display-lg);
 }
 
 .week-header-range {

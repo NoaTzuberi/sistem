@@ -4,6 +4,8 @@ import { IconPlus } from '@tabler/icons-react';
 import { useCopy } from '@sistem/shared';
 import { workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../hooks/useStartWorkout';
 import { useWeekPlan } from '../../hooks/useWeekPlan';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
@@ -44,6 +46,7 @@ const FILTERS: HistoryFilter[] = FREE_WORKOUT_ENABLED ? HISTORY_FILTERS : HISTOR
  */
 export function WorkoutsScreen() {
   const copy = useCopy(workoutCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const tab: WorkoutsTab = params.get(TAB_PARAM) === 'history' ? 'history' : 'plan';
@@ -146,6 +149,7 @@ export function WorkoutsScreen() {
 
               <div className="workouts-section-head">
                 <h2 className="workouts-section-title" id="workouts-week-title">
+                  <Eyebrow>{eyebrow.thisWeek}</Eyebrow>
                   {copy.plan.allWorkouts}
                 </h2>
               </div>
@@ -158,7 +162,10 @@ export function WorkoutsScreen() {
           )}
 
           <div className="workouts-section-head">
-            <h2 className="workouts-section-title">{copy.list.nextWeek}</h2>
+            <h2 className="workouts-section-title">
+              <Eyebrow>{eyebrow.nextWeek}</Eyebrow>
+              {copy.list.nextWeek}
+            </h2>
           </div>
           <NextWeekLock
             weekStartDate={weekPlan.nextWeek.weekStartDate}
@@ -169,7 +176,10 @@ export function WorkoutsScreen() {
           {FREE_WORKOUT_ENABLED && (
             <>
               <div className="workouts-section-head">
-                <h2 className="workouts-section-title">{copy.plan.moreToMove}</h2>
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{eyebrow.extra}</Eyebrow>
+                  {copy.plan.moreToMove}
+                </h2>
               </div>
               <FreeWorkoutEntry onOpen={openFree} />
             </>
@@ -200,7 +210,10 @@ export function WorkoutsScreen() {
           ) : (
             <>
               <div className="workouts-section-head">
-                <h2 className="workouts-section-title">{copy.history.monthTitle}</h2>
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{eyebrow.month}</Eyebrow>
+                  {copy.history.monthTitle}
+                </h2>
               </div>
               <MonthCalendar
                 month={shownMonth}
@@ -214,7 +227,10 @@ export function WorkoutsScreen() {
               />
 
               <div className="workouts-section-head">
-                <h2 className="workouts-section-title">{copy.history.logTitle}</h2>
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{eyebrow.log}</Eyebrow>
+                  {copy.history.logTitle}
+                </h2>
                 {day && (
                   <button type="button" className="workouts-section-link" onClick={() => setDay(null)}>
                     {copy.history.clearDay}

@@ -3,6 +3,9 @@
 }
 
 .today-headline-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
   margin: 0 0 calc(var(--space-1) / 2);
   font-size: var(--text-xs);
   font-weight: var(--font-weight-semibold);
@@ -14,7 +17,7 @@
   display: -webkit-box;
   margin: 0;
   overflow: hidden;
-  font-family: var(--font-numeric);
+  font-family: var(--font-num);
   font-size: var(--text-home-title);
   font-style: italic;
   font-weight: var(--font-weight-extrabold);
@@ -28,12 +31,13 @@
   color: var(--color-on-stage);
 }
 
-/* Hebrew has no italic or case: Rubik, upright, a little smaller so it sits like the Latin. */
+/* Hebrew has no italic or case: Karantina, upright. Its line height keeps the clamped second line's
+   descenders (ק ך ן) inside the box. */
 .today-headline-title-he {
-  font-family: var(--font-family-home);
-  font-size: var(--text-4xl);
+  font-family: var(--font-display-he);
+  font-size: var(--text-display-3xl);
   font-style: normal;
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-display);
+  letter-spacing: 0;
 }

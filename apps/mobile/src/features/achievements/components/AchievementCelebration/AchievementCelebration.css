@@ -19,10 +19,7 @@
 
 .achievement-celebration-name {
   margin-top: var(--space-1);
-  font-family: var(--font-family-display);
-  font-size: var(--text-xl);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
+  font-size: var(--text-display-lg);
   color: var(--color-primary-deep);
   overflow-wrap: anywhere;
 }

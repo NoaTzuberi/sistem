@@ -56,7 +56,7 @@ export function PortionTracker(props: PortionTrackerProps) {
         >
           <IconChevronLeft className="flip-rtl" size={20} aria-hidden="true" />
         </button>
-        <h2 className="portion-tracker-title" id="portion-tracker-title">
+        <h2 className="portion-tracker-title display-title" id="portion-tracker-title">
           {date === today ? `${copy.today}, ${formatDateOnly(date, language)}` : formatDateOnly(date, language)}
         </h2>
         <button

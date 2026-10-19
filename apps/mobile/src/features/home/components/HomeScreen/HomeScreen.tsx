@@ -4,6 +4,8 @@ import { IconCalendarEvent } from '@tabler/icons-react';
 import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
 import { ROUTES, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../../workouts/hooks/useStartWorkout';
 import { StartConflictModal } from '../../../workouts/components/StartConflictModal/StartConflictModal';
 import { useHomeData } from '../../hooks/useHomeData';
@@ -27,6 +29,7 @@ import './HomeScreen.css';
  */
 export function HomeScreen() {
   const copy = useCopy(homeCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const language = useLanguage();
   const navigate = useNavigate();
   const home = useHomeData();
@@ -90,6 +93,7 @@ export function HomeScreen() {
         <section className="home-section" aria-labelledby="home-week-title">
           <div className="home-section-head">
             <h2 className="home-section-title" id="home-week-title">
+              <Eyebrow>{eyebrow.thisWeek}</Eyebrow>
               {fill(copy.week.title, { range: formatWeekRange(data.weekStartDate, language) })}
             </h2>
             {data.plan && (
@@ -121,6 +125,7 @@ export function HomeScreen() {
         <section className="home-section" aria-labelledby="home-achievement-title">
           <div className="home-section-head">
             <h2 className="home-section-title" id="home-achievement-title">
+              <Eyebrow>{eyebrow.nextGoal}</Eyebrow>
               {copy.achievement.title}
             </h2>
             <button type="button" className="home-section-link" onClick={() => navigate(ROUTES.PROFILE_ACHIEVEMENTS)}>
@@ -140,6 +145,7 @@ export function HomeScreen() {
         <section className="home-section" aria-labelledby="home-fuel-title">
           <div className="home-section-head">
             <h2 className="home-section-title" id="home-fuel-title">
+              <Eyebrow>{eyebrow.fuel}</Eyebrow>
               {copy.fuel.title}
             </h2>
             <button type="button" className="home-section-link" onClick={() => navigate(ROUTES.NUTRITION)}>

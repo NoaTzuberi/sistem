@@ -19,10 +19,9 @@
 }
 
 .workout-log-page-title {
+  line-height: var(--line-height-numeric);
   margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--text-2xl);
-  line-height: var(--line-height-tight);
+  font-size: var(--text-preview-title);
   overflow-wrap: anywhere;
 }
 

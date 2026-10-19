@@ -78,7 +78,7 @@ export function IntervalTimerPage() {
       <div className="interval-setup">
         <header className="interval-setup-header">
           <BackButton />
-          <h1 className="interval-setup-title">{copy.interval.timerTitle}</h1>
+          <h1 className="interval-setup-title display-title">{copy.interval.timerTitle}</h1>
         </header>
 
         <SetupRow

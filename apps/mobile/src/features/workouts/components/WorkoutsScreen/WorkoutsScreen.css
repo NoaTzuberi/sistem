@@ -3,7 +3,7 @@
   min-height: 100%;
   background-color: var(--color-card);
   color: var(--color-ink);
-  font-family: var(--font-family-home);
+  font-family: var(--font-body);
 }
 
 .workouts-panel {
@@ -28,8 +28,12 @@
 }
 
 .workouts-section-title {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
   margin: 0;
-  font-family: var(--font-family-home);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-muted);

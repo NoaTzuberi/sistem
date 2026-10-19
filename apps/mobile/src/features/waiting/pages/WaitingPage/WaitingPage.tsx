@@ -130,7 +130,7 @@ export function WaitingPage() {
         <Logo variant="mark" className="waiting-logo" />
 
         <div className="waiting-content">
-          <h1 className="waiting-title">{isReady ? copy.readyTitle : copy.title}</h1>
+          <h1 className="waiting-title display-title">{isReady ? copy.readyTitle : copy.title}</h1>
 
           {remainingMs === null && !isReady && <Spinner size="lg" />}
 

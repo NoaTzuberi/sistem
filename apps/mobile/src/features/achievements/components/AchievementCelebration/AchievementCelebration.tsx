@@ -30,7 +30,7 @@ export function AchievementCelebration() {
           return (
             <li key={achievement.id} className="achievement-celebration-item" data-reveal>
               <AchievementBadge type={achievement.type} size="lg" />
-              <span className="achievement-celebration-name">{text.name}</span>
+              <span className="achievement-celebration-name display-title">{text.name}</span>
               <span className="achievement-celebration-description">{text.description}</span>
             </li>
           );

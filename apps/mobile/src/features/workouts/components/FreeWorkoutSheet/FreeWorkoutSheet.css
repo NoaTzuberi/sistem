@@ -1,9 +1,6 @@
 .free-sheet-title {
   margin: 6px 0 var(--space-1);
-  font-family: var(--font-family-home);
-  font-size: var(--text-xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--text-display-xl);
   color: var(--color-ink);
 }
 
@@ -66,8 +63,7 @@
 }
 
 .free-sheet-option-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-sm);
 }
 
 .free-sheet-option-note,
