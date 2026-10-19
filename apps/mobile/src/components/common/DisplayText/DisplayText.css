@@ -1,0 +1,17 @@
+/* Barlow's figures stand taller than Karantina's letters at the same size: a little smaller sits level
+   with the word (owner's reference: 42px numbers next to 48px Hebrew). */
+.display-number {
+  font-family: var(--font-num);
+  font-size: 0.875em;
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-display-num);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* English: the heading is Barlow already — the number stays its size. */
+:root:lang(en) .display-number {
+  font-size: 1em;
+}

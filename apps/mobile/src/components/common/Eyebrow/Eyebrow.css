@@ -1,0 +1,22 @@
+/* JetBrains Mono 700, 10px, tracked out, faint. Always left-to-right Latin, isolated from the Hebrew
+   label around it. The color comes from the context (--eyebrow-color) so it also works on pink / ink. */
+.eyebrow {
+  display: inline-block;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: isolate;
+  color: var(--eyebrow-color, var(--color-text-faint));
+}
+
+/* English: the label next to it already reads the same — show it once. */
+:root:lang(en) .eyebrow:not(.eyebrow-keep) {
+  display: none;
+}

@@ -11,6 +11,21 @@ export const en: CopyShape<typeof he> = {
     trainees: 'Trainees',
     navigation: 'Main',
   },
+  // The small Latin mono "eyebrows" next to Hebrew section labels (decoration, aria-hidden). Latin in
+  // both languages on purpose (owner's type system). Weekdays: Sunday first.
+  eyebrow: {
+    today: 'TODAY',
+    thisWeek: 'THIS WEEK',
+    nextWeek: 'NEXT WEEK',
+    coach: 'COACH',
+    nextGoal: 'NEXT GOAL',
+    fuel: 'FUEL',
+    extra: 'EXTRA',
+    month: 'MONTH',
+    log: 'LOG',
+    upNext: 'UP NEXT',
+    weekdays: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+  },
   comingSoon: 'Coming soon.',
   unread: plural({ one: '{count} unread', other: '{count} unread' }),
 };

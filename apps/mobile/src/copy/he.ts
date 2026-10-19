@@ -12,6 +12,21 @@ export const he = {
     trainees: 'מתאמנות',
     navigation: 'ראשי',
   },
+  // The small Latin mono "eyebrows" next to Hebrew section labels (decoration, aria-hidden). Latin in
+  // both languages on purpose (owner's type system). Weekdays: Sunday first.
+  eyebrow: {
+    today: 'TODAY',
+    thisWeek: 'THIS WEEK',
+    nextWeek: 'NEXT WEEK',
+    coach: 'COACH',
+    nextGoal: 'NEXT GOAL',
+    fuel: 'FUEL',
+    extra: 'EXTRA',
+    month: 'MONTH',
+    log: 'LOG',
+    upNext: 'UP NEXT',
+    weekdays: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+  },
   comingSoon: 'בקרוב.',
   unread: plural({ one: 'התראה אחת שלא נקראה', two: '2 התראות שלא נקראו', other: '{count} התראות שלא נקראו' }),
 } as const;
