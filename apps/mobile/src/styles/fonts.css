@@ -1,0 +1,44 @@
+/* The trainee type system's font files: self-hosted (@fontsource, imported in main.tsx) so the Capacitor
+   build needs no network. Only the subsets / weights the app draws are loaded. Tokens: --font-display-he,
+   --font-num, --font-mono, --font-body (packages/tokens/tokens.css).
+
+   Size-adjusted fallbacks: until a face has loaded (font-display: swap) the text is drawn in a local font
+   scaled to the same average glyph width and line metrics, so the swap doesn't move the layout. Values
+   measured from the @fontsource files (avg. width of the Hebrew / Latin letters or digits vs Arial;
+   ascent / descent ÷ size-adjust). Re-measure if a face changes. */
+
+@font-face {
+  font-family: 'Karantina Fallback';
+  src: local('Arial'), local('ArialMT'), local('Roboto');
+  size-adjust: 70.4%;
+  ascent-override: 122%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Barlow Condensed Fallback';
+  src: local('Arial'), local('ArialMT'), local('Roboto');
+  size-adjust: 78%;
+  ascent-override: 128.2%;
+  descent-override: 25.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Rubik Fallback';
+  src: local('Arial'), local('ArialMT'), local('Roboto');
+  size-adjust: 111%;
+  ascent-override: 84.2%;
+  descent-override: 22.5%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Menlo'), local('Courier New'), local('Roboto Mono');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
