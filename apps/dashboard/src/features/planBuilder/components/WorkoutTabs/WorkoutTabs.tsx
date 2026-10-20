@@ -3,6 +3,9 @@ import { workoutSetCount } from '../../data/planStats';
 import { workoutColorClass } from '../../data/workoutColors';
 import { workoutTabId } from '../../data/workoutTabs';
 import { useTabListKeys } from '../../hooks/useTabListKeys';
+import type { CardioSession } from '@sistem/types';
+import { CardioTab } from '../CardioTab/CardioTab';
+import { WorkoutAddMenu } from '../WorkoutAddMenu/WorkoutAddMenu';
 import type { DraftWorkout } from '../../types';
 import { planBuilderCopy } from '../../copy';
 import './WorkoutTabs.css';
@@ -16,6 +19,10 @@ interface WorkoutTabsProps {
   panelId: string;
   onSelect: (workoutKey: string) => void;
   onAdd: () => void;
+  /** This week's cardio sessions (drafts too) and where each one opens. */
+  cardioSessions: CardioSession[];
+  cardioPath: (sessionId?: string) => string;
+  onAddCardio: () => void;
 }
 
 /**
@@ -23,7 +30,7 @@ interface WorkoutTabsProps {
  * is filled. Switching is instant — it is used all the time. A workout's day is only a label
  * here (none, or shared with another workout, is fine); it is chosen inside the workout.
  */
-export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAdd }: WorkoutTabsProps) {
+export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAdd, cardioSessions, cardioPath, onAddCardio }: WorkoutTabsProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   const handleKeyDown = useTabListKeys();
@@ -59,9 +66,10 @@ export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelec
           );
         })}
       </div>
-      <button className="workout-tab-add" type="button" onClick={onAdd}>
-        {copy.addWorkoutShort}
-      </button>
+      {cardioSessions.map((session) => (
+        <CardioTab key={session.id} session={session} to={cardioPath(session.id)} />
+      ))}
+      <WorkoutAddMenu onAddStrength={onAdd} onAddCardio={onAddCardio} />
     </div>
   );
 }

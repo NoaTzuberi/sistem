@@ -1,0 +1,39 @@
+.cb-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cb-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1.5px dashed color-mix(in srgb, var(--color-text-faint) 55%, transparent);
+  border-radius: var(--radius-round);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    border-color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease;
+}
+
+.cb-add-button:active {
+  transform: scale(var(--press-scale));
+}
+
+.cb-add-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cb-add-button:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-card);
+  }
+}

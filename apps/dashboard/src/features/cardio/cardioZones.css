@@ -1,0 +1,7 @@
+/* The five intensity zones as local variables: --cb-c fill, --cb-s tint, --cb-t ink on the tint.
+   Set data-zone (1–5) on an element with the cb-zone class. */
+.cb-zone[data-zone='1'] { --cb-c: var(--color-zone-1); --cb-s: var(--color-zone-1-soft); --cb-t: var(--color-zone-1-text); }
+.cb-zone[data-zone='2'] { --cb-c: var(--color-zone-2); --cb-s: var(--color-zone-2-soft); --cb-t: var(--color-zone-2-text); }
+.cb-zone[data-zone='3'] { --cb-c: var(--color-zone-3); --cb-s: var(--color-zone-3-soft); --cb-t: var(--color-zone-3-text); }
+.cb-zone[data-zone='4'] { --cb-c: var(--color-zone-4); --cb-s: var(--color-zone-4-soft); --cb-t: var(--color-zone-4-text); }
+.cb-zone[data-zone='5'] { --cb-c: var(--color-zone-5); --cb-s: var(--color-zone-5-soft); --cb-t: var(--color-zone-5-text); }

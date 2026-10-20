@@ -1,0 +1,141 @@
+/* A guard: nothing in the chart widens the page sideways (the tips may still rise above it). */
+.cb-graph-wrap {
+  overflow-x: clip;
+}
+
+/* Time runs left → right in both languages (like every chart). */
+.cb-graph {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 130px;
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: var(--radius-qv-tile);
+  background-color: var(--color-fill-soft);
+  direction: ltr;
+}
+
+.cb-graph::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  background: repeating-linear-gradient(to top, transparent 0 21px, var(--color-cardio-grid) 21px 22px);
+  pointer-events: none;
+}
+
+.cb-graph-bar {
+  position: relative;
+  flex-grow: var(--cb-w);
+  flex-basis: 0;
+  min-width: 3px;
+  height: var(--cb-h);
+  padding: 0;
+  border-radius: 6px 6px 3px 3px;
+  background-color: var(--cb-c);
+  transition:
+    height 320ms var(--ease-press),
+    flex-grow 320ms var(--ease-press),
+    opacity var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+}
+
+.cb-graph-bar:active {
+  transform: scaleY(0.97);
+  transform-origin: bottom;
+}
+
+.cb-graph-bar[data-dim] {
+  opacity: 0.35;
+}
+
+.cb-graph-bar:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cb-graph-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  /* physical: centered over the bar (the chart is always left → right) */
+  left: 50%;
+  z-index: var(--z-top);
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity var(--transition-fast) ease;
+}
+
+.cb-graph-bar[data-tip-edge='left'] .cb-graph-tip {
+  left: 0; /* physical: the chart is always left → right */
+  transform: none;
+}
+
+.cb-graph-bar[data-tip-edge='right'] .cb-graph-tip {
+  right: 0; /* physical: the chart is always left → right */
+  left: auto; /* physical: undoes the centered tip's left */
+  transform: none;
+}
+
+.cb-graph-bar:focus-visible .cb-graph-tip {
+  opacity: 1;
+}
+
+.cb-graph-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 0 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-faint);
+  direction: ltr;
+}
+
+.cb-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+.cb-graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cb-graph-legend-item i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background-color: var(--cb-c);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cb-graph-bar:hover .cb-graph-tip {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-graph-bar,
+  .cb-graph-tip {
+    transition: none;
+  }
+}

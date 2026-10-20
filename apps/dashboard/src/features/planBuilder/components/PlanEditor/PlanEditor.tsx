@@ -1,11 +1,13 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { AiPlanExercise, AiSplitOption, AiTrainingRecommendation, CoachPlan, ExerciseFacts, TrainingSlot } from '@sistem/types';
-import { DUPLICATE_WEEK_STATE, traineePath } from '../../../../app/config/routes';
+import { DUPLICATE_WEEK_STATE, cardioBuilderPath, traineePath } from '../../../../app/config/routes';
+import { listTraineeCardio } from '../../../../services/cardio/cardioService';
+import { sessionInWeek } from '../../../cardio/data/cardioDraft';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
-import { fill, findWorkoutType, formatPlural, formatWeekSpan, sharedCopy, splitLabel, useCopy, useLanguage } from '@sistem/shared';
+import { fill, findWorkoutType, formatPlural, formatWeekSpan, sharedCopy, splitLabel, useCopy, useLanguage, useLoad } from '@sistem/shared';
 import { PublishModal } from '../../../../components/common/PublishModal/PublishModal';
 import type { PublishSummary } from '../../../../components/common/PublishModal/PublishModal';
 import { appCopy } from '../../../../copy';
@@ -63,6 +65,10 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   const [librarySlot, setLibrarySlot] = useState<TrainingSlot>();
   const { toastMessage, showToast } = useToast();
   const panelId = useId();
+  // This week's cardio sessions, shown next to the workouts; each opens its own builder.
+  const loadCardio = useCallback(() => listTraineeCardio(traineeId), [traineeId]);
+  const cardio = useLoad(loadCardio, '');
+  const weekCardio = (cardio.data?.sessions ?? []).filter((session) => sessionInWeek(session, initialPlan.weekStartDate));
 
   const isPublished = plan.status === 'published';
   const { workouts } = draft;
@@ -302,6 +308,9 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
             panelId={panelId}
             onSelect={setSelectedKey}
             onAdd={handleAddWorkout}
+            cardioSessions={weekCardio}
+            cardioPath={(sessionId) => cardioBuilderPath(traineeId, initialPlan.id, sessionId)}
+            onAddCardio={() => navigate(cardioBuilderPath(traineeId, initialPlan.id))}
           />
           <div id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
             {/* Keyed by workout: another workout starts with its rows closed. */}

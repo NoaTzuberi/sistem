@@ -6,6 +6,9 @@ export const ROUTES = {
   TRAINEES: '/trainees',
   TRAINEE: '/trainees/:traineeId',
   PLAN: '/trainees/:traineeId/plans/:planId',
+  // A cardio session of that plan week: new without an id, then its own address (one route, so the
+  // builder stays mounted when a new session gets its id).
+  CARDIO: '/trainees/:traineeId/plans/:planId/cardio/:sessionId?',
   // Nutrition (Phase 13a): the coach's food list, templates and numbers, and each
   // trainee's nutrition plan builder.
   NUTRITION: '/nutrition',
@@ -44,6 +47,11 @@ export function traineePath(traineeId: string, tab?: TraineeTab): string {
 
 export function planPath(traineeId: string, planId: string): string {
   return `${ROUTES.TRAINEES}/${traineeId}/plans/${planId}`;
+}
+
+export function cardioBuilderPath(traineeId: string, planId: string, sessionId?: string): string {
+  const path = `${planPath(traineeId, planId)}/cardio`;
+  return sessionId ? `${path}/${sessionId}` : path;
 }
 
 export function nutritionBuilderPath(traineeId: string): string {

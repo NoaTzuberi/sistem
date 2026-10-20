@@ -1,0 +1,87 @@
+.cb-stepper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 4px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.cb-stepper-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--color-text);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.cb-stepper-button:active {
+  transform: scale(0.9);
+}
+
+.cb-stepper-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.cb-stepper-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.cb-stepper-unit {
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+/* The intensity stepper in the block's zone. */
+.cb-stepper-zone {
+  background-color: var(--cb-s);
+}
+
+.cb-stepper-zone .cb-stepper-value,
+.cb-stepper-zone .cb-stepper-unit {
+  color: var(--cb-t);
+}
+
+/* The repeat set's ×N on its soft box. */
+.cb-stepper-repeat {
+  height: 36px;
+  background-color: var(--color-card);
+}
+
+.cb-stepper-repeat .cb-stepper-button {
+  width: 28px;
+  height: 28px;
+  background-color: var(--color-fill-soft);
+}
+
+.cb-stepper-repeat .cb-stepper-value {
+  min-width: 44px;
+  font-size: var(--text-base);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cb-stepper-button:hover {
+    background-color: var(--color-fill-soft);
+  }
+
+  .cb-stepper-repeat .cb-stepper-button:hover {
+    background-color: var(--color-hairline);
+  }
+}
