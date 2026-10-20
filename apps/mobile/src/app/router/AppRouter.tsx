@@ -5,6 +5,8 @@ import {
   WORKOUT_DETAIL_PATH,
   WORKOUT_LOG_PATH,
   WORKOUT_SESSION_PATH,
+  CARDIO_DETAIL_PATH,
+  CARDIO_RUN_PATH,
   WORKOUT_SUMMARY_PATH,
   ONBOARDING_EDIT_PATH,
 } from '../config/routes';
@@ -12,6 +14,8 @@ import { Login } from '../../features/auth/pages/Login/Login';
 import { Register } from '../../features/auth/pages/Register/Register';
 import { ForgotPassword } from '../../features/auth/pages/ForgotPassword/ForgotPassword';
 import { ResetPassword } from '../../features/auth/pages/ResetPassword/ResetPassword';
+import { CardioDetailPage } from '../../features/cardio/pages/CardioDetailPage/CardioDetailPage';
+import { CardioRunPage } from '../../features/cardio/pages/CardioRunPage/CardioRunPage';
 import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute/ProtectedRoute';
 import { AppStateGuard } from '../../features/auth/components/AppStateGuard/AppStateGuard';
 import { RootRedirect } from '../../features/auth/components/RootRedirect/RootRedirect';
@@ -76,6 +80,8 @@ function AppRoutes({ location }: { location: Location }) {
             <Route path={WORKOUT_DETAIL_PATH} element={<WorkoutDetailPage />} />
             <Route path={WORKOUT_LOG_PATH} element={<WorkoutLogPage />} />
             <Route path={WORKOUT_SESSION_PATH} element={<WorkoutSessionPage />} />
+            <Route path={CARDIO_DETAIL_PATH} element={<CardioDetailPage />} />
+            <Route path={CARDIO_RUN_PATH} element={<CardioRunPage />} />
             <Route path={WORKOUT_SUMMARY_PATH} element={<WorkoutSummaryPage />} />
             <Route path={ROUTES.INTERVAL_TIMER} element={<IntervalTimerPage />} />
             <Route path={ROUTES.NUTRITION} element={<NutritionPage />} />

@@ -1,0 +1,7 @@
+/* The five intensity zones as local variables (data-zone 1–5 on a .cp-zone element): --cp-c fill,
+   --cp-s tint, --cp-t ink on the tint, --cp-stage the live ground under white text. */
+.cp-zone[data-zone='1'] { --cp-c: var(--color-zone-1); --cp-s: var(--color-zone-1-soft); --cp-t: var(--color-zone-1-text); --cp-stage: var(--color-zone-1-stage); }
+.cp-zone[data-zone='2'] { --cp-c: var(--color-zone-2); --cp-s: var(--color-zone-2-soft); --cp-t: var(--color-zone-2-text); --cp-stage: var(--color-zone-2-stage); }
+.cp-zone[data-zone='3'] { --cp-c: var(--color-zone-3); --cp-s: var(--color-zone-3-soft); --cp-t: var(--color-zone-3-text); --cp-stage: var(--color-zone-3-stage); }
+.cp-zone[data-zone='4'] { --cp-c: var(--color-zone-4); --cp-s: var(--color-zone-4-soft); --cp-t: var(--color-zone-4-text); --cp-stage: var(--color-zone-4-stage); }
+.cp-zone[data-zone='5'] { --cp-c: var(--color-zone-5); --cp-s: var(--color-zone-5-soft); --cp-t: var(--color-zone-5-text); --cp-stage: var(--color-zone-5-stage); }

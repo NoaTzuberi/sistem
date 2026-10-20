@@ -1,0 +1,17 @@
+.cp-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  text-transform: var(--font-display-case);
+  line-height: 0.85;
+  overflow-wrap: anywhere;
+}
+
+.cp-title-latin {
+  font-family: var(--font-num);
+  font-style: italic;
+  font-weight: 800;
+  /* Barlow fills more of its size than Karantina. */
+  font-size: 0.82em;
+}

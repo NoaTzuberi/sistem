@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IconPlus } from '@tabler/icons-react';
-import { useCopy } from '@sistem/shared';
+import { sharedCopy, useCopy } from '@sistem/shared';
 import { workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../hooks/useStartWorkout';
 import { useWeekPlan } from '../../hooks/useWeekPlan';
+import { useCardioWeek } from '../../../cardio/hooks/useCardioWeek';
+import { CardioWeekList } from '../../../cardio/components/CardioWeekList/CardioWeekList';
+import { cardioCopy } from '../../../cardio/copy';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFreeWorkout } from '../../hooks/useFreeWorkout';
 import { FREE_WORKOUT_ENABLED } from '../../data/freeWorkout';
@@ -52,6 +55,10 @@ export function WorkoutsScreen() {
   const tab: WorkoutsTab = params.get(TAB_PARAM) === 'history' ? 'history' : 'plan';
 
   const { weekPlan, activeLog, error, isLoading, reload } = useWeekPlan();
+  const cardioWeek = useCardioWeek();
+  const cardioText = useCopy(cardioCopy);
+  const sharedText = useCopy(sharedCopy);
+  const cardioItems = cardioWeek.data?.items ?? [];
   const starter = useStartWorkout();
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
   const [isFreeOpen, setIsFreeOpen] = useState(false);
@@ -158,6 +165,18 @@ export function WorkoutsScreen() {
                 label={copy.plan.allWorkouts}
                 onOpen={(planned) => setPreview({ planned, isNextWeek: false })}
               />
+            </>
+          )}
+
+          {cardioItems.length > 0 && (
+            <>
+              <div className="workouts-section-head">
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{cardioText.eyebrowCardio}</Eyebrow>
+                  {sharedText.cardio.cardioTag}
+                </h2>
+              </div>
+              <CardioWeekList items={cardioItems} />
             </>
           )}
 

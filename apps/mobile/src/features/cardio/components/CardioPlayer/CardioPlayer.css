@@ -1,0 +1,316 @@
+/* Full screen on the block's zone (white text only on the -stage grounds), with a faint vertical grid. */
+.cp-live {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  max-width: var(--app-column-max);
+  margin-inline: auto;
+  padding:
+    calc(var(--safe-top) + var(--space-4))
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    calc(var(--safe-bottom) + var(--space-4))
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  overflow: hidden;
+  background-color: var(--cp-stage);
+  color: var(--color-on-primary);
+  transition: background-color var(--transition-zone) ease;
+}
+
+.cp-live::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, var(--color-on-zone-soft) 0 1px, transparent 1px 48px);
+  -webkit-mask-image: linear-gradient(to bottom, var(--color-ink), transparent 70%);
+  mask-image: linear-gradient(to bottom, var(--color-ink), transparent 70%);
+  pointer-events: none;
+}
+
+.cp-live > * {
+  position: relative;
+}
+
+/* The global type styles color paragraphs; on a zone ground every text is white. */
+.cp-live p,
+.cp-live b,
+.cp-live span {
+  color: inherit;
+}
+
+.cp-live-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cp-live-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-zone-soft);
+  color: var(--color-on-primary);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.cp-live-icon:active,
+.cp-live-control:active {
+  transform: scale(0.94);
+}
+
+.cp-live-eyebrow {
+  margin-inline-start: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--color-on-zone-muted);
+}
+
+.cp-live-kind {
+  margin: var(--space-5) 0 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  text-transform: var(--font-display-case);
+  font-size: var(--text-cardio-kind);
+  line-height: 0.78;
+  white-space: nowrap;
+}
+
+.cp-live-kind-long {
+  font-size: var(--text-cardio-kind-long);
+}
+
+.cp-live-target {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.cp-live-target-value {
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+}
+
+.cp-live-clock {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-num);
+  font-size: var(--text-cardio-clock);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  direction: ltr;
+}
+
+.cp-live-clock span {
+  display: inline-block;
+}
+
+.cp-live-clock-beat {
+  animation: cp-live-beat var(--transition-beat) var(--ease-slide-snap);
+}
+
+@keyframes cp-live-beat {
+  30% {
+    transform: scale(1.06);
+  }
+}
+
+.cp-live-bar {
+  height: 8px;
+  margin-top: 18px;
+  border-radius: 4px;
+  background-color: var(--color-on-zone-track);
+  overflow: hidden;
+}
+
+.cp-live-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background-color: var(--color-on-primary);
+  transform: scaleX(var(--cp-p));
+  transform-origin: left;
+  transition: transform 200ms linear;
+}
+
+[dir='rtl'] .cp-live-bar i {
+  /* physical: the bar fills from the reading start */
+  transform-origin: right;
+}
+
+.cp-live-next {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-tile);
+  background-color: var(--color-on-zone-soft);
+}
+
+.cp-live-next-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-round);
+  background-color: var(--cp-c);
+  box-shadow: 0 0 0 2px var(--color-on-primary);
+}
+
+.cp-live-next-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-live-next-text span {
+  font-size: 13px;
+}
+
+.cp-live-next-text b {
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  text-transform: var(--font-display-case);
+  font-size: var(--text-display-xs);
+  line-height: 0.9;
+}
+
+.cp-live-next-time {
+  margin-inline-start: auto;
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+/* The whole session, time left → right. */
+.cp-live-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 40px;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  direction: ltr;
+}
+
+.cp-live-strip i {
+  flex-grow: var(--cp-w);
+  flex-basis: 0;
+  min-width: 2px;
+  height: var(--cp-h);
+  border-radius: 3px 3px 1px 1px;
+  background-color: var(--color-on-zone-upcoming);
+  transition: background-color 300ms ease;
+}
+
+.cp-live-strip i[data-state='done'] {
+  background-color: var(--color-on-zone-done);
+}
+
+.cp-live-strip i[data-state='now'] {
+  background-color: var(--color-on-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ink) 25%, transparent);
+}
+
+.cp-live-totals {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: var(--text-xs);
+}
+
+.cp-live-totals bdi {
+  font-family: var(--font-num);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.cp-live-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 18px;
+  direction: ltr;
+}
+
+.cp-live-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-cardio-control);
+  height: var(--size-cardio-control);
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-zone-soft);
+  color: var(--color-on-primary);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.cp-live-control-main {
+  width: var(--size-cardio-control-main);
+  height: var(--size-cardio-control-main);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+
+.cp-live-icon:focus-visible,
+.cp-live-control:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-on-primary);
+  outline-offset: 3px;
+}
+
+.cp-live-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cp-live-icon:hover,
+  .cp-live-control:not(.cp-live-control-main):hover {
+    background-color: var(--color-on-zone-raised);
+  }
+}
+
+/* --text-cardio-clock-sm: under 440px wide. */
+@media (max-width: 440px) {
+  .cp-live-clock {
+    font-size: var(--text-cardio-clock-sm);
+  }
+}
+
+/* A short phone (iPhone SE): the name and clock give room so nothing scrolls. */
+@media (max-height: 700px) {
+  .cp-live-kind {
+    margin-top: var(--space-3);
+    font-size: var(--text-cardio-kind-long);
+  }
+
+  .cp-live-clock {
+    font-size: calc(var(--text-cardio-clock-sm) - 16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-live,
+  .cp-live-strip i,
+  .cp-live-bar i {
+    transition: none;
+  }
+
+  .cp-live-clock-beat {
+    animation: none;
+  }
+}

@@ -1,0 +1,42 @@
+.cp-countdown {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-top);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-ink);
+  color: var(--color-on-primary);
+}
+
+.cp-countdown-number {
+  font-family: var(--font-num);
+  font-size: var(--text-cardio-countdown);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+  animation: cp-countdown-in var(--transition-countdown) var(--ease-press) both;
+}
+
+@keyframes cp-countdown-in {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-countdown-number {
+    animation: none;
+  }
+}

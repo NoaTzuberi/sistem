@@ -1,0 +1,66 @@
+/* White screen, ink type (as Workouts B). */
+.cp-detail {
+  min-height: 100%;
+  padding:
+    calc(var(--safe-top) + var(--space-3))
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    calc(var(--safe-bottom) + var(--space-5))
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+
+/* Room for the floating slide (the detail is full screen: no dock). */
+.cp-detail-with-slide {
+  padding-block-end: calc(var(--slide-height) + var(--slide-float-offset) + var(--safe-bottom) + var(--space-5));
+}
+
+.cp-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cp-detail-eyebrow {
+  display: block;
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--color-text-faint);
+}
+
+.cp-detail-title {
+  margin-top: var(--space-2);
+  font-size: var(--text-cardio-title);
+}
+
+.cp-detail-done,
+.cp-detail-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: var(--space-2) 0 0;
+  padding: 4px 12px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary-deep);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cp-detail-saved {
+  display: flex;
+  width: fit-content;
+}
+
+.cp-detail-options {
+  margin-top: var(--space-4);
+}
+
+.cp-detail-note {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

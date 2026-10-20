@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router-dom';
 import type { UserRole } from '@sistem/types';
-import { ROUTES, WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH } from './routes';
+import { CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, ROUTES, WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH } from './routes';
 
 // The dock's tabs by role (PRD §5 trainee tabs, §6 coach mode), in dock order — the order decides
 // the direction of the screen transition (a higher index = forward).
@@ -27,7 +27,8 @@ export const TABS: Record<UserRole, TabRoute[]> = {
 };
 
 // Full-screen flows under a tab's path: no dock, no tab transition.
-const FULL_SCREEN = [WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH];
+// The cardio detail too: its slide floats where the dock would be (docs/design/trainee-cardio.html).
+const FULL_SCREEN = [WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH, CARDIO_DETAIL_PATH, CARDIO_RUN_PATH];
 
 function belongsTo(pathname: string, to: string): boolean {
   return pathname === to || pathname.startsWith(`${to}/`);

@@ -5,15 +5,19 @@ import { workoutCopy } from '../../../workouts/copy';
 import { exerciseCountLabel } from '../../../workouts/data/workoutDisplay';
 import { type PlannedWorkout, type WeekDay, isHebrewText } from '../../data/homeDisplay';
 import { homeCopy } from '../../copy';
+import type { CardioOccurrence } from '@sistem/types';
+import { CardioWeekList } from '../../../cardio/components/CardioWeekList/CardioWeekList';
 import './WeekDayDetail.css';
 
 interface WeekDayDetailProps {
   day: WeekDay;
   planId: string | null;
+  /** That day's cardio sessions. */
+  cardio?: CardioOccurrence[];
 }
 
 /** The selected lane, read out: color chip + workout name + status — or "rest day · recovery". */
-export function WeekDayDetail({ day, planId }: WeekDayDetailProps) {
+export function WeekDayDetail({ day, planId, cardio = [] }: WeekDayDetailProps) {
   const copy = useCopy(homeCopy);
   const workoutText = useCopy(workoutCopy);
   const language = useLanguage();
@@ -28,7 +32,7 @@ export function WeekDayDetail({ day, planId }: WeekDayDetailProps) {
 
   return (
     <div className="week-day-detail" aria-live="polite">
-      {day.workouts.length === 0 && (
+      {day.workouts.length === 0 && cardio.length === 0 && (
         <p className="week-day-detail-row week-day-detail-rest">
           <span className="week-day-detail-chip" aria-hidden="true" />
           {copy.week.rest}
@@ -51,6 +55,7 @@ export function WeekDayDetail({ day, planId }: WeekDayDetailProps) {
             <span className="week-day-detail-status">{statusOf(planned)}</span>
           </Link>
         ))}
+      {cardio.length > 0 && <CardioWeekList items={cardio} showDay={false} />}
     </div>
   );
 }

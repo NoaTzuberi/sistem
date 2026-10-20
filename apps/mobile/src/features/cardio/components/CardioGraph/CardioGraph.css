@@ -1,0 +1,44 @@
+/* Time left → right in both languages. */
+.cp-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 96px;
+  margin-top: var(--space-4);
+  direction: ltr;
+}
+
+.cp-graph-bar {
+  flex-grow: var(--cp-w);
+  flex-basis: 0;
+  min-width: 2px;
+  height: var(--cp-h);
+  border-radius: 4px 4px 2px 2px;
+  background-color: var(--cp-c);
+  transform-origin: bottom;
+  animation: cp-graph-grow var(--transition-graph-grow) var(--ease-press) both;
+  animation-delay: calc(var(--cp-i) * var(--graph-grow-step));
+}
+
+@keyframes cp-graph-grow {
+  from {
+    transform: scaleY(0.05);
+    opacity: 0;
+  }
+}
+
+.cp-graph-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-faint);
+  direction: ltr;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-graph-bar {
+    animation: none;
+  }
+}

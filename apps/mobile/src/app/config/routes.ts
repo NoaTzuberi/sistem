@@ -89,3 +89,15 @@ export function measurementsLogPath(date?: string): string {
 export function progressPhotosDayPath(date?: string): string {
   return date ? `${ROUTES.PROFILE_PHOTOS_DAY}?date=${date}` : ROUTES.PROFILE_PHOTOS_DAY;
 }
+
+// A cardio session on one of its days, and its live run (full screen: countdown → player → finish).
+export const CARDIO_DETAIL_PATH = '/workouts/cardio/:sessionId/:date';
+export const CARDIO_RUN_PATH = '/workouts/cardio/:sessionId/:date/run';
+
+export function cardioDetailPath(sessionId: string, date: string): string {
+  return `/workouts/cardio/${sessionId}/${date}`;
+}
+
+export function cardioRunPath(sessionId: string, date: string): string {
+  return `/workouts/cardio/${sessionId}/${date}/run`;
+}

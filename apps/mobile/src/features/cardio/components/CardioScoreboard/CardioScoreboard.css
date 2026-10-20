@@ -1,0 +1,32 @@
+.cp-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--space-4) 0 0;
+  padding-block: var(--space-3);
+  border-block: 1px solid var(--color-hairline);
+}
+
+.cp-scoreboard-item {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding-inline: var(--space-2);
+}
+
+.cp-scoreboard-item + .cp-scoreboard-item {
+  border-inline-start: 1px solid var(--color-hairline);
+}
+
+.cp-scoreboard-value {
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-scoreboard-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}

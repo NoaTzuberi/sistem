@@ -1,0 +1,6 @@
+.cp-run-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-3)) calc(var(--home-gutter) + var(--safe-inline-end)) var(--space-4) calc(var(--home-gutter) + var(--safe-inline-start));
+}
