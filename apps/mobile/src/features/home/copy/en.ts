@@ -28,7 +28,7 @@ export const en: CopyShape<typeof he> = {
     exercises: 'exercises',
     thisWeek: 'this week',
     slideToStart: 'Slide to start workout',
-    startWorkout: 'Start workout',
+    workoutStarted: 'Workout started',
     restDay: 'Rest day',
   },
   photo: {

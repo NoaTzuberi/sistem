@@ -1,0 +1,211 @@
+/* --x / --p / --tw are written by useSlideToStart (offset px, progress 0…1, track width px). */
+.sts {
+  --x: 0px;
+  --p: 0;
+  --sts-inset: calc((var(--slide-height) - var(--slide-knob)) / 2);
+  --sts-trail-width: calc(var(--x) + var(--slide-height));
+  position: relative;
+  height: var(--slide-height);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 1px var(--color-slide-hairline);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sts-floating {
+  position: fixed;
+  inset-inline: calc(var(--slide-float-gutter) + var(--safe-inline-start)) calc(var(--slide-float-gutter) + var(--safe-inline-end));
+  inset-block-end: calc(var(--slide-float-offset) + var(--safe-bottom));
+  z-index: var(--z-tab-bar);
+  /* Centered in the app column on wide screens. */
+  max-width: calc(var(--app-column-max) - 2 * var(--slide-float-gutter));
+  margin-inline: auto;
+  box-shadow: inset 0 0 0 1px var(--color-slide-hairline), var(--shadow-slide-float);
+}
+
+/* The trail: from the start edge to just past the knob; its gradient spans the whole track (pink at the
+   start, purple at the end), so it reveals more purple as it grows. At rest: a thin pink ring under the knob. */
+.sts-trail {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--sts-trail-width);
+  border-radius: var(--radius-round);
+  background-image: linear-gradient(
+    to right,
+    var(--color-slide-trail-start) 0%,
+    var(--color-slide-trail-mid) 50%,
+    var(--color-slide-trail-end) 100%
+  );
+  background-size: var(--tw, 100%) 100%;
+  /* physical: the gradient's anchor follows the reading direction (mirrored below) */
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+[dir='rtl'] .sts-trail {
+  background-image: linear-gradient(
+    to left,
+    var(--color-slide-trail-start) 0%,
+    var(--color-slide-trail-mid) 50%,
+    var(--color-slide-trail-end) 100%
+  );
+  /* physical: RTL anchors the gradient at the right (the start) */
+  background-position: right center;
+}
+
+.sts-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: calc(var(--slide-height) - var(--slide-knob) + var(--slide-label-pad)) var(--space-4);
+  font-size: var(--text-slide-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sts-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sts-go {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-slide-go);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  opacity: var(--opacity-slide-go);
+}
+
+/* The same label in white, shown only where the trail is. */
+.sts-label-on {
+  color: var(--color-on-primary);
+  /* physical: clip-path inset has no logical form; the RTL rule mirrors it */
+  clip-path: inset(0 calc(100% - var(--sts-trail-width)) 0 0);
+}
+
+[dir='rtl'] .sts-label-on {
+  /* physical: RTL keeps the right part (the start) */
+  clip-path: inset(0 0 0 calc(100% - var(--sts-trail-width)));
+}
+
+.sts-knob {
+  position: absolute;
+  inset-block-start: var(--sts-inset);
+  inset-inline-start: var(--sts-inset);
+  display: grid;
+  place-items: center;
+  width: var(--slide-knob);
+  height: var(--slide-knob);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: color-mix(in srgb, var(--color-slide-trail-end) calc(var(--p) * 100%), var(--color-slide-trail-start));
+  box-shadow: var(--shadow-slide-knob);
+  transform: translateX(var(--x));
+  cursor: grab;
+  touch-action: none;
+}
+
+[dir='rtl'] .sts-knob {
+  transform: translateX(calc(var(--x) * -1));
+}
+
+.sts[data-state='dragging'] .sts-knob {
+  cursor: grabbing;
+}
+
+.sts-knob:active {
+  scale: var(--press-scale);
+}
+
+.sts-knob:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.sts-icon {
+  grid-area: 1 / 1;
+  transition:
+    transform var(--transition-knob-icon) var(--ease-press),
+    opacity var(--transition-knob-icon) var(--ease-press);
+}
+
+/* The play triangle sits a hair right of center to look centered (it points right in both languages). */
+.sts-icon-play {
+  /* physical: the play glyph's optical center */
+  translate: 1px 0;
+}
+
+.sts-icon-check {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.sts[data-state='done'] .sts-icon-play {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.sts[data-state='done'] .sts-icon-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sts[data-state='done'] .sts-knob {
+  animation: sts-knob-pop var(--transition-knob-pop) var(--ease-slide-snap);
+}
+
+@keyframes sts-knob-pop {
+  40% {
+    scale: 1.12;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+/* Springing back / snapping to the end: transform, width and clip-path only. While dragging nothing animates. */
+.sts[data-state='snapping'] .sts-knob,
+.sts[data-state='done'] .sts-knob {
+  transition: transform var(--transition-slide-snap) var(--ease-slide-snap);
+}
+
+.sts[data-state='snapping'] .sts-trail,
+.sts[data-state='done'] .sts-trail {
+  transition: width var(--transition-slide-snap) var(--ease-slide-snap);
+}
+
+.sts[data-state='snapping'] .sts-label-on,
+.sts[data-state='done'] .sts-label-on {
+  transition: clip-path var(--transition-slide-snap) var(--ease-slide-snap);
+}
+
+.sts-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Reduced motion: the global rule makes every transition instant (it still ends, so the state resets); no pop. */
+@media (prefers-reduced-motion: reduce) {
+  .sts[data-state='done'] .sts-knob {
+    animation: none;
+  }
+}

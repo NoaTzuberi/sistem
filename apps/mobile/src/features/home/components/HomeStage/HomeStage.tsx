@@ -12,8 +12,11 @@ import { homeCopy } from '../../copy';
 import { DailyObject3D } from '../DailyObject3D/DailyObject3D';
 import { TodayWorkoutHeadline } from '../TodayWorkoutHeadline/TodayWorkoutHeadline';
 import { type WorkoutFact, WorkoutFacts } from '../WorkoutFacts/WorkoutFacts';
-import { SlideToStart } from '../SlideToStart/SlideToStart';
+import { SlideToStart } from '../../../../components/common/SlideToStart/SlideToStart';
 import './HomeStage.css';
+
+/** The slide shows "started" this long, then resets (if Home is still on screen). */
+const SLIDE_RESET_MS = 1800;
 
 interface HomeStageProps {
   name: string;
@@ -127,9 +130,10 @@ export function HomeStage(props: HomeStageProps) {
       {canSlide && (
         <SlideToStart
           label={activeLog ? fill(copy.resumeWorkout, { title: activeLog.workoutTitle }) : copy.stage.slideToStart}
-          knobLabel={activeLog ? fill(copy.resumeWorkout, { title: activeLog.workoutTitle }) : copy.stage.startWorkout}
+          completeLabel={copy.stage.workoutStarted}
           onComplete={onStart}
           busy={isStarting}
+          resetAfterMs={SLIDE_RESET_MS}
         />
       )}
       {startError && (

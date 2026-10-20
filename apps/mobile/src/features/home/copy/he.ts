@@ -27,7 +27,7 @@ export const he = {
     exercises: 'תרגילים',
     thisWeek: 'השבוע',
     slideToStart: 'החליקי להתחלת אימון',
-    startWorkout: 'התחלת אימון',
+    workoutStarted: 'האימון התחיל',
     restDay: 'יום מנוחה',
   },
   photo: {
