@@ -499,4 +499,18 @@ export const he = {
     coachToConfirm: 'לאישור המאמנת',
     daysPerWeek: plural({ one: 'יום אחד בשבוע', two: 'יומיים בשבוע', other: '{count} ימים בשבוע' }),
   },
+  // Cardio sessions (docs/design/coach-cardio-builder.html, trainee-cardio.html — the designs' wording).
+  cardio: {
+    sports: { run: 'ריצה', intervals: 'אינטרוולים', walk: 'הליכה', bike: 'אופניים' },
+    metrics: { rpe: 'מאמץ 1–10', pace: 'קצב', speed: 'מהירות', hrZone: 'אזור דופק' },
+    kinds: { warmup: 'חימום', steady: 'קטע', work: 'עבודה', recovery: 'התאוששות', cooldown: 'שחרור' },
+    zones: ['קל מאוד', 'קל', 'בינוני', 'קשה', 'מקסימלי'],
+    effort: 'מאמץ',
+    effortValue: 'מאמץ {value}',
+    // The trainee's default line per block kind (a steady block has none in the design).
+    tips: { warmup: 'ריצה קלה, נשימה רגועה', work: 'קשה לדבר', recovery: 'הליכה מהירה, לא לעצור', cooldown: 'מורידים קצב בהדרגה' },
+    cardioTag: 'קרדיו',
+    minutes: '{count}′',
+    rounds: plural({ one: 'סבב אחד', two: '2 סבבים', other: '{count} סבבים' }),
+  },
 } as const;

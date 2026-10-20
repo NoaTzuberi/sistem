@@ -8,3 +8,5 @@ export { createCoachApi, NutritionRequestError, PlanRequestError } from './coach
 export type { CoachApi } from './coachApi';
 export { createTraineeApi } from './traineeApi';
 export type { TraineeApi } from './traineeApi';
+export { createCardioApi, createCoachCardioApi } from './cardioApi';
+export type { CardioApi, CoachCardioApi } from './cardioApi';

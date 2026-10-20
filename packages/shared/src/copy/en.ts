@@ -494,4 +494,16 @@ export const en: CopyShape<typeof he> = {
     coachToConfirm: 'Coach to confirm',
     daysPerWeek: plural({ one: '{count} day a week', other: '{count} days a week' }),
   },
+  cardio: {
+    sports: { run: 'Run', intervals: 'Intervals', walk: 'Walk', bike: 'Bike' },
+    metrics: { rpe: 'Effort 1–10', pace: 'Pace', speed: 'Speed', hrZone: 'Heart-rate zone' },
+    kinds: { warmup: 'Warm-up', steady: 'Steady', work: 'Work', recovery: 'Recovery', cooldown: 'Cool-down' },
+    zones: ['Very easy', 'Easy', 'Moderate', 'Hard', 'Max'],
+    effort: 'Effort',
+    effortValue: 'Effort {value}',
+    tips: { warmup: 'Easy run, calm breathing', work: 'Hard to talk', recovery: 'Brisk walk, don\'t stop', cooldown: 'Ease off gradually' },
+    cardioTag: 'Cardio',
+    minutes: '{count}′',
+    rounds: plural({ one: '1 round', two: '2 rounds', other: '{count} rounds' }),
+  },
 };

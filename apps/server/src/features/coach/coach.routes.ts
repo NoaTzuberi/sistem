@@ -43,6 +43,13 @@ import {
   postTraineeNutritionTemplate,
 } from '../nutrition/nutrition.controller';
 import { getTraineeMealLogs } from '../mealLogs/mealLog.controller';
+import {
+  deleteTraineeCardioSession,
+  getTraineeCardio,
+  getTraineeCardioSessionForCoach,
+  postTraineeCardioSession,
+  putTraineeCardioSession,
+} from '../cardio/cardio.controller';
 import { getTrainingConfig, putTrainingSettings } from '../trainingSplits/trainingSplit.controller';
 import {
   getFamilies,
@@ -118,3 +125,9 @@ coachRouter.post('/trainees/:traineeId/nutrition-plan/from-template', loadCoachT
 coachRouter.post('/trainees/:traineeId/nutrition-plan/template', loadCoachTrainee, postTraineeNutritionTemplate);
 // Portion tracking (Phase 13a+): her week, read-only.
 coachRouter.get('/trainees/:traineeId/meal-logs', loadCoachTrainee, getTraineeMealLogs);
+// Cardio sessions (run / intervals / walk / bike) and her cardio logs.
+coachRouter.get('/trainees/:traineeId/cardio', loadCoachTrainee, getTraineeCardio);
+coachRouter.post('/trainees/:traineeId/cardio', loadCoachTrainee, postTraineeCardioSession);
+coachRouter.get('/trainees/:traineeId/cardio/:sessionId', loadCoachTrainee, getTraineeCardioSessionForCoach);
+coachRouter.put('/trainees/:traineeId/cardio/:sessionId', loadCoachTrainee, putTraineeCardioSession);
+coachRouter.delete('/trainees/:traineeId/cardio/:sessionId', loadCoachTrainee, deleteTraineeCardioSession);
