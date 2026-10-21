@@ -1,15 +1,14 @@
-import type { WorkoutStatus } from './index';
+import type { PlanWorkout, WorkoutStatus } from './index';
 
-// Cardio sessions (run / intervals / walk / bike): a second workout kind next to the strength Plan.
-// A session belongs to one trainee; it starts in the plan week it was added to and, when it repeats
-// weekly, shows in every later week too. Units: seconds, km. Intensity is stored 1–10; how it is
-// shown (RPE "8/10" or a heart-rate zone Z1–Z5) follows the session's metric.
+// Cardio workouts (run / intervals / walk / bike): a workout `kind` inside the weekly Plan, next to
+// strength workouts. Day, note and repeating come from the plan workout itself; `cardio` holds the
+// blocks. Units: seconds, km. Intensity is stored 1–10; how it is shown (RPE "8/10" or a heart-rate
+// zone Z1–Z5) follows the metric.
 
+export type WorkoutKind = 'strength' | 'cardio';
 export type CardioSport = 'run' | 'intervals' | 'walk' | 'bike';
 export type CardioMetric = 'rpe' | 'pace' | 'speed' | 'hrZone';
 export type CardioBlockKind = 'warmup' | 'steady' | 'work' | 'recovery' | 'cooldown';
-/** draft = only the coach sees it · active = in her app. */
-export type CardioSessionStatus = 'draft' | 'active';
 
 export interface CardioBlock {
   type: 'block';
@@ -31,44 +30,22 @@ export interface CardioRepeatSet {
 
 export type CardioStep = CardioBlock | CardioRepeatSet;
 
-/** What the coach saves (POST / PUT). */
-export interface SaveCardioSessionPayload {
-  name: string;
+/** A cardio workout's own content (`PlanWorkout.cardio`). */
+export interface PlanCardio {
   sport: CardioSport;
   metric: CardioMetric;
   steps: CardioStep[];
-  note?: string | null;
-  /** 0 = Sunday … 6 = Saturday. */
-  days: number[];
-  repeatsWeekly: boolean;
-  /** The plan week (a Sunday, 'YYYY-MM-DD') it starts in. Fixed after creation. */
-  weekStartDate: string;
-  status: CardioSessionStatus;
-}
-
-export interface CardioSession {
-  id: string;
-  traineeId: string;
-  name: string;
-  sport: CardioSport;
-  metric: CardioMetric;
-  steps: CardioStep[];
-  note: string | null;
-  days: number[];
-  repeatsWeekly: boolean;
-  weekStartDate: string;
-  status: CardioSessionStatus;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CardioLog {
   id: string;
-  sessionId: string;
+  planId: string;
+  /** The PlanWorkout's id. */
+  workoutId: string;
   /** Copied when saved, so history survives later edits. */
-  sessionName: string;
+  workoutTitle: string;
   sport: CardioSport;
-  /** The session's day ('YYYY-MM-DD' in her zone). */
+  /** The day she did it for ('YYYY-MM-DD' in her zone): the workout's day, else the day she ran it. */
   date: string;
   completedSec: number;
   roundsDone: number;
@@ -82,8 +59,8 @@ export interface CardioLog {
 }
 
 export interface SaveCardioLogPayload {
-  sessionId: string;
-  date: string;
+  planId: string;
+  workoutId: string;
   completedSec: number;
   roundsDone: number;
   highIntensitySec: number;
@@ -92,36 +69,22 @@ export interface SaveCardioLogPayload {
   note?: string | null;
 }
 
-/** One day a session falls on, with its status (computed on the server, like a strength workout's). */
-export interface CardioOccurrence {
-  session: CardioSession;
-  date: string;
-  dayOfWeek: number;
-  status: WorkoutStatus;
-  isToday: boolean;
-  /** Her log for that day, when done. */
-  logId: string | null;
-}
-
-/** GET /api/cardio/week */
-export interface TraineeCardioWeek {
+/** GET /api/cardio/plans/:planId/workouts/:workoutId — one cardio workout of her published plan. */
+export interface TraineeCardioWorkoutResponse {
+  planId: string;
   weekStartDate: string;
-  today: string;
-  items: CardioOccurrence[];
-}
-
-/** GET /api/cardio/sessions/:id?date= */
-export interface TraineeCardioSessionResponse {
-  occurrence: CardioOccurrence;
+  workout: PlanWorkout & { kind: 'cardio'; cardio: PlanCardio };
+  /** Its day ('YYYY-MM-DD'), or null for a workout without a day. */
+  date: string | null;
+  status: WorkoutStatus;
   log: CardioLog | null;
   coach: { name: string } | null;
-  /** A day of this week, not logged yet: she can run it (decided on the server). */
+  /** A workout of this week, not logged yet: she can run it (decided on the server). */
   canStart: boolean;
 }
 
-/** GET /api/coach/trainees/:id/cardio */
-export interface CoachCardioList {
-  sessions: CardioSession[];
+/** GET /api/coach/trainees/:id/cardio-logs */
+export interface CoachCardioLogList {
   /** Newest first. */
-  logs: CardioLog[];
+  items: CardioLog[];
 }

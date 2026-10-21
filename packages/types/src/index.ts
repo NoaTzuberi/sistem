@@ -1,3 +1,5 @@
+import type { PlanCardio, WorkoutKind } from './cardio';
+
 // API contract types shared by the mobile app, the coach dashboard and the server.
 // Types only — no runtime code, so the server (CommonJS) can use `import type`.
 
@@ -308,6 +310,9 @@ export interface PlanWorkout {
   notes?: string;
   /** Phase 12b, coach-only: its workout type (slot template); missing = free workout. */
   workoutType?: string;
+  /** Missing = strength. A cardio workout has no exercises; its blocks are in `cardio`. */
+  kind?: WorkoutKind;
+  cardio?: PlanCardio;
   exercises: PlanExercise[];
 }
 
@@ -437,6 +442,9 @@ export interface PlanWorkoutInput {
   notes?: string;
   /** A workout type of the coach's training config (Phase 12b); omitted = free workout. */
   workoutType?: string;
+  /** Omitted = strength. A cardio workout sends `cardio` and no exercises. */
+  kind?: WorkoutKind;
+  cardio?: PlanCardio;
   exercises: PlanExerciseInput[];
 }
 
@@ -1677,6 +1685,12 @@ export interface NutritionCalorieTarget {
   floorConfirmation: NutritionFloorConfirmation | null;
 }
 
+/**
+ * What she gets (owner, 2026-10-20): 'portions' = daily portions per group, she picks foods herself from
+ * the coach's list; 'menu' = meals with options. Switching never deletes meals or the daily portions.
+ */
+export type NutritionPlanMode = 'portions' | 'menu';
+
 export interface PortionCounts {
   protein: number;
   carb: number;
@@ -1762,6 +1776,12 @@ export interface SaveNutritionPlanPayload {
   };
   meals: NutritionMealInput[];
   tips: { id?: string; text: string }[];
+  /** Omitted = keep (a plan saved before modes reads as menu when an option has lines, else portions). */
+  mode?: NutritionPlanMode;
+  /** The day's portions in portions mode (steps of 0.5). Omitted = keep. */
+  dailyPortions?: PortionCounts;
+  /** Portions mode: "vegetables free, at every meal". Omitted = keep. */
+  vegetablesFree?: boolean;
   /** Plain text, ≤ 1,500 chars, line breaks kept; '' / null = none. Omitted = keep. */
   introMessage?: string | null;
   /** 13b, waterTracking only — refused while the feature is closed. */
@@ -1796,6 +1816,11 @@ export interface CoachNutritionPlan {
   id: string;
   traineeId: string;
   calorieTarget: NutritionCalorieTarget;
+  mode: NutritionPlanMode;
+  /** Portions mode's day (kept in menu mode too, so switching back loses nothing). */
+  dailyPortions: PortionCounts;
+  /** Portions mode: vegetables free at every meal. */
+  vegetablesFree: boolean;
   meals: NutritionMeal[];
   tips: NutritionTip[];
   introMessage: string | null;
@@ -1808,7 +1833,7 @@ export interface CoachNutritionPlan {
   changedSincePublish: boolean;
   updatedAt: string;
   kcal: NutritionKcal;
-  /** The meals' portions summed over the day. */
+  /** The day's portions as she gets them: dailyPortions in portions mode, the meals summed in menu mode. */
   dayPortions: PortionCounts;
   /** Recommended portions for the current target (null without a target). */
   targetPortions: PortionCounts | null;
@@ -1824,6 +1849,8 @@ export interface NutritionFoodFacts {
   portion: string;
   grams: number | null;
   isNew: boolean;
+  /** One of its group's categories (the trainee's food sheet groups by it); null = none set. */
+  category: FoodCategory | null;
 }
 
 export interface NutritionViewLine {
@@ -1847,12 +1874,16 @@ export interface NutritionViewMeal {
 export interface NutritionPlanView {
   version: number;
   publishedAt: string;
+  /** Portions mode sends no meals (she picks from the food lists); menu mode sends them. */
+  mode: NutritionPlanMode;
   meals: NutritionViewMeal[];
   tips: string[];
   /** The coach's note at the top of the tab (plain text, line breaks kept). */
   intro: string | null;
-  /** The meals' portions summed over the day (the day header / tracker). */
+  /** The day's portions (the day header / tracker): the daily portions, or the meals summed. */
   dayPortions: PortionCounts;
+  /** Vegetables free that day (portions mode: the plan's switch; menu mode: any meal with it on). */
+  vegetablesFree: boolean;
   /** Every active item of each group — what a portion can be swapped for. */
   swaps: Record<FoodGroup, NutritionFoodFacts[]>;
   /** Only while waterTracking is open (13b). */
@@ -1862,6 +1893,8 @@ export interface NutritionPlanView {
 /** GET /nutrition-plan (trainee). */
 export interface TraineeNutritionPlanResponse {
   plan: NutritionPlanView | null;
+  /** The coach who published it (the coach card's name and initials); null when there is no plan. */
+  coach: { name: string } | null;
   /** She hasn't read this version's intro yet (open it; POST /nutrition-plan/intro-seen after). */
   introUnseen: boolean;
   features: NutritionFeatures;
@@ -1981,3 +2014,6 @@ export type TabUpdates = Record<UpdateTab, boolean>;
 export interface MarkTabSeenPayload {
   tab: UpdateTab;
 }
+
+// Cardio sessions + logs.
+export * from './cardio';
