@@ -1,4 +1,5 @@
 import { cardioLogRefs } from '../cardio/cardio.service';
+import { CardioLog } from '../cardio/cardio.model';
 import { Types } from 'mongoose';
 import type { CoachPlan, CoachPlanProgress } from '@sistem/types';
 import { emitAppEvent } from '../../events/appEvents';
@@ -209,8 +210,19 @@ export async function saveCoachPlan(traineeId: string, planId: string, input: Sa
     throw new PlanValidationError(issues);
   }
 
-  const workoutIds = new Set(plan.workouts.map((workout) => String(workout._id)));
-  const planExerciseIds = new Set(plan.workouts.flatMap((workout) => workout.exercises.map((exercise) => String(exercise._id))));
+  // A workout removed in an earlier save and put back ("Undo") keeps the id her logs point at, so
+  // its history stays linked. Only this plan's own ids (in it now, or in its logs) are ever kept.
+  const logFilter = { planId: plan._id, traineeId };
+  const [loggedWorkoutIds, loggedExerciseIds, cardioWorkoutIds] = await Promise.all([
+    WorkoutLog.distinct('workoutId', logFilter),
+    WorkoutLog.distinct('sets.planExerciseId', logFilter),
+    CardioLog.distinct('workoutId', logFilter),
+  ]);
+  const workoutIds = new Set([...plan.workouts.map((workout) => String(workout._id)), ...[...loggedWorkoutIds, ...cardioWorkoutIds].map(String)]);
+  const planExerciseIds = new Set([
+    ...plan.workouts.flatMap((workout) => workout.exercises.map((exercise) => String(exercise._id))),
+    ...loggedExerciseIds.filter((id) => id != null).map(String),
+  ]);
   const used = new Set<string>();
   const keepOrCreateId = (id: string | undefined, existing: Set<string>): Types.ObjectId => {
     if (id && existing.has(id) && !used.has(id)) {

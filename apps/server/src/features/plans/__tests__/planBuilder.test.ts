@@ -512,6 +512,35 @@ describe('plan builder (coach)', () => {
       expect(edit.status).toBe(200);
       expect(edit.body.plan.workouts[0].id).toBe(plan.workouts[0].id);
     });
+
+    it('deleting a logged workout keeps her log, and putting it back ("Undo") keeps its ids', async () => {
+      const plan = await createPublishedPlan();
+      const [lower, core] = plan.workouts;
+      await WorkoutLog.create({
+        traineeId: trainee.user._id,
+        planId: plan.id,
+        workoutId: lower.id,
+        workoutTitle: lower.title,
+        status: 'completed',
+        finishedAt: new Date(),
+        sets: [{ exerciseId: squat, planExerciseId: lower.exercises[0].id, setIndex: 0, reps: 8, completed: true }],
+      });
+
+      const removed = await savePlan(plan.id, [toWorkoutInput(core)]);
+      expect(removed.status).toBe(200);
+      expect(removed.body.plan.workouts.map((workout: { id: string }) => workout.id)).toEqual([core.id]);
+      // No cascade: the log and its copied title stay.
+      const log = await WorkoutLog.findOne({ planId: plan.id }).lean();
+      expect(log).toMatchObject({ workoutTitle: lower.title });
+
+      const restored = await savePlan(plan.id, [toWorkoutInput(lower), toWorkoutInput(core)]);
+      expect(restored.status).toBe(200);
+      expect(restored.body.plan.workouts[0].id).toBe(lower.id);
+      expect(restored.body.plan.workouts[0].exercises[0].id).toBe(lower.exercises[0].id);
+      // An id this plan never had is never kept.
+      const foreign = await savePlan(plan.id, [{ ...toWorkoutInput(lower), id: new Types.ObjectId().toString() }, toWorkoutInput(core)]);
+      expect(foreign.body.plan.workouts[0].id).not.toBe(lower.id);
+    });
   });
 
   describe('trainee status', () => {
