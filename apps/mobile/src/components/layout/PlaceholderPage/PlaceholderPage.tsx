@@ -15,7 +15,7 @@ export function PlaceholderPage({ title, children }: PlaceholderPageProps) {
   return (
     <AppShell>
       <section className="placeholder-page">
-        <h1 className="placeholder-page-title">{title}</h1>
+        <h1 className="placeholder-page-title display-title">{title}</h1>
         <p className="placeholder-page-text">{copy.comingSoon}</p>
         {children}
       </section>

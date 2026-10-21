@@ -12,7 +12,7 @@
 
 .select-field {
   min-height: var(--touch-target-min);
-  font-family: var(--font-family-body);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--color-text);
   background-color: var(--color-surface);

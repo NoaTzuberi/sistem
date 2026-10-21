@@ -3,7 +3,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-modal);
-  font-family: var(--font-family-home);
+  font-family: var(--font-body);
   color: var(--color-ink);
 }
 
