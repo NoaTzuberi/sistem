@@ -363,6 +363,54 @@
   --color-portion-vegetable: var(--color-primary-deep); /* Vegetables are free: Cherry Rose on a blush */
   --color-portion-vegetable-text: var(--ink-pink);
   --color-portion-vegetable-soft: #fbe3ec;
+  /* A group badge's glow at 35% (the fallback where color-mix is missing; otherwise it is mixed from the fill). */
+  --color-portion-protein-glow: rgb(255 0 110 / 35%);
+  --color-portion-carb-glow: rgb(124 77 255 / 35%);
+  --color-portion-fat-glow: rgb(255 122 0 / 35%);
+  --color-portion-snack-glow: rgb(0 148 255 / 35%);
+  --color-portion-vegetable-glow: rgb(165 0 71 / 35%);
+  /* Trainee Nutrition (docs/design/trainee-nutrition.html — "training OS", like Home B / Workouts).
+     Fills (cells, badges, the MIX bar) take the bright group color; text on a tint or white takes the
+     group's -text ink (the reference's fat / snack text colors miss 4.5:1 on their tints). */
+  --size-portion-badge: 38px;        /* A group's round icon badge */
+  --size-portion-badge-sm: 22px;     /* A menu item's portion count badge */
+  --radius-portion-badge-sm: 7px;
+  --size-fuel-cell: 40px;            /* A fuel cell's drawn height (its button stays 44px tall) */
+  --radius-fuel-capsule: 13px;
+  --gap-fuel-capsule: 5px;           /* Between two portions */
+  --gap-fuel-cell: 2px;              /* Between a portion's two halves */
+  --size-fuel-handle: 3px;           /* The white handle on the last filled cell */
+  --inset-fuel-handle: 11px;         /* … its distance from the cell's top and bottom */
+  --color-fuel-handle: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+  --opacity-fuel-number: 0.45;       /* A capsule's number on its tint */
+  --opacity-fuel-number-full: 0.85;  /* … in white on a full capsule */
+  --text-nutrition-title: 58px;      /* "תזונה" */
+  --line-height-nutrition-title: 0.8;
+  --text-portion-total: 64px;        /* The day's "eaten / total" */
+  --text-portion-total-goal: 26px;
+  --text-group-name: 32px;           /* A group row's name (Karantina) */
+  --text-group-count: 30px;          /* … its "eaten/goal" (Barlow) */
+  --text-group-goal: 18px;
+  --text-meal-name: 28px;            /* A menu meal's name */
+  --text-food-sheet-title: 44px;
+  --text-coach-name: 20px;
+  --text-vegetables: 22px;
+  --text-day-number: 18px;           /* A day number in the week strip */
+  --size-day-circle: 34px;
+  --size-day-bar-width: 26px;        /* A day's portion progress bar */
+  --size-day-bar-height: 4px;
+  --size-coach-avatar: 32px;
+  --size-coach-dot: 9px;
+  --size-mix-width: 150px;           /* The MIX bar */
+  --size-mix-height: 10px;
+  --size-photo-tile-width: 110px;
+  --size-photo-tile-height: 130px;
+  --size-photo-add: 40px;            /* The ink circle on the "add photo" tile */
+  --radius-meal-card: 24px;
+  --color-vegetables-dash: #e2dde3;  /* The free-vegetables row's dashed edge */
+  --border-width-dash: 1.5px;
+  --sheet-food-height: 82dvh;
+  --surface-photo-chip: color-mix(in srgb, var(--color-card) 90%, transparent);
   /* Nutrition library (food list · templates · settings). */
   --color-food-warn-ring: #ffd2a0;     /* A food card with a missing kcal / over its group's cap */
   --gradient-template-tile: linear-gradient(140deg, #ff8fc0, var(--color-lilac));
@@ -384,7 +432,7 @@
   --color-nb-tip: #fff8e9;           /* A coach tip row */
   --color-nb-meal-ground: #fbfafb;   /* A meal card at rest */
   --color-nb-dash: #d9d2d8;          /* The "+ meal" tile's dashed edge */
-  --color-nb-switch-off: color-mix(in srgb, var(--color-text-muted) 22%, transparent);
+  --color-nb-switch-off: color-mix(in srgb, var(--color-text-muted) 70%, var(--color-card)); /* ~3:1 on white: an off switch stays visible */
   --color-nb-delete: #d70015;        /* A destructive tool (the meal's delete) */
   --color-nb-delete-soft: #ffe5e7;
   --surface-nb-header: color-mix(in srgb, var(--color-card) 78%, transparent);
@@ -395,7 +443,9 @@
   --shadow-nb-recommended: 0 10px 24px color-mix(in srgb, var(--color-primary) 28%, transparent);
   --shadow-nb-alert: 0 10px 24px color-mix(in srgb, var(--color-primary) 25%, transparent);
   --shadow-nb-meal-hover: 0 10px 26px color-mix(in srgb, var(--color-text) 7%, transparent);
-  --nb-header-offset: 100px;         /* scroll-margin under the sticky header */
+  --nb-header-offset: 140px;         /* scroll-margin under the sticky header + steps nav */
+  --nb-steps-top: 87px;              /* The steps nav sticks right under the header (8 + 71 + 8) */
+  --nb-side-top: 131px;              /* … and the side column under both */
   /* Nutrition: the portion groups' share of the day (donut, bars) — identity colors. */
   --color-macro-protein: var(--color-primary);
   --color-macro-carb: #7c4dff;
@@ -453,7 +503,7 @@
   --color-stage-grid: color-mix(in srgb, var(--color-on-primary) 16%, transparent);     /* the faint grid lines */
   --surface-on-stage: color-mix(in srgb, var(--color-on-primary) 18%, transparent);     /* the bell, the slider fill */
   --surface-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 28%, transparent);
-  --surface-slide-track: color-mix(in srgb, var(--color-ink) 22%, transparent);         /* the slide-to-start track */
+  --surface-slide-track: color-mix(in srgb, var(--color-ink) 22%, transparent);         /* the rest day's next-workout card */
   --color-lane-line: color-mix(in srgb, var(--color-ink) 5%, transparent);              /* lane lines in a week column */
   --color-pulse-ring: color-mix(in srgb, var(--color-primary) 30%, transparent);        /* today's pulsing dot */
   --color-pulse-ring-out: color-mix(in srgb, var(--color-primary) 0%, transparent);
@@ -731,7 +781,6 @@
     0 16px 36px color-mix(in srgb, var(--color-ink) 35%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-on-primary) 8%, transparent);
   --shadow-dock-active: 0 6px 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
-  --shadow-knob: 0 6px 16px color-mix(in srgb, var(--color-stage-shadow) 30%, transparent);
   --ring-hairline: 0 0 0 1px var(--color-hairline);
   --ring-on-pink: 0 0 0 2px var(--color-primary);
   --ring-on-card: 0 0 0 2px var(--color-card);
@@ -805,7 +854,7 @@
   --intro-meter: 900ms;            /* A tile's meter growing */   /* An exercise card's chevron turning as it opens */
   --loop-slow: 2s;               /* Repeating hints (scroll bounce) */
   /* Trainee Home (direction B) and the tab screens' depth transition. */
-  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);   /* The dock pill opening, the slider snapping back */
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);   /* The dock pill opening */
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);            /* A screen leaving */
   --transition-screen-in: 440ms;
   --transition-screen-out: 300ms;
@@ -815,8 +864,10 @@
   --transition-lane: 200ms;
   --press-scale: 0.97;
   --press-scale-strong: 0.96;
+  --transition-fuel-cell: 300ms; /* A portion tracker cell filling / emptying (on --ease-out) … */
+  --fuel-cell-step: 45ms;        /* … one cell after the other */
+  --transition-badge-pop: 520ms; /* A group's badge popping when she completes it (on --ease-spring) */
   --loop-pulse: 1.8s;            /* Today's dot */
-  --loop-nudge: 1.6s;            /* The slider's arrow */
   --loop-tick: 1.4s;             /* The next achievement tick */
 
   /* ═══ 8. Opacity ══════════════════════════════════════════════════════════════ */
@@ -902,6 +953,73 @@
   /* The safe-area insets on the reading-direction sides (notch / home bar in landscape). */
   --safe-inline-start: var(--safe-left);
   --safe-inline-end: var(--safe-right);
+
+  /* ═══ 12. Slide to start + cardio (docs/design/trainee-home-b.html, trainee-cardio.html,
+     coach-cardio-builder.html) ═════════════════════════════════════════════════ */
+  /* The shared slide: a white track; its trail runs pink → purple toward the reading end. */
+  --color-slide-trail-start: #ff006e;
+  --color-slide-trail-mid: #c23bc0;
+  --color-slide-trail-end: #7c4dff;
+  --color-slide-hairline: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --shadow-slide-float: 0 12px 30px color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --shadow-slide-knob: 0 4px 14px color-mix(in srgb, var(--color-ink) 16%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  --ease-slide-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-slide-snap: 420ms;  /* The knob springing back, or snapping to the end */
+  --transition-knob-pop: 460ms;    /* The knob popping when the slide completes */
+  --transition-knob-icon: 220ms;   /* Play → check */
+  --slide-float-offset: 28px;      /* The floating slide's distance from the bottom … */
+  --slide-float-gutter: 20px;      /* … and from the sides */
+  --slide-label-pad: 40px;         /* The label's start padding (clears the knob) */
+  --text-slide-label: 15px;
+  --text-slide-go: 10px;
+  --opacity-slide-go: 0.45;
+  /* Cardio intensity zones (1–3 Z1 · 4–5 Z2 · 6 Z3 · 7–8 Z4 · 9–10 Z5): the bright fill, its tint, and its
+     readable ink on the tint. -stage = the live player's full-screen ground under white text (the light
+     blue and orange take their deeper ink, so white keeps ≥ 3:1 at the player's large sizes). */
+  --color-zone-1: #0094ff;
+  --color-zone-1-soft: #e1f1ff;
+  --color-zone-1-text: #0068bb;      /* the design's #0070C9 is 4.38:1 on its tint; a hair darker passes 4.5:1 */
+  --color-zone-1-stage: #0070c9;
+  --color-zone-2: #7c4dff;
+  --color-zone-2-soft: #efe7ff;
+  --color-zone-2-text: #5b2fd6;
+  --color-zone-2-stage: #7c4dff;
+  --color-zone-3: #ff7a00;
+  --color-zone-3-soft: #ffebd6;
+  --color-zone-3-text: #c75a00;
+  --color-zone-3-stage: #c75a00;
+  --color-zone-4: #ff006e;
+  --color-zone-4-soft: #ffe3ee;
+  --color-zone-4-text: #c80058;
+  --color-zone-4-stage: #ff006e;
+  --color-zone-5: #a50047;
+  --color-zone-5-soft: #fbe3ec;
+  --color-zone-5-text: #a50047;
+  --color-zone-5-stage: #a50047;
+  --color-cardio-strength: #5b2fd6;     /* "כוח" on a day tile that already has a strength workout */
+  --color-cardio-preview: var(--color-ink);
+  --color-on-zone-soft: color-mix(in srgb, var(--color-on-primary) 18%, transparent); /* Buttons / cards on a zone ground */
+  --color-on-zone-raised: color-mix(in srgb, var(--color-on-primary) 28%, transparent);
+  --color-on-zone-track: color-mix(in srgb, var(--color-on-primary) 25%, transparent);
+  --color-on-zone-upcoming: color-mix(in srgb, var(--color-on-primary) 35%, transparent);
+  --color-on-zone-done: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+  --color-on-zone-muted: color-mix(in srgb, var(--color-on-primary) 75%, transparent);
+  --color-cardio-grid: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  --transition-zone: 450ms;        /* The live player's ground changing zone */
+  --transition-graph-grow: 520ms;  /* A graph bar growing in (one every --graph-grow-step) */
+  --graph-grow-step: 22ms;
+  --transition-countdown: 900ms;   /* One 3-2-1 number */
+  --transition-beat: 600ms;        /* The clock's beat on the last 3 seconds */
+  --text-cardio-title: 64px;       /* The session detail's Karantina title */
+  --text-cardio-kind: 84px;        /* The live block name */
+  --text-cardio-kind-long: 64px;
+  --text-cardio-clock: 150px;
+  --text-cardio-clock-sm: 120px;   /* Under 440px wide (tokens can't sit in @media: repeat it there) */
+  --text-cardio-countdown: 220px;
+  --text-cardio-done: 56px;
+  --size-cardio-control: 56px;
+  --size-cardio-control-main: 84px;
+  --size-cardio-save: 58px;
 }
 
 /* English: the Latin font pair; a display heading is Barlow Condensed italic 800, uppercase. */

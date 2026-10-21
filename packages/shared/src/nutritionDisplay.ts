@@ -15,7 +15,7 @@ import type {
 } from '@sistem/types';
 import { sharedCopy } from './copy';
 import { fill, formatPlural } from './i18n/copy';
-import { isolateAuto } from './i18n/bidi';
+import { isolateAuto, isolateLtr } from './i18n/bidi';
 import { formatNumber } from './i18n/intl';
 import { formatDateOnly } from './format';
 import { formatWeight } from './units';
@@ -65,10 +65,18 @@ export function formatPortionCount(count: number): string {
   return whole === 0 ? '½' : `${whole}½`;
 }
 
+/**
+ * THE portion count inside a sentence: '4½' as one left-to-right unit, so Hebrew never shows it as
+ * '½4' (½ is a neutral character that RTL text would move to the other side of the digit).
+ */
+export function formatPortionCountLtr(count: number): string {
+  return isolateLtr(formatPortionCount(count));
+}
+
 /** '1 protein' */
 export function describePortion(group: PortionGroup, count: number, language: Language): string {
   const copy = sharedCopy[language].nutrition;
-  return fill(copy.portion, { count: formatPortionCount(count), group: copy.portionWords[group] });
+  return fill(copy.portion, { count: formatPortionCountLtr(count), group: copy.portionWords[group] });
 }
 
 /** The groups a meal counts, in order, without the zeros. */
