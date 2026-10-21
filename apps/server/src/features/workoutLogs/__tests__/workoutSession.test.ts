@@ -230,6 +230,36 @@ describe('workout session', () => {
       expect((await patch('nope')).status).toBe(400);
     });
 
+    it('adds an extra set at the next index only, and counts it at finish', async () => {
+      const plan = await createPlan(trainee);
+      const logId = (await start(plan)).body.session.log.id;
+      const patch = (sets: unknown) => api.request('PATCH', `/workout-logs/${logId}/sets`, { token: trainee.token, body: { sets } });
+
+      // The squat has sets 0 and 1: index 2 is added (with a change to set 0 in the same batch), 4 would open a gap.
+      const res = await patch([
+        setUpdate(plan, 0, 2, { reps: 9, weight: 40, completed: true }),
+        setUpdate(plan, 0, 0, { reps: 10, completed: true }),
+      ]);
+      expect(res.status).toBe(200);
+      const squatSets = res.body.log.sets.filter((set: { exerciseId: string }) => set.exerciseId === squatId);
+      expect(squatSets).toHaveLength(3);
+      expect(squatSets[2]).toMatchObject({ setIndex: 2, type: 'working', reps: 9, weight: 40, completed: true });
+      expect(squatSets[2].completedAt).toEqual(expect.any(String));
+      expect(squatSets[0]).toMatchObject({ reps: 10, completed: true });
+      expect((await patch([setUpdate(plan, 0, 4, { completed: true })])).status).toBe(400);
+
+      // Sent again (a retry after a lost response): the set is updated, not added twice.
+      const again = await patch([setUpdate(plan, 0, 2, { reps: 11, weight: 40, completed: true })]);
+      expect(again.body.log.sets.filter((set: { exerciseId: string }) => set.exerciseId === squatId)).toHaveLength(3);
+
+      const session = await api.request('GET', `/workout-logs/${logId}/session`, { token: trainee.token });
+      expect(session.body.session.log.sets).toHaveLength(5);
+
+      const finished = await api.request('POST', `/workout-logs/${logId}/finish`, { token: trainee.token });
+      expect(finished.status).toBe(200);
+      expect(finished.body.log.stats).toMatchObject({ setsCompleted: 2, totalVolume: 11 * 40 });
+    });
+
     it("another trainee's log is not found", async () => {
       const plan = await createPlan(trainee);
       const logId = (await start(plan)).body.session.log.id;

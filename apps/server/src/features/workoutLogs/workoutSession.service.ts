@@ -1,4 +1,4 @@
-import type { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import type {
   ActiveWorkoutRef,
   LastPerformance,
@@ -18,7 +18,7 @@ import { evaluateAchievementsSafely } from '../achievements/achievement.service'
 import { WorkoutLog } from './workoutLog.model';
 import { WorkoutLogNotFoundError, attachLogDetails, attachLogExerciseFacts, toPublicWorkoutLog } from './workoutLog.service';
 import type { WorkoutLogDocument, WorkoutLogSetFields } from './workoutLog.types';
-import { LAST_PERFORMANCE_LOG_SCAN } from './workoutLog.constants';
+import { LAST_PERFORMANCE_LOG_SCAN, MAX_SETS_PER_EXERCISE } from './workoutLog.constants';
 import { LocalizedError } from '../../i18n';
 
 // The active workout session (PRD §5.2). The log is created the moment a workout
@@ -217,23 +217,96 @@ async function assertActive(logId: string, traineeId: string): Promise<LeanWorko
   return log;
 }
 
+function findLogSetIndex(log: LeanWorkoutLog, update: WorkoutLogSetUpdate): number {
+  return log.sets.findIndex(
+    (set) => String(set.planExerciseId) === update.planExerciseId && set.setIndex === update.setIndex,
+  );
+}
+
+/**
+ * "+ Extra set": an update for the set right after an exercise's last one adds that set
+ * (a working set, not part of the plan). Only the next index is accepted, so a typo can't
+ * open a gap, and an exercise never grows past MAX_SETS_PER_EXERCISE.
+ */
+function extraSetsToAdd(log: LeanWorkoutLog, updates: WorkoutLogSetUpdate[], now: Date): WorkoutLogSetFields[] {
+  const lastIndex = new Map<string, { setIndex: number; exerciseId: Types.ObjectId; count: number }>();
+  for (const set of log.sets) {
+    if (!set.planExerciseId) continue;
+    const key = String(set.planExerciseId);
+    const current = lastIndex.get(key);
+    lastIndex.set(key, {
+      setIndex: Math.max(current?.setIndex ?? -1, set.setIndex),
+      exerciseId: set.exerciseId,
+      count: (current?.count ?? 0) + 1,
+    });
+  }
+
+  const added: WorkoutLogSetFields[] = [];
+  const unknown = updates
+    .filter((update) => findLogSetIndex(log, update) === -1)
+    .sort((a, b) => a.setIndex - b.setIndex);
+  for (const update of unknown) {
+    const last = lastIndex.get(update.planExerciseId);
+    if (!last || update.setIndex !== last.setIndex + 1 || last.count >= MAX_SETS_PER_EXERCISE) {
+      throw new UnknownLogSetError('workout_set_unknown', { n: update.setIndex + 1 });
+    }
+    added.push({
+      exerciseId: last.exerciseId,
+      planExerciseId: new Types.ObjectId(update.planExerciseId),
+      setIndex: update.setIndex,
+      type: 'working',
+      ...(typeof update.reps === 'number' && { reps: update.reps }),
+      ...(typeof update.weight === 'number' && { weight: update.weight }),
+      ...(typeof update.durationSec === 'number' && { durationSec: update.durationSec }),
+      completed: update.completed,
+      ...(update.completed && { completedAt: now }),
+    });
+    lastIndex.set(update.planExerciseId, { ...last, setIndex: update.setIndex, count: last.count + 1 });
+  }
+  return added;
+}
+
+/**
+ * Adds the extra sets in their own conditional update (a $push can't share an update with
+ * $set on the same array). The filter also refuses an index another device added first:
+ * then the caller retries, and the set is simply updated.
+ */
+async function pushExtraSets(log: LeanWorkoutLog, added: WorkoutLogSetFields[]): Promise<boolean> {
+  const result = await WorkoutLog.updateOne(
+    {
+      _id: log._id,
+      status: 'in_progress',
+      $nor: added.map((set) => ({ sets: { $elemMatch: { planExerciseId: set.planExerciseId, setIndex: set.setIndex } } })),
+    },
+    { $push: { sets: { $each: added } } },
+    { runValidators: true },
+  );
+  return result.matchedCount > 0;
+}
+
 /**
  * Applies set changes with one conditional update, so a change that arrives after the
  * workout was finished on another device is refused instead of rewriting history, and
  * two devices editing different sets never overwrite each other.
  */
-async function applySetUpdates(log: LeanWorkoutLog, updates: WorkoutLogSetUpdate[], now: Date): Promise<void> {
+async function applySetUpdates(log: LeanWorkoutLog, updates: WorkoutLogSetUpdate[], now: Date, retried = false): Promise<void> {
   if (updates.length === 0) return;
+
+  const added = extraSetsToAdd(log, updates, now);
+  if (added.length > 0) {
+    if (!(await pushExtraSets(log, added))) {
+      // Finished elsewhere (assertActive throws), or another device added the same set: update it instead.
+      if (retried) throw new WorkoutLogNotActiveError('workout_not_in_progress');
+      return applySetUpdates(await assertActive(String(log._id), String(log.traineeId)), updates, now, true);
+    }
+  }
+  const remaining = updates.filter((update) => findLogSetIndex(log, update) !== -1);
+  if (remaining.length === 0) return;
 
   const $set: Record<string, unknown> = {};
   const $unset: Record<string, ''> = {};
-  for (const update of updates) {
-    const index = log.sets.findIndex(
-      (set) => String(set.planExerciseId) === update.planExerciseId && set.setIndex === update.setIndex,
-    );
-    if (index === -1) {
-      throw new UnknownLogSetError('workout_set_unknown', { n: update.setIndex + 1 });
-    }
+  for (const update of remaining) {
+    const index = findLogSetIndex(log, update);
     const path = `sets.${index}`;
     for (const field of ['reps', 'weight', 'durationSec'] as const) {
       const value = update[field];

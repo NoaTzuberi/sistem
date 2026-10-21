@@ -13,6 +13,8 @@ export const LAST_PERFORMANCE_LOG_SCAN = 50;
 
 // Request limits for set updates (kg, seconds).
 export const MAX_SET_UPDATES = 300;
+// "+ Extra set" in the session: an exercise can grow to this many sets (planned + added).
+export const MAX_SETS_PER_EXERCISE = 20;
 export const MAX_LOGGED_REPS = 1000;
 export const MAX_LOGGED_WEIGHT = 1000;
 export const MAX_LOGGED_DURATION_SEC = 6 * 60 * 60;
