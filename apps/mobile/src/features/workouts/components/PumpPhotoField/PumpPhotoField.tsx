@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import axios from 'axios';
 import type { WorkoutLog } from '@sistem/types';
-import { IconCamera, IconPhoto } from '@tabler/icons-react';
+import { IconCamera, IconLock, IconPhoto } from '@tabler/icons-react';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { appCopy } from '../../../../copy';
 import { Button } from '../../../../components/common/Button/Button';
 import { Modal } from '../../../../components/common/Modal/Modal';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
@@ -33,12 +35,14 @@ function uploadErrorMessage(error: unknown, copy: (typeof workoutCopy)['he']): s
 
 /**
  * The Daily Pump photo (PRD §5.3): camera or gallery → compressed on the phone →
- * uploaded at once as a private photo (only she and her coach can see it). A new pick
+ * uploaded at once as a private photo (only she and her coach can see it; compression drops
+ * EXIF / GPS). A soft card with round camera / gallery buttons. A new pick
  * replaces the photo. Separate from the rating / notes save, so a slow or failed
  * upload never blocks them.
  */
 export function PumpPhotoField({ log, onLogChange, onLinkExpired }: PumpPhotoFieldProps) {
   const copy = useCopy(workoutCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<Busy>(null);
@@ -110,29 +114,56 @@ export function PumpPhotoField({ log, onLogChange, onLinkExpired }: PumpPhotoFie
         : null;
 
   return (
-    <section className="pump-photo-field" aria-labelledby="pump-photo-title">
-      <h2 id="pump-photo-title" className="pump-photo-field-title display-title">
-        {copy.pumpPhoto.title}
+    <section className="ws-section" aria-labelledby="pump-photo-title">
+      <h2 className="ws-section-title" id="pump-photo-title">
+        <Eyebrow>{eyebrow.dailyPump}</Eyebrow>
+        {copy.finish.pumpSection}
       </h2>
 
+      <div className="ws-pump">
+        <span className="ws-pump-icon" aria-hidden="true">
+          <IconCamera size={22} stroke={2} />
+        </span>
+        <div className="ws-pump-text">
+          <b dir="ltr">{copy.pumpPhoto.title}</b>
+          <small>
+            <IconLock size={12} stroke={2.2} aria-hidden="true" />
+            {copy.pumpPhoto.privacy}
+          </small>
+        </div>
+        <div className="ws-pump-buttons">
+          <button type="button" aria-label={copy.pumpPhoto.takePhoto} onClick={() => cameraRef.current?.click()} disabled={busy !== null}>
+            <IconCamera size={18} stroke={2} aria-hidden="true" />
+          </button>
+          <button type="button" aria-label={copy.pumpPhoto.chooseFromGallery} onClick={() => galleryRef.current?.click()} disabled={busy !== null}>
+            <IconPhoto size={18} stroke={2} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
       {log.pumpPhoto && (
-        <PrivatePhoto
-          photo={log.pumpPhoto}
-          localSrc={localSrc ?? undefined}
-          alt={copy.pumpPhoto.alt}
-          openLabel={copy.pumpPhoto.open}
-          closeLabel={copy.summary.close}
-          onLinkExpired={onLinkExpired}
-        />
+        <div className="ws-pump-photo">
+          <PrivatePhoto
+            photo={log.pumpPhoto}
+            localSrc={localSrc ?? undefined}
+            alt={copy.pumpPhoto.alt}
+            openLabel={copy.pumpPhoto.open}
+            closeLabel={copy.summary.close}
+            onLinkExpired={onLinkExpired}
+          />
+          <button type="button" className="ws-pump-remove" onClick={() => setConfirmRemove(true)} disabled={busy !== null}>
+            {copy.pumpPhoto.remove}
+          </button>
+        </div>
       )}
 
       {status && (
-        <p className="pump-photo-field-status" role="status">
+        <p className="ws-pump-status" role="status">
           {status}
         </p>
       )}
       {error && (
-        <div className="pump-photo-field-error" role="alert">
+        <div className="ws-pump-error" role="alert">
           <span>{error}</span>
           {pending && (
             <Button variant="secondary" onClick={() => void upload(pending)}>
@@ -142,45 +173,13 @@ export function PumpPhotoField({ log, onLogChange, onLinkExpired }: PumpPhotoFie
         </div>
       )}
 
-      <div className="pump-photo-field-actions">
-        <Button
-          variant="secondary"
-          icon={<IconCamera size={20} aria-hidden="true" />}
-          onClick={() => cameraRef.current?.click()}
-          disabled={busy !== null}
-        >
-          {copy.pumpPhoto.takePhoto}
-        </Button>
-        <Button
-          variant="secondary"
-          icon={<IconPhoto size={20} aria-hidden="true" />}
-          onClick={() => galleryRef.current?.click()}
-          disabled={busy !== null}
-        >
-          {copy.pumpPhoto.chooseFromGallery}
-        </Button>
-        {log.pumpPhoto && (
-          <Button
-            className="pump-photo-field-remove"
-            variant="ghost"
-            onClick={() => setConfirmRemove(true)}
-            loading={busy?.kind === 'removing'}
-            disabled={busy !== null}
-          >
-            {copy.pumpPhoto.remove}
-          </Button>
-        )}
-      </div>
-
-      <p className="pump-photo-field-privacy">{copy.pumpPhoto.privacy}</p>
-
       {/* `capture` opens the camera directly; without it the phone offers its photo library. */}
-      <input ref={cameraRef} className="pump-photo-field-input" type="file" accept="image/*" capture onChange={handlePicked} />
-      <input ref={galleryRef} className="pump-photo-field-input" type="file" accept="image/*" onChange={handlePicked} />
+      <input ref={cameraRef} className="ws-pump-input" type="file" accept="image/*" capture onChange={handlePicked} />
+      <input ref={galleryRef} className="ws-pump-input" type="file" accept="image/*" onChange={handlePicked} />
 
       <Modal isOpen={confirmRemove} onClose={() => setConfirmRemove(false)} variant="flat" title={copy.pumpPhoto.removeTitle}>
-        <div className="pump-photo-field-dialog">
-          <Button variant="danger" onClick={() => void handleRemove()}>
+        <div className="ws-pump-dialog">
+          <Button variant="danger" onClick={() => void handleRemove()} loading={busy?.kind === 'removing'}>
             {copy.pumpPhoto.removeConfirm}
           </Button>
           <Button variant="ghost" onClick={() => setConfirmRemove(false)}>

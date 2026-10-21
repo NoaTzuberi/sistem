@@ -1,49 +1,137 @@
-.pump-photo-field {
+/* A soft card: ink camera tile, the title and the privacy line, round camera / gallery buttons. */
+.ws-pump {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-card);
+  background-color: var(--color-fill-soft);
+}
+
+.ws-pump-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-option-icon);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.ws-pump-text {
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+}
+
+.ws-pump-text b {
+  display: block;
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
+  text-align: match-parent;
+  white-space: nowrap;
+}
+
+.ws-pump-text small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.ws-pump-buttons {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.ws-pump-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.ws-pump-buttons button:active:not(:disabled) {
+  transform: scale(var(--press-scale-strong));
+}
+
+.ws-pump-buttons button:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+.ws-pump-photo {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: var(--space-1);
+  margin-top: 12px;
 }
 
-.pump-photo-field-title {
-  margin: 0;
-  font-size: var(--text-display-xs);
+.ws-pump-remove {
+  min-height: var(--touch-target-min);
+  padding: 0 10px;
+  margin-inline-start: -10px;
+  border-radius: var(--radius-round);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.pump-photo-field-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
+.ws-pump-remove:active:not(:disabled) {
+  transform: scale(var(--press-scale));
 }
 
-/* Two per row fits 360 px without wrapping a label; Remove gets its own row. */
-.pump-photo-field-remove {
-  grid-column: 1 / -1;
-}
-
-.pump-photo-field-privacy,
-.pump-photo-field-status {
-  margin: 0;
+.ws-pump-status {
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.pump-photo-field-error {
+.ws-pump-error {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--color-error-soft);
-  color: var(--color-error);
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
+  color: var(--color-error);
 }
 
-/* Opened from the buttons; the native file inputs stay out of sight. */
-.pump-photo-field-input {
+.ws-pump-input {
   display: none;
 }
 
-.pump-photo-field-dialog {
+.ws-pump-dialog {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ws-pump-buttons button:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-pump-buttons button:active:not(:disabled),
+  .ws-pump-remove:active:not(:disabled) {
+    transform: none;
+  }
 }

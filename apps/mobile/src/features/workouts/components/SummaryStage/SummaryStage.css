@@ -1,0 +1,174 @@
+/* Full-bleed hot pink, rounded at the bottom, faint grid lines rising from the bottom edge (Home's stage). */
+.ws-stage {
+  --eyebrow-color: var(--color-on-stage-muted);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding:
+    calc(var(--safe-top) + var(--space-3))
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    26px
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  border-radius: 0 0 var(--radius-stage) var(--radius-stage);
+  background-color: var(--color-stage);
+  color: var(--color-on-stage);
+}
+
+/* The grid is screen-space decoration: it reads the same in both directions. */
+.ws-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--color-stage-grid) 0 1px, transparent 1px 44px);
+  mask-image: linear-gradient(to bottom, transparent 5%, var(--color-ink));
+  -webkit-mask-image: linear-gradient(to bottom, transparent 5%, var(--color-ink));
+}
+
+.ws-stage-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ws-stage-bar .eyebrow {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-stage-close {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-round);
+  background-color: var(--surface-on-stage);
+  color: var(--color-on-stage);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.ws-stage-close:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+/* The ring, then the check, draw themselves. */
+.ws-stage-medal {
+  display: block;
+  width: 74px;
+  height: 74px;
+  margin-top: 14px;
+}
+
+.ws-stage-medal circle,
+.ws-stage-medal path {
+  stroke: var(--color-on-stage);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ws-stage-medal circle {
+  stroke-width: 3;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: ws-draw 900ms var(--ease-press) 200ms forwards;
+}
+
+.ws-stage-medal path {
+  stroke-width: 4;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: ws-draw 500ms var(--ease-press) 900ms forwards;
+}
+
+@keyframes ws-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* White on Neon Pink: only large / bold text sits on the stage. */
+.ws-stage-title {
+  margin-top: 10px;
+  font-size: 68px;
+  color: var(--color-on-stage);
+}
+
+.ws-stage-meta {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-stage);
+}
+
+.ws-stage-meta .display-name {
+  font-size: 17px;
+  font-weight: var(--font-weight-bold);
+}
+
+.ws-stage-meta .display-name[data-script='he'] {
+  font-size: 22px;
+}
+
+.ws-stage-score {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 18px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-stage-rule);
+}
+
+.ws-stage-score div {
+  display: flex;
+  flex-direction: column-reverse;
+  min-width: 0;
+}
+
+.ws-stage-score div + div {
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid var(--color-stage-rule);
+}
+
+.ws-stage-score dd {
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: 32px;
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.ws-stage-score dd small {
+  margin-inline-start: 2px;
+  font-size: 15px;
+}
+
+.ws-stage-score dt {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ws-stage-close:hover {
+    background-color: var(--surface-on-stage-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-stage-medal circle,
+  .ws-stage-medal path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .ws-stage-close:active {
+    transform: none;
+  }
+}

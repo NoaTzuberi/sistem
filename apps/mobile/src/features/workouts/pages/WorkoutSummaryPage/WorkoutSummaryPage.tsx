@@ -1,23 +1,30 @@
 import { useCallback, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
-import type { WorkoutLog } from '@sistem/types';
-import { formatDateTime, useCopy, useLanguage, useLoad } from '@sistem/shared';
-import { IconX } from '@tabler/icons-react';
+import type { AchievementProgress, WorkoutLog } from '@sistem/types';
+import { fill, getActiveLanguage, useCopy, useLoad } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
-import { Button } from '../../../../components/common/Button/Button';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
+import { useToast } from '../../../../hooks/useToast';
+import { appCopy } from '../../../../copy';
 import { ROUTES, workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
 import { getWorkoutLog, updateWorkoutSummary } from '../../../../services/workoutLogs/workoutLogsService';
-import { SummaryStats } from '../../components/SummaryStats/SummaryStats';
-import { PersonalRecordList } from '../../components/PersonalRecordList/PersonalRecordList';
+import { getWeek } from '../../../../services/plans/plansService';
+import { getAchievements } from '../../../../services/achievements/achievementsService';
 import { UnlockedAchievements } from '../../../achievements/components/UnlockedAchievements/UnlockedAchievements';
-import { RatingPicker } from '../../components/RatingPicker/RatingPicker';
+import { SummaryStage } from '../../components/SummaryStage/SummaryStage';
+import { SummaryRecap } from '../../components/SummaryRecap/SummaryRecap';
+import { FeelPicker } from '../../components/FeelPicker/FeelPicker';
 import { PumpPhotoField } from '../../components/PumpPhotoField/PumpPhotoField';
+import { SummaryNextAchievement } from '../../components/SummaryNextAchievement/SummaryNextAchievement';
+import { nextWorkoutAchievement } from '../../data/summaryDisplay';
 import { workoutCopy } from '../../copy';
 import './WorkoutSummaryPage.css';
 
 const NOTES_MAX_LENGTH = 1000;
+/** The "Saved and sent" toast stays this long before Home opens. */
+const SAVED_TOAST_MS = 900;
 
 /** Where she came from: right after Finish (→ Home) or her log page ("Add summary"). */
 export interface SummaryLocationState {
@@ -25,17 +32,18 @@ export interface SummaryLocationState {
 }
 
 /**
- * The workout summary (PRD §5.3), full screen: the server's stats and PRs, the
- * achievements it unlocked (Phase 11), "How was it?", notes and the Daily Pump photo. Opened
- * after Finish and again from the log page — she can change it any time.
+ * The workout summary (PRD §5.3), full screen: the pink stage with the server's numbers, what she
+ * did (PRs tagged), the achievements it unlocked, "How was it?", a note for her coach, the Daily
+ * Pump photo and her next achievement. Opened after Finish and again from the log page.
  */
 export function WorkoutSummaryPage() {
-  const language = useLanguage();
   const copy = useCopy(workoutCopy);
+  const eyebrow = useCopy(appCopy).eyebrow;
   const { logId = '' } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const fromLog = (location.state as SummaryLocationState | null)?.fromLog === true;
+  const { toastMessage, showToast } = useToast();
 
   const load = useCallback(() => getWorkoutLog(logId), [logId]);
   const { data, error, reload } = useLoad(load, copy.summary.loadError);
@@ -46,6 +54,31 @@ export function WorkoutSummaryPage() {
   const [isFormReady, setIsFormReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Extras: never block the summary — on a failure they just don't show.
+  const [coachName, setCoachName] = useState<string | null>(null);
+  const [nextAchievement, setNextAchievement] = useState<(AchievementProgress & { threshold: number }) | null>(null);
+
+  // The summary opens at its stage, not where the player was scrolled to.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getWeek()
+      .then((week) => {
+        if (!cancelled) setCoachName(week.coach?.name ?? null);
+      })
+      .catch(() => undefined);
+    getAchievements()
+      .then((overview) => {
+        if (!cancelled) setNextAchievement(nextWorkoutAchievement(overview.progress));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!data) return;
@@ -63,18 +96,16 @@ export function WorkoutSummaryPage() {
   }
 
   async function save() {
-    if (!log) return;
+    if (!log || isSaving) return;
     const trimmed = notes.trim();
     const changed = rating !== (log.rating ?? null) || trimmed !== (log.notes ?? '');
-    if (!changed) {
-      leave();
-      return;
-    }
     setIsSaving(true);
     setSaveError(null);
     try {
-      await updateWorkoutSummary(log.id, { rating, notes: trimmed === '' ? null : trimmed });
-      leave();
+      if (changed) await updateWorkoutSummary(log.id, { rating, notes: trimmed === '' ? null : trimmed });
+      const text = workoutCopy[getActiveLanguage()].finish;
+      showToast(coachName ? fill(text.savedFor, { name: coachName }) : text.saved);
+      window.setTimeout(leave, SAVED_TOAST_MS);
     } catch {
       setSaveError(copy.summary.saveError);
       setIsSaving(false);
@@ -84,77 +115,68 @@ export function WorkoutSummaryPage() {
   if (log?.status === 'in_progress') return <Navigate to={workoutSessionPath(log.id)} replace />;
 
   return (
-    <AppShell hideTabBar>
-      <div className="workout-summary">
-        <header className="workout-summary-header">
-          <button type="button" className="workout-summary-close" aria-label={copy.summary.close} onClick={leave}>
-            <IconX size={24} aria-hidden="true" />
-          </button>
-          <div className="workout-summary-heading">
-            <h1 className="workout-summary-title display-title">{copy.summary.title}</h1>
-            {log && (
-              <span className="workout-summary-meta">
-                {log.workoutTitle} · {formatDateTime(log.finishedAt ?? log.startedAt, language)}
-              </span>
-            )}
+    <AppShell hideTabBar bleed>
+      <div className="ws">
+        {!log && (
+          <div className="ws-state">
+            {error ? <StateMessage onRetry={reload}>{error}</StateMessage> : <StateMessage>{copy.summary.loading}</StateMessage>}
           </div>
-        </header>
-
-        {!log && !error && <StateMessage>{copy.summary.loading}</StateMessage>}
-        {!log && error && <StateMessage onRetry={reload}>{error}</StateMessage>}
-        {log && log.status !== 'completed' && <StateMessage>{copy.summary.notFinished}</StateMessage>}
+        )}
+        {log && log.status !== 'completed' && (
+          <div className="ws-state">
+            <StateMessage>{copy.summary.notFinished}</StateMessage>
+          </div>
+        )}
 
         {log && log.status === 'completed' && (
           <>
-            {log.stats && <SummaryStats stats={log.stats} />}
-            <PersonalRecordList log={log} title={copy.summary.personalRecords} />
-            <UnlockedAchievements achievements={log.achievements ?? []} />
+            <SummaryStage workoutTitle={log.workoutTitle} finishedAt={log.finishedAt ?? log.startedAt} stats={log.stats} onClose={leave} />
 
-            <section className="workout-summary-section" aria-labelledby="summary-rating">
-              <h2 id="summary-rating" className="workout-summary-section-title display-title">
-                {copy.summary.ratingQuestion}
-              </h2>
-              <RatingPicker value={rating} label={copy.summary.ratingQuestion} onChange={setRating} />
-            </section>
+            <div className="ws-body">
+              <SummaryRecap log={log} />
+              <UnlockedAchievements achievements={log.achievements ?? []} />
 
-            <section className="workout-summary-section">
-              <label htmlFor="summary-notes" className="workout-summary-section-title display-title">
-                {copy.summary.notes}
-              </label>
-              <textarea
-                id="summary-notes"
-                className="workout-summary-notes"
-                rows={3}
-                maxLength={NOTES_MAX_LENGTH}
-                placeholder={copy.summary.notesPlaceholder}
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-              />
-            </section>
+              <section className="ws-section">
+                <h2 className="ws-section-title" id="ws-feel-title">
+                  <Eyebrow>{eyebrow.feel}</Eyebrow>
+                  {copy.summary.ratingQuestion}
+                </h2>
+                <FeelPicker value={rating} labelledBy="ws-feel-title" onChange={setRating} />
+              </section>
 
-            <PumpPhotoField log={log} onLogChange={setLog} onLinkExpired={reload} />
+              <section className="ws-section">
+                <h2 className="ws-section-title">
+                  <label htmlFor="ws-notes">{coachName ? fill(copy.finish.noteFor, { name: coachName }) : copy.finish.noteNoCoach}</label>
+                </h2>
+                <textarea
+                  id="ws-notes"
+                  className="ws-notes"
+                  dir="auto"
+                  rows={3}
+                  maxLength={NOTES_MAX_LENGTH}
+                  placeholder={copy.summary.notesPlaceholder}
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                />
+              </section>
+
+              <PumpPhotoField log={log} onLogChange={setLog} onLinkExpired={reload} />
+
+              {nextAchievement && <SummaryNextAchievement achievement={nextAchievement} />}
+
+              {saveError && (
+                <p className="ws-error" role="alert">
+                  {saveError}
+                </p>
+              )}
+              <button type="button" className="ws-save" onClick={() => void save()} disabled={isSaving} aria-busy={isSaving || undefined}>
+                {coachName ? fill(copy.finish.saveFor, { name: coachName }) : copy.summary.save}
+              </button>
+            </div>
           </>
         )}
       </div>
-
-      {/* Portaled: the page-enter animation transforms <main>, which would pin a fixed
-          footer to <main> instead of the screen while it runs. */}
-      {log?.status === 'completed' &&
-        createPortal(
-          <footer className="workout-summary-footer">
-            {saveError && (
-              <p className="workout-summary-error" role="alert">
-                {saveError}
-              </p>
-            )}
-            <div className="workout-summary-footer-row">
-              <Button className="workout-summary-save" onClick={() => void save()} loading={isSaving}>
-                {copy.summary.save}
-              </Button>
-            </div>
-          </footer>,
-          document.body,
-        )}
+      <Toast message={toastMessage} />
     </AppShell>
   );
 }
