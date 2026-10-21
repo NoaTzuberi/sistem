@@ -5,6 +5,7 @@ import { FOOD_GROUPS, fill, getActiveLanguage, sharedCopy, useCopy, useLoad } fr
 import { createFood, deleteFood, getNutritionSettings, listFoods, restoreFood, updateFood } from '../../../services/coach/coachService';
 import type { CategoryFilter } from '../../nutrition/data/foodFilters';
 import { filterFoods } from '../data/foodLibrary';
+import { useHiddenItems } from '../../../hooks/useHiddenItems';
 import { nutritionLibraryCopy } from '../copy';
 
 async function loadFoods(): Promise<{ foods: FoodItem[]; config: NutritionConfig }> {
@@ -45,7 +46,10 @@ export function useFoods() {
     setCategory(null);
   }, []);
 
-  const foods = useMemo(() => data?.foods ?? [], [data]);
+  // A delete waiting for its "Undo" hides the item at once (useUndoToast).
+  const hiddenItems = useHiddenItems(data);
+  const { hidden } = hiddenItems;
+  const foods = useMemo(() => (data?.foods ?? []).filter((food) => !hidden.has(food.id)), [data, hidden]);
   const caps = data?.config.groupKcal;
 
   // The chips count what the archive switch shows; the search narrows only the cards.
@@ -97,14 +101,20 @@ export function useFoods() {
     [run, copy.foodSaveError],
   );
 
+  const { markDone, show } = hiddenItems;
+  /** The server call behind "remove" (after the undo window): the item stays hidden until the list is read again. */
   const remove = useCallback(
-    (item: FoodItem) =>
-      run(async () => {
+    async (item: FoodItem) => {
+      const result = await run(async () => {
         const text = nutritionLibraryCopy[getActiveLanguage()];
-        const result = await deleteFood(item.id);
-        return fill(result.outcome === 'archived' ? text.removedArchived : text.removedDeleted, { name: item.name });
-      }, copy.foodSaveError),
-    [run, copy.foodSaveError],
+        const outcome = await deleteFood(item.id);
+        return fill(outcome.outcome === 'archived' ? text.removedArchived : text.removedDeleted, { name: item.name });
+      }, copy.foodSaveError);
+      if (result.ok) markDone(item.id);
+      else show(item.id);
+      return result;
+    },
+    [run, copy.foodSaveError, markDone, show],
   );
 
   const restore = useCallback(
@@ -134,5 +144,7 @@ export function useFoods() {
     save,
     remove,
     restore,
+    hide: hiddenItems.hide,
+    show,
   };
 }

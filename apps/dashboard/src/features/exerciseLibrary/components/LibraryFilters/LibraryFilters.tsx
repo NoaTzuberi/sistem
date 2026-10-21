@@ -30,6 +30,8 @@ export function LibraryFilters({ search, onSearch, status, statusCounts, onStatu
         <input
           className="exlib-filters-input"
           type="search"
+          data-search-shortcut
+          aria-keyshortcuts="/"
           dir="auto"
           placeholder={copy.search}
           aria-label={copy.search}

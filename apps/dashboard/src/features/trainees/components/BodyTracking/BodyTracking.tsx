@@ -10,6 +10,7 @@ import { MeasurementsCard } from '../MeasurementsCard/MeasurementsCard';
 import { ProgressPhotosCard } from '../ProgressPhotosCard/ProgressPhotosCard';
 import { WeightTrendCard } from '../WeightTrendCard/WeightTrendCard';
 import './BodyTracking.css';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 interface BodyTrackingProps {
   traineeId: string;
@@ -26,7 +27,7 @@ export function BodyTracking({ traineeId, traineeName, timezone }: BodyTrackingP
   const shared = useCopy(sharedCopy);
   const { list, error, isLoading, reload } = useBodyMetrics(traineeId);
 
-  if (isLoading && !list) return <p className="body-tracking-message">{shared.common.loading}</p>;
+  if (isLoading && !list) return <Skeleton layout="panel" />;
   if (!list) {
     return (
       <p className="body-tracking-message" role="alert">

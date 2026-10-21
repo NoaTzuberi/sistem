@@ -10,6 +10,7 @@ import { AchievementsHero } from '../AchievementsHero/AchievementsHero';
 import { AchievementStats } from '../AchievementStats/AchievementStats';
 import './TraineeAchievements.css';
 import { traineesCopy } from '../../copy';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 interface TraineeAchievementsProps {
   traineeId: string;
@@ -24,7 +25,7 @@ export function TraineeAchievements({ traineeId }: TraineeAchievementsProps) {
   const shared = useCopy(sharedCopy);
   const state = useAchievementBoard(traineeId);
 
-  if (state.isLoading && !state.overview) return <p className="trainee-achievements-message">{shared.common.loading}</p>;
+  if (state.isLoading && !state.overview) return <Skeleton layout="panel" />;
   if (!state.overview || !state.board) {
     return (
       <p className="trainee-achievements-message" role="alert">

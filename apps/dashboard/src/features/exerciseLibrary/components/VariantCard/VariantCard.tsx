@@ -26,8 +26,9 @@ export function VariantCard({ member, variantSize, isBusy, onMakeMain }: Variant
       </div>
       {member.isPrimary && <span className="variant-card-badge variant-card-badge-main">{copy.mainBadge}</span>}
       {member.isPrimary && variantSize > 1 && (
-        <span className="variant-card-badge variant-card-badge-copies" dir="ltr">
-          {fill(copy.copiesBadge, { count: variantSize })}
+        // Only the text is left-to-right: a dir on the badge itself would flip its inline-end corner onto "main".
+        <span className="variant-card-badge variant-card-badge-copies">
+          <bdi dir="ltr">{fill(copy.copiesBadge, { count: variantSize })}</bdi>
         </span>
       )}
       {!member.isPrimary && (

@@ -54,7 +54,7 @@ export const he = {
   workoutLogs: 'תיעודי אימונים',
   // The trainees list and the quick-view drawer (coach dashboard design). Wording from the
   // approved design; `fullProfile` is a PLACEHOLDER.
-  listSubtitle: '{active} פעילות · {waiting} מחכות לתוכניתמתאמנות ש',
+  listSubtitle: '{active} פעילות · {waiting} מחכות לתוכנית',
   trainee: 'מתאמנת',
   plan: 'תוכנית',
   daysPerWeek: '{days} ימים בשבוע',

@@ -61,7 +61,8 @@ export function WeekBoard({ stats, trainees, onOpen, className }: WeekBoardProps
                 <td className="week-board-who" />
                 {dates.map((date) => (
                   <th key={date} scope="col" className={date === stats.today ? 'week-board-day week-board-today' : 'week-board-day'}>
-                    {date === stats.today ? copy.board.today : weekdayName(weekdayOf(date), language, 'short')}
+                    {/* Hebrew: the letter ("ד׳"), as in the design; English single letters repeat (T, S), so "Wed". */}
+                    {date === stats.today ? copy.board.today : weekdayName(weekdayOf(date), language, language === 'he' ? 'narrow' : 'short')}
                   </th>
                 ))}
               </tr>

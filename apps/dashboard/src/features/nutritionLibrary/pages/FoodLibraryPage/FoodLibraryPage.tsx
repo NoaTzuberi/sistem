@@ -7,6 +7,8 @@ import { PageHeader } from '../../../../components/common/PageHeader/PageHeader'
 import { StateLine } from '../../../../components/common/StateLine/StateLine';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
+import { useUndoToast } from '../../../../hooks/useUndoToast';
+import { appCopy } from '../../../../copy';
 import { CategoryChips } from '../../../nutrition/components/CategoryChips/CategoryChips';
 import { TEMPLATE_STATE_KEY } from '../../data/templateHandoff';
 import { TAB_PATHS, libraryTabId, tabFromPath } from '../../data/libraryTabs';
@@ -55,7 +57,9 @@ export function FoodLibraryPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const tab = tabFromPath(location.pathname);
+  const app = useCopy(appCopy);
   const { toastMessage, showToast } = useToast();
+  const { undoMessage, offerUndo, undo } = useUndoToast();
 
   const foods = useFoods();
   const templates = useTemplates();
@@ -88,9 +92,14 @@ export function FoodLibraryPage() {
     return result.ok;
   }
 
-  async function removeFood(item: FoodItem) {
-    if (!window.confirm(fill(copy.removeConfirm, { name: item.name }))) return;
-    showToast((await foods.remove(item)).message);
+  // No confirm: the card goes at once, "Undo" brings it back; the server call waits for the undo window.
+  function removeFood(item: FoodItem) {
+    foods.hide(item.id);
+    offerUndo({
+      message: fill(copy.removing, { name: item.name }),
+      onUndo: () => foods.show(item.id),
+      onCommit: () => void foods.remove(item).then((result) => showToast(result.message)),
+    });
   }
 
   async function restoreFood(item: FoodItem) {
@@ -110,9 +119,14 @@ export function FoodLibraryPage() {
     navigate(nutritionBuilderPath(traineeId), template ? { state: { [TEMPLATE_STATE_KEY]: template.id } } : undefined);
   }
 
-  async function deleteTemplate(template: NutritionTemplate) {
-    if (!window.confirm(fill(copy.deleteConfirm, { name: template.name }))) return;
-    showToast((await templates.remove(template)).message);
+  function deleteTemplate(template: NutritionTemplate) {
+    templates.hide(template.id);
+    offerUndo({
+      message: fill(copy.deleted, { name: template.name }),
+      onUndo: () => templates.show(template.id),
+      // Success was already said; only a failure needs a line.
+      onCommit: () => void templates.remove(template).then((result) => !result.ok && showToast(result.message)),
+    });
   }
 
   async function renameTemplate(name: string): Promise<boolean> {
@@ -262,7 +276,8 @@ export function FoodLibraryPage() {
       {rename.subject && (
         <TemplateRenameSheet key={`rename-${rename.key}`} isOpen={rename.isOpen} name={rename.subject.name} onClose={closeRename} onSave={renameTemplate} />
       )}
-      <Toast message={toastMessage} />
+      {/* One toast at a time: the undo line while it is offered, otherwise the last message. */}
+      <Toast message={undoMessage ?? toastMessage} action={undoMessage ? { label: app.shell.undo, onPress: undo } : undefined} />
     </div>
   );
 }

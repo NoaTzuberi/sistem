@@ -20,6 +20,7 @@ import { valueSince } from '../../data/statsFormat';
 import { useStats } from '../../hooks/useStats';
 import { useStatsIntro } from '../../hooks/useStatsIntro';
 import './StatsPage.css';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 const DEFAULT_RANGE: CoachStatsRange = 6;
 /** The promise the waiting screen makes: a plan within 48 hours of the questionnaire (PRD §5). */
@@ -42,7 +43,7 @@ export function StatsPage() {
         <RangeSegmented label={copy.rangeLabel} options={ranges} value={range} onChange={setRange} />
       </PageHeader>
 
-      {!stats && !hasError && <StateLine />}
+      {!stats && !hasError && <Skeleton layout="cards" />}
       {hasError && !stats && <StateLine error={copy.loadError} onRetry={reload} />}
       {stats && <StatsContent stats={stats} />}
     </div>

@@ -24,6 +24,8 @@ export function FoodToolbar({ query, onQueryChange, showArchived, onShowArchived
         <input
           className="food-toolbar-input"
           type="search"
+          data-search-shortcut
+          aria-keyshortcuts="/"
           dir="auto"
           value={query}
           placeholder={copy.searchPlaceholder}

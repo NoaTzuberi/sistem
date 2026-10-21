@@ -13,6 +13,7 @@ import { WeekTicks } from '../../components/WeekTicks/WeekTicks';
 import { overviewCopy } from '../../copy';
 import { formatShare } from '../../data/overviewFormat';
 import './OverviewPage.css';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 /** Where the coach lands: this week at a glance — every number comes from /coach/stats and her trainees list. */
 export function OverviewPage() {
@@ -29,7 +30,7 @@ export function OverviewPage() {
     <div className="overview-page">
       <Greeting stats={stats} nowMs={nowMs} />
 
-      {!stats && !hasStatsError && <StateLine />}
+      {!stats && !hasStatsError && <Skeleton layout="overview" />}
       {hasStatsError && !stats && <StateLine error={copy.loadError} onRetry={reload} />}
 
       {stats && (

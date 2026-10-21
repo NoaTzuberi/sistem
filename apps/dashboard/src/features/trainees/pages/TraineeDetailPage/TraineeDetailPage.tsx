@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getTrainee } from '../../../../services/coach/coachService';
 import { sharedCopy, useCopy, useLoad, useServerNow } from '@sistem/shared';
-import { DEFAULT_TRAINEE_TAB, ROUTES, TRAINEE_TABS, TRAINEE_TAB_PARAM, planPath } from '../../../../app/config/routes';
-import type { TraineeTab } from '../../../../app/config/routes';
+import { ROUTES, planPath } from '../../../../app/config/routes';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { useCoachData } from '../../../../services/coach/CoachDataContext';
 import { OnboardingAnswers } from '../../components/OnboardingAnswers/OnboardingAnswers';
@@ -15,15 +14,13 @@ import { BodyTracking } from '../../components/BodyTracking/BodyTracking';
 import { TraineeAchievements } from '../../components/TraineeAchievements/TraineeAchievements';
 import { TraineeNutritionTab } from '../../../nutrition/components/TraineeNutritionTab/TraineeNutritionTab';
 import { useTraineePlans } from '../../hooks/useTraineePlans';
+import { useTraineeTab } from '../../hooks/useTraineeTab';
 import { traineeTabId } from '../../data/traineeTabs';
 import './TraineeDetailPage.css';
 import { traineesCopy } from '../../copy';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 const PANEL_ID = 'trainee-tab-panel';
-
-function isTraineeTab(value: string | null): value is TraineeTab {
-  return (TRAINEE_TABS as readonly string[]).includes(value ?? '');
-}
 
 /** A trainee's profile: the header card, her sections as pill tabs, and the open section. */
 export function TraineeDetailPage() {
@@ -31,9 +28,7 @@ export function TraineeDetailPage() {
   const copy = useCopy(traineesCopy);
   const navigate = useNavigate();
   const { traineeId = '' } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const requestedTab = searchParams.get(TRAINEE_TAB_PARAM);
-  const tab = isTraineeTab(requestedTab) ? requestedTab : DEFAULT_TRAINEE_TAB;
+  const [tab, selectTab] = useTraineeTab(traineeId);
 
   const load = useCallback(() => getTrainee(traineeId), [traineeId]);
   const { data, error, isLoading, reload } = useLoad(load, shared.coach.loadTraineeError);
@@ -44,10 +39,6 @@ export function TraineeDetailPage() {
   // The header's pink pill asks the Plans tab for its week picker.
   const [wantsNewPlan, setWantsNewPlan] = useState(false);
   const handleNewPlanHandled = useCallback(() => setWantsNewPlan(false), []);
-
-  function selectTab(next: TraineeTab) {
-    setSearchParams(next === DEFAULT_TRAINEE_TAB ? {} : { [TRAINEE_TAB_PARAM]: next }, { replace: true });
-  }
 
   // "Build plan" / "Next week": next week's plan when she already has one, else a new plan (the
   // week picker of the Plans tab — the server decides which week it offers first).
@@ -67,7 +58,7 @@ export function TraineeDetailPage() {
         {copy.backToAllTrainees}
       </Link>
 
-      {isLoading && !trainee && <p className="trainee-message">{shared.common.loading}</p>}
+      {isLoading && !trainee && <Skeleton layout="profile" />}
       {error && !trainee && (
         <p className="trainee-message" role="alert">
           {error}{' '}

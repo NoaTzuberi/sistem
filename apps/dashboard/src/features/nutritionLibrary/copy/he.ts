@@ -46,7 +46,7 @@ export const he = {
   editNamed: 'עריכת ״{name}״',
   removeNamed: 'הסרת ״{name}״',
   restoreNamed: 'שחזור ״{name}״',
-  removeConfirm: 'להסיר את ״{name}״? אם הוא בשימוש בתוכנית או בתבנית הוא יועבר לארכיון ולא יימחק.',
+  removing: 'הפריט ״{name}״ הוסר.', // PLACEHOLDER (undo toast)
   removedArchived: '״{name}״ בשימוש בתוכנית או בתבנית, ולכן הועבר לארכיון (לא נמחק).',
   removedDeleted: '״{name}״ נמחק.',
   restored: '״{name}״ שוחזר.',
@@ -81,7 +81,6 @@ export const he = {
   useTemplate: 'שימוש לתוכנית חדשה',
   renameNamed: 'שינוי השם של ״{name}״',
   deleteNamed: 'מחיקת ״{name}״',
-  deleteConfirm: 'למחוק את התבנית ״{name}״?',
   deleted: 'התבנית ״{name}״ נמחקה.',
   deleteError: 'לא הצלחנו למחוק את התבנית.',
   renameTitle: 'שינוי שם התבנית',

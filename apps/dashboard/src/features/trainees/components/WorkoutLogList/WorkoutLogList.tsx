@@ -8,6 +8,7 @@ import { WorkoutLogDayGroup } from '../WorkoutLogDayGroup/WorkoutLogDayGroup';
 import { WorkoutLogFilters } from '../WorkoutLogFilters/WorkoutLogFilters';
 import { WorkoutLogSummary } from '../WorkoutLogSummary/WorkoutLogSummary';
 import './WorkoutLogList.css';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 
 interface WorkoutLogListProps {
   traineeId: string;
@@ -25,7 +26,7 @@ export function WorkoutLogList({ traineeId, timezone, currentWeekStart }: Workou
   const logs = useWorkoutLogs(traineeId, timezone, currentWeekStart);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  if (logs.isLoading && !logs.logs) return <p className="logs-message" role="status">{shared.common.loading}</p>;
+  if (logs.isLoading && !logs.logs) return <Skeleton layout="panel" />;
   if (logs.error && !logs.logs) {
     return (
       <p className="logs-message" role="alert">

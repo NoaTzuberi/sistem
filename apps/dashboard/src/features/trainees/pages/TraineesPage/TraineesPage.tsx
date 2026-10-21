@@ -17,6 +17,7 @@ import {
 } from '@sistem/shared';
 import type { TraineeFilter } from '@sistem/shared';
 import { TRAINEE_FILTER_PARAM } from '../../../../app/config/routes';
+import { Skeleton } from '../../../../components/common/Skeleton/Skeleton';
 import { Avatar } from '../../../../components/common/Avatar/Avatar';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { PageHeader } from '../../../../components/common/PageHeader/PageHeader';
@@ -76,6 +77,8 @@ export function TraineesPage() {
           <input
             className="trainees-search-input"
             type="search"
+            data-search-shortcut
+            aria-keyshortcuts="/"
             placeholder={shared.coach.searchPlaceholder}
             aria-label={shared.coach.searchLabel}
             value={search}
@@ -84,7 +87,7 @@ export function TraineesPage() {
         </label>
       </div>
 
-      {!hasTrainees && !hasTraineesError && <StateLine />}
+      {!hasTrainees && !hasTraineesError && <Skeleton layout="rows" />}
       {hasTraineesError && !hasTrainees && <StateLine error={shared.coach.loadTraineesError} onRetry={reload} />}
 
       {hasTrainees && (
