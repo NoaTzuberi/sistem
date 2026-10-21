@@ -1,0 +1,64 @@
+.tn-summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block: var(--space-3) var(--space-2);
+}
+
+.tn-summary-main {
+  min-width: 0;
+}
+
+.tn-summary-total {
+  display: inline-block;
+  font-family: var(--font-num);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-portion-total);
+  line-height: 0.85;
+  color: var(--color-ink);
+}
+
+.tn-summary-total .tn-portion-goal {
+  font-size: var(--text-portion-total-goal);
+  color: var(--color-text-faint); /* contrast-ignore: the day's total, also in every row's count */
+}
+
+.tn-summary-line {
+  display: block;
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tn-summary-mix {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+/* Segments in group order from the start side; each one's width is its share of the day's portions. */
+.tn-summary-mix-bar {
+  display: flex;
+  width: var(--size-mix-width);
+  height: var(--size-mix-height);
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.tn-summary-mix-bar i {
+  flex: none;
+  width: calc(var(--share, 0) * 100%);
+  height: 100%;
+  background-color: var(--group-fill);
+  transition: width var(--transition-fuel-cell) var(--ease-press);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-summary-mix-bar i {
+    transition: none;
+  }
+}

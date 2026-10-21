@@ -1,0 +1,49 @@
+/* Trainee Nutrition: a plain white screen, ink type (the "training OS" of Home B / Workouts). */
+.tn-screen {
+  min-height: 100%;
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.tn-body {
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  padding-block-end: var(--space-4);
+}
+
+.tn-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tn-note {
+  min-height: 1lh;
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tn-note:empty {
+  min-height: 0;
+}
+
+/* A section's header (the menu, the photos): a mono eyebrow + a small label, an action at the end. */
+.tn-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.tn-section-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}

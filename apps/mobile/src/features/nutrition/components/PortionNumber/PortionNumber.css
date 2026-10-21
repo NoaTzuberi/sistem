@@ -1,0 +1,6 @@
+/* A count is one isolated left-to-right run; it never wraps between the number and its goal. */
+.tn-portion-number {
+  unicode-bidi: isolate;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

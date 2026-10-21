@@ -1,8 +1,7 @@
 import type { PortionCounts, PortionGroup } from '@sistem/types';
 
-// The day tracker's circles (Phase 13a+), as plain functions. One circle per planned
-// portion; a planned half is a half-size circle. Marks always fill from the start, so
-// only the count matters — she never says which meal a portion was.
+// The day tracker's marks (Phase 13a+), as plain functions. Marks always fill from the start,
+// so only the count matters — she never says which meal a portion was.
 
 const STEP = 0.5;
 
@@ -13,6 +12,7 @@ export interface Circle {
   filled: number;
 }
 
+/** One circle per planned portion; a planned half is a half-size circle (Home's read-only pips). */
 export function circlesFor(planned: number, eaten: number): Circle[] {
   const circles: Circle[] = [];
   let left = eaten;
@@ -25,24 +25,36 @@ export function circlesFor(planned: number, eaten: number): Circle[] {
   return circles;
 }
 
-/** Tap on an empty circle = one more portion; on a marked one = take the last mark back. */
-export function tapCircle(circle: Circle, planned: number, eaten: number): number {
-  if (circle.filled > 0) {
-    const last = [...circlesFor(planned, eaten)].reverse().find((candidate) => candidate.filled > 0);
-    return Math.max(0, eaten - (last?.filled ?? 0));
+/** A portion on the Nutrition tab's fuel bar: its number (1, 2, …) and its half-cells' indexes. */
+export interface FuelCapsule {
+  portion: number;
+  /** Two half-cells, or one for a planned half portion at the end. */
+  cells: number[];
+}
+
+/** One half-cell per planned half portion, paired into capsules. */
+export function fuelCapsules(planned: number): FuelCapsule[] {
+  const total = Math.round(planned / STEP);
+  const capsules: FuelCapsule[] = [];
+  for (let cell = 0; cell < total; cell += 2) {
+    capsules.push({ portion: cell / 2 + 1, cells: cell + 1 < total ? [cell, cell + 1] : [cell] });
   }
-  const next = circlesFor(planned, eaten).find((candidate) => candidate.filled < candidate.size);
-  return Math.min(planned, eaten + (next ? next.size - next.filled : 0));
+  return capsules;
 }
 
-/** "½": takes back a half mark, or marks half a portion. */
-export function toggleHalf(planned: number, eaten: number): number {
-  if (!Number.isInteger(eaten)) return eaten - STEP;
-  return Math.min(planned, eaten + STEP);
+/** How many half-cells are filled (all of them when she is over the goal). */
+export function filledCells(planned: number, eaten: number): number {
+  return Math.min(Math.round(planned / STEP), Math.round(eaten / STEP));
 }
 
-export function hasHalfMark(eaten: number): boolean {
-  return !Number.isInteger(eaten);
+/** The value of filling up to (and including) a half-cell. */
+export function cellValue(cell: number): number {
+  return (cell + 1) * STEP;
+}
+
+/** Tap a cell = fill up to it; tap the last filled cell = empty it. */
+export function tapCell(cell: number, planned: number, eaten: number): number {
+  return cell === filledCells(planned, eaten) - 1 ? cell * STEP : cellValue(cell);
 }
 
 export function withGroup(eaten: PortionCounts, group: PortionGroup, value: number): PortionCounts {

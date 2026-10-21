@@ -2,6 +2,7 @@ import type { FoodGroup, NutritionFoodFacts } from '@sistem/types';
 import { fill, sharedCopy, useCopy } from '@sistem/shared';
 import { Modal } from '../../../../components/common/Modal/Modal';
 import { Badge } from '../../../../components/common/Badge/Badge';
+import { GroupBadge } from '../GroupBadge/GroupBadge';
 import { nutritionCopy } from '../../copy';
 import './SwapSheet.css';
 
@@ -29,7 +30,18 @@ export function SwapSheet({ group, swaps, currentFoodId, onClose }: SwapSheetPro
   const items = group ? swaps[group] : [];
 
   return (
-    <Modal isOpen={group !== null} onClose={onClose} title={group ? fill(copy.swapsTitle, { group: shared.nutrition.groups[group] }) : undefined}>
+    <Modal
+      isOpen={group !== null}
+      onClose={onClose}
+      title={
+        group ? (
+          <span className="swap-sheet-title">
+            <GroupBadge group={group} />
+            {fill(copy.swapsTitle, { group: shared.nutrition.groups[group] })}
+          </span>
+        ) : undefined
+      }
+    >
       <p className="swap-sheet-intro">{copy.swapsIntro}</p>
       {items.length === 0 ? (
         <p className="swap-sheet-empty">{copy.swapsEmpty}</p>

@@ -1,0 +1,38 @@
+/* The portion groups' colors for the trainee Nutrition screen: put .tn-group-<group> on an element and
+   its children read --group-fill (bright: cells, badges, bars — never under small text), --group-soft
+   (tints), --group-text (the ink for text on a tint or on white, ≥ 4.5:1) and --group-glow (a badge's
+   glow where color-mix is missing). */
+.tn-group-protein {
+  --group-fill: var(--color-portion-protein);
+  --group-soft: var(--color-portion-protein-soft);
+  --group-text: var(--color-portion-protein-text);
+  --group-glow: var(--color-portion-protein-glow);
+}
+
+.tn-group-carb {
+  --group-fill: var(--color-portion-carb);
+  --group-soft: var(--color-portion-carb-soft);
+  --group-text: var(--color-portion-carb-text);
+  --group-glow: var(--color-portion-carb-glow);
+}
+
+.tn-group-fat {
+  --group-fill: var(--color-portion-fat);
+  --group-soft: var(--color-portion-fat-soft);
+  --group-text: var(--color-portion-fat-text);
+  --group-glow: var(--color-portion-fat-glow);
+}
+
+.tn-group-snack {
+  --group-fill: var(--color-portion-snack);
+  --group-soft: var(--color-portion-snack-soft);
+  --group-text: var(--color-portion-snack-text);
+  --group-glow: var(--color-portion-snack-glow);
+}
+
+.tn-group-vegetable {
+  --group-fill: var(--color-portion-vegetable);
+  --group-soft: var(--color-portion-vegetable-soft);
+  --group-text: var(--color-portion-vegetable-text);
+  --group-glow: var(--color-portion-vegetable-glow);
+}

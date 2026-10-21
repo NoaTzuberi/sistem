@@ -1,0 +1,39 @@
+.tn-photo-sheet-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-display-md);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+}
+
+.tn-photo-sheet-privacy {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.tn-photo-sheet-meals {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tn-photo-sheet-meal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.tn-photo-sheet-meal-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-display-xs);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+}

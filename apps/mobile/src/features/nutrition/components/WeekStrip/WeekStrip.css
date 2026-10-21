@@ -1,0 +1,106 @@
+.tn-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+  margin-block-start: var(--space-3);
+}
+
+.tn-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  padding: var(--space-1) 0;
+  border: 0;
+  border-radius: var(--radius-lane);
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-fast) var(--ease-press),
+    transform var(--transition-press) var(--ease-press);
+}
+
+.tn-week-day:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.tn-week-letter {
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.tn-week-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-day-circle);
+  height: var(--size-day-circle);
+  border-radius: var(--radius-round);
+  font-family: var(--font-num);
+  font-size: var(--text-day-number);
+  font-weight: var(--font-weight-bold);
+}
+
+.tn-week-day[aria-selected='true'] .tn-week-number {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.tn-week-bar {
+  width: var(--size-day-bar-width);
+  height: var(--size-day-bar-height);
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+/* The day's share of portions: a scaled ink line (transform only), from the start side. */
+.tn-week-bar i {
+  display: block;
+  height: 100%;
+  background-color: var(--color-ink);
+  transform: scaleX(var(--progress, 0));
+  /* physical: transform-origin has no logical keyword — the bar grows from the start side. */
+  transform-origin: left center;
+  transition: transform var(--transition-fuel-cell) var(--ease-press);
+}
+
+[dir='rtl'] .tn-week-bar i {
+  /* physical: the start side is the right in Hebrew. */
+  transform-origin: right center;
+}
+
+.tn-week-day:disabled {
+  cursor: default;
+}
+
+.tn-week-day-future .tn-week-number {
+  color: var(--color-text-faint); /* contrast-ignore: a disabled future day */
+}
+
+.tn-week-day-future .tn-week-bar {
+  opacity: var(--opacity-faint);
+}
+
+.tn-week-day:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: calc(var(--border-width-medium) * -1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tn-week-day:not([aria-selected='true']):not(:disabled):hover {
+    background-color: var(--color-fill-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-week-day,
+  .tn-week-bar i {
+    transition: none;
+  }
+}

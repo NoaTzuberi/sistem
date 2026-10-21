@@ -11,10 +11,15 @@ export interface NutritionCache {
   days: MealLogDay[];
   /** Whole-day marks waiting for the server, by date. */
   pending: Record<string, PortionCounts>;
+  /**
+   * Menu meals she marked "I ate this", by date → meal id → the portions that mark added (so unmarking
+   * takes back exactly those). Phone only: the server keeps counts per group, never which meal (PRD 13a+).
+   */
+  mealMarks: Record<string, Record<string, PortionCounts>>;
 }
 
 const KEY_PREFIX = 'sistem.nutrition.';
-const EMPTY: NutritionCache = { plan: null, today: null, days: [], pending: {} };
+const EMPTY: NutritionCache = { plan: null, today: null, days: [], pending: {}, mealMarks: {} };
 
 export function loadNutritionCache(userId: string): NutritionCache {
   try {

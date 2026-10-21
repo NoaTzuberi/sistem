@@ -1,0 +1,41 @@
+/* The glyph is decoration (aria-hidden; the group's name is next to it), so it may sit on the bright fill. */
+.tn-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-portion-badge);
+  height: var(--size-portion-badge);
+  border-radius: var(--radius-round);
+  background-color: var(--group-fill);
+  color: var(--on-pink); /* contrast-ignore: a decorative glyph (aria-hidden) beside the group's name */
+  /* The glow follows the badge's own group (set by .tn-group-* on the badge itself). */
+  box-shadow: 0 6px 14px var(--group-glow);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .tn-badge {
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--group-fill) 35%, transparent);
+  }
+}
+
+.tn-badge svg {
+  width: 55%;
+  height: 55%;
+}
+
+.tn-badge-pop {
+  animation: tn-badge-pop var(--transition-badge-pop) var(--ease-spring);
+}
+
+@keyframes tn-badge-pop {
+  40% {
+    transform: scale(1.16) rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-badge-pop {
+    animation: none;
+  }
+}

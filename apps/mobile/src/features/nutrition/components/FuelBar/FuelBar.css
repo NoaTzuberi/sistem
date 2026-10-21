@@ -1,0 +1,144 @@
+/* The parent sets --group-fill / --group-soft / --group-text (.tn-group-*). A drag along the bar fills
+   it, so the bar never scrolls the page. */
+.tn-fuel-bar {
+  display: flex;
+  gap: var(--gap-fuel-capsule);
+  margin-block-start: var(--space-2);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* A portion is two shares of the width, a planned half one (flex 1 : 0.5). */
+.tn-fuel-capsule {
+  position: relative;
+  display: flex;
+  flex: 2 1 0;
+  gap: var(--gap-fuel-cell);
+  min-width: 0;
+}
+
+.tn-fuel-capsule-half {
+  flex-grow: 1;
+}
+
+/* The number in the capsule's top start corner: faint on the tint, white once the capsule is full. */
+.tn-fuel-number {
+  position: absolute;
+  inset-block-start: calc((var(--touch-target-min) - var(--size-fuel-cell)) / 2 + var(--space-1));
+  inset-inline-start: var(--space-2);
+  z-index: var(--z-raised);
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--group-text);
+  opacity: var(--opacity-fuel-number);
+  transition:
+    color var(--transition-fuel-cell) var(--ease-press),
+    opacity var(--transition-fuel-cell) var(--ease-press);
+  pointer-events: none;
+}
+
+.tn-fuel-capsule-full .tn-fuel-number {
+  color: var(--on-pink); /* contrast-ignore: a decorative capsule number (aria-hidden); the count is in the row header */
+  opacity: var(--opacity-fuel-number-full);
+}
+
+/* The tap area is 44px tall; the drawn cell inside it is 40px. */
+.tn-fuel-cell {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tn-fuel-cell::before,
+.tn-fuel-fill {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc((var(--touch-target-min) - var(--size-fuel-cell)) / 2);
+  height: var(--size-fuel-cell);
+}
+
+.tn-fuel-cell::before {
+  content: '';
+  background-color: var(--group-soft);
+}
+
+.tn-fuel-cell:first-of-type::before,
+.tn-fuel-cell:first-of-type .tn-fuel-fill {
+  border-start-start-radius: var(--radius-fuel-capsule);
+  border-end-start-radius: var(--radius-fuel-capsule);
+}
+
+.tn-fuel-cell:last-of-type::before,
+.tn-fuel-cell:last-of-type .tn-fuel-fill {
+  border-start-end-radius: var(--radius-fuel-capsule);
+  border-end-end-radius: var(--radius-fuel-capsule);
+}
+
+.tn-fuel-fill {
+  background-color: var(--group-fill);
+  transform: scaleX(0);
+  /* physical: transform-origin has no logical keyword — the fill grows from the start side. */
+  transform-origin: left center;
+  transition: transform var(--transition-fuel-cell) var(--ease-press);
+  transition-delay: calc(var(--cell-order, 0) * var(--fuel-cell-step));
+}
+
+[dir='rtl'] .tn-fuel-fill {
+  /* physical: the start side is the right in Hebrew. */
+  transform-origin: right center;
+}
+
+.tn-fuel-fill-on {
+  transform: scaleX(1);
+}
+
+/* The last filled cell's grip: a short white bar at its end edge. */
+.tn-fuel-handle {
+  position: absolute;
+  inset-inline-end: var(--space-1);
+  inset-block: calc((var(--touch-target-min) - var(--size-fuel-cell)) / 2 + var(--inset-fuel-handle));
+  z-index: var(--z-raised);
+  width: var(--size-fuel-handle);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fuel-handle);
+  pointer-events: none;
+}
+
+.tn-fuel-cell:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: calc(var(--border-width-medium) * -1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tn-fuel-cell:hover::before {
+    filter: brightness(0.96);
+  }
+}
+
+.tn-fuel-cell:active::before {
+  filter: brightness(0.94);
+}
+
+.tn-fuel-bar-disabled .tn-fuel-cell {
+  cursor: default;
+}
+
+.tn-fuel-bar-disabled .tn-fuel-capsule {
+  opacity: var(--opacity-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-fuel-fill,
+  .tn-fuel-number {
+    transition: none;
+  }
+}
