@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { dayNames, useCopy, useLanguage, workoutTypeLabel } from '@sistem/shared';
 import type { TrainingConfig, WorkoutTypeConfig } from '@sistem/types';
 import { ActionMenu } from '../../../../components/common/ActionMenu/ActionMenu';
+import { Icon } from '../../../../components/common/Icon/Icon';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { estimateWorkoutMinutes, workoutSetCount } from '../../data/planStats';
 import type { DraftWorkout } from '../../types';
@@ -16,8 +17,12 @@ interface WorkoutHeroProps {
   type: WorkoutTypeConfig | undefined;
   /** The muscle groups the workout already covers (its slots that have exercises). */
   coveredGroups: string[];
-  /** The band's "⋯": move, duplicate, remove. */
+  /** The band's "⋯": move, duplicate, delete. */
   menuItems: ActionMenuItem[];
+  /** The small "×" next to the "⋯": deletes this workout only (never the plan). */
+  onDelete: () => void;
+  /** Its accessible name and tooltip: "Delete <workout name>". */
+  deleteLabel: string;
   onChange: (workout: DraftWorkout) => void;
   /** Omitted for a cardio workout: it has no slot template, so no type select. */
   onTypeChange?: (typeId: string) => void;
@@ -35,7 +40,7 @@ export interface HeroStat {
  * The top of the selected workout: a soft cloud in the workout's own color, with its title, its
  * day / type / note chips, and the workout in three big numbers.
  */
-export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, onChange, onTypeChange, stats }: WorkoutHeroProps) {
+export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, onDelete, deleteLabel, onChange, onTypeChange, stats }: WorkoutHeroProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   // The notes field is tucked behind its chip; the chip says whether there is a note.
@@ -56,6 +61,9 @@ export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, o
           value={workout.title}
           onChange={(event) => onChange({ ...workout, title: event.target.value })}
         />
+        <button className="workout-hero-delete" type="button" aria-label={deleteLabel} title={deleteLabel} onClick={onDelete}>
+          <Icon name="close" className="workout-hero-delete-icon" />
+        </button>
         <ActionMenu label={copy.workoutActions} variant="ghost" items={menuItems} />
       </div>
 

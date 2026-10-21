@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { useCopy } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { aiDraftCopy } from '../../../aiDraft/copy';
@@ -12,10 +13,12 @@ interface StartCardsProps {
   onFromScratch: () => void;
   /** A cardio workout as the week's first workout. */
   onCardio: () => void;
+  /** "From scratch" (the empty week's "+ workout"): the focus lands here when the week's last workout was deleted. */
+  addFocusRef?: Ref<HTMLButtonElement>;
 }
 
 /** An empty week: three ways to start, each running the flow that already exists. */
-export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch, onCardio }: StartCardsProps) {
+export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch, onCardio, addFocusRef }: StartCardsProps) {
   const copy = useCopy(planBuilderCopy);
   const trainee = useCopy(traineesCopy);
   const ai = useCopy(aiDraftCopy);
@@ -37,7 +40,7 @@ export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch, onCardio
         <span className="start-card-title">{ai.training.title}</span>
         <span className="start-card-hint">{copy.startAiHint}</span>
       </button>
-      <button className="start-card" type="button" onClick={onFromScratch}>
+      <button ref={addFocusRef} className="start-card" type="button" onClick={onFromScratch}>
         <span className="start-card-icon">
           <Icon name="plus" />
         </span>

@@ -80,3 +80,9 @@
 .plan-workout-panel {
   scroll-margin-block-start: 96px;
 }
+
+/* A deleted workout folding away (usePlanWorkouts animates height + opacity): clipped, not pressable. */
+.plan-workout-panel-leaving {
+  overflow: hidden;
+  pointer-events: none;
+}

@@ -71,6 +71,54 @@
   border-bottom-color: var(--workout-color);
 }
 
+/* "×": deletes this workout only. Small and quiet next to the "⋯"; its press area reaches 44px. */
+.workout-hero-delete {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  color: var(--color-text-muted);
+  background: none;
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    color var(--transition-hover) var(--ease-out),
+    background-color var(--transition-hover) var(--ease-out);
+}
+
+.workout-hero-delete::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.workout-hero-delete-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.workout-hero-delete:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workout-hero-delete:hover {
+    color: var(--color-primary-deep);
+    background-color: var(--color-primary-soft);
+  }
+}
+
+.workout-hero-delete:focus-visible {
+  outline: var(--border-width-medium) solid var(--workout-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 /* The menu hangs from the band's far edge and opens inward. */
 .workout-hero-top .action-menu {
   position: static;
@@ -250,7 +298,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-chip-button {
+  .hero-chip-button,
+  .workout-hero-delete {
     transition: none;
   }
 }

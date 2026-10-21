@@ -5,6 +5,8 @@ import { DUPLICATE_WEEK_STATE, traineePath } from '../../../../app/config/routes
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
+import { useUndoToast } from '../../../../hooks/useUndoToast';
+import { WORKOUT_UNDO_MS } from '../../data/planDefaults';
 import { fill, findWorkoutType, formatPlural, formatWeekSpan, sharedCopy, splitLabel, useCopy, useLanguage } from '@sistem/shared';
 import { PublishModal } from '../../../../components/common/PublishModal/PublishModal';
 import type { PublishSummary } from '../../../../components/common/PublishModal/PublishModal';
@@ -63,6 +65,8 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   // The slot the library was opened for ("+ Add" on a slot); undefined = any exercise.
   const [librarySlot, setLibrarySlot] = useState<TrainingSlot>();
   const { toastMessage, showToast } = useToast();
+  // A deleted workout comes back from the toast ("Undo"); the change goes through the plan's save like any edit.
+  const { undoMessage, offerUndo, undo } = useUndoToast();
   const panelId = useId();
 
   const isPublished = plan.status === 'published';
@@ -74,7 +78,12 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     setWorkouts,
     placeholderTitle: (n) => fill(copy.workoutPlaceholder, { n }),
     onDuplicated: (source) => showToast(fill(copy.toastDuplicated, { name: source.title.trim() || copy.untitledWorkout })),
-    onRemoved: (workout) => showToast(fill(copy.toastRemoved, { name: workout.title.trim() || copy.untitledWorkout })),
+    onRemoved: (workout, restore) =>
+      offerUndo({
+        message: fill(copy.toastWorkoutDeleted, { name: workout.title.trim() || copy.untitledWorkout }),
+        onUndo: restore,
+        durationMs: WORKOUT_UNDO_MS,
+      }),
   });
   const { selected, selectedIndex } = planWorkouts;
   const planIssues = issues.filter((issue) => issue.workoutIndex === undefined);
@@ -293,7 +302,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
             onAddStrength={planWorkouts.addStrength}
             onAddCardio={planWorkouts.addCardio}
           />
-          <div ref={planWorkouts.panelRef} className="plan-workout-panel" id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
+          <div ref={planWorkouts.panelRef} className={planWorkouts.leavingKey ? 'plan-workout-panel plan-workout-panel-leaving' : 'plan-workout-panel'} id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
             {/* Keyed by workout: another workout starts with its rows closed. A cardio workout has its own body. */}
             {selected.kind === 'cardio' ? (
               <CardioWorkoutCard
@@ -329,7 +338,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
           </div>
         </>
       ) : (
-        <StartCards onDuplicateWeek={goDuplicateWeek} onAiDraft={() => setOpenSheet('ai')} onFromScratch={planWorkouts.addStrength} onCardio={planWorkouts.addCardio} />
+        <StartCards addFocusRef={planWorkouts.emptyFocusRef} onDuplicateWeek={goDuplicateWeek} onAiDraft={() => setOpenSheet('ai')} onFromScratch={planWorkouts.addStrength} onCardio={planWorkouts.addCardio} />
       )}
 
       <label className="plan-notes">
@@ -365,7 +374,8 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
         onUseFullPlan={handleUseFullPlan}
         onUseSplitOnly={handleUseSplitOnly}
       />
-      <Toast message={toastMessage} />
+      {/* One toast region: a pending "Undo" wins over a plain confirmation. */}
+      <Toast message={undoMessage ?? toastMessage} action={undoMessage ? { label: appText.shell.undo, onPress: undo } : undefined} />
       <PublishModal
         flow={publishFlow}
         traineeName={traineeName}

@@ -269,6 +269,21 @@ export function removeExercise(workout: DraftWorkout, exerciseKey: string): Draf
   return { ...workout, exercises: workout.exercises.filter((exercise) => exercise.key !== exerciseKey) };
 }
 
+/**
+ * After a workout left the week (or came back with "Undo"): a workout still called by its default
+ * name for its old place ("Workout 3", in either language) takes the default name of its new place.
+ * A name the coach wrote is never touched; a workout not in `before` keeps its name.
+ */
+export function renumberDefaultTitles(before: DraftWorkout[], after: DraftWorkout[], defaultTitles: ((n: number) => string)[]): DraftWorkout[] {
+  const oldIndexes = new Map(before.map((workout, index) => [workout.key, index]));
+  return after.map((workout, index) => {
+    const from = oldIndexes.get(workout.key);
+    if (from === undefined || from === index) return workout;
+    const defaultTitle = defaultTitles.find((title) => workout.title.trim() === title(from + 1));
+    return defaultTitle ? { ...workout, title: defaultTitle(index + 1) } : workout;
+  });
+}
+
 export function moveItem<T>(items: T[], from: number, to: number): T[] {
   if (to < 0 || to >= items.length || from === to) return items;
   const next = [...items];

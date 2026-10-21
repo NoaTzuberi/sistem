@@ -7,6 +7,10 @@ export const DEFAULT_REPS = 10;
 /** Drafts are saved on their own this long after the last change. */
 export const AUTOSAVE_DELAY_MS = 2500;
 
+/** A deleted workout's card folding away, and how long its "Undo" stays. */
+export const WORKOUT_COLLAPSE_MS = 200;
+export const WORKOUT_UNDO_MS = 6000;
+
 export const SUPERSET_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'] as const;
 
 // The set types in picker order; their labels are in the shared copy (plan.setTypes). Day names

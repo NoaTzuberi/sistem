@@ -16,6 +16,7 @@ interface CardioWorkoutCardProps {
   onChange: (workout: DraftWorkout) => void;
   onMove: (direction: -1 | 1) => void;
   onDuplicate: () => void;
+  /** Deletes this workout only — at once, the page offers "Undo". */
   onRemove: () => void;
 }
 
@@ -42,8 +43,10 @@ export function CardioWorkoutCard({ workout, index, count, issues, onChange, onM
           { id: 'up', label: fill(copy.moveUpNamed, { name: title }), disabled: index === 0, onSelect: () => onMove(-1) },
           { id: 'down', label: fill(copy.moveDownNamed, { name: title }), disabled: index === count - 1, onSelect: () => onMove(1) },
           { id: 'duplicate', label: copy.duplicate, onSelect: onDuplicate },
-          { id: 'remove', label: copy.remove, danger: true, onSelect: onRemove },
+          { id: 'delete', label: copy.deleteWorkout, danger: true, onSelect: onRemove },
         ]}
+        onDelete={onRemove}
+        deleteLabel={fill(copy.deleteWorkoutNamed, { name: title })}
         stats={[
           { id: 'total', label: cardioText.total, value: `${cardioMinutes(totals.totalSec)}′` },
           { id: 'high', label: cardioText.high, value: formatClock(totals.highIntensitySec) },

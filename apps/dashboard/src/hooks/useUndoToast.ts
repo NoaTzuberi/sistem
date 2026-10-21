@@ -10,6 +10,8 @@ interface UndoOffer {
   onUndo: () => void;
   /** Runs once the undo is no longer offered (a delete that waits for it: the server call). */
   onCommit?: () => void;
+  /** How long "Undo" stays; defaults to UNDO_MS. */
+  durationMs?: number;
 }
 
 /**
@@ -35,7 +37,7 @@ export function useUndoToast() {
       commit();
       current.current = next;
       setMessage(next.message);
-      timer.current = window.setTimeout(commit, UNDO_MS);
+      timer.current = window.setTimeout(commit, next.durationMs ?? UNDO_MS);
     },
     [commit],
   );

@@ -27,6 +27,7 @@ interface WorkoutCardProps {
   onChange: (workout: DraftWorkout) => void;
   onMove: (direction: -1 | 1) => void;
   onDuplicate: () => void;
+  /** Deletes this workout only — at once, the page offers "Undo". */
   onRemove: () => void;
   onExerciseRemoved: (name: string) => void;
   /** Open the exercise library for this workout — for one slot ("+ Add" on it), or for all exercises. */
@@ -125,10 +126,6 @@ export function WorkoutCard({
   // The hero's chips: the slots that already have an exercise.
   const coveredGroups = grouped ? grouped.sections.filter((section) => section.exerciseIndexes.length > 0).map((section) => slotLabel(section.slot, language)) : [];
 
-  function handleRemove() {
-    if (exercises.length === 0 || window.confirm(fill(copy.removeWorkoutConfirm, { title, count: exercises.length }))) onRemove();
-  }
-
   return (
     <section className={`workout-card ${colorClass}`} aria-label={title}>
       <WorkoutHero
@@ -140,8 +137,10 @@ export function WorkoutCard({
           { id: 'up', label: fill(copy.moveUpNamed, { name: title }), disabled: index === 0, onSelect: () => onMove(-1) },
           { id: 'down', label: fill(copy.moveDownNamed, { name: title }), disabled: index === count - 1, onSelect: () => onMove(1) },
           { id: 'duplicate', label: copy.duplicate, onSelect: onDuplicate },
-          { id: 'remove', label: copy.remove, danger: true, onSelect: handleRemove },
+          { id: 'delete', label: copy.deleteWorkout, danger: true, onSelect: onRemove },
         ]}
+        onDelete={onRemove}
+        deleteLabel={fill(copy.deleteWorkoutNamed, { name: title })}
         onChange={onChange}
         onTypeChange={handleTypeChange}
       />
