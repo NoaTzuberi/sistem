@@ -1,0 +1,9 @@
+/* The card itself is .workout-card (its frame and hero come from WorkoutCard / WorkoutHero). */
+.cardio-workout-issues {
+  margin: 16px 22px 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+}

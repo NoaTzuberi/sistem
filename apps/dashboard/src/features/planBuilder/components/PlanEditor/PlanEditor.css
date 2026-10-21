@@ -75,3 +75,8 @@
   background-color: var(--color-card);
   box-shadow: var(--ring-field);
 }
+
+/* A newly added workout scrolls into view below the sticky top bar. */
+.plan-workout-panel {
+  scroll-margin-block-start: 96px;
+}

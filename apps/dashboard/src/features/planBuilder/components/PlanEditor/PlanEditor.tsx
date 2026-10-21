@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { AiPlanExercise, AiSplitOption, AiTrainingRecommendation, CoachPlan, ExerciseFacts, TrainingSlot } from '@sistem/types';
-import { DUPLICATE_WEEK_STATE, cardioBuilderPath, traineePath } from '../../../../app/config/routes';
-import { listTraineeCardio } from '../../../../services/cardio/cardioService';
-import { sessionInWeek } from '../../../cardio/data/cardioDraft';
+import { DUPLICATE_WEEK_STATE, traineePath } from '../../../../app/config/routes';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
-import { fill, findWorkoutType, formatPlural, formatWeekSpan, sharedCopy, splitLabel, useCopy, useLanguage, useLoad } from '@sistem/shared';
+import { fill, findWorkoutType, formatPlural, formatWeekSpan, sharedCopy, splitLabel, useCopy, useLanguage } from '@sistem/shared';
 import { PublishModal } from '../../../../components/common/PublishModal/PublishModal';
 import type { PublishSummary } from '../../../../components/common/PublishModal/PublishModal';
 import { appCopy } from '../../../../copy';
@@ -15,13 +13,15 @@ import { usePublishFlow } from '../../../../hooks/usePublishFlow';
 import { usePlanEditor } from '../../hooks/usePlanEditor';
 import { workoutColorClass } from '../../data/workoutColors';
 import { workoutTabId } from '../../data/workoutTabs';
-import { addExerciseToWorkout, duplicateWorkout, moveItem, newWorkout } from '../../planDraft';
+import { addExerciseToWorkout, moveItem } from '../../planDraft';
 import type { DraftWorkout } from '../../types';
 import { BuilderHeader } from '../BuilderHeader/BuilderHeader';
 import { LibrarySheet } from '../LibrarySheet/LibrarySheet';
 import { StartCards } from '../StartCards/StartCards';
 import { WorkoutCard } from '../WorkoutCard/WorkoutCard';
 import { WorkoutTabs } from '../WorkoutTabs/WorkoutTabs';
+import { CardioWorkoutCard } from '../CardioWorkoutCard/CardioWorkoutCard';
+import { usePlanWorkouts } from '../../hooks/usePlanWorkouts';
 import { useLatestAiDraft } from '../../../aiDraft/hooks/useLatestAiDraft';
 import { applyAiDraft, draftWorkoutsFromSplit } from '../../../aiDraft/aiDraftToPlan';
 import { useTrainingConfig } from '../../../trainingConfig/useTrainingConfig';
@@ -56,7 +56,6 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     traineeId,
     initialPlan,
   );
-  const [selectedKey, setSelectedKey] = useState<string | undefined>(draft.workouts[0]?.key);
   const [isBusy, setIsBusy] = useState(false);
   const config = useTrainingConfig();
   // The two side sheets. At most one is open; closed, neither is in the page.
@@ -65,16 +64,19 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   const [librarySlot, setLibrarySlot] = useState<TrainingSlot>();
   const { toastMessage, showToast } = useToast();
   const panelId = useId();
-  // This week's cardio sessions, shown next to the workouts; each opens its own builder.
-  const loadCardio = useCallback(() => listTraineeCardio(traineeId), [traineeId]);
-  const cardio = useLoad(loadCardio, '');
-  const weekCardio = (cardio.data?.sessions ?? []).filter((session) => sessionInWeek(session, initialPlan.weekStartDate));
 
   const isPublished = plan.status === 'published';
   const { workouts } = draft;
   // The workout on screen (the library adds to it); without a valid selection, the first.
-  const selected = workouts.find((workout) => workout.key === selectedKey) ?? workouts[0];
-  const selectedIndex = selected ? workouts.indexOf(selected) : -1;
+  // The open workout (in the URL) and adding / duplicating / removing any kind of workout in this week.
+  const planWorkouts = usePlanWorkouts({
+    workouts,
+    setWorkouts,
+    placeholderTitle: (n) => fill(copy.workoutPlaceholder, { n }),
+    onDuplicated: (source) => showToast(fill(copy.toastDuplicated, { name: source.title.trim() || copy.untitledWorkout })),
+    onRemoved: (workout) => showToast(fill(copy.toastRemoved, { name: workout.title.trim() || copy.untitledWorkout })),
+  });
+  const { selected, selectedIndex } = planWorkouts;
   const planIssues = issues.filter((issue) => issue.workoutIndex === undefined);
   const plansTab = traineePath(traineeId, 'plans');
   const sharedText = useCopy(sharedCopy);
@@ -110,7 +112,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       firstKey = next.workouts[0]?.key;
       return next;
     });
-    setSelectedKey(firstKey);
+    planWorkouts.select(firstKey ? { key: firstKey } : undefined);
   }
 
   /** "Use split only": one typed, empty workout per day of the split. */
@@ -124,7 +126,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       aiRecommendationId: recommendationId ?? current.aiRecommendationId,
       workouts: splitWorkouts,
     }));
-    setSelectedKey(splitWorkouts[0]?.key);
+    planWorkouts.select(splitWorkouts[0]);
     return splitWorkouts.length;
   }
 
@@ -170,25 +172,6 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the draft / config arrives
   }, [loadAiDraftId, splitOnly, ai.ready, ai.isLoading, config]);
 
-  /** A new free workout, without a day yet — its day and type are chosen inside it. */
-  function handleAddWorkout() {
-    const workout = newWorkout(fill(copy.workoutPlaceholder, { n: workouts.length + 1 }));
-    setWorkouts((current) => [...current, workout]);
-    setSelectedKey(workout.key);
-  }
-
-  function handleDuplicateWorkout(index: number) {
-    const source = workouts[index];
-    const duplicate = duplicateWorkout(source);
-    setWorkouts((current) => [...current.slice(0, index + 1), duplicate, ...current.slice(index + 1)]);
-    setSelectedKey(duplicate.key);
-    showToast(fill(copy.toastDuplicated, { name: source.title.trim() || copy.untitledWorkout }));
-  }
-
-  function handleRemoveWorkout(workout: DraftWorkout) {
-    setWorkouts((current) => current.filter((other) => other.key !== workout.key));
-    showToast(fill(copy.toastRemoved, { name: workout.title.trim() || copy.untitledWorkout }));
-  }
 
   function handleClearWeek() {
     if (!window.confirm(copy.clearWeekConfirm)) return;
@@ -306,14 +289,25 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
             selectedKey={selected.key}
             issueKeys={issueKeys}
             panelId={panelId}
-            onSelect={setSelectedKey}
-            onAdd={handleAddWorkout}
-            cardioSessions={weekCardio}
-            cardioPath={(sessionId) => cardioBuilderPath(traineeId, initialPlan.id, sessionId)}
-            onAddCardio={() => navigate(cardioBuilderPath(traineeId, initialPlan.id))}
+            onSelect={(key) => planWorkouts.select(workouts.find((workout) => workout.key === key))}
+            onAddStrength={planWorkouts.addStrength}
+            onAddCardio={planWorkouts.addCardio}
           />
-          <div id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
-            {/* Keyed by workout: another workout starts with its rows closed. */}
+          <div ref={planWorkouts.panelRef} className="plan-workout-panel" id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
+            {/* Keyed by workout: another workout starts with its rows closed. A cardio workout has its own body. */}
+            {selected.kind === 'cardio' ? (
+              <CardioWorkoutCard
+                key={selected.key}
+                workout={selected}
+                index={selectedIndex}
+                count={workouts.length}
+                issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
+                onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
+                onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}
+                onDuplicate={() => planWorkouts.duplicate(selectedIndex)}
+                onRemove={() => planWorkouts.remove(selected)}
+              />
+            ) : (
             <WorkoutCard
               key={selected.key}
               traineeId={traineeId}
@@ -326,15 +320,16 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
               issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
               onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
               onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}
-              onDuplicate={() => handleDuplicateWorkout(selectedIndex)}
-              onRemove={() => handleRemoveWorkout(selected)}
+              onDuplicate={() => planWorkouts.duplicate(selectedIndex)}
+              onRemove={() => planWorkouts.remove(selected)}
               onExerciseRemoved={(name) => showToast(fill(copy.toastRemoved, { name }))}
               onAddExercise={openLibrary}
             />
+            )}
           </div>
         </>
       ) : (
-        <StartCards onDuplicateWeek={goDuplicateWeek} onAiDraft={() => setOpenSheet('ai')} onFromScratch={handleAddWorkout} />
+        <StartCards onDuplicateWeek={goDuplicateWeek} onAiDraft={() => setOpenSheet('ai')} onFromScratch={planWorkouts.addStrength} onCardio={planWorkouts.addCardio} />
       )}
 
       <label className="plan-notes">

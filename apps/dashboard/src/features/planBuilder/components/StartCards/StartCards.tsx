@@ -1,6 +1,7 @@
 import { useCopy } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { aiDraftCopy } from '../../../aiDraft/copy';
+import { cardioCopy } from '../../../cardio/copy';
 import { traineesCopy } from '../../../trainees/copy';
 import { planBuilderCopy } from '../../copy';
 import './StartCards.css';
@@ -9,13 +10,16 @@ interface StartCardsProps {
   onDuplicateWeek: () => void;
   onAiDraft: () => void;
   onFromScratch: () => void;
+  /** A cardio workout as the week's first workout. */
+  onCardio: () => void;
 }
 
 /** An empty week: three ways to start, each running the flow that already exists. */
-export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch }: StartCardsProps) {
+export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch, onCardio }: StartCardsProps) {
   const copy = useCopy(planBuilderCopy);
   const trainee = useCopy(traineesCopy);
   const ai = useCopy(aiDraftCopy);
+  const cardio = useCopy(cardioCopy);
 
   return (
     <div className="start-cards">
@@ -39,6 +43,13 @@ export function StartCards({ onDuplicateWeek, onAiDraft, onFromScratch }: StartC
         </span>
         <span className="start-card-title">{copy.startScratch}</span>
         <span className="start-card-hint">{copy.startScratchHint}</span>
+      </button>
+      <button className="start-card start-card-cardio" type="button" onClick={onCardio}>
+        <span className="start-card-icon">
+          <Icon name="pulse" />
+        </span>
+        <span className="start-card-title">{cardio.menuCardio}</span>
+        <span className="start-card-hint">{cardio.menuCardioHint}</span>
       </button>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { PlanWorkout, WorkoutStatus } from '@sistem/types';
-import { formatPlural, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { cardioMinutesLabel, cardioTotals, formatPlural, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { workoutColorClass } from '../../../planBuilder/data/workoutColors';
 import { traineesCopy } from '../../copy';
 import './CalendarWorkout.css';
@@ -28,7 +28,11 @@ export function CalendarWorkout({ workout, index, status, to }: CalendarWorkoutP
       <bdi className="pw-workout-name" dir="auto">
         {workout.title}
       </bdi>
-      <span className="pw-workout-count">{formatPlural(language, shared.coach.exerciseCount, workout.exercises.length)}</span>
+      <span className="pw-workout-count">
+        {workout.kind === 'cardio' && workout.cardio
+          ? `${shared.cardio.cardioTag} · ${cardioMinutesLabel(cardioTotals(workout.cardio.steps).totalSec, language)}`
+          : formatPlural(language, shared.coach.exerciseCount, workout.exercises.length)}
+      </span>
       <span className="pw-workout-chip">{chip}</span>
     </Link>
   );

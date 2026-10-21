@@ -3,6 +3,7 @@ import type { planBuilderCopy } from './copy';
 import type { CoachPlan, ExerciseFacts, PlanExerciseInput, SavePlanPayload, SetType, WorkoutTypeConfig } from '@sistem/types';
 import type { DraftExercise, DraftKeys, DraftSetTarget, DraftTargets, DraftWorkout, PlanDraft } from './types';
 import { DEFAULT_REPS, DEFAULT_SETS } from './data/planDefaults';
+import { DEFAULT_CARDIO_SPORT, copySteps, presetSteps } from '../cardio/data/cardioPresets';
 
 // Pure functions over the editable plan. No rule about what a valid plan is lives
 // here — the server decides that and answers with issues.
@@ -23,6 +24,7 @@ export function draftFromPlan(plan: CoachPlan): PlanDraft {
       dayOfWeek: workout.dayOfWeek,
       notes: workout.notes ?? '',
       workoutType: workout.workoutType,
+      ...(workout.kind === 'cardio' && workout.cardio ? { kind: 'cardio' as const, cardio: workout.cardio } : {}),
       exercises: workout.exercises.map((exercise) => ({
         key: newKey(),
         id: exercise.id,
@@ -92,6 +94,7 @@ export function toPayload(draft: PlanDraft): SavePlanPayload {
       dayOfWeek: workout.dayOfWeek,
       notes: workout.notes.trim() || undefined,
       workoutType: workout.workoutType,
+      ...(workout.kind === 'cardio' && workout.cardio ? { kind: 'cardio' as const, cardio: workout.cardio } : {}),
       exercises: workout.exercises.map(exerciseToInput),
     })),
   };
@@ -133,6 +136,11 @@ export function newWorkout(title: string, workoutType?: string): DraftWorkout {
   return { key: newKey(), title, notes: '', workoutType, exercises: [] };
 }
 
+/** A cardio workout of the week: the default preset ("אינטרוולים 1:1"); its day and note are the workout's own. */
+export function newCardioWorkout(title: string): DraftWorkout {
+  return { key: newKey(), title, notes: '', kind: 'cardio', cardio: { sport: DEFAULT_CARDIO_SPORT, metric: 'rpe', steps: presetSteps(DEFAULT_CARDIO_SPORT) }, exercises: [] };
+}
+
 export function newExercise(facts: ExerciseFacts, slotId?: string): DraftExercise {
   return {
     slotId,
@@ -155,6 +163,8 @@ export function duplicateWorkout(workout: DraftWorkout): DraftWorkout {
     ...workout,
     key: newKey(),
     id: undefined,
+    // Fresh block ids too, so the copy's blocks never share keys with the original's.
+    cardio: workout.cardio ? { ...workout.cardio, steps: copySteps(workout.cardio.steps) } : undefined,
     exercises: workout.exercises.map((exercise) => ({
       ...exercise,
       key: newKey(),

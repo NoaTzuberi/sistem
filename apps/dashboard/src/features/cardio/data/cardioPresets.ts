@@ -50,3 +50,13 @@ export function newStep(kind: AddKind): CardioStep {
   if (kind === 'repeat') return repeatSet(6, [block('work', 60, 8), block('recovery', 90, 4)]);
   return kind === 'steady' ? block('steady', 600, 6) : block(kind, 300, 3);
 }
+
+/** A new cardio workout starts as intervals ("אינטרוולים 1:1"). */
+export const DEFAULT_CARDIO_SPORT: CardioSport = 'intervals';
+
+/** The same steps with fresh ids (a duplicated workout). */
+export function copySteps(steps: CardioStep[]): CardioStep[] {
+  return steps.map((step) =>
+    step.type === 'repeat' ? { ...step, id: newStepId(), blocks: step.blocks.map((item) => ({ ...item, id: newStepId() })) } : { ...step, id: newStepId() },
+  );
+}

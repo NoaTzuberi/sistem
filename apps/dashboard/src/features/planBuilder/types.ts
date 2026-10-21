@@ -1,4 +1,4 @@
-import type { ExerciseFacts, SetType } from '@sistem/types';
+import type { ExerciseFacts, PlanCardio, SetType } from '@sistem/types';
 
 // The plan as it is being edited. Every item has a client `key` (stable across
 // renders, drags and saves); `id` appears once the server has stored the item.
@@ -45,6 +45,9 @@ export interface DraftWorkout {
   notes: string;
   /** Phase 12b: the workout type (slot template); undefined = free workout. */
   workoutType?: string;
+  /** undefined = strength. A cardio workout has no exercises; its blocks are in `cardio`. */
+  kind?: 'cardio';
+  cardio?: PlanCardio;
   exercises: DraftExercise[];
 }
 

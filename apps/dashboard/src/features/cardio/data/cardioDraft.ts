@@ -1,4 +1,4 @@
-import type { CardioBlock, CardioSession, CardioStep } from '@sistem/types';
+import type { CardioBlock, CardioStep } from '@sistem/types';
 import { FINE_STEP_UNDER_SEC, MAX_BLOCK_SEC, MAX_TIMES, MIN_BLOCK_SEC, MIN_TIMES, type AddKind, newStep } from './cardioPresets';
 
 // Pure edits of a session's steps (the builder hook calls them). Nothing here validates for the
@@ -45,9 +45,4 @@ export function addStep(steps: CardioStep[], kind: AddKind): { steps: CardioStep
   const last = steps[steps.length - 1];
   if (kind === 'cooldown' || !last || last.type !== 'block' || last.kind !== 'cooldown') return { steps: [...steps, added], added };
   return { steps: [...steps.slice(0, -1), added, last], added };
-}
-
-/** Does the session show in this plan week (the coach sees drafts too)? */
-export function sessionInWeek(session: Pick<CardioSession, 'weekStartDate' | 'repeatsWeekly'>, weekStart: string): boolean {
-  return session.weekStartDate === weekStart || (session.repeatsWeekly && weekStart > session.weekStartDate);
 }

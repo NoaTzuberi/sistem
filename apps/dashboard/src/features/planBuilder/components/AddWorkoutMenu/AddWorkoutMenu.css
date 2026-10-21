@@ -1,0 +1,96 @@
+/* Fixed in a portal, placed by useAddWorkoutMenu (top / left + its growing corner --awm-origin). */
+.awm {
+  position: fixed;
+  top: var(--awm-top, 0);
+  left: var(--awm-left, 0); /* physical: viewport coordinates from the trigger's box (mirrored in the hook) */
+  z-index: var(--z-palette);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: min(300px, calc(100vw - 24px));
+  padding: 8px;
+  border-radius: var(--radius-qv-tile);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-float);
+  transform-origin: var(--awm-origin, top);
+  animation: awm-in 160ms var(--ease-press);
+}
+
+@keyframes awm-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.awm-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 10px;
+  border-radius: var(--radius-row);
+  text-align: start;
+  color: var(--color-text);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.awm-row:active {
+  transform: scale(var(--press-scale));
+}
+
+.awm-row:focus-visible {
+  outline: none;
+  background-color: var(--color-fill-soft);
+  box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-primary);
+}
+
+.awm-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-option-icon);
+}
+
+.awm-icon-strength {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary-deep);
+}
+
+.awm-icon-cardio {
+  background-color: var(--tint-purple);
+  color: var(--ink-purple);
+}
+
+.awm-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.awm-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.awm-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .awm-row:hover {
+    background-color: var(--color-fill-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .awm {
+    animation: none;
+  }
+}

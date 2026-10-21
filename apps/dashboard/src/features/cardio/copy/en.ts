@@ -1,20 +1,8 @@
 import type { CopyShape } from '@sistem/shared';
 import type { he } from './he';
 
-// PLACEHOLDER English for the cardio builder.
+// PLACEHOLDER English for the cardio editor and the "+ workout" menu.
 export const en: CopyShape<typeof he> = {
-  newTitle: 'New cardio session',
-  editTitle: 'Cardio session',
-  subtitle: 'Will be added to her training plan, week {week}',
-  back: 'Back to the plan',
-  saveDraft: 'Save as draft',
-  addToPlan: 'Add to plan',
-  saving: 'Saving…',
-  more: 'More actions',
-  remove: 'Delete session',
-  removeConfirm: "Delete this cardio session? She won't see it anymore.",
-  nameLabel: 'Session name',
-  namePlaceholder: 'e.g. Easy run, 30 minutes',
   sportLabel: 'Type',
   metricLabel: 'How intensity is measured',
   metricGroup: 'Measure',
@@ -37,20 +25,9 @@ export const en: CopyShape<typeof he> = {
   moreRounds: 'More rounds',
   perRound: '{round} per round · {total} total',
   kindLabel: 'Block type',
-  daysTitle: 'Which days',
-  strength: 'Strength',
-  daysHint: 'Days marked in purple already have a strength workout. You can combine them; the run shows as an extra workout that day.',
-  weekly: 'Repeats every week until the plan ends',
-  noteTitle: 'A note to her',
-  notePlaceholder: 'e.g. On the fast parts it should be hard to talk. If you feel dizzy, switch to walking.',
-  previewTitle: 'How she will see it',
-  previewFallback: 'Cardio session',
-  toastDraft: 'Saved as draft',
-  toastAdded: "Added to {name}'s plan",
-  loadError: "Couldn't load the cardio session.",
-  saveError: "Couldn't save. Try again.",
-  defaultNames: { run: 'Steady run 35 min', intervals: 'Intervals 1:1', walk: 'Brisk walk 40 min', bike: 'Bike 2:2' },
+  menuLabel: 'Workout type',
   menuStrength: 'Strength workout',
-  menuCardio: 'Cardio session',
-  draftTag: 'Draft',
+  menuStrengthHint: 'Exercises, sets and reps',
+  menuCardio: 'Cardio workout',
+  menuCardioHint: 'Run, intervals, walk or bike',
 };

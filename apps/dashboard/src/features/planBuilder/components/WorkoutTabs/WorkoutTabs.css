@@ -64,6 +64,16 @@
   white-space: nowrap;
 }
 
+.workout-tab-kind {
+  margin-inline-end: 4px;
+  vertical-align: -2px;
+  color: var(--ink-purple);
+}
+
+.workout-tab[aria-selected='true'] .workout-tab-kind {
+  color: inherit;
+}
+
 .workout-tab-alert {
   font-weight: var(--font-weight-semibold);
   color: var(--color-error);

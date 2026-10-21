@@ -19,14 +19,23 @@ interface WorkoutHeroProps {
   /** The band's "⋯": move, duplicate, remove. */
   menuItems: ActionMenuItem[];
   onChange: (workout: DraftWorkout) => void;
-  onTypeChange: (typeId: string) => void;
+  /** Omitted for a cardio workout: it has no slot template, so no type select. */
+  onTypeChange?: (typeId: string) => void;
+  /** The three big numbers; omitted = a strength workout's (exercises / sets / minutes). */
+  stats?: HeroStat[];
+}
+
+export interface HeroStat {
+  id: string;
+  label: string;
+  value: string;
 }
 
 /**
  * The top of the selected workout: a soft cloud in the workout's own color, with its title, its
  * day / type / note chips, and the workout in three big numbers.
  */
-export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, onChange, onTypeChange }: WorkoutHeroProps) {
+export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, onChange, onTypeChange, stats }: WorkoutHeroProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   // The notes field is tucked behind its chip; the chip says whether there is a note.
@@ -66,19 +75,21 @@ export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, o
             ))}
           </select>
         </label>
-        <label className="hero-chip hero-chip-select">
-          <span className="visually-hidden">{copy.workoutType}</span>
-          <select className="hero-select" value={workout.workoutType ?? ''} onChange={(event) => onTypeChange(event.target.value)}>
-            <option value="">{workoutTypeLabel(undefined, language)}</option>
-            {/* A type her config no longer has stays selectable until she changes it. */}
-            {workout.workoutType && !type && <option value={workout.workoutType}>{workoutTypeLabel(workout.workoutType, language)}</option>}
-            {config?.workoutTypes.map((option) => (
-              <option key={option.id} value={option.id}>
-                {workoutTypeLabel(option, language)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {onTypeChange && (
+          <label className="hero-chip hero-chip-select">
+            <span className="visually-hidden">{copy.workoutType}</span>
+            <select className="hero-select" value={workout.workoutType ?? ''} onChange={(event) => onTypeChange(event.target.value)}>
+              <option value="">{workoutTypeLabel(undefined, language)}</option>
+              {/* A type her config no longer has stays selectable until she changes it. */}
+              {workout.workoutType && !type && <option value={workout.workoutType}>{workoutTypeLabel(workout.workoutType, language)}</option>}
+              {config?.workoutTypes.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {workoutTypeLabel(option, language)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <button className="hero-chip hero-chip-button" type="button" aria-expanded={showNotes} onClick={() => setShowNotes((open) => !open)}>
           {hasNotes ? copy.workoutNoteSet : copy.addWorkoutNote}
         </button>
@@ -99,19 +110,30 @@ export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, o
 
       <div className="workout-hero-stats">
         <dl className="hero-stats">
-          <div className="hero-stat">
-            <dt>{copy.statExercises}</dt>
-            <dd>{workout.exercises.length}</dd>
-          </div>
-          <div className="hero-stat">
-            <dt>{copy.sets}</dt>
-            <dd>{workoutSetCount(workout)}</dd>
-          </div>
-          <div className="hero-stat">
-            <dt>{copy.statMinutes}</dt>
-            {/* "~32": the sign stays in front of the number in Hebrew too. */}
-            <dd dir="ltr">~{estimateWorkoutMinutes(workout)}</dd>
-          </div>
+          {stats ? (
+            stats.map((stat) => (
+              <div key={stat.id} className="hero-stat">
+                <dt>{stat.label}</dt>
+                <dd dir="ltr">{stat.value}</dd>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="hero-stat">
+                <dt>{copy.statExercises}</dt>
+                <dd>{workout.exercises.length}</dd>
+              </div>
+              <div className="hero-stat">
+                <dt>{copy.sets}</dt>
+                <dd>{workoutSetCount(workout)}</dd>
+              </div>
+              <div className="hero-stat">
+                <dt>{copy.statMinutes}</dt>
+                {/* "~32": the sign stays in front of the number in Hebrew too. */}
+                <dd dir="ltr">~{estimateWorkoutMinutes(workout)}</dd>
+              </div>
+            </>
+          )}
         </dl>
         {coveredGroups.length > 0 && (
           <ul className="hero-groups">

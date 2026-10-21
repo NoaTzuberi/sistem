@@ -1,6 +1,6 @@
 .start-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -70,6 +70,19 @@
 .start-card:focus-visible {
   outline: var(--border-width-medium) solid var(--color-primary);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* The cardio start: the cardio purple on its icon tile. */
+.start-card-cardio .start-card-icon {
+  background-color: var(--tint-purple);
+  color: var(--ink-purple);
+}
+
+/* Four in a row get narrow: two by two. */
+@media (max-width: 1180px) { /* = --breakpoint-dash-grid */
+  .start-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 860px) { /* = --breakpoint-dash-nav */
