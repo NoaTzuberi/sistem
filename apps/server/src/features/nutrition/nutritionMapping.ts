@@ -33,8 +33,8 @@ export function toPublicFoodItem(item: LeanFoodItem): FoodItem {
 }
 
 /** What the trainee may see of a food: no calories. */
-export function toFoodFacts(item: Pick<FoodItem, 'id' | 'group' | 'name' | 'portion' | 'grams' | 'isNew'>): NutritionFoodFacts {
-  return { id: item.id, group: item.group, name: item.name, portion: item.portion, grams: item.grams, isNew: item.isNew };
+export function toFoodFacts(item: Pick<FoodItem, 'id' | 'group' | 'name' | 'portion' | 'grams' | 'isNew' | 'category'>): NutritionFoodFacts {
+  return { id: item.id, group: item.group, name: item.name, portion: item.portion, grams: item.grams, isNew: item.isNew, category: item.category };
 }
 
 export function compareFoods(a: Pick<FoodItem, 'order' | 'name'>, b: Pick<FoodItem, 'order' | 'name'>): number {

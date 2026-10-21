@@ -33,6 +33,9 @@ export function isCategoryOf(group: FoodGroup, category: unknown): category is F
 /** The groups a meal counts — vegetables are free (PRD §5.6). */
 export const PORTION_GROUP_IDS = ['protein', 'carb', 'fat', 'snack'] as const satisfies readonly PortionGroup[];
 
+/** What she gets (owner, 2026-10-20): daily portions, or meals with options. */
+export const NUTRITION_PLAN_MODE_IDS = ['portions', 'menu'] as const;
+
 export const DIET_TAG_IDS = [
   'meat',
   'poultry',
@@ -129,6 +132,8 @@ export const LINE_KIND_IDS = ['food', 'text', 'recipe'] as const satisfies reado
 // Limits for the coach's input.
 export const PORTION_STEP = 0.5;
 export const MAX_MEAL_PORTIONS = 10;
+/** Portions mode: one group's portions over a whole day. */
+export const MAX_DAILY_PORTIONS = 30;
 export const MAX_LINE_PORTIONS = 10;
 export const MAX_MEALS = 10;
 export const MAX_MEAL_OPTIONS = 6;

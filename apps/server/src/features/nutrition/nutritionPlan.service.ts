@@ -46,8 +46,9 @@ import {
   toStoredMeals,
   toStoredTips,
 } from './nutritionMapping';
-import { computeNutritionKcal, findNutritionPublishIssues, hasBlockingIssues, sumDayPortions, type NutritionProblem } from './nutrition.validation';
+import { computeNutritionKcal, findNutritionPublishIssues, hasBlockingIssues, type NutritionProblem } from './nutrition.validation';
 import type { NutritionPlanDocument, NutritionPlanVersionDocument, TipFields } from './nutrition.types';
+import { dayPortionsOf, portionsKcalOf, resolveDailyPortions, resolvePlanMode, resolveVegetablesFree } from './nutritionPlanMode';
 import { LocalizedError, msg } from '../../i18n';
 
 // The coach's side of nutrition plans (PRD §5.6, dashboard builder). Every function
@@ -144,8 +145,13 @@ export function storedOverrides(target: Pick<NutritionPlanDocument['calorieTarge
 // ---------------------------------------------------------------------------
 
 /** What a version / working copy holds that the trainee can see — compared to detect changes. */
-function publishableContent(plan: Pick<NutritionPlanDocument, 'meals' | 'tips' | 'waterGoalMl' | 'introMessage'>): string {
+function publishableContent(
+  plan: Pick<NutritionPlanDocument, 'meals' | 'tips' | 'waterGoalMl' | 'introMessage' | 'mode' | 'dailyPortions' | 'vegetablesFree'>,
+): string {
   return JSON.stringify({
+    mode: resolvePlanMode(plan),
+    dailyPortions: resolveDailyPortions(plan),
+    vegetablesFree: resolveVegetablesFree(plan),
     meals: toPublicMeals(plan.meals),
     tips: toPublicTips(plan.tips).map((tip) => tip.text),
     intro: plan.introMessage ?? null,
@@ -160,6 +166,9 @@ async function findLatestVersion(traineeId: string): Promise<LeanVersion | null>
 function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersion | null): CoachNutritionPlan {
   const meals = toPublicMeals(plan.meals);
   const target = plan.calorieTarget;
+  const mode = resolvePlanMode(plan);
+  const dayPortions = dayPortionsOf(plan);
+  const mealsKcal = computeNutritionKcal(meals, config.groupKcal);
   return {
     id: String(plan._id),
     traineeId: String(plan.traineeId),
@@ -178,6 +187,9 @@ function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersio
           }
         : null,
     },
+    mode,
+    dailyPortions: resolveDailyPortions(plan),
+    vegetablesFree: resolveVegetablesFree(plan),
     meals,
     tips: toPublicTips(plan.tips),
     introMessage: plan.introMessage ?? null,
@@ -190,8 +202,9 @@ function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersio
       publishableContent(plan) !== publishableContent(latest) ||
       (plan.calorieTarget.kcal ?? null) !== (latest.calorieTarget.kcal ?? null),
     updatedAt: plan.updatedAt.toISOString(),
-    kcal: computeNutritionKcal(meals, config.groupKcal),
-    dayPortions: sumDayPortions(meals),
+    // Portions mode: the day is the daily portions (the meals keep their own kcal for menu mode).
+    kcal: mode === 'portions' ? { meals: mealsKcal.meals, day: portionsKcalOf(dayPortions, config.groupKcal) } : mealsKcal,
+    dayPortions,
     targetPortions: target.kcal ? recommendPortions(target.kcal, config).portions : null,
     aiRecommendationId: plan.aiRecommendationId ? String(plan.aiRecommendationId) : null,
   };
@@ -199,10 +212,13 @@ function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersio
 
 /** A published version as she sees it — no calorie numbers anywhere. */
 export function buildPlanView(version: LeanVersion, foods: Map<string, FoodItem>, includeWater: boolean): NutritionPlanView {
-  const meals = toPublicMeals(version.meals);
+  const mode = resolvePlanMode(version);
+  // Portions mode: no meals for her — she picks from the food lists (the versions keep them for the photo slots).
+  const meals = mode === 'menu' ? toPublicMeals(version.meals) : [];
   return {
     version: version.version,
     publishedAt: version.publishedAt.toISOString(),
+    mode,
     meals: meals.map((meal) => ({
       id: meal.id,
       name: meal.name,
@@ -226,7 +242,8 @@ export function buildPlanView(version: LeanVersion, foods: Map<string, FoodItem>
     })),
     tips: version.tips.map((tip: TipFields) => tip.text),
     intro: version.introMessage ?? null,
-    dayPortions: sumDayPortions(meals),
+    dayPortions: dayPortionsOf(version),
+    vegetablesFree: resolveVegetablesFree(version),
     swaps: groupSwaps([...foods.values()]),
     ...(includeWater ? { waterGoalMl: version.waterGoalMl ?? null } : {}),
   };
@@ -248,6 +265,8 @@ async function findIssues(
   return findNutritionPublishIssues(
     {
       calorieTarget: { kcal: plan.calorieTarget.kcal ?? null, floorConfirmation: plan.calorieTarget.floorConfirmation ?? null },
+      mode: resolvePlanMode(plan),
+      dailyPortions: resolveDailyPortions(plan),
       meals,
     },
     { ...context, features: getNutritionFeatures(), recipeIds: await findActiveRecipeIds(coachId, meals) },
@@ -374,6 +393,10 @@ export async function saveCoachNutritionPlan(
   const ids = collectContentIds(plan.meals ?? [], plan.tips ?? []);
   plan.set('meals', toStoredMeals(input.meals, foodGroups, ids));
   plan.set('tips', toStoredTips(input.tips, ids.tips));
+  // Omitted = kept: switching modes never deletes the meals or the daily portions.
+  if (input.mode !== undefined) plan.set('mode', input.mode);
+  if (input.dailyPortions !== undefined) plan.set('dailyPortions', input.dailyPortions);
+  if (input.vegetablesFree !== undefined) plan.set('vegetablesFree', input.vegetablesFree);
   if (input.waterGoalMl !== undefined) plan.set('waterGoalMl', input.waterGoalMl);
   if (input.aiRecommendationId !== undefined) plan.set('aiRecommendationId', input.aiRecommendationId);
   plan.markModified('calorieTarget.suggestion');
@@ -416,7 +439,10 @@ export async function publishCoachNutritionPlan(traineeId: string, coachId: stri
   const version = plan.publishedVersion + 1;
   const publishedAt = new Date();
   const meals = toPublicMeals(plan.meals);
+  const mode = resolvePlanMode(plan);
+  const dailyPortions = resolveDailyPortions(plan);
   const kcal = computeNutritionKcal(meals, config.groupKcal);
+  const dayKcal = mode === 'portions' ? portionsKcalOf(dailyPortions, config.groupKcal) : kcal.day;
   try {
     // The unique (planId, version) index lets only one of two publishes at once through.
     await NutritionPlanVersion.create({
@@ -426,13 +452,16 @@ export async function publishCoachNutritionPlan(traineeId: string, coachId: stri
       version,
       publishedAt,
       calorieTarget: plan.calorieTarget,
+      mode,
+      dailyPortions,
+      vegetablesFree: resolveVegetablesFree(plan),
       meals: plan.meals,
       tips: plan.tips,
       introMessage: plan.introMessage ?? null,
       waterGoalMl: plan.waterGoalMl ?? null,
       groupKcal: config.groupKcal,
       mealKcal: kcal.meals.map((meal) => ({ mealId: meal.mealId, kcal: meal.kcal })),
-      dayKcal: kcal.day,
+      dayKcal,
     });
   } catch (error) {
     if ((error as { code?: unknown }).code === 11000) {
@@ -538,6 +567,8 @@ export async function applyNutritionTemplate(traineeId: string, coachId: string,
     plan.set('calorieTarget.source', 'override');
   }
   plan.set('meals', copyMeals(template.nutrition.meals, await foodGroupsFor(coachId, template.nutrition.meals)));
+  // A template is a menu: its meals are what she gets.
+  plan.set('mode', 'menu');
   plan.set('tips', toStoredTips(toPublicTips(template.nutrition.tips).map(({ text }) => ({ text }))));
   plan.set('templateId', template._id);
   // The meals no longer come from an AI draft.
@@ -551,18 +582,25 @@ export async function applyNutritionTemplate(traineeId: string, coachId: string,
 // ---------------------------------------------------------------------------
 
 /**
- * Her newest published version (no calories), with every active swap of each group, and
- * whether she has read this version's intro yet (it opens until she has).
+ * Her newest published version (no calories), with every active swap of each group, whether she
+ * has read this version's intro yet (it opens until she has), and the publishing coach's name.
  */
-export async function getTraineeNutritionPlan(traineeId: string): Promise<{ plan: NutritionPlanView | null; introUnseen: boolean }> {
+export async function getTraineeNutritionPlan(
+  traineeId: string,
+): Promise<{ plan: NutritionPlanView | null; introUnseen: boolean; coach: { name: string } | null }> {
   const latest = await findLatestVersion(traineeId);
-  if (!latest) return { plan: null, introUnseen: false };
-  const [foods, user] = await Promise.all([
+  if (!latest) return { plan: null, introUnseen: false, coach: null };
+  const [foods, user, coach] = await Promise.all([
     findCoachFoods(String(latest.coachId)),
     User.findById(traineeId).select('nutritionIntroSeenVersion').lean(),
+    User.findById(latest.coachId).select('name').lean(),
   ]);
   const plan = buildPlanView(latest, foods, getNutritionFeatures().waterTracking);
-  return { plan, introUnseen: plan.intro !== null && (user?.nutritionIntroSeenVersion ?? 0) < latest.version };
+  return {
+    plan,
+    introUnseen: plan.intro !== null && (user?.nutritionIntroSeenVersion ?? 0) < latest.version,
+    coach: coach ? { name: coach.name } : null,
+  };
 }
 
 /** She has read the intro of this version (never moves backwards). */

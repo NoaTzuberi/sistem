@@ -9,6 +9,7 @@ import type {
   FormulaSex,
   NutritionGoal,
   NutritionLineKind,
+  NutritionPlanMode,
   PortionGroup,
 } from '@sistem/types';
 
@@ -84,6 +85,10 @@ export interface NutritionPlanDocument {
   traineeId: Types.ObjectId;
   coachId: Types.ObjectId;
   calorieTarget: CalorieTargetFields;
+  /** null / missing = saved before modes (see nutritionPlanMode.ts). */
+  mode?: NutritionPlanMode | null;
+  dailyPortions?: PortionCountsFields | null;
+  vegetablesFree?: boolean | null;
   meals: MealFields[];
   tips: TipFields[];
   introMessage?: string | null;
@@ -105,6 +110,10 @@ export interface NutritionPlanVersionDocument {
   version: number;
   publishedAt: Date;
   calorieTarget: CalorieTargetFields;
+  /** null / missing = saved before modes (see nutritionPlanMode.ts). */
+  mode?: NutritionPlanMode | null;
+  dailyPortions?: PortionCountsFields | null;
+  vegetablesFree?: boolean | null;
   meals: MealFields[];
   tips: TipFields[];
   introMessage?: string | null;

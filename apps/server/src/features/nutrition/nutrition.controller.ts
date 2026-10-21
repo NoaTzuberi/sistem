@@ -291,8 +291,8 @@ export async function postTraineeNutritionTemplate(req: AuthenticatedRequest, re
 
 /** Her newest published version — no calorie numbers. */
 export async function getMyNutritionPlan(req: AuthenticatedRequest, res: Response) {
-  const { plan, introUnseen } = await getTraineeNutritionPlan(req.userId!);
-  res.status(200).json({ plan, introUnseen, features: getNutritionFeatures() });
+  const { plan, introUnseen, coach } = await getTraineeNutritionPlan(req.userId!);
+  res.status(200).json({ plan, introUnseen, coach, features: getNutritionFeatures() });
 }
 
 /** She has read the coach's intro of this version — it starts collapsed from now on. */

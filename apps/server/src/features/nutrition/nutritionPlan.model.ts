@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { CALORIE_TARGET_SOURCE_IDS, FORMULA_SEX_IDS, NUTRITION_GOAL_IDS } from './nutrition.constants';
-import { nutritionMealSchema, nutritionTipSchema } from './nutritionMeal.schema';
+import { CALORIE_TARGET_SOURCE_IDS, FORMULA_SEX_IDS, NUTRITION_GOAL_IDS, NUTRITION_PLAN_MODE_IDS } from './nutrition.constants';
+import { nutritionMealSchema, nutritionTipSchema, portionCountsSchema } from './nutritionMeal.schema';
 import type {
   CalculationOverridesFields,
   CalorieTargetFields,
@@ -55,6 +55,10 @@ const nutritionPlanSchema = new Schema<NutritionPlanDocument>(
     // Copied from the trainee when the plan is created.
     coachId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     calorieTarget: { type: calorieTargetSchema, required: true },
+    // null = saved before modes (nutritionPlanMode.ts decides on read).
+    mode: { type: String, enum: [...NUTRITION_PLAN_MODE_IDS, null], default: null },
+    dailyPortions: { type: portionCountsSchema, default: null },
+    vegetablesFree: { type: Boolean, default: null },
     meals: { type: [nutritionMealSchema], default: [] },
     tips: { type: [nutritionTipSchema], default: [] },
     // The coach's note at the top of her Nutrition tab (plain text, line breaks kept).
@@ -82,6 +86,10 @@ const nutritionPlanVersionSchema = new Schema<NutritionPlanVersionDocument>(
     version: { type: Number, required: true, min: 1 },
     publishedAt: { type: Date, required: true },
     calorieTarget: { type: calorieTargetSchema, required: true },
+    mode: { type: String, enum: [...NUTRITION_PLAN_MODE_IDS, null], default: null },
+    dailyPortions: { type: portionCountsSchema, default: null },
+    vegetablesFree: { type: Boolean, default: null },
+    // Kept in portions mode too: the meal photo slots (13a+) use their names.
     meals: { type: [nutritionMealSchema], default: [] },
     tips: { type: [nutritionTipSchema], default: [] },
     introMessage: { type: String, default: null },

@@ -384,7 +384,9 @@ describe('nutrition (API)', () => {
       expect(JSON.stringify(res.body)).not.toMatch(/kcal|calorie/i);
       expect(view.tips).toEqual(['Swap within a group']);
       expect(view.meals[0].portions).toEqual({ protein: 1, carb: 1, fat: 1, snack: 0 });
-      expect(view.meals[0].options[0].lines[2].food).toEqual({ id: fat.id, group: 'fat', name: 'Almonds', portion: '10 pcs', grams: null, isNew: true });
+      expect(view.meals[0].options[0].lines[2].food).toEqual({ id: fat.id, group: 'fat', name: 'Almonds', portion: '10 pcs', grams: null, isNew: true, category: null });
+      // The coach card's name (the publishing coach).
+      expect(res.body.coach).toEqual({ name: coach.user.name });
       expect(view.meals[0].options[0].lines[3]).toMatchObject({ kind: 'text', text: 'Cut vegetables — free', group: 'vegetable' });
       expect(view.swaps.fat.map((food: { id: string }) => food.id)).toEqual([fat.id, unusedFat.id]);
       expect(view.swaps.vegetable).toEqual([]);
@@ -583,6 +585,71 @@ describe('nutrition (API)', () => {
       expect(view.dayPortions.snack).toBe(1);
       expect(view.swaps.snack.map((food: { name: string }) => food.name)).toEqual(['Bamba']);
       expect(JSON.stringify(view)).not.toMatch(/kcal|calorie/i);
+    });
+  });
+
+  describe('plan mode (portions / menu, owner 2026-10-20)', () => {
+    it('a plan saved before modes reads as menu with option lines, else portions with its meals summed', async () => {
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()] });
+      expect((await api.request('GET', planPath(trainee.id), { token: coach.token })).body.plan.mode).toBe('menu');
+
+      const bare = { ...breakfast(), options: [] };
+      await savePlan({ calorieTarget: target(1500), meals: [bare, bare] });
+      await NutritionPlan.updateOne({ traineeId: trainee.user._id }, { $set: { mode: null, dailyPortions: null } });
+      const plan = (await api.request('GET', planPath(trainee.id), { token: coach.token })).body.plan;
+      expect(plan.mode).toBe('portions');
+      expect(plan.dailyPortions).toEqual({ protein: 2, carb: 2, fat: 2, snack: 0 });
+    });
+
+    it('portions mode: the daily portions are her day (kcal, view, tracker); the meals stay but she gets none', async () => {
+      const saved = await savePlan({
+        calorieTarget: target(1500),
+        meals: [breakfast()],
+        mode: 'portions',
+        dailyPortions: { protein: 4, carb: 3.5, fat: 3, snack: 0 },
+        vegetablesFree: true,
+      });
+      expect(saved.status).toBe(200);
+      expect(saved.body.plan.mode).toBe('portions');
+      expect(saved.body.plan.dayPortions).toEqual({ protein: 4, carb: 3.5, fat: 3, snack: 0 });
+      expect(saved.body.plan.kcal.day).toBe(4 * 150 + 3.5 * 120 + 3 * 90);
+      expect(saved.body.plan.meals).toHaveLength(1);
+      expect((await publish()).status).toBe(200);
+
+      const view = (await api.request('GET', '/nutrition-plan', { token: trainee.token })).body.plan;
+      expect(view.mode).toBe('portions');
+      expect(view.meals).toEqual([]);
+      expect(view.dayPortions).toEqual({ protein: 4, carb: 3.5, fat: 3, snack: 0 });
+      expect(view.vegetablesFree).toBe(true);
+      expect(JSON.stringify(view)).not.toMatch(/kcal|calorie/i);
+
+      const days = (await api.request('GET', '/meal-logs', { token: trainee.token })).body.days;
+      expect(days.at(-1).planned).toEqual({ protein: 4, carb: 3.5, fat: 3, snack: 0 });
+    });
+
+    it('portions mode needs some daily portions; switching back to menu keeps both sides', async () => {
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()], mode: 'portions', dailyPortions: { protein: 0, carb: 0, fat: 0, snack: 0 } });
+      const refused = await publish();
+      expect(refused.status).toBe(400);
+      expect(refused.body.issues.map((issue: { code: string }) => issue.code)).toContain('no_portions');
+
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()], mode: 'portions', dailyPortions: { protein: 4, carb: 3, fat: 3, snack: 0 } });
+      const back = (await savePlan({ calorieTarget: target(1500), meals: [breakfast()], mode: 'menu' })).body.plan;
+      expect(back.mode).toBe('menu');
+      expect(back.dailyPortions).toEqual({ protein: 4, carb: 3, fat: 3, snack: 0 });
+      expect(back.dayPortions).toEqual({ protein: 1, carb: 1, fat: 1, snack: 0 });
+
+      const invalid = await savePlan({ calorieTarget: target(1500), meals: [], dailyPortions: { protein: 0.3, carb: 0, fat: 0, snack: 0 } });
+      expect(invalid.status).toBe(400);
+    });
+
+    it('applying a template makes the plan a menu', async () => {
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()] });
+      const template = await api.request('POST', `${planPath(trainee.id)}/template`, { token: coach.token, body: { name: 'Base' } });
+      await savePlan({ calorieTarget: target(1500), meals: [], mode: 'portions', dailyPortions: { protein: 4, carb: 3, fat: 3, snack: 0 } });
+      const applied = await api.request('POST', `${planPath(trainee.id)}/from-template`, { token: coach.token, body: { templateId: template.body.template.id } });
+      expect(applied.status).toBe(200);
+      expect(applied.body.plan.mode).toBe('menu');
     });
   });
 

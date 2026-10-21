@@ -14,6 +14,7 @@ import { MealLog } from './mealLog.model';
 import { MEAL_LOG_EDITABLE_DAYS } from './mealLog.constants';
 import type { MealLogDocument, MealPhotoFields } from './mealLog.types';
 import { LocalizedError } from '../../i18n';
+import { dayPortionsOf } from '../nutrition/nutritionPlanMode';
 
 // Portion tracking (PRD §5.6, Phase 13a+): one MealLog per trainee and day. She marks
 // portions per group against the day's plan — never what she ate, never calories — and
@@ -40,7 +41,7 @@ async function traineeTimezone(traineeId: string): Promise<string> {
 async function loadVersions(traineeId: string): Promise<LeanVersion[]> {
   return NutritionPlanVersion.find({ traineeId })
     .sort({ version: -1 })
-    .select('planId coachId version publishedAt meals')
+    .select('planId coachId version publishedAt meals mode dailyPortions')
     .lean<LeanVersion[]>();
 }
 
@@ -49,10 +50,9 @@ function versionLiveOn(versions: readonly LeanVersion[], date: string, timezone:
   return versions.find((version) => localDateString(version.publishedAt, timezone) <= date) ?? null;
 }
 
+/** The day's portions of that version: its daily portions (portions mode) or its meals summed (menu mode). */
 function plannedOf(version: LeanVersion): PortionCounts {
-  const total = { ...ZERO };
-  for (const meal of version.meals) for (const group of PORTION_GROUP_IDS) total[group] += meal.portions?.[group] ?? 0;
-  return total;
+  return dayPortionsOf(version);
 }
 
 /** Never more than planned, in steps of 0.5 (a plan that shrank since the tap clamps it). */

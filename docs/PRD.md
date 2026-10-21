@@ -214,6 +214,11 @@ A meal is defined as **a number of portions per group** (halves allowed, e.g. 1.
 - Validation: the daily portions per group must match the computed ones **exactly**; every option adds up to its meal; no snack portions unless the calculation gave some; only foods that were sent (active, hers, allowed by her tags), re-checked against the list after the reply; kosher = no meat / poultry + dairy in one option; plus the builder's own publish rules. Invalid → sent back (3 attempts) → failed. A missing calculation or a group left empty by her restrictions → no model call; the coach is told why.
 - The coach sees the draft in the nutrition builder (summary, "check by hand — not checked by code" with her own words, points to check, the rationale and what was sent) and loads it into the editable working copy (`NutritionPlan.aiRecommendationId`, coach-only). Only her publish reaches the trainee.
 
+**Decisions (owner, 2026-10-20 — plan mode and the builder's target).**
+- **Plan mode — "what she gets"**: a nutrition plan is either **portions only** (she gets a number of portions per group per day and picks what to eat from the coach's food lists) or a **full menu** (meals with options, as above). The mode, the daily portions and a day-level "vegetables free" switch are stored on the plan and each version, next to the meals: switching never deletes the meals or the daily portions. New plans start in portions mode; a plan saved before modes reads as a menu when an option has lines, else as portions with its meals summed. In portions mode the trainee gets no meals (her tracker counts the daily portions); the version keeps the meals for the meal-photo slots. Publishing in portions mode needs a target and some daily portions; the meal and option rules apply in menu mode only. Applying a template or an AI draft makes the plan a menu.
+- **The daily target starts as the recommendation** (marked "as suggested"; the coach changes it or returns to it with one press), so the portion budget works from the start. Publishing is still her explicit action.
+- **Daily portions start from the calculation's split**; snack stays 0 (as in 13a+ — only the coach adds snack portions).
+
 ## 6. Coach Admin — Screens
 
 **Decision:** the coach has **both**:

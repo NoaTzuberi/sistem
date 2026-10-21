@@ -6,7 +6,7 @@ import type { MealFields, MealOptionFields, OptionLineFields, PortionCountsField
 // (the way plans and templates share planWorkoutSchema), so a template copies into a plan
 // as-is. Every meal / option / line keeps a stable _id: 13b meal logs point at meal ids.
 
-const portionCountsSchema = new Schema<PortionCountsFields>(
+export const portionCountsSchema = new Schema<PortionCountsFields>(
   {
     protein: { type: Number, min: 0, default: 0 },
     carb: { type: Number, min: 0, default: 0 },

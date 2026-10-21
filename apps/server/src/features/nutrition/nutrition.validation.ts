@@ -15,6 +15,7 @@ import type {
   NutritionKcal,
   NutritionMeal,
   NutritionOptionLineInput,
+  NutritionPlanMode,
   NutritionPreferences,
   NutritionSettingsPayload,
   PortionCounts,
@@ -36,7 +37,9 @@ import {
   MAX_MEALS,
   MAX_MEAL_NAME_LENGTH,
   MAX_MEAL_OPTIONS,
+  MAX_DAILY_PORTIONS,
   MAX_MEAL_PORTIONS,
+  NUTRITION_PLAN_MODE_IDS,
   MAX_OPTION_LABEL_LENGTH,
   MAX_OPTION_LINES,
   MAX_TARGET_KCAL,
@@ -298,12 +301,12 @@ export function parseCalculationOverrides(value: unknown): { value: CalculationO
   return { value: overrides, error: null };
 }
 
-function parsePortionCounts(value: unknown): PortionCounts | null {
+function parsePortionCounts(value: unknown, max: number = MAX_MEAL_PORTIONS): PortionCounts | null {
   if (!isRecord(value)) return null;
   const counts = {} as PortionCounts;
   for (const group of PORTION_GROUP_IDS) {
     const count = value[group] ?? 0;
-    if (!isPortionCount(count, MAX_MEAL_PORTIONS)) return null;
+    if (!isPortionCount(count, max)) return null;
     counts[group] = count;
   }
   return counts;
@@ -488,6 +491,24 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
     }
   }
 
+  // Plan mode (owner, 2026-10-20): omitted keeps; the daily portions in ½ steps.
+  let mode: NutritionPlanMode | undefined;
+  if (body.mode !== undefined) {
+    if (isOneOf(body.mode, NUTRITION_PLAN_MODE_IDS)) mode = body.mode;
+    else issues.push(invalid(msg('invalid_body')));
+  }
+  let dailyPortions: PortionCounts | undefined;
+  if (body.dailyPortions !== undefined) {
+    const parsed = parsePortionCounts(body.dailyPortions, MAX_DAILY_PORTIONS);
+    if (parsed) dailyPortions = parsed;
+    else issues.push(invalid(msg('nutrition_daily_portions_invalid', { max: MAX_DAILY_PORTIONS })));
+  }
+  let vegetablesFree: boolean | undefined;
+  if (body.vegetablesFree !== undefined) {
+    if (typeof body.vegetablesFree === 'boolean') vegetablesFree = body.vegetablesFree;
+    else issues.push(invalid(msg('invalid_body')));
+  }
+
   // 13c: the AI draft the meals came from (string links, null clears, omitted keeps).
   let aiRecommendationId: string | null | undefined;
   if (body.aiRecommendationId === null) aiRecommendationId = null;
@@ -504,6 +525,9 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
       calorieTarget,
       meals,
       tips,
+      ...(mode !== undefined ? { mode } : {}),
+      ...(dailyPortions !== undefined ? { dailyPortions } : {}),
+      ...(vegetablesFree !== undefined ? { vegetablesFree } : {}),
       ...(waterGoalMl !== undefined ? { waterGoalMl } : {}),
       ...(introMessage !== undefined ? { introMessage } : {}),
       ...(aiRecommendationId !== undefined ? { aiRecommendationId } : {}),
@@ -530,6 +554,10 @@ export function computeNutritionKcal(
 
 export interface PublishCheckInput {
   calorieTarget: { kcal: number | null; floorConfirmation: { kcal: number } | null };
+  /** Omitted = menu (the meals are what she gets). */
+  mode?: NutritionPlanMode;
+  /** Portions mode's day. */
+  dailyPortions?: PortionCounts;
   meals: NutritionMeal[];
 }
 
@@ -575,6 +603,22 @@ export function findNutritionPublishIssues(plan: PublishCheckInput, context: Pub
       message: msg('below_floor_unconfirmed', { floor: config.floorKcal }),
     });
   }
+  // Portions mode: she gets the daily portions and picks the foods herself — the meals aren't published to her.
+  if (plan.mode === 'portions') {
+    const day = plan.dailyPortions ?? { protein: 0, carb: 0, fat: 0, snack: 0 };
+    if (PORTION_GROUP_IDS.every((group) => day[group] === 0)) {
+      issues.push({ severity: 'error', code: 'no_portions', message: msg('no_daily_portions') });
+    }
+    if (followsKeto(preferences) && hasKetoConflict(day, config.ketoMaxCarbPortions)) {
+      issues.push({
+        severity: 'warning',
+        code: 'keto_conflict',
+        message: msg('keto_carb_portions', { count: day.carb + day.snack, limit: config.ketoMaxCarbPortions }),
+      });
+    }
+    return issues;
+  }
+
   if (plan.meals.length === 0) {
     issues.push({ severity: 'error', code: 'no_meals', message: msg('no_meals') });
   }
