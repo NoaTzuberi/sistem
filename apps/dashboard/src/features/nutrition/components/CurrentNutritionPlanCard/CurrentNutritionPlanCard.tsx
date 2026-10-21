@@ -18,19 +18,25 @@ interface CurrentNutritionPlanCardProps {
 
 /**
  * Her nutrition plan at a glance (the coach's working copy): its goal, where it stands, the day's
- * kcal split by portion group, and the meals — with the way into the nutrition builder.
+ * kcal split by portion group, and the meals (menu mode) — with the way into the nutrition builder.
  */
 export function CurrentNutritionPlanCard({ plan, config, builderPath }: CurrentNutritionPlanCardProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
   const isPublished = plan.publishedVersion > 0 && plan.publishedAt !== null;
+  const isPortions = plan.mode === 'portions';
   const status = !isPublished ? shared.coach.planStatus.draft : plan.changedSincePublish ? copy.statusChanged : shared.coach.planStatus.published;
   const meta = [
     isPublished && plan.publishedAt
       ? fill(copy.statusPublished, { version: plan.publishedVersion, date: formatDateTime(plan.publishedAt, language) })
       : copy.statusNever,
-    plan.meals.length > 0 ? fill(copy.tab.mealsADay, { meals: formatPlural(language, shared.nutrition.meals, plan.meals.length) }) : null,
+    // Portions mode: she gets daily portions, not meals (owner, 2026-10-20).
+    isPortions
+      ? copy.builder.modePortions
+      : plan.meals.length > 0
+        ? fill(copy.tab.mealsADay, { meals: formatPlural(language, shared.nutrition.meals, plan.meals.length) })
+        : null,
   ].filter(Boolean);
   const shares = groupShares(plan.dayPortions, config.groupKcal);
 
@@ -52,7 +58,7 @@ export function CurrentNutritionPlanCard({ plan, config, builderPath }: CurrentN
         <Tag tone={isPublished && !plan.changedSincePublish ? 'accent' : 'neutral'}>{status}</Tag>
       </header>
 
-      {plan.meals.length === 0 ? (
+      {!isPortions && plan.meals.length === 0 ? (
         <p className="nutrition-plan-empty">{copy.noMeals}</p>
       ) : (
         <>
@@ -62,7 +68,7 @@ export function CurrentNutritionPlanCard({ plan, config, builderPath }: CurrentN
               <MacroBars shares={shares} />
             </div>
           )}
-          <MealsList meals={plan.meals} kcal={plan.kcal} />
+          {!isPortions && <MealsList meals={plan.meals} kcal={plan.kcal} />}
         </>
       )}
 

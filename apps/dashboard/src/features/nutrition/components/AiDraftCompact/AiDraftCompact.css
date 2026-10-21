@@ -1,29 +1,14 @@
 .nb-ai-compact {
-  position: relative;
-  isolation: isolate;
+  /* A clean white card: the small gradient icon tile is its only color (no blurred glow behind). */
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 10px 12px;
   padding: 16px;
-  overflow: hidden;
   border-radius: var(--radius-qv-card);
   background-color: var(--color-card);
   box-shadow: var(--shadow-panel);
 }
 
-.nb-ai-compact::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset-block-start: -40px;
-  inset-inline-end: -40px;
-  width: 160px;
-  height: 120px;
-  background-image: radial-gradient(50% 50% at 50% 50%, var(--color-qv-active-cloud), transparent 70%);
-  filter: var(--blur-rating-cloud);
-  opacity: 0.5;
-  pointer-events: none;
-}
 
 .nb-ai-compact-icon {
   display: flex;

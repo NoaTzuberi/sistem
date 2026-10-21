@@ -6,6 +6,7 @@ import type {
   FormulaSex,
   NutritionGoal,
   NutritionLineKind,
+  NutritionPlanMode,
   PortionCounts,
   PortionGroup,
   SaveNutritionPlanPayload,
@@ -57,6 +58,12 @@ export interface NutritionDraft {
     overrides: CalculationOverrides;
     confirmBelowFloor: boolean;
   };
+  /** What she gets (owner, 2026-10-20): daily portions, or meals with options. Both are kept. */
+  mode: NutritionPlanMode;
+  /** Portions mode's day; all 0 = not set yet (filled from the recommendation once there is one). */
+  dailyPortions: PortionCounts;
+  /** Portions mode: vegetables free at every meal. */
+  vegetablesFree: boolean;
   meals: DraftMeal[];
   tips: DraftTip[];
   /** The note at the top of her Nutrition tab (13a+); '' = none. */
@@ -73,6 +80,8 @@ export const NO_OVERRIDES: CalculationOverrides = {
   targetWeightKg: null,
   timelineWeeks: null,
 };
+
+export const NO_PORTIONS: PortionCounts = { protein: 0, carb: 0, fat: 0, snack: 0 };
 
 export function newKey(): string {
   return crypto.randomUUID();
@@ -92,6 +101,10 @@ type DefaultMealKey = 'breakfast' | 'lunch' | 'snack' | 'dinner';
 export function emptyDraft(goal: NutritionGoal, mealNames: Record<DefaultMealKey, string>): NutritionDraft {
   return {
     target: { kcal: undefined, source: null, goal, formulaSex: null, overrides: { ...NO_OVERRIDES }, confirmBelowFloor: false },
+    // A new plan starts as daily portions (owner, 2026-10-20); the meals are there for menu mode.
+    mode: 'portions',
+    dailyPortions: { ...NO_PORTIONS },
+    vegetablesFree: false,
     meals: DEFAULT_MEALS.map((meal) => newMeal(mealNames[meal.key], meal.portions)),
     tips: [],
     introMessage: '',
@@ -112,6 +125,9 @@ export function draftFromPlan(plan: CoachNutritionPlan): NutritionDraft {
     },
     introMessage: plan.introMessage ?? '',
     aiRecommendationId: plan.aiRecommendationId,
+    mode: plan.mode,
+    dailyPortions: { ...plan.dailyPortions },
+    vegetablesFree: plan.vegetablesFree,
     meals: plan.meals.map((meal) => ({
       key: newKey(),
       id: meal.id,
@@ -161,6 +177,9 @@ export function toPayload(draft: NutritionDraft): SaveNutritionPlanPayload {
       confirmBelowFloor: draft.target.confirmBelowFloor,
     },
     introMessage: draft.introMessage.trim() ? draft.introMessage : null,
+    mode: draft.mode,
+    dailyPortions: draft.dailyPortions,
+    vegetablesFree: draft.vegetablesFree,
     meals: draft.meals.map((meal) => ({
       id: meal.id,
       name: meal.name,
@@ -244,6 +263,11 @@ export function newMeal(name: string, portions: PortionCounts = { protein: 1, ca
 
 export function newOption(label: string): DraftOption {
   return { key: newKey(), label, lines: [] };
+}
+
+/** "Duplicate option": a copy of its lines under a new label (new keys, no ids — saved as new rows). */
+export function duplicateOption(option: DraftOption, label: string): DraftOption {
+  return { key: newKey(), label, lines: option.lines.map((line) => ({ ...line, key: newKey(), id: undefined })) };
 }
 
 export function newFoodLine(foodItemId: string, group: FoodGroup): DraftLine {

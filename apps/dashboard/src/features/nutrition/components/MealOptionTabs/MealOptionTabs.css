@@ -17,12 +17,18 @@
     background-color var(--transition-fast) ease;
 }
 
-.nb-option-tab[aria-pressed='true'] {
+.nb-option-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.nb-option-tab[aria-selected='true'] {
   background-color: var(--color-primary-soft);
   color: var(--color-primary-deep);
 }
 
-.nb-option-add {
+.nb-option-tab-add {
   color: var(--color-primary);
 }
 
@@ -36,7 +42,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .nb-option-tab:not([aria-pressed='true']):hover {
+  .nb-option-tab:not([aria-selected='true']):hover {
     background-color: var(--color-fill-soft);
   }
 }

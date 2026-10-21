@@ -1,5 +1,5 @@
 import type { CalorieSuggestion, PortionCounts } from '@sistem/types';
-import { fill, formatKcal, formatNumber, formatPortionCount, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { fill, formatKcal, formatNumber, formatPortionCountLtr, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { Switch } from '../../../../components/common/Switch/Switch';
 import { nutritionCopy } from '../../copy';
@@ -78,7 +78,7 @@ export function DailyTarget({ target, suggestion, floorKcal, portions, portionsK
           <div className="nb-target-portions">
             {GROUPS.map((group) => (
               <span key={group} className="nb-portion-chip" data-group={group}>
-                <b>{isolateLtr(formatPortionCount(portions[group]))}</b>
+                <b>{formatPortionCountLtr(portions[group])}</b>
                 {shared.nutrition.portionWords[group]}
               </span>
             ))}

@@ -3,7 +3,8 @@ import type { FoodGroup, FoodItem, NutritionIssue } from '@sistem/types';
 import { fill, formatKcal, PORTION_GROUPS, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { nutritionCopy } from '../../copy';
-import { move, newOption } from '../../nutritionDraft';
+import { insertAt, useBuilderUndo } from '../../hooks/useBuilderUndo';
+import { duplicateOption, move, newOption } from '../../nutritionDraft';
 import type { DraftMeal, DraftOption } from '../../nutritionDraft';
 import { IssueList } from '../IssueList/IssueList';
 import { MealOptionTabs } from '../MealOptionTabs/MealOptionTabs';
@@ -34,10 +35,10 @@ export function MealCard({ meal, index, count, kcal, foods, recentFoodIds, foods
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
   const b = copy.builder;
+  const undo = useBuilderUndo();
   const [selected, setSelected] = useState(0);
   const option = meal.options[Math.min(selected, meal.options.length - 1)];
   const optionIndex = option ? meal.options.indexOf(option) : -1;
-  const hasPortions = PORTION_GROUPS.some((group) => meal.portions[group] > 0);
 
   function setOption(next: DraftOption) {
     onChange({ ...meal, options: meal.options.map((current, i) => (i === optionIndex ? next : current)) });
@@ -49,8 +50,8 @@ export function MealCard({ meal, index, count, kcal, foods, recentFoodIds, foods
     setSelected(meal.options.length);
   }
 
+  // No confirm: the meals list offers "Undo" right after.
   function remove() {
-    if (hasPortions && !window.confirm(fill(b.removeMealConfirm, { name: meal.name }))) return;
     onRemove();
   }
 
@@ -108,8 +109,20 @@ export function MealCard({ meal, index, count, kcal, foods, recentFoodIds, foods
             setSelected(optionIndex - 1);
           }}
           onRemove={() => {
+            const removed = meal.options[optionIndex];
             onChange({ ...meal, options: meal.options.filter((_, i) => i !== optionIndex) });
             setSelected(Math.max(0, optionIndex - 1));
+            if (removed && undo) {
+              undo.offer(fill(b.optionRemoved, { name: removed.label }), meal.key, (current) => ({
+                ...current,
+                options: insertAt(current.options, optionIndex, removed),
+              }));
+            }
+          }}
+          onDuplicate={() => {
+            const letter = b.optionLetters[meal.options.length] ?? String(meal.options.length + 1);
+            onChange({ ...meal, options: [...meal.options, duplicateOption(option, fill(b.newOptionLabel, { letter }))] });
+            setSelected(meal.options.length);
           }}
         />
       )}

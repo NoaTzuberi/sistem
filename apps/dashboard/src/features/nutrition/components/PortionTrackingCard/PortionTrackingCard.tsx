@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { dateFormat, fill, formatDateOnly, formatPortionCount, formatWeekSpan, isolateLtr, PORTION_GROUPS, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { dateFormat, fill, formatDateOnly, formatPortionCountLtr, formatWeekSpan, PORTION_GROUPS, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { nutritionCopy } from '../../copy';
 import { usePortionTracking } from '../../hooks/usePortionTracking';
@@ -75,7 +75,7 @@ export function PortionTrackingCard({ traineeId }: { traineeId: string }) {
                   label={shared.nutrition.groups[group]}
                   eaten={eaten}
                   planned={planned}
-                  description={fill(t.weekRing, { group: shared.nutrition.groups[group], eaten: formatPortionCount(eaten), planned: formatPortionCount(planned) })}
+                  description={fill(t.weekRing, { group: shared.nutrition.groups[group], eaten: formatPortionCountLtr(eaten), planned: formatPortionCountLtr(planned) })}
                 />
               );
             })}
@@ -100,7 +100,7 @@ export function PortionTrackingCard({ traineeId }: { traineeId: string }) {
             {PORTION_GROUPS.filter((group) => (tracking.dailyGoal[group] ?? 0) > 0).map((group) => (
               <li key={group} className="nb-tracking-legend-item" data-group={group}>
                 <span className="nb-tracking-legend-dot" aria-hidden="true" />
-                {fill(t.perDay, { group: shared.nutrition.groups[group], count: isolateLtr(formatPortionCount(tracking.dailyGoal[group] ?? 0)) })}
+                {fill(t.perDay, { group: shared.nutrition.groups[group], count: formatPortionCountLtr(tracking.dailyGoal[group] ?? 0) })}
               </li>
             ))}
           </ul>

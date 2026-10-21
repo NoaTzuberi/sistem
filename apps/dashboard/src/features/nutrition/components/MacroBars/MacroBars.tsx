@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { foodGroupLabel, formatNumber, formatPortionCount, useCopy, useLanguage } from '@sistem/shared';
+import { foodGroupLabel, formatNumber, formatPortionCountLtr, useCopy, useLanguage } from '@sistem/shared';
 import type { GroupShare } from '../../data/nutritionSummary';
 import { nutritionCopy } from '../../copy';
 import './MacroBars.css';
@@ -16,7 +16,7 @@ export function MacroBars({ shares }: { shares: GroupShare[] }) {
             <span className="macro-bars-dot" aria-hidden="true" />
             <span className="macro-bars-name">{foodGroupLabel(share.group, language)}</span>
             <b className="macro-bars-portions">
-              {formatPortionCount(share.portions)} <small>{copy.portionsUnit}</small>
+              {formatPortionCountLtr(share.portions)} <small>{copy.portionsUnit}</small>
             </b>
             <span className="macro-bars-percent">
               <bdi>{formatNumber(share.share, language, { style: 'percent' })}</bdi>

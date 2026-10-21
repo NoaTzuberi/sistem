@@ -1,4 +1,5 @@
 import { fill, formatNumber, useCopy, useLanguage } from '@sistem/shared';
+import { StepNumber } from '../StepNumber/StepNumber';
 import { nutritionCopy } from '../../copy';
 import { sectionId } from '../../data/scrollToSection';
 import type { DraftTip } from '../../nutritionDraft';
@@ -26,7 +27,7 @@ export function MessageTipsSection({ message, onMessageChange, tips, onTipsChang
   return (
     <section className="nb-card" id={sectionId('message')} aria-labelledby="nb-message-title">
       <header className="nb-card-head">
-        <span className="nb-card-number" aria-hidden="true">3</span>
+        <StepNumber number={3} isDone={message.trim().length > 0} />
         <h2 className="nb-card-title" id="nb-message-title" tabIndex={-1}>
           {b.step3}
         </h2>

@@ -1,4 +1,4 @@
-/* White, with a lilac / pink cloud behind and a lilac hairline. */
+/* A clean white card with a lilac hairline (owner, 2026-10-20: no blurred cloud); the gradient icon tile carries the color. */
 .nb-ai-banner {
   position: relative;
   isolation: isolate;
@@ -10,22 +10,6 @@
   border-radius: var(--radius-drawer);
   background-color: var(--color-card);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-qv-active-cloud) 70%, transparent), var(--shadow-panel);
-}
-
-.nb-ai-banner::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset-block-start: -80px;
-  inset-inline-end: -60px;
-  width: 280px;
-  height: 220px;
-  background-image:
-    radial-gradient(45% 50% at 35% 55%, var(--color-qv-active-cloud), transparent 70%),
-    radial-gradient(40% 45% at 70% 40%, var(--color-qv-waiting-cloud), transparent 70%);
-  filter: var(--blur-rating-cloud);
-  opacity: 0.55;
-  pointer-events: none;
 }
 
 /* Applied: one quiet line on a Cherry Rose hairline. */

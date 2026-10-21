@@ -9,9 +9,8 @@
   padding: 10px 12px;
   padding-inline-start: 14px;
   border-radius: var(--radius-panel);
-  background-color: var(--surface-nb-header);
-  -webkit-backdrop-filter: var(--blur-nb-header);
-  backdrop-filter: var(--blur-nb-header);
+  /* Solid white: the page's color clouds must not show through while it is stuck. */
+  background-color: var(--color-card);
   box-shadow: var(--shadow-nb-header);
 }
 

@@ -71,7 +71,7 @@ export const he = {
   trackingPhotos: 'תמונות ארוחות',
   trackingLoadError: 'לא הצלחנו לטעון את המעקב.',
   useSuggestion: 'שימוש בהצעה',
-  usingSuggestion: 'משתמשת בהצעה',
+  usingSuggestion: '✓ לפי ההצעה',
   suggestionMissing: 'אין הערכה — חסרים: {fields}.',
   suggestionNeedsFormula: 'אין הערכה אוטומטית (המין אינו זכר / נקבה) — בחרי נוסחה או הקלידי יעד.',
   missing: { weight: 'משקל', height: 'גובה', birthDate: 'גיל', trainingFrequency: 'ימי אימון' },
@@ -170,7 +170,28 @@ export const he = {
     blockers: plural({ one: 'דבר אחד לפני פרסום', two: '2 דברים לפני פרסום', other: '{count} דברים לפני פרסום' }),
     stepsLabel: 'שלבי התוכנית', // PLACEHOLDER (screen readers)
     step1: 'יעד קלורי',
-    step2: 'ארוחות',
+    step2: 'מה היא מקבלת',
+    stepDaily: 'מנות יומיות · {count} מנות',
+    stepMenu: plural({ one: 'תפריט · ארוחה אחת', two: 'תפריט · 2 ארוחות', other: 'תפריט · {count} ארוחות' }),
+    // Plan mode (owner, 2026-10-20). Wording from the brief.
+    modePortions: 'מנות בלבד',
+    modePortionsText: 'היא מקבלת כמה מנות מכל קבוצה ביום, ובוחרת בעצמה מה לאכול מתוך רשימת המזון שלך',
+    modeMenu: 'תפריט מלא',
+    modeMenuText: 'ארוחות מוגדרות עם אפשרויות החלפה. גם כאן היא תראה את כל האפשרויות לכל קבוצה',
+    dailyTitle: 'מנות ביום',
+    dailyKcal: '≈ {kcal}',
+    byTarget: 'לפי היעד',
+    recommendedReset: 'מומלץ {count} · החזרה',
+    vegAllMeals: 'ירקות חופשי, בכל ארוחה',
+    appPreviewTitle: 'מה היא תראה באפליקציה',
+    previewMore: 'ועוד {count}',
+    appPreviewEmpty: 'אין עדיין פריטים בקבוצה הזו', // PLACEHOLDER
+    editFoods: 'עריכת רשימת המזון',
+    duplicateOption: 'שכפול אפשרות',
+    optionRemoved: 'האפשרות ״{name}״ נמחקה.', // PLACEHOLDER (undo toast)
+    lineRemoved: 'השורה נמחקה.', // PLACEHOLDER (undo toast)
+    editStep: 'עריכה',
+    collapseStep: 'כיווץ', // PLACEHOLDER
     step3: 'הודעה וטיפים',
     mealCount: plural({ one: 'ארוחה אחת', two: '2 ארוחות', other: '{count} ארוחות' }),
     tipCount: plural({ one: 'טיפ אחד', two: '2 טיפים', other: '{count} טיפים' }),
@@ -200,7 +221,7 @@ export const he = {
     newMealName: 'ארוחה {number}',
     newOptionLabel: 'אפשרות {letter}',
     optionLetters: ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ז׳', 'ח׳'],
-    removeMealConfirm: 'למחוק את ״{name}״? יש בה מנות.', // PLACEHOLDER
+    mealRemoved: 'הארוחה ״{name}״ נמחקה.', // PLACEHOLDER (undo toast)
     mealTools: 'פעולות על הארוחה', // PLACEHOLDER (screen readers)
     removeLess: '{group} −½', // screen readers
     addMore: '{group} +½', // screen readers
@@ -210,6 +231,8 @@ export const he = {
     tipAdd: 'הוספה',
     budgetTitle: 'חלוקת המנות', // PLACEHOLDER
     budgetAllocated: '{amount} קק״ל חולקו לארוחות',
+    budgetDaily: '{amount} קק״ל ביום', // PLACEHOLDER (portions mode)
+    budgetDailyExact: 'המנות היומיות תואמות את היעד', // PLACEHOLDER (portions mode)
     budgetNoTarget: 'קבעי יעד קלורי כדי לראות כמה מנות לחלק.', // PLACEHOLDER
     budgetMissing: 'חסרות {list}',
     budgetOver: 'עודף של {list}', // PLACEHOLDER
@@ -217,9 +240,10 @@ export const he = {
     budgetPending: 'החלוקה מתעדכנת אחרי השמירה…', // PLACEHOLDER
     statusMissing: 'חסר',
     statusOver: 'עודף',
-    checkTarget: 'נקבע יעד קלורי', // PLACEHOLDER
-    checkPortions: 'כל המנות חולקו', // PLACEHOLDER
-    checkMeals: 'לפחות ארוחה אחת', // PLACEHOLDER
+    checkTarget: 'יעד קלורי נקבע',
+    checkDaily: 'מנות יומיות לכל קבוצה',
+    checkPortions: 'כל המנות חולקו לארוחות',
+    checkMeals: 'לפחות 3 ארוחות',
     checkIssues: 'הארוחות תקינות', // PLACEHOLDER
     checkMessage: 'הודעה אליה',
     noPreferences: 'היא לא ענתה על שאלות התזונה',

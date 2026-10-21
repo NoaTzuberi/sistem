@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { AiNutritionRecommendation, CoachNutritionPlanResponse, NutritionTemplate, PortionCounts } from '@sistem/types';
-import { describePortion, fill, formatDateTime, formatKcal, formatPlural, PORTION_GROUPS, useCopy, useI18n } from '@sistem/shared';
+import { describePortion, fill, formatDateTime, formatKcal, formatNumber, formatPlural, formatPortionCountLtr, isolateLtr, nutritionGoalLabel, PORTION_GROUPS, useCopy, useI18n } from '@sistem/shared';
 import { PublishModal } from '../../../../components/common/PublishModal/PublishModal';
 import type { PublishSummary } from '../../../../components/common/PublishModal/PublishModal';
 import { appCopy } from '../../../../copy';
@@ -16,8 +16,9 @@ import { scrollToSection } from '../../data/scrollToSection';
 import { useNutritionCalc } from '../../hooks/useNutritionCalc';
 import { useNutritionEditor } from '../../hooks/useNutritionEditor';
 import { useTemplateHandoff } from '../../hooks/useTemplateHandoff';
-import { portionsKcal, usePortionBudget } from '../../hooks/usePortionBudget';
+import { draftDayPortions, portionsKcal, usePortionBudget } from '../../hooks/usePortionBudget';
 import { usePublishChecklist } from '../../hooks/usePublishChecklist';
+import { useActiveSection } from '../../hooks/useActiveSection';
 import type { NutritionDraft } from '../../nutritionDraft';
 import { NutritionAiRationale } from '../../../aiDraft/components/NutritionAiRationale/NutritionAiRationale';
 import { useAiDraftBanner } from '../../hooks/useAiDraftBanner';
@@ -86,17 +87,38 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
     targetPortions = plan.targetPortions;
     targetPortionsKcal = portionsKcal(plan.targetPortions, groupKcal);
   }
-  const budget = usePortionBudget(draft.meals, kcal, targetPortions, groupKcal);
+  // What she gets per day in this mode: the daily portions, or the meals summed.
+  const dayPortions = useMemo(() => draftDayPortions(draft), [draft]);
+  const budget = usePortionBudget(dayPortions, kcal, targetPortions, groupKcal);
+  const isPortionsMode = draft.mode === 'portions';
+
+  // The target starts as the recommendation (owner, 2026-10-20): marked "as suggested", one press back to
+  // it after a change — so the budget works from the first moment. Only while no target was ever set.
+  const suggestedKcal = suggestion?.status === 'ok' ? suggestion.kcal : null;
+  useEffect(() => {
+    if (suggestedKcal === null || draft.target.kcal !== undefined) return;
+    updateDraft((current) =>
+      current.target.kcal === undefined ? { ...current, target: { ...current.target, kcal: suggestedKcal, source: 'suggested', confirmBelowFloor: false } } : current,
+    );
+  }, [suggestedKcal, draft.target.kcal, updateDraft]);
+
+  // Portions mode with no daily portions yet: start from the target's split (the calculation never adds snack).
+  const dailyEmpty = PORTION_GROUPS.every((group) => draft.dailyPortions[group] === 0);
+  useEffect(() => {
+    if (!targetPortions || draft.mode !== 'portions' || !dailyEmpty) return;
+    updateDraft((current) => ({ ...current, dailyPortions: { ...targetPortions } }));
+  }, [targetPortions, draft.mode, dailyEmpty, updateDraft]);
   const publishSummary: PublishSummary = {
     kind: 'nutrition',
     title: kcal !== undefined ? fill(appText.publish.nutritionTitle, { kcal: formatKcal(kcal, language) }) : b.title,
     chips: [
-      { id: 'meals', label: formatPlural(language, appText.publish.meals, draft.meals.length) },
+      ...(isPortionsMode ? [] : [{ id: 'meals', label: formatPlural(language, appText.publish.meals, draft.meals.length) }]),
       ...(['protein', 'carb', 'fat'] as const)
         .filter((group) => budget.allocated[group] > 0)
         .map((group) => ({ id: group, label: describePortion(group, budget.allocated[group], language) })),
     ],
   };
+  const activeSection = useActiveSection();
   const checklist = usePublishChecklist(draft, response.issues, budget, floorKcal);
 
   const isPublished = plan !== null && plan.publishedVersion > 0;
@@ -120,6 +142,8 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
     updateDraft((current) => ({
       ...current,
       meals: draftMealsFromAi(output),
+      // An AI draft is a menu: its meals are what she gets.
+      mode: 'menu',
       aiRecommendationId: recommendation.id,
       target: current.target.kcal === undefined ? { ...current.target, kcal: output.kcal, source: 'suggested' } : current.target,
     }));
@@ -158,14 +182,29 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
     }
   }
 
+  // A step is done when every checklist item of its section is (optional ones aside).
+  const sectionDone = (section: 'target' | 'meals') =>
+    checklist.items.filter((item) => item.section === section && item.state !== 'optional').every((item) => item.state === 'ok');
+  const step2Done = sectionDone('meals');
+  const goalPercent = goalAdjustments[draft.target.goal];
+  const targetSummary = [
+    kcal !== undefined ? formatKcal(kcal, language) : b.noTargetYet,
+    `${nutritionGoalLabel(draft.target.goal, language)} ${isolateLtr(`${formatNumber(goalPercent, language, { signDisplay: 'exceptZero' })}%`)}`,
+    ...(targetPortions
+      ? [`${isolateLtr((['protein', 'carb', 'fat'] as const).map((group) => formatPortionCountLtr(targetPortions[group])).join(' / '))} ${copy.tab.portionsUnit}`]
+      : []),
+  ].join(' · ');
+
   const steps = [
     { section: 'target' as const, number: 1, label: b.step1, detail: kcal !== undefined ? formatKcal(kcal, language) : b.noTargetYet, done: stateOf('target') === 'ok' },
     {
       section: 'meals' as const,
       number: 2,
       label: b.step2,
-      detail: plural(b.mealCount, draft.meals.length),
-      done: stateOf('meals') === 'ok' && stateOf('issues') === 'ok' && stateOf('portions') === 'ok',
+      detail: isPortionsMode
+        ? fill(b.stepDaily, { count: formatPortionCountLtr(PORTION_GROUPS.reduce((sum, group) => sum + draft.dailyPortions[group], 0)) })
+        : plural(b.stepMenu, draft.meals.length),
+      done: step2Done,
     },
     {
       section: 'message' as const,
@@ -191,7 +230,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
         onPublish={handlePublish}
         onBlockedPublish={() => checklist.firstBlocker && scrollToSection(checklist.firstBlocker.section)}
       />
-      <StepNav label={b.stepsLabel} steps={steps} onGo={scrollToSection} />
+      <StepNav label={b.stepsLabel} steps={steps} active={activeSection} onGo={scrollToSection} />
 
       {editor.error && (
         <div className="nb-alert" role="alert">
@@ -230,8 +269,19 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
             goalAdjustments={goalAdjustments}
             portions={targetPortions}
             portionsKcal={targetPortionsKcal}
+            isDone={sectionDone('target')}
+            summary={targetSummary}
+            startCollapsed={plan !== null && plan.calorieTarget.kcal !== null}
           />
           <MealsSection
+            mode={draft.mode}
+            onModeChange={(mode) => updateDraft((current) => ({ ...current, mode }))}
+            dailyPortions={draft.dailyPortions}
+            recommended={targetPortions}
+            onDailyChange={(group, value) => updateDraft((current) => ({ ...current, dailyPortions: { ...current.dailyPortions, [group]: value } }))}
+            vegetablesFree={draft.vegetablesFree}
+            onVegetablesChange={(vegetablesFree) => updateDraft((current) => ({ ...current, vegetablesFree }))}
+            isDone={step2Done}
             meals={draft.meals}
             onMealsChange={(update) => updateDraft((current) => ({ ...current, meals: update(current.meals) }))}
             groupKcal={groupKcal}
@@ -251,7 +301,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
         </div>
 
         <aside className="nb-side">
-          <PortionBudgetCard budget={budget} />
+          <PortionBudgetCard budget={budget} title={isPortionsMode ? b.dailyTitle : b.budgetTitle} isDaily={isPortionsMode} />
           <PublishChecklist
             items={checklist.items}
             issues={response.issues.filter((issue) => issue.mealIndex === undefined && !CHECKLIST_CODES.has(issue.code))}

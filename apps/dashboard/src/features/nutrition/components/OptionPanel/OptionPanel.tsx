@@ -2,6 +2,7 @@ import type { FoodGroup, FoodItem, NutritionIssue } from '@sistem/types';
 import { sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { nutritionCopy } from '../../copy';
+import { insertAt, useBuilderUndo } from '../../hooks/useBuilderUndo';
 import { neededGroup, newFoodLine, newTextLine } from '../../nutritionDraft';
 import type { DraftLine, DraftMeal, DraftOption } from '../../nutritionDraft';
 import { FoodPicker } from '../FoodPicker/FoodPicker';
@@ -28,16 +29,30 @@ interface OptionPanelProps {
   onChange: (option: DraftOption) => void;
   onMoveUp: () => void;
   onRemove: () => void;
+  /** "Duplicate option": a copy of this one as a new option. */
+  onDuplicate: () => void;
 }
 
 /** The open option of a meal: what she eats — food items with their portions, free vegetables, text lines — and what to add. */
-export function OptionPanel({ meal, option, canMoveUp, foods, recentFoodIds, foodsById, issues, onChange, onMoveUp, onRemove }: OptionPanelProps) {
+export function OptionPanel({ meal, option, canMoveUp, foods, recentFoodIds, foodsById, issues, onChange, onMoveUp, onRemove, onDuplicate }: OptionPanelProps) {
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
   const { plural } = useI18n();
   const b = copy.builder;
   const setLine = (index: number, line: DraftLine) => onChange({ ...option, lines: option.lines.map((current, i) => (i === index ? line : current)) });
-  const removeLine = (index: number) => onChange({ ...option, lines: option.lines.filter((_, i) => i !== index) });
+  const undo = useBuilderUndo();
+  // A row goes at once; "Undo" puts it back in this option (found by key — the meal may have changed since).
+  const removeLine = (index: number) => {
+    const removed = option.lines[index];
+    onChange({ ...option, lines: option.lines.filter((_, i) => i !== index) });
+    if (!removed || !undo) return;
+    undo.offer(b.lineRemoved, meal.key, (current) => ({
+      ...current,
+      options: current.options.map((candidate) =>
+        candidate.key === option.key ? { ...candidate, lines: insertAt(candidate.lines, index, removed) } : candidate,
+      ),
+    }));
+  };
 
   return (
     <div className="nb-option">
@@ -45,6 +60,9 @@ export function OptionPanel({ meal, option, canMoveUp, foods, recentFoodIds, foo
         <input className="nb-inline-input nb-option-label" dir="auto" value={option.label} aria-label={copy.optionLabel} onChange={(event) => onChange({ ...option, label: event.target.value })} />
         <span className="nb-option-suffix">{b.optionFoods}</span>
         <span className="nb-option-count">{plural(b.itemCount, option.lines.length)}</span>
+        <button className="nb-tool" type="button" onClick={onDuplicate} aria-label={b.duplicateOption} title={b.duplicateOption}>
+          <Icon name="copy" size="sm" />
+        </button>
         <button className="nb-tool" type="button" onClick={onMoveUp} disabled={!canMoveUp} aria-label={copy.moveUp}>
           <Icon name="arrowUp" size="sm" />
         </button>

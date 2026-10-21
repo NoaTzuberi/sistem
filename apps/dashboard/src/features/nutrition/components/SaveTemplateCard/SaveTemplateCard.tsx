@@ -16,13 +16,13 @@ export function SaveTemplateCard({ disabled, onSave }: SaveTemplateCardProps) {
   const [name, setName] = useState('');
   const canSave = !disabled && name.trim().length > 0;
   return (
-    <section className="nb-quiet-card" aria-labelledby="nb-save-template-title">
+    <section className="nb-save-template-card" aria-labelledby="nb-save-template-title">
       <h3 className="nb-side-title" id="nb-save-template-title">
         {copy.saveAsTemplate}
       </h3>
       <div className="nb-save-template">
         <input className="nb-save-template-input" dir="auto" value={name} placeholder={copy.templateName} aria-label={copy.templateName} onChange={(event) => setName(event.target.value)} />
-        <button className="nb-pill-button" type="button" disabled={!canSave} onClick={async () => (await onSave(name.trim())) && setName('')}>
+        <button className="nb-save-template-button" type="button" disabled={!canSave} onClick={async () => (await onSave(name.trim())) && setName('')}>
           {copy.saveAsTemplate}
         </button>
       </div>

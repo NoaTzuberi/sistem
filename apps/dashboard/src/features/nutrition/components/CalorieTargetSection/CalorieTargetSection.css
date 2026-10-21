@@ -16,17 +16,20 @@
   margin-bottom: 18px;
 }
 
-.nb-card-number {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-field);
-  background-color: var(--color-primary-soft);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-deep);
+.nb-card-head-folded {
+  margin-bottom: 0;
+}
+
+/* Step 1 folded: its numbers on one line next to the title. */
+.nb-card-summary {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .nb-card-title {

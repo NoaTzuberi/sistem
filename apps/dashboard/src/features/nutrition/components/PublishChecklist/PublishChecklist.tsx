@@ -19,6 +19,7 @@ export function PublishChecklist({ items, issues, onGo }: PublishChecklistProps)
   const b = copy.builder;
   const labels: Record<ChecklistItem['id'], string> = {
     target: b.checkTarget,
+    daily: b.checkDaily,
     meals: b.checkMeals,
     issues: b.checkIssues,
     portions: b.checkPortions,

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { FoodGroup, PortionCounts, PortionGroup } from '@sistem/types';
-import type { DraftMeal } from '../nutritionDraft';
+import type { DraftMeal, NutritionDraft } from '../nutritionDraft';
 
 /** The groups the day's target splits into (the calculation never adds snack portions; the coach may). */
 export const BUDGET_GROUPS = ['protein', 'carb', 'fat'] as const;
@@ -35,26 +35,36 @@ export function portionsKcal(portions: PortionCounts, groupKcal: Record<FoodGrou
   return (['protein', 'carb', 'fat', 'snack'] as PortionGroup[]).reduce((sum, group) => sum + portions[group] * groupKcal[group], 0);
 }
 
+/** The meals' portions summed over the day. */
+export function sumMealPortions(meals: readonly DraftMeal[]): PortionCounts {
+  return meals.reduce<PortionCounts>(
+    (sum, meal) => ({
+      protein: sum.protein + meal.portions.protein,
+      carb: sum.carb + meal.portions.carb,
+      fat: sum.fat + meal.portions.fat,
+      snack: sum.snack + meal.portions.snack,
+    }),
+    { ...EMPTY },
+  );
+}
+
+/** What she gets per day in the draft's mode: the daily portions, or the meals summed. */
+export function draftDayPortions(draft: Pick<NutritionDraft, 'mode' | 'dailyPortions' | 'meals'>): PortionCounts {
+  return draft.mode === 'portions' ? draft.dailyPortions : sumMealPortions(draft.meals);
+}
+
 /**
- * The live portion budget: what the meals give out now (from the draft, as it is typed) against
- * the day's recommended portions for the target (the server's — `targetPortions`).
+ * The live portion budget: what the day gives out now (the daily portions in portions mode, the meals
+ * summed in menu mode — from the draft, as it is typed) against the day's recommended portions for the
+ * target (the server's or the live calculation's — `targetPortions`).
  */
 export function usePortionBudget(
-  meals: readonly DraftMeal[],
+  allocated: PortionCounts,
   targetKcal: number | undefined,
   targetPortions: PortionCounts | null,
   groupKcal: Record<FoodGroup, number>,
 ): PortionBudget {
   return useMemo(() => {
-    const allocated = meals.reduce<PortionCounts>(
-      (sum, meal) => ({
-        protein: sum.protein + meal.portions.protein,
-        carb: sum.carb + meal.portions.carb,
-        fat: sum.fat + meal.portions.fat,
-        snack: sum.snack + meal.portions.snack,
-      }),
-      { ...EMPTY },
-    );
     const allocatedKcal = portionsKcal(allocated, groupKcal);
     const target = targetPortions ?? EMPTY;
     const lines: BudgetLine[] = BUDGET_GROUPS.map((group) => {
@@ -79,5 +89,5 @@ export function usePortionBudget(
       lines,
       snack,
     };
-  }, [meals, targetKcal, targetPortions, groupKcal]);
+  }, [allocated, targetKcal, targetPortions, groupKcal]);
 }

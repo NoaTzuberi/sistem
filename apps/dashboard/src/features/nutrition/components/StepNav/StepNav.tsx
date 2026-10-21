@@ -11,12 +11,19 @@ export interface BuilderStep {
   done: boolean;
 }
 
-/** The three steps as pills: a check when done, else its number; a press scrolls to the step. */
-export function StepNav({ label, steps, onGo }: { label: string; steps: BuilderStep[]; onGo: (section: BuilderSection) => void }) {
+/** The three steps as pills: a check when done, else its number; the one in view is highlighted; a press scrolls to it. */
+export function StepNav({ label, steps, active, onGo }: { label: string; steps: BuilderStep[]; active: BuilderSection; onGo: (section: BuilderSection) => void }) {
   return (
     <nav className="nb-steps" aria-label={label}>
       {steps.map((step) => (
-        <button key={step.section} className="nb-step" type="button" data-done={step.done || undefined} onClick={() => onGo(step.section)}>
+        <button
+          key={step.section}
+          className="nb-step"
+          type="button"
+          data-done={step.done || undefined}
+          aria-current={step.section === active ? 'step' : undefined}
+          onClick={() => onGo(step.section)}
+        >
           <span className="nb-step-mark" aria-hidden="true">
             {step.done ? <Icon name="check" size="sm" /> : step.number}
           </span>

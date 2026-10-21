@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { AiNutritionRecommendation } from '@sistem/types';
-import { fill, formatDateTime, formatKcal, formatNumber, formatPortionCount, isolateLtr, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { fill, formatDateTime, formatKcal, formatNumber, formatPortionCountLtr, isolateLtr, sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { aiDraftCopy } from '../../../aiDraft/copy';
 import { nutritionCopy } from '../../copy';
@@ -91,7 +91,7 @@ export function AiDraftBanner({ draft, targetKcal, applied, canUndo, regenerateD
         </span>
         {GROUPS.map((group) => (
           <span key={group} className="nb-portion-chip" data-group={group}>
-            <b>{isolateLtr(formatPortionCount(output.dailyPortions[group]))}</b>
+            <b>{formatPortionCountLtr(output.dailyPortions[group])}</b>
             {shared.nutrition.portionWords[group]}
           </span>
         ))}

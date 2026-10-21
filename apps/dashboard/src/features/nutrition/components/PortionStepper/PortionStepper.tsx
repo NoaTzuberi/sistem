@@ -1,5 +1,5 @@
 import type { PortionGroup } from '@sistem/types';
-import { fill, formatPortionCount, isolateLtr, useCopy } from '@sistem/shared';
+import { fill, formatPortionCountLtr, useCopy } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { nutritionCopy } from '../../copy';
 import './PortionStepper.css';
@@ -33,7 +33,7 @@ export function PortionStepper({ label, value, onChange, group, min = 0, max = 1
         <Icon name="minus" size="sm" />
       </button>
       <span className="nb-stepper-value" aria-live="polite">
-        {isolateLtr(formatPortionCount(value))}
+        {formatPortionCountLtr(value)}
       </span>
       <button
         type="button"

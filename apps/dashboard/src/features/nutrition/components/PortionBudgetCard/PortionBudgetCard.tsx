@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Language } from '@sistem/types';
-import { describePortion, fill, formatNumber, formatPortionCount, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { describePortion, fill, formatNumber, formatPortionCount, formatPortionCountLtr, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { nutritionCopy } from '../../copy';
 import type { BudgetLine, PortionBudget } from '../../hooks/usePortionBudget';
@@ -15,8 +15,8 @@ function describeLines(lines: BudgetLine[], language: Language): string {
   return lines.map((line) => isolateLtr(describePortion(line.group, Math.abs(line.diff), language))).join(', ');
 }
 
-/** The live budget: kcal given to meals against the target, what is missing or over, and each group. */
-export function PortionBudgetCard({ budget }: { budget: PortionBudget }) {
+/** The live budget: the day's kcal (given to meals, or the daily portions in portions mode) against the target, what is missing or over, and each group. */
+export function PortionBudgetCard({ budget, title, isDaily }: { budget: PortionBudget; title: string; isDaily: boolean }) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
@@ -29,7 +29,7 @@ export function PortionBudgetCard({ budget }: { budget: PortionBudget }) {
   return (
     <section className="nb-side-card nb-budget" aria-labelledby="nb-budget-title" aria-live="polite">
       <h3 className="nb-side-title" id="nb-budget-title">
-        {b.budgetTitle}
+        {title}
       </h3>
       <div className="nb-budget-top">
         <span className="nb-budget-ring">
@@ -52,7 +52,7 @@ export function PortionBudgetCard({ budget }: { budget: PortionBudget }) {
         </span>
         <p className="nb-budget-text">
           {hasTarget ? (
-            fill(b.budgetAllocated, { amount: isolateLtr(`${formatNumber(budget.allocatedKcal, language)} / ${formatNumber(budget.targetKcal ?? 0, language)}`) })
+            fill(isDaily ? b.budgetDaily : b.budgetAllocated, { amount: isolateLtr(`${formatNumber(budget.allocatedKcal, language)} / ${formatNumber(budget.targetKcal ?? 0, language)}`) })
           ) : (
             b.budgetNoTarget
           )}
@@ -76,7 +76,7 @@ export function PortionBudgetCard({ budget }: { budget: PortionBudget }) {
       {budget.state === 'exact' && (
         <p className="nb-budget-alert" data-tone="exact">
           <Icon name="check" size="sm" />
-          {b.budgetExact}
+          {isDaily ? b.budgetDailyExact : b.budgetExact}
         </p>
       )}
 
@@ -107,7 +107,7 @@ export function PortionBudgetCard({ budget }: { budget: PortionBudget }) {
       <p className="nb-budget-snack">
         <span>{shared.nutrition.groups.snack}</span>
         <b>
-          <bdi>{`${formatPortionCount(budget.snack.portions)} · ${formatNumber(budget.snack.kcal, language)} ${shared.units.kcal}`}</bdi>
+          <bdi>{`${formatPortionCountLtr(budget.snack.portions)} · ${formatNumber(budget.snack.kcal, language)} ${shared.units.kcal}`}</bdi>
         </b>
       </p>
     </section>

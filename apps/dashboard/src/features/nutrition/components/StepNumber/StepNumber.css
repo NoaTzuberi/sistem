@@ -1,0 +1,28 @@
+.nb-step-number {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-round);
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--transition-base) var(--ease-press),
+    color var(--transition-base) var(--ease-press);
+}
+
+.nb-step-number[data-done] {
+  background-color: var(--color-primary-deep);
+  color: var(--color-on-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-step-number {
+    transition: none;
+  }
+}

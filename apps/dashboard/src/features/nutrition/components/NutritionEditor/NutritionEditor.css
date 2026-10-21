@@ -16,10 +16,16 @@
   min-width: 0;
 }
 
-/* Beside the steps, under the sticky header. */
+/* Beside the steps, under the sticky header and steps nav — always in view while editing. Taller than
+   the screen, it scrolls on its own (a sticky element taller than the viewport would hide its end). */
 .nb-side {
   position: sticky;
-  top: 92px;
+  top: var(--nb-side-top);
+  max-height: calc(100dvh - var(--nb-side-top) - var(--space-3));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding-block-end: var(--space-1);
   display: flex;
   flex-direction: column;
   gap: 12px;

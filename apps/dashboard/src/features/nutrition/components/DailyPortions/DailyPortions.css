@@ -1,0 +1,149 @@
+.nm-daily {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.nm-daily-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nm-daily-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* A group's tile in its tint; its text in the group's ink (≥ 4.5:1 on the tint). */
+.nm-tile {
+  --nm-ink: var(--color-portion-protein-text);
+  --nm-soft: var(--color-portion-protein-soft);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: var(--radius-qv-tile);
+  background-color: var(--nm-soft);
+  color: var(--nm-ink);
+  text-align: center;
+}
+
+.nm-tile[data-group='carb'] {
+  --nm-ink: var(--color-portion-carb-text);
+  --nm-soft: var(--color-portion-carb-soft);
+}
+
+.nm-tile[data-group='fat'] {
+  --nm-ink: var(--color-portion-fat-text);
+  --nm-soft: var(--color-portion-fat-soft);
+}
+
+.nm-tile[data-group='snack'] {
+  --nm-ink: var(--color-portion-snack-text);
+  --nm-soft: var(--color-portion-snack-soft);
+}
+
+.nm-tile-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nm-tile-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nm-tile-value {
+  min-width: 2.2ch;
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-light);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.nm-tile-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--nm-ink);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.nm-tile-step:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.nm-tile-step:disabled {
+  opacity: var(--opacity-faint);
+  cursor: default;
+}
+
+.nm-tile-step:focus-visible,
+.nm-tile-reset:focus-visible {
+  outline: var(--border-width-medium) solid var(--nm-ink);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.nm-tile-kcal {
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "As targeted" (a label) or "Suggested N · reset" (a button), the same pill. */
+.nm-tile-chip {
+  min-height: 26px;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--nm-ink);
+  font: inherit;
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nm-tile-reset {
+  cursor: pointer;
+  box-shadow: inset 0 0 0 var(--border-width-thin) currentColor;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.nm-tile-reset:active {
+  transform: scale(var(--press-scale));
+}
+
+.nm-daily-veg {
+  display: flex;
+  justify-content: flex-start;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nm-tile-step:not(:disabled):hover,
+  .nm-tile-reset:hover {
+    background-color: var(--color-fill-soft);
+  }
+}
+
+@media (max-width: 760px) {
+  .nm-daily-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-tile-step,
+  .nm-tile-reset {
+    transition: none;
+  }
+}
