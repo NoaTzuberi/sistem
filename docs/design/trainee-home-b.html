@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: "training OS ". White screen, ink type, one hot-pink stage with a live 3D kettlebell (the brand mark). Scoreboard numerals in condensed italic, hairline rules instead of cards, slide-to-start. Light-only by design. */
+/* Layout: "training OS". White screen, ink type, one hot-pink stage with a live 3D kettlebell (the brand mark). Scoreboard numerals in condensed italic, hairline rules instead of cards, slide-to-start. Light-only by design. */
 :root {
   --bg: #FFFFFF; --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6;
   --pink: #FF006E; --pink2: #FF4E9A; --cherry: #A50047; --blush: #FFE3EF;
@@ -52,14 +52,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .facts div { flex: 1; padding-top: 10px; } .facts div + div { border-inline-start: 1px solid rgba(255,255,255,0.3); padding-inline-start: 12px; }
 .facts b { display: block; font-family: var(--num); font-weight: 700; font-size: 30px; line-height: 1; }
 .facts span { font-size: 11px; opacity: 0.85; }
-.slide { position: relative; margin-top: 18px; height: 62px; border-radius: 31px; background: rgba(20,17,22,0.22); overflow: hidden; user-select: none; touch-action: none; }
-.slide .lbl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; pointer-events: none; }
-.slide .lbl em { font-style: normal; opacity: 0.6; margin-inline-start: 8px; animation: nudge 1.6s ease-in-out infinite; display: inline-block; }
-@keyframes nudge { 50% { transform: translateX(-5px); opacity: 1; } }
-.slide .fill { position: absolute; inset-block: 0; right: 0; width: calc(var(--x, 0px) + 62px); background: #fff; border-radius: 31px; opacity: 0.18; }
-.knob { position: absolute; top: 5px; right: 5px; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; color: var(--pink); display: flex; align-items: center; justify-content: center; transform: translateX(calc(var(--x, 0px) * -1)); box-shadow: 0 6px 16px rgba(80,0,40,0.3); cursor: grab; }
-.slide.snap .knob, .slide.snap .fill { transition: transform 380ms var(--spring), width 380ms var(--spring); }
-.slide.done { background: #fff; } .slide.done .lbl { color: var(--pink); } .slide.done .knob { background: var(--pink); color: #fff; }
+/* slide-to-start "reveal": clean white track; the trail behind the knob reveals the brand gradient (pink at the start -> purple at the end, mapped to the full track width --tw); the label flips to white where the trail passes. --x knob offset px, --p progress 0..1 */
+.slide { position: relative; margin-top: 18px;  height: 62px; border-radius: 31px; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; background: #fff; box-shadow: inset 0 0 0 1px rgba(20,17,22,0.06); }
+.slide .fill { position: absolute; inset-block: 0; right: 0; width: calc(var(--x, 0px) + 62px); border-radius: 31px; background: linear-gradient(to left, #FF006E 0%, #C23BC0 50%, #7C4DFF 100%); background-size: var(--tw, 340px) 100%; background-position: right center; pointer-events: none; }
+.slide .lbl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-inline-start: 40px; color: #141116; font-weight: 600; font-size: 15px; letter-spacing: 0.1px; pointer-events: none; white-space: nowrap; }
+.slide .lbl.on { color: #fff; clip-path: inset(0 0 0 calc(100% - var(--x, 0px) - 62px)); }
+.slide .lbl i { font-style: normal; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; opacity: 0.45; margin-inline-start: 10px; direction: ltr; }
+.knob { position: absolute; z-index: 2; top: 5px; right: 5px; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; color: color-mix(in srgb, #7C4DFF calc(var(--p, 0) * 100%), #FF006E); display: flex; align-items: center; justify-content: center; transform: translateX(calc(var(--x, 0px) * -1)); box-shadow: 0 4px 14px rgba(20,17,22,0.16), 0 0 0 1px rgba(20,17,22,0.04); cursor: grab; }
+.knob svg { position: absolute; transition: opacity 180ms ease, transform 260ms var(--spring); }
+.knob .ck { opacity: 0; transform: scale(0.5); }
+.slide.done .knob .pl { opacity: 0; transform: scale(0.5); } .slide.done .knob .ck { opacity: 1; transform: scale(1); }
+.slide.done .knob { animation: knobPop 460ms var(--spring); }
+@keyframes knobPop { 40% { transform: translateX(calc(var(--x, 0px) * -1)) scale(1.12); } }
+.slide.snap .knob { transition: transform 420ms var(--spring); } .slide.snap .fill { transition: width 420ms var(--spring); } .slide.snap .lbl.on { transition: clip-path 420ms var(--spring); }
+
 
 /* body */
 .sec { padding: 22px 20px 0; }
@@ -186,7 +192,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 @media (prefers-reduced-motion: reduce) {
   .view.in-f, .view.in-b, .view.out-f, .view.out-b { animation: fade 160ms ease both; } @keyframes fade { from { opacity: 0; } }
-  .slide .lbl em, .ticks i.nx, .lane.today .col::before { animation: none; }
+  .slide.done .knob, .ticks i.nx, .lane.today .col::before { animation: none; }
   .dk, .dk .l, .dk svg { transition-duration: 1ms; }
 }
 
@@ -208,7 +214,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
         <div class="kb" id="kb"><div class="fb" id="fb"><span></span></div><span class="hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span>היום: <b id="objName">קטלבל</b></span></span><div class="odots" id="objDots" aria-label="אובייקט היום"></div></div>
         <div class="today"><div><small><span style="font-family:var(--mono);font-size:10px;letter-spacing:1.2px;opacity:.8" aria-hidden="true">TODAY · WK06</span> &nbsp;האימון של היום</small><h1>Full Body C</h1></div></div>
         <div class="facts"><div><b class="n">05</b><span>תרגילים</span></div><div><b class="n">45′</b><span>דקות בערך</span></div><div><b class="n">3/4</b><span>השבוע</span></div></div>
-        <div class="slide" id="slide"><span class="fill"></span><span class="lbl" id="slbl">החליקי להתחלת אימון<em>←</em></span><button class="knob" type="button" id="knob" aria-label="התחלת אימון"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></button></div>
+        <div class="slide" id="slide"><span class="fill"></span><span class="lbl" id="slbl">החליקי להתחלת אימון<i aria-hidden="true">GO</i></span><span class="lbl on" aria-hidden="true">החליקי להתחלת אימון<i>GO</i></span><button class="knob" type="button" id="knob" aria-label="התחלת אימון"><svg class="pl" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg><svg class="ck" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></button></div>
       </section>
 
       <div class="photo" id="photo"><span class="pi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span><div><b>תמונת התחלה</b><span>כדי לראות את השינוי שלך</span></div><button class="go" type="button">צילום</button><button class="x" type="button" aria-label="לא עכשיו" id="px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -270,8 +276,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
   // slide to start
   var sl = document.getElementById('slide'), kn = document.getElementById('knob'), drag = null, max = 0;
-  function setX(x) { sl.style.setProperty('--x', x + 'px'); }
-  function finish() { sl.classList.add('snap', 'done'); setX(max); document.getElementById('slbl').textContent = 'האימון התחיל 💪'; if (navigator.vibrate) try { navigator.vibrate(20); } catch (x) {} setTimeout(function () { sl.classList.remove('done'); setX(0); document.getElementById('slbl').innerHTML = 'החליקי להתחלת אימון<em>←</em>'; }, 1800); }
+  function setX(x) { sl.style.setProperty('--tw', sl.clientWidth + 'px'); sl.style.setProperty('--x', x + 'px'); sl.style.setProperty('--p', max ? (x / max).toFixed(3) : 0); }
+  function setLbl(t) { sl.querySelectorAll('.lbl').forEach(function (l, i) { l.innerHTML = t + '<i' + (i ? '' : ' aria-hidden="true"') + '>GO</i>'; }); }
+  function finish() { sl.classList.add('snap', 'done'); setX(max); setLbl('האימון התחיל'); if (navigator.vibrate) try { navigator.vibrate(20); } catch (x) {} setTimeout(function () { sl.classList.remove('done'); setX(0); setLbl('החליקי להתחלת אימון'); }, 1800); }
   kn.addEventListener('pointerdown', function (e) { max = sl.clientWidth - 62; drag = { x: e.clientX }; sl.classList.remove('snap'); kn.setPointerCapture(e.pointerId); });
   kn.addEventListener('pointermove', function (e) { if (!drag) return; setX(Math.max(0, Math.min(max, drag.x - e.clientX))); });
   kn.addEventListener('pointerup', function (e) { if (!drag) return; var x = Math.max(0, Math.min(max, drag.x - e.clientX)); drag = null; if (x > max * 0.8) finish(); else { sl.classList.add('snap'); setX(0); } });

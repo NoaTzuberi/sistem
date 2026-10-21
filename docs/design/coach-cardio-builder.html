@@ -1,0 +1,249 @@
+<title>Sistem Cardio Builder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: coach dashboard page. Header bar, main column (session + intensity graph + block list), side column (summary, schedule, note). Light-only, matches the coach dashboard. */
+:root {
+  --canvas: #EFEDF0; --ink: #1F1B22; --ink2: #3A3440; --muted: #7A7380; --faint: #B7B0BC; --line: #E6E2E8; --soft: #F5F3F6; --white: #fff;
+  --pink: #FF006E; --pink-soft: #FFE3EF; --cherry: #A50047;
+  --z1: #0094FF; --z1s: #E1F1FF; --z1t: #0070C9; --z2: #7C4DFF; --z2s: #EFE7FF; --z2t: #5B2FD6; --z3: #FF7A00; --z3s: #FFEBD6; --z3t: #C75A00; --z4: #FF006E; --z4s: #FFE3EE; --z4t: #C80058; --z5: #A50047; --z5s: #FBE3EC; --z5t: #A50047;
+  --shadow: 0 1px 2px rgba(31,27,34,0.04), 0 8px 24px rgba(31,27,34,0.06);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1);
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: 'Rubik', system-ui, sans-serif; direction: rtl; font-size: 14px; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.num { font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+.top { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border-radius: 22px; box-shadow: var(--shadow); position: sticky; top: 12px; z-index: 10; }
+.back { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; }
+.av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF6FAE, #FF006E); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.top h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; } .top h1 span { color: var(--muted); font-weight: 500; }
+.top p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.top .act { margin-inline-start: auto; display: flex; gap: 8px; }
+.btn { height: 42px; padding: 0 18px; border: 0; border-radius: 21px; font-weight: 600; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.btn:active { transform: scale(0.97); }
+.btn.soft { background: var(--soft); } .btn.pk { background: var(--pink); color: #fff; box-shadow: 0 8px 20px rgba(255,0,110,0.28); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; margin-top: 16px; align-items: start; }
+.card { background: #fff; border-radius: 26px; box-shadow: var(--shadow); padding: 22px; }
+.card + .card { margin-top: 16px; }
+.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 8px; }
+.name { width: 100%; border: 0; outline: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.6px; padding: 0; background: none; }
+.name::placeholder { color: var(--faint); }
+.row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { height: 38px; padding: 0 14px; border: 0; border-radius: 19px; background: var(--soft); font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 7px; transition: background-color 150ms ease, color 150ms ease, transform 140ms var(--ease-out); }
+.seg button:active { transform: scale(0.97); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+/* graph */
+.gh { display: flex; align-items: flex-end; gap: 22px; margin-top: 24px; flex-wrap: wrap; }
+.gh div b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; }
+.gh div span { font-size: 12px; color: var(--muted); }
+.gh code { margin-inline-start: auto; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.graph { position: relative; display: flex; align-items: flex-end; gap: 2px; height: 130px; margin-top: 14px; padding: 10px; border-radius: 20px; background: var(--soft); }
+.graph::before { content: ''; position: absolute; inset: 10px; background: repeating-linear-gradient(to top, transparent 0 21px, rgba(31,27,34,0.05) 21px 22px); pointer-events: none; }
+.gb { position: relative; height: var(--h); flex-grow: var(--w); flex-basis: 0; min-width: 3px; border-radius: 6px 6px 3px 3px; background: var(--c); border: 0; padding: 0; transform-origin: bottom; transition: height 320ms var(--ease-out), flex-grow 320ms var(--ease-out), opacity 150ms ease; }
+.gb.dim { opacity: 0.35; }
+.gtip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; height: 26px; padding: 0 10px; border-radius: 13px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; pointer-events: none; opacity: 0; transition: opacity 120ms ease; z-index: 2; }
+.gb.hov .gtip, .gb:focus-visible .gtip { opacity: 1; }
+.gx { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--faint); direction: ltr; padding: 0 10px; }
+.legend { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; } .legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+
+/* blocks */
+.bl-h { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 10px; }
+.bl-h h2 { margin: 0; font-size: 16px; font-weight: 700; } .bl-h small { color: var(--muted); font-size: 12px; }
+.blk { --c: var(--z1); --s: var(--z1s); --t: var(--z1t); display: grid; grid-template-columns: 6px minmax(0, 1fr) auto auto 36px; gap: 12px; align-items: center; padding: 10px 12px 10px 10px; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 8px; transition: box-shadow 150ms ease; }
+[dir="rtl"] .blk, .blk { padding: 10px 10px 10px 12px; }
+.blk .bar { align-self: stretch; border-radius: 3px; background: var(--c); }
+.kn { border: 0; background: none; padding: 4px 8px; margin: -4px -8px; border-radius: 10px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.kn svg { color: var(--faint); transition: transform 200ms var(--ease-out); } .blk.on .kn svg { transform: rotate(180deg); }
+.blk .kinds { display: none; } .blk.on .kinds { display: flex; }
+.blk.on { box-shadow: inset 0 0 0 2px var(--c); }
+.kinds { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.kinds button { height: 24px; padding: 0 9px; border: 0; border-radius: 12px; background: var(--soft); font-size: 11px; font-weight: 600; color: var(--muted); }
+.kinds button[aria-pressed="true"] { background: var(--s); color: var(--t); }
+.stp { display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 4px; border-radius: 20px; background: var(--soft); }
+.stp button { width: 32px; height: 32px; border: 0; border-radius: 50%; background: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: transform 120ms var(--ease-out); }
+.stp button:active { transform: scale(0.9); }
+.stp output { min-width: 60px; text-align: center; font-weight: 700; font-size: 15px; }
+.stp output small { display: block; font-size: 10px; font-weight: 500; color: var(--muted); margin-top: -2px; }
+.stp.tg { background: var(--s); } .stp.tg output { color: var(--t); } .stp.tg output small { color: var(--t); opacity: 0.75; }
+.del { width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--faint); display: flex; align-items: center; justify-content: center; transition: background-color 150ms ease, color 150ms ease; }
+.rep { border-radius: 22px; padding: 12px; margin-bottom: 8px; background: var(--soft); }
+.rep-h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.rep-h b { font-size: 14px; } .rep-h small { color: var(--muted); font-size: 12px; }
+.rep-h .stp { background: #fff; height: 36px; } .rep-h .stp button { width: 28px; height: 28px; background: var(--soft); } .rep-h .stp output { min-width: 44px; font-size: 16px; }
+.rep-h .del { margin-inline-start: auto; }
+.rep .blk { margin-bottom: 6px; }
+.rep .blk:last-child { margin-bottom: 0; }
+.adds { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.adds button { height: 38px; padding: 0 14px; border: 1.5px dashed #D9D3DC; border-radius: 19px; background: none; font-size: 13px; font-weight: 600; color: var(--ink2); display: inline-flex; align-items: center; gap: 6px; transition: border-color 150ms ease, background-color 150ms ease; }
+
+/* side */
+.side h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.days button { height: 54px; border: 0; border-radius: 14px; background: var(--soft); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 13px; font-weight: 700; transition: background-color 150ms ease, color 150ms ease; }
+.days button small { font-size: 10px; font-weight: 500; color: var(--muted); }
+.days button[aria-pressed="true"] { background: var(--pink); color: #fff; } .days button[aria-pressed="true"] small { color: rgba(255,255,255,0.85); }
+.days button.has small { color: var(--z2t); }
+.hint { margin: 10px 0 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.sw { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.sw input { position: absolute; opacity: 0; pointer-events: none; }
+.sw i { width: 40px; height: 24px; border-radius: 12px; background: rgba(118,118,128,0.2); position: relative; transition: background-color 200ms ease; flex: none; }
+.sw i::after { content: ''; position: absolute; top: 2px; inset-inline-start: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 220ms var(--ease-out); }
+.sw input:checked + i { background: var(--cherry); } .sw input:checked + i::after { transform: translateX(-16px); }
+.sw input:focus-visible + i { box-shadow: 0 0 0 3px rgba(255,0,110,0.3); }
+textarea { width: 100%; min-height: 110px; resize: vertical; border: 0; border-radius: 16px; background: var(--soft); padding: 12px 14px; line-height: 1.5; outline: 0; }
+textarea:focus { background: #fff; box-shadow: 0 0 0 2px var(--pink); }
+.pv { border-radius: 20px; background: #141116; color: #fff; padding: 16px; }
+.pv code { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: rgba(255,255,255,0.5); }
+.pv b { display: block; font-size: 20px; font-weight: 700; margin: 4px 0 10px; }
+.pv .mini { display: flex; align-items: flex-end; gap: 1px; height: 46px; }
+.pv .mini i { flex-grow: var(--w); flex-basis: 0; height: var(--h); background: var(--c); border-radius: 3px 3px 1px 1px; min-width: 2px; }
+.pv p { margin: 10px 0 0; font-size: 12px; color: rgba(255,255,255,0.7); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; height: 44px; padding: 0 18px; border-radius: 22px; background: var(--ink); color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; z-index: 30; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) {
+  .back:hover, .btn.soft:hover { background: #ECE8EE; } .btn.pk:hover { background: #E8005F; }
+  .seg button:not([aria-pressed="true"]):hover, .kinds button:not([aria-pressed="true"]):hover { background: #ECE8EE; }
+  .blk:not(.on):hover { box-shadow: inset 0 0 0 1px #D6D0DA; } .kn:hover { background: var(--soft); }
+  .stp button:hover { background: #F0ECF2; } .rep-h .stp button:hover { background: #ECE8EE; }
+  .del:hover { background: var(--pink-soft); color: var(--cherry); }
+  .adds button:hover { border-color: var(--pink); background: #fff; }
+  .days button:not([aria-pressed="true"]):hover { background: #ECE8EE; }
+}
+@media (max-width: 980px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .top { flex-wrap: wrap; } .top .act { width: 100%; } .top .act .btn { flex: 1; }
+  .row2 { grid-template-columns: minmax(0, 1fr); }
+  .blk { grid-template-columns: 6px minmax(0, 1fr) 36px; } .blk .stp { grid-column: 2 / 3; justify-self: start; }
+  .card { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .gb, .toast, .sw i::after { transition-duration: 1ms !important; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <button class="back" type="button" aria-label="חזרה לתוכנית"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+    <span class="av">מ</span>
+    <div><h1>אימון קרדיו חדש <span>· מאיה כהן</span></h1><p>יתווסף לתוכנית האימונים שלה, שבוע 6</p></div>
+    <div class="act"><button class="btn soft" type="button" data-save>שמירה כטיוטה</button><button class="btn pk" type="button" data-add>הוספה לתוכנית</button></div>
+  </header>
+  <div class="grid">
+    <main>
+      <section class="card">
+        <label class="lbl" for="nm">שם האימון</label>
+        <input class="name" id="nm" value="אינטרוולים 1:1" placeholder="למשל: ריצה קלה 30 דקות">
+        <div class="row2">
+          <div><span class="lbl">סוג</span><div class="seg" id="type" role="radiogroup" aria-label="סוג"></div></div>
+          <div><span class="lbl">איך מודדים עצימות</span><div class="seg" id="metric" role="radiogroup" aria-label="מדד"></div></div>
+        </div>
+        <div class="gh" id="gh"></div>
+        <div class="graph" id="graph" aria-label="גרף עצימות לאורך האימון"></div>
+        <div class="gx" id="gx"></div>
+        <div class="legend" id="legend"></div>
+        <div class="bl-h"><h2>מבנה האימון</h2><small>לחיצה על שם הקטע או על עמודה בגרף פותחת אותו</small></div>
+        <div id="blocks"></div>
+        <div class="adds">
+          <button type="button" data-addb="warm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>חימום</button>
+          <button type="button" data-addb="steady"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>קטע</button>
+          <button type="button" data-addb="rep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>סט חוזר</button>
+          <button type="button" data-addb="cool"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>שחרור</button>
+        </div>
+      </section>
+    </main>
+    <aside class="side">
+      <section class="card"><h3>באילו ימים</h3><div class="days" id="days"></div><p class="hint">בימים המסומנים בסגול כבר יש לה אימון כוח. אפשר לשלב, הריצה תופיע כאימון נוסף באותו יום.</p>
+        <label class="sw"><input type="checkbox" checked data-weekly><i></i>חוזר כל שבוע עד סוף התוכנית</label></section>
+      <section class="card"><h3>הערה אליה</h3><textarea placeholder="למשל: בקטעים המהירים רוצה שתרגישי שקשה לדבר. אם יש סחרחורת, עוברים להליכה.">בקטעים המהירים רוצה שתרגישי שקשה לדבר. בהתאוששות הליכה מהירה, לא לעצור.</textarea></section>
+      <section class="card"><h3>כך היא תראה את זה</h3><div class="pv" id="pv"></div></section>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var TYPES = [['run', 'ריצה'], ['int', 'אינטרוולים'], ['walk', 'הליכה'], ['bike', 'אופניים']];
+  var METRICS = [['rpe', 'מאמץ 1–10'], ['pace', 'קצב'], ['speed', 'מהירות'], ['zone', 'אזור דופק']];
+  var KIND = { warm: ['חימום', 1], steady: ['קטע', 3], work: ['עבודה', 4], rest: ['התאוששות', 2], cool: ['שחרור', 1] };
+  var ZN = ['z1', 'z2', 'z3', 'z4', 'z5'], ZL = ['קל מאוד', 'קל', 'בינוני', 'קשה', 'מקסימלי'];
+  var DAYS = [['א׳', ''], ['ב׳', 'כוח'], ['ג׳', ''], ['ד׳', 'כוח'], ['ה׳', ''], ['ו׳', 'כוח'], ['ש׳', '']];
+  var uid = 0; function B(kind, dur, lvl) { return { id: ++uid, kind: kind, dur: dur, lvl: lvl }; }
+  function presets(t) {
+    if (t === 'run') return [B('warm', 300, 3), B('steady', 1500, 6), B('cool', 300, 3)];
+    if (t === 'walk') return [B('warm', 300, 2), B('steady', 1800, 4), B('cool', 300, 2)];
+    if (t === 'bike') return [B('warm', 300, 3), { id: ++uid, rep: 5, items: [B('work', 120, 7), B('rest', 120, 4)] }, B('cool', 300, 3)];
+    return [B('warm', 300, 3), { id: ++uid, rep: 8, items: [B('work', 60, 8), B('rest', 60, 4)] }, B('cool', 300, 3)];
+  }
+  var S = { type: 'int', metric: 'rpe', blocks: presets('int'), days: [2], sel: null };
+  function z(l) { return ZN[l <= 3 ? 0 : l <= 5 ? 1 : l === 6 ? 2 : l <= 8 ? 3 : 4]; }
+  function mmss(s) { var m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+  function tgt(l) {
+    if (S.metric === 'rpe') return [l + '/10', 'מאמץ'];
+    if (S.metric === 'zone') return ['Z' + (ZN.indexOf(z(l)) + 1), ZL[ZN.indexOf(z(l))]];
+    if (S.metric === 'speed') return [(4 + l * 1.1).toFixed(1), 'קמ״ש'];
+    var p = Math.round(9.5 * 60 - l * 26); return [mmss(p), 'דק׳ לק״מ'];
+  }
+  function flat() { var o = []; S.blocks.forEach(function (b) { if (b.rep) { for (var r = 0; r < b.rep; r++) b.items.forEach(function (it) { o.push({ b: it, r: r, of: b.rep }); }); } else o.push({ b: b }); }); return o; }
+  function I(p, s) { return '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  var X = '<path d="M6 6l12 12M18 6 6 18"/>';
+
+  function blkRow(b) {
+    var zc = z(b.lvl), t = tgt(b.lvl);
+    return '<div class="blk' + (S.sel === b.id ? ' on' : '') + '" data-id="' + b.id + '" style="--c:var(--' + zc + ');--s:var(--' + zc + 's);--t:var(--' + zc + 't)"><span class="bar"></span>' +
+      '<div class="k"><button type="button" class="kn" data-pick="' + b.id + '" aria-expanded="' + (S.sel === b.id) + '">' + KIND[b.kind][0] + I('<path d="m6 9 6 6 6-6"/>', 14) + '</button><div class="kinds">' + Object.keys(KIND).map(function (k) { return '<button type="button" data-kind="' + b.id + ':' + k + '" aria-pressed="' + (k === b.kind) + '">' + KIND[k][0] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="stp"><button type="button" data-dur="' + b.id + ':-1" aria-label="פחות זמן">−</button><output class="num">' + mmss(b.dur) + '<small>דקות</small></output><button type="button" data-dur="' + b.id + ':1" aria-label="יותר זמן">+</button></div>' +
+      '<div class="stp tg"><button type="button" data-lvl="' + b.id + ':-1" aria-label="פחות עצימות">−</button><output class="num">' + t[0] + '<small>' + t[1] + '</small></output><button type="button" data-lvl="' + b.id + ':1" aria-label="יותר עצימות">+</button></div>' +
+      '<button class="del" type="button" data-del="' + b.id + '" aria-label="מחיקת הקטע">' + I(X) + '</button></div>';
+  }
+  function render() {
+    document.getElementById('type').innerHTML = TYPES.map(function (t) { return '<button type="button" role="radio" data-type="' + t[0] + '" aria-pressed="' + (t[0] === S.type) + '">' + t[1] + '</button>'; }).join('');
+    document.getElementById('metric').innerHTML = METRICS.map(function (t) { return '<button type="button" role="radio" data-metric="' + t[0] + '" aria-pressed="' + (t[0] === S.metric) + '">' + t[1] + '</button>'; }).join('');
+    var F = flat(), tot = 0, work = 0, rounds = 0; F.forEach(function (f) { tot += f.b.dur; if (f.b.lvl >= 7) work += f.b.dur; });
+    S.blocks.forEach(function (b) { if (b.rep) rounds += b.rep; });
+    document.getElementById('gh').innerHTML = '<div><b class="num">' + Math.round(tot / 60) + '′</b><span>זמן כולל</span></div><div><b class="num">' + mmss(work) + '</b><span>בעצימות גבוהה</span></div><div><b class="num">' + (rounds || '—') + '</b><span>סבבים</span></div><code aria-hidden="true">INTENSITY · ' + F.length + ' STEPS</code>';
+    document.getElementById('graph').innerHTML = F.map(function (f, i) { var zc = z(f.b.lvl), t = tgt(f.b.lvl); return '<button type="button" class="gb' + (S.sel && S.sel !== f.b.id ? ' dim' : '') + '" data-gsel="' + f.b.id + '" style="--w:' + f.b.dur + ';--h:' + (18 + f.b.lvl * 8) + '%;--c:var(--' + zc + ')" aria-label="' + KIND[f.b.kind][0] + ' ' + mmss(f.b.dur) + '"><span class="gtip">' + KIND[f.b.kind][0] + (f.of ? ' ' + (f.r + 1) + '/' + f.of : '') + ' · ' + mmss(f.b.dur) + ' · ' + t[0] + '</span></button>'; }).join('');
+    var marks = [0, 0.25, 0.5, 0.75, 1].map(function (p) { return Math.round(tot * p / 60) + '′'; });
+    document.getElementById('gx').innerHTML = marks.map(function (m) { return '<span>' + m + '</span>'; }).join('');
+    document.getElementById('legend').innerHTML = ZN.map(function (zz, i) { return '<span style="--c:var(--' + zz + ')"><i></i>' + ZL[i] + '</span>'; }).join('');
+    document.getElementById('blocks').innerHTML = S.blocks.map(function (b) {
+      if (!b.rep) return blkRow(b);
+      var one = b.items.reduce(function (a, it) { return a + it.dur; }, 0);
+      return '<div class="rep"><div class="rep-h">' + I('<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>') + '<b>סט חוזר</b><div class="stp"><button type="button" data-rep="' + b.id + ':-1" aria-label="פחות סבבים">−</button><output class="num">× ' + b.rep + '</output><button type="button" data-rep="' + b.id + ':1" aria-label="עוד סבבים">+</button></div><small>' + mmss(one) + ' לסבב · ' + mmss(one * b.rep) + ' סה״כ</small><button class="del" type="button" data-del="' + b.id + '" aria-label="מחיקת הסט">' + I(X) + '</button></div>' + b.items.map(blkRow).join('') + '</div>';
+    }).join('');
+    document.getElementById('days').innerHTML = DAYS.map(function (d, i) { return '<button type="button" data-day="' + i + '" aria-pressed="' + (S.days.indexOf(i) > -1) + '" class="' + (d[1] ? 'has' : '') + '">' + d[0] + '<small>' + (d[1] || '—') + '</small></button>'; }).join('');
+    document.getElementById('pv').innerHTML = '<code aria-hidden="true">' + (S.type === 'walk' ? 'WALK' : S.type === 'bike' ? 'RIDE' : 'RUN') + ' · ' + Math.round(tot / 60) + ' MIN</code><b>' + (document.getElementById('nm').value || 'אימון קרדיו') + '</b><div class="mini">' + F.map(function (f) { return '<i style="--w:' + f.b.dur + ';--h:' + (18 + f.b.lvl * 8) + '%;--c:var(--' + z(f.b.lvl) + ')"></i>'; }).join('') + '</div><p>' + (S.days.length ? 'בימים ' + S.days.map(function (i) { return DAYS[i][0]; }).join(', ') : 'לא נבחרו ימים') + ' · עם טיימר וקול בכל מעבר קטע</p>';
+  }
+  render();
+  function find(id) { var r = null; S.blocks.forEach(function (b) { if (b.id === id) r = b; if (b.rep) b.items.forEach(function (it) { if (it.id === id) r = it; }); }); return r; }
+  function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('on'); }, 1800); }
+  document.addEventListener('click', function (e) {
+    var t, p;
+    if ((t = e.target.closest('[data-type]'))) { S.type = t.dataset.type; S.blocks = presets(S.type); var nm = document.getElementById('nm'); nm.value = { run: 'ריצה רציפה 35 דקות', int: 'אינטרוולים 1:1', walk: 'הליכה מהירה 40 דקות', bike: 'אופניים 2:2' }[S.type]; S.sel = null; return render(); }
+    if ((t = e.target.closest('[data-metric]'))) { S.metric = t.dataset.metric; return render(); }
+    if ((t = e.target.closest('[data-kind]'))) { p = t.dataset.kind.split(':'); var b = find(+p[0]); b.kind = p[1]; b.lvl = { warm: 3, steady: 6, work: 8, rest: 4, cool: 3 }[p[1]]; return render(); }
+    if ((t = e.target.closest('[data-dur]'))) { p = t.dataset.dur.split(':'); var b2 = find(+p[0]), st = b2.dur < 120 ? 15 : 60; b2.dur = Math.max(15, Math.min(5400, b2.dur + st * +p[1])); return render(); }
+    if ((t = e.target.closest('[data-lvl]'))) { p = t.dataset.lvl.split(':'); var b3 = find(+p[0]); b3.lvl = Math.max(1, Math.min(10, b3.lvl + +p[1])); return render(); }
+    if ((t = e.target.closest('[data-rep]'))) { p = t.dataset.rep.split(':'); var b4 = find(+p[0]); b4.rep = Math.max(1, Math.min(30, b4.rep + +p[1])); return render(); }
+    if ((t = e.target.closest('[data-del]'))) { var id = +t.dataset.del; S.blocks = S.blocks.filter(function (b) { if (b.rep) b.items = b.items.filter(function (it) { return it.id !== id; }); return b.id !== id && (!b.rep || b.items.length); }); return render(); }
+    if ((t = e.target.closest('[data-addb]'))) { var k = t.dataset.addb, nb = k === 'rep' ? { id: ++uid, rep: 6, items: [B('work', 60, 8), B('rest', 90, 4)] } : B(k, k === 'steady' ? 600 : 300, k === 'steady' ? 6 : 3); if (k === 'cool' || !S.blocks.length) S.blocks.push(nb); else { var ci = S.blocks.length && S.blocks[S.blocks.length - 1].kind === 'cool' ? S.blocks.length - 1 : S.blocks.length; S.blocks.splice(k === 'warm' ? 0 : ci, 0, nb); } return render(); }
+    if ((t = e.target.closest('[data-pick]'))) { var pid = +t.dataset.pick; S.sel = S.sel === pid ? null : pid; return render(); }
+    if ((t = e.target.closest('[data-gsel]'))) { var gid = +t.dataset.gsel; S.sel = S.sel === gid ? null : gid; render(); var row = document.querySelector('.blk[data-id="' + gid + '"]'); if (row && S.sel) row.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); return; }
+    if ((t = e.target.closest('[data-day]'))) { var d = +t.dataset.day, ix = S.days.indexOf(d); if (ix > -1) S.days.splice(ix, 1); else S.days.push(d); S.days.sort(); return render(); }
+    if (e.target.closest('[data-add]')) return toast('האימון נוסף לתוכנית של מאיה');
+    if (e.target.closest('[data-save]')) return toast('נשמר כטיוטה');
+  });
+  document.getElementById('graph').addEventListener('pointerover', function (e) { var b = e.target.closest('.gb'); document.querySelectorAll('.gb.hov').forEach(function (x) { x.classList.remove('hov'); }); if (b) b.classList.add('hov'); });
+  document.getElementById('graph').addEventListener('pointerleave', function () { document.querySelectorAll('.gb.hov').forEach(function (x) { x.classList.remove('hov'); }); });
+  document.getElementById('nm').addEventListener('input', render);
+})();
+</script>

@@ -1,0 +1,313 @@
+<title>Sistem Trainee Nutrition</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: "training OS" nutrition. Portions are the core: 4 group rows with tappable tokens. Exchange list in a bottom sheet per group. Meal photos strip. Full-menu mode adds meal cards underneath. Light-only by design. */
+:root {
+  --bg: #FFFFFF; --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6;
+  --pink: #FF006E; --cherry: #A50047; --blush: #FFE3EF;
+  --P: #FF006E; --Pt: #C80058; --Ps: #FFE3EE; --C: #7C4DFF; --Ct: #5B2FD6; --Cs: #EFE7FF; --F: #FF7A00; --Ft: #C75A00; --Fs: #FFEBD6; --S: #0094FF; --St: #0070C9; --Ss: #E1F1FF;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', 'Heebo', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1); --sheet: cubic-bezier(.32,.72,0,1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); color: var(--ink); direction: rtl; background: #E9E6EA; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.n { font-family: var(--num); font-variant-numeric: tabular-nums; }
+.he { font-family: var(--he); font-weight: 700; line-height: 0.86; }
+.eyb { display: inline-flex; align-items: baseline; gap: 8px; }
+.eyb code { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.review { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.review span { font-size: 12px; color: var(--muted); }
+.rv { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px rgba(20,17,22,0.06); }
+.rv button { height: 34px; padding: 0 16px; border: 0; border-radius: 11px; background: none; font-size: 13px; font-weight: 600; color: var(--muted); }
+.rv button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.stage { display: flex; justify-content: center; }
+.phone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 54px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 10px #141116, 0 0 0 11px #3a3540, 0 40px 90px rgba(20,17,22,0.3); }
+.island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 60; }
+.scr { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; padding: 0 0 130px; }
+.scr::-webkit-scrollbar { display: none; }
+
+.hdr { position: sticky; top: 0; z-index: 20; padding: 58px 20px 10px; background: rgba(255,255,255,0.9); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); }
+.tt { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.tt h1 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 58px; line-height: 0.8; }
+.tt small { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; font-size: 12px; color: var(--muted); margin-top: 8px; white-space: nowrap; }
+.cam { white-space: nowrap; flex: none; height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; transition: transform 140ms var(--ease-out); }
+.cam:active { transform: scale(0.96); }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 14px; }
+.day { border: 0; background: none; padding: 6px 0; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: background-color 150ms ease; }
+.day small { font-size: 11px; color: var(--muted); font-weight: 600; }
+.day b { font-family: var(--num); font-weight: 700; font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.day .ring { width: 26px; height: 4px; border-radius: 2px; background: var(--soft); overflow: hidden; }
+.day .ring i { display: block; height: 100%; width: var(--v); background: var(--ink); border-radius: 2px; }
+.day[aria-pressed="true"] b { background: var(--ink); color: #fff; }
+.day.fut b { color: var(--faint); } .day.fut .ring { opacity: 0.4; }
+
+.pad { padding: 0 20px; }
+.coach { margin-top: 14px; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 20px; background: var(--soft); width: 100%; border: 0; text-align: start; }
+.coach .av { width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; position: relative; }
+.coach .av::after { content: ''; position: absolute; top: -1px; inset-inline-end: -1px; width: 9px; height: 9px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 2px var(--soft); }
+.coach div { flex: 1; min-width: 0; }
+.coach b { font-family: var(--he); font-size: 20px; font-weight: 700; line-height: 1; display: block; }
+.coach p { margin: 3px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink2); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.coach.open p { -webkit-line-clamp: unset; display: block; }
+.coach svg { flex: none; margin-top: 4px; color: var(--muted); transition: transform 250ms var(--ease-out); }
+.coach.open svg { transform: rotate(180deg); }
+
+/* summary */
+.sum { margin-top: 16px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.sum .big b { font-family: var(--num); font-weight: 700; font-size: 64px; line-height: 0.85; direction: ltr; display: inline-block; }
+.sum .big b small { font-size: 26px; color: var(--faint); }
+.sum .big span { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.mix { display: flex; height: 10px; width: 150px; border-radius: 5px; overflow: hidden; background: var(--soft); direction: rtl; }
+.mix i { height: 100%; width: var(--w); background: var(--c); transition: width 300ms var(--ease-out); }
+.mix-w { text-align: left; }
+.mix-w span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+
+/* group rows: fuel cells. Each portion = a capsule of two half-cells; tap or drag along the bar. */
+.groups { margin-top: 10px; }
+.fc-row { --c: var(--P); --t: var(--Pt); --s: var(--Ps); padding: 16px 0 14px; border-top: 1px solid var(--rule); }
+.fc-h { display: flex; align-items: center; gap: 10px; }
+.fc-ic { width: 38px; height: 38px; flex: none; border-radius: 50%; background: var(--c); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px color-mix(in srgb, var(--c) 35%, transparent); transition: transform 320ms var(--spring); }
+.fc-row.pop .fc-ic { animation: fcPop 420ms var(--spring); }
+@keyframes fcPop { 40% { transform: scale(1.16) rotate(-8deg); } }
+.fc-h b { font-family: var(--he); font-weight: 700; font-size: 32px; line-height: 0.8; }
+.fc-cnt { margin-inline-start: auto; font-family: var(--num); font-weight: 700; font-size: 30px; line-height: 1; color: var(--t); }
+.fc-cnt small { font-size: 18px; color: var(--faint); }
+.fc-bar { display: flex; gap: 5px; margin-top: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.fc-p { position: relative; flex: 1; display: flex; gap: 2px; }
+.fc-p.hf { flex: 0.5; }
+.fc-c { position: relative; flex: 1; height: 40px; border: 0; padding: 0; background: var(--s); overflow: hidden; cursor: pointer; }
+.fc-p .fc-c:first-child { border-start-start-radius: 13px; border-end-start-radius: 13px; }
+.fc-p .fc-c:last-child { border-start-end-radius: 13px; border-end-end-radius: 13px; }
+/* RTL fills from the right edge of each cell */
+.fc-c::after { content: ''; position: absolute; inset: 0; background: var(--c); transform: scaleX(0); transform-origin: 100% 50%; transition: transform 300ms var(--ease-out); transition-delay: var(--d, 0ms); }
+.fc-c.on::after { transform: scaleX(1); }
+.fc-c.tip::before { content: ''; position: absolute; z-index: 1; top: 11px; bottom: 11px; inset-inline-end: 6px; width: 3px; border-radius: 2px; background: rgba(255,255,255,0.9); }
+.fc-num { position: absolute; z-index: 1; top: 6px; inset-inline-start: 8px; line-height: 1; font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--t); opacity: 0.45; pointer-events: none; transition: color 200ms ease, opacity 200ms ease; }
+.fc-p.full .fc-num { color: #fff; opacity: 0.85; }
+.fc-meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--muted); min-height: 30px; }
+.fc-meta b { color: var(--t); font-weight: 700; }
+.fc-meta .ok { color: var(--cherry); font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+.fc-meta .ov { height: 22px; padding: 0 8px; border-radius: 11px; background: #FFF4E5; color: #8A4A00; font-weight: 700; display: inline-flex; align-items: center; }
+.fc-opt { margin-inline-start: auto; height: 30px; padding: 0 10px 0 12px; border: 0; border-radius: 15px; background: var(--s); color: var(--t); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: transform 140ms var(--ease-out), filter 150ms ease; }
+.fc-opt:active { transform: scale(0.97); }
+.veg { margin-top: 4px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 18px; border: 1.5px dashed #E2DDE3; font-size: 13px; color: var(--muted); }
+.veg b { font-family: var(--he); font-size: 22px; color: var(--ink); font-weight: 700; line-height: 1; }
+
+/* photos */
+.sh { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 12px; }
+.sh h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.sh button { border: 0; background: none; padding: 0; font-size: 13px; font-weight: 600; color: var(--pink); }
+.photos { display: grid; grid-auto-flow: column; grid-auto-columns: 110px; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+.photos::-webkit-scrollbar { display: none; }
+.ph { position: relative; height: 130px; border: 0; border-radius: 18px; overflow: hidden; padding: 0; background: var(--g); }
+.ph span { position: absolute; bottom: 8px; inset-inline-start: 8px; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,0.9); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; }
+.ph.add { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--rule); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.ph.add i { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+
+/* menu mode */
+.meal { border-radius: 24px; border: 1px solid var(--rule); padding: 14px; margin-bottom: 10px; }
+.mh { display: flex; align-items: center; gap: 10px; }
+.mh b { font-family: var(--he); font-weight: 700; font-size: 28px; line-height: 0.85; }
+.mh time { font-family: var(--num); font-weight: 700; font-size: 16px; color: var(--muted); }
+.mh .done { margin-inline-start: auto; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: background-color 200ms ease, transform 140ms var(--ease-out); }
+.mh .done.ok { background: var(--blush); color: var(--cherry); }
+.mh .done:active { transform: scale(0.96); }
+.mo { display: flex; gap: 4px; margin: 10px 0 8px; }
+.mo button { height: 28px; padding: 0 12px; border: 0; border-radius: 14px; background: none; font-size: 12px; font-weight: 600; color: var(--muted); }
+.mo button[aria-pressed="true"] { background: var(--soft); color: var(--ink); }
+.mi { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; }
+.mi i { width: 22px; height: 22px; border-radius: 7px; background: var(--s); color: var(--t); font-style: normal; font-family: var(--num); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: none; }
+.mi span { flex: 1; } .mi small { font-size: 12px; color: var(--muted); }
+.mi .sw { border: 0; background: none; padding: 4px 6px; border-radius: 10px; color: var(--muted); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; z-index: 70; background: rgba(20,17,22,0.35); transition: opacity 240ms ease; }
+.scrim[data-off] { opacity: 0; pointer-events: none; }
+.sheet { position: absolute; inset-inline: 0; bottom: 0; z-index: 71; height: 82%; display: flex; flex-direction: column; border-radius: 32px 32px 0 0; background: #fff; box-shadow: 0 -20px 50px rgba(20,17,22,0.25); transition: transform 300ms var(--sheet); }
+.sheet[data-off] { transform: translateY(104%); transition-duration: 200ms; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #D8D3DB; margin: 10px auto 2px; flex: none; }
+.sh-h { padding: 8px 20px 10px; }
+.sh-h h3 { display: flex; align-items: center; gap: 12px; margin: 0; font-family: var(--he); font-weight: 700; font-size: 44px; line-height: 0.85; color: var(--t); }
+.sh-h p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.gtabs { display: flex; gap: 6px; padding: 0 20px 10px; overflow-x: auto; scrollbar-width: none; }
+.gtabs button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: var(--soft); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.gtabs button svg { color: var(--c); }
+.gtabs button[aria-pressed="true"] { background: var(--c); color: #fff; } .gtabs button[aria-pressed="true"] svg { color: #fff; }
+.srch { margin: 0 20px 6px; display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px; border-radius: 21px; background: var(--soft); color: var(--muted); }
+.srch input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; color: var(--ink); }
+.srch:focus-within { background: #fff; box-shadow: 0 0 0 2px var(--pink); }
+.flist { flex: 1; overflow-y: auto; padding: 4px 20px 24px; }
+.fcat { font-size: 11px; font-weight: 700; color: var(--faint); margin: 12px 0 2px; letter-spacing: 0.3px; }
+.fo { width: 100%; border: 0; background: none; padding: 12px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: start; border-bottom: 1px solid var(--rule); }
+.fo b { display: block; font-size: 15px; font-weight: 600; } .fo small { font-size: 12px; color: var(--muted); }
+.fo .add { height: 34px; padding: 0 12px; border-radius: 17px; background: var(--s); color: var(--t); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: background-color 150ms ease, color 150ms ease; }
+.fo.added .add { background: var(--c); color: #fff; }
+.hidden-note { margin: 14px 0 0; padding: 10px 12px; border-radius: 14px; background: #FFF4E5; color: #8A4A00; font-size: 12px; line-height: 1.45; }
+.toast { position: absolute; left: 50%; bottom: 110px; z-index: 80; transform: translate(-50%, 20px); opacity: 0; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* dock */
+.dock { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 30; display: flex; gap: 4px; padding: 6px; border-radius: 34px; background: var(--ink); box-shadow: 0 16px 36px rgba(20,17,22,0.35); }
+.dk { height: 54px; min-width: 54px; padding: 0 16px; border: 0; border-radius: 27px; background: transparent; color: rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; gap: 0; }
+.dk .l { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; font-size: 13px; font-weight: 700; }
+.dk[aria-current="page"] { background: var(--pink); color: #fff; padding: 0 18px; gap: 8px; box-shadow: 0 6px 16px rgba(255,0,110,0.45); }
+.dk[aria-current="page"] .l { max-width: 80px; opacity: 1; }
+.hi { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 130px; height: 5px; border-radius: 3px; background: var(--ink); z-index: 31; opacity: 0.85; }
+@media (hover: hover) and (pointer: fine) {
+  .gh .opts:hover { filter: brightness(0.96); } .cam:hover { background: var(--ink2); }
+  .day:not([aria-pressed="true"]):hover { background: var(--soft); }
+  .fc-c:hover { filter: brightness(0.96); } .fc-opt:hover { filter: brightness(0.96); }
+  .fo:hover b { color: var(--t); } .mh .done:hover { background: var(--ink2); } .mh .done.ok:hover { background: #FFD3E5; }
+  .gtabs button:not([aria-pressed="true"]):hover { background: #ECE8EE; }
+}
+@media (max-width: 440px) { body { padding: 0; } .review { padding: 10px 16px 0; } .phone { width: 100%; height: calc(100dvh - 60px); border-radius: 0; box-shadow: none; } .island, .hi { display: none; } .hdr { padding-top: max(16px, env(safe-area-inset-top, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .fc-c::after, .fc-ic, .sheet, .scrim, .toast, .mix i { transition-duration: 1ms !important; transition-delay: 0ms !important; } .fc-row.pop .fc-ic { animation: none; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="review"><span>לבדיקה: מה המאמנת שלחה</span><div class="rv" role="group" aria-label="סוג תוכנית"><button type="button" data-mode="portions" aria-pressed="true">מנות בלבד</button><button type="button" data-mode="menu" aria-pressed="false">תפריט מלא</button></div></div>
+<div class="stage"><div class="phone">
+  <div class="island" aria-hidden="true"></div>
+  <div class="scr" id="scr">
+    <header class="hdr">
+      <div class="tt"><div><h1>תזונה</h1><small class="eyb"><code aria-hidden="true">FUEL · MON 19.10</code><span>יום ב׳, 19 באוקטובר</span></small></div>
+        <button class="cam" type="button" data-photo><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>תמונת ארוחה</button></div>
+      <div class="days" id="days" role="tablist" aria-label="ימים"></div>
+    </header>
+    <div class="pad" id="body"></div>
+  </div>
+  <div class="scrim" id="scrim" data-off></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="מה אפשר לאכול" data-off><div class="grab"></div><div id="shc" style="display:flex;flex-direction:column;min-height:0;flex:1"></div></section>
+  <div class="toast" id="toast" role="status"></div>
+  <nav class="dock" aria-label="ניווט">
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="l">בית</span></button>
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg><span class="l">אימונים</span></button>
+    <button class="dk" type="button" aria-current="page"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8a3 3 0 0 0 6 0V3M10 3v18M17 3c-2 2-2 6 0 8v10"/></svg><span class="l">תזונה</span></button>
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="l">פרופיל</span></button>
+  </nav>
+  <span class="hi" aria-hidden="true"></span>
+</div></div>
+
+<script>
+(function () {
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function ic(p, s) { return '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  function fr(n) { var w = Math.floor(n), h = n - w >= 0.5; return '<bdi dir="ltr">' + (w || !h ? w : '') + (h ? '½' : '') + '</bdi>'; }
+  var G = { P: ['חלבון', 4.5, 150], C: ['פחמימה', 4, 120], F: ['שומן', 4, 90], S: ['נשנוש', 1, 150] };
+  var KEYS = ['P', 'C', 'F', 'S'];
+  var eaten = { P: 2, C: 1.5, F: 2, S: 0 };
+  var FOODS = {
+    P: [['מוצרי חלב', [['קוטג׳ 5%', '155 גרם · ¾ גביע'], ['יוגורט יווני 0%', 'גביע 170 גרם'], ['גבינה לבנה 3%', '150 גרם']]], ['ביצים', [['ביצים', '2 ביצים M/L'], ['חלבונים', '5 חלבונים']]], ['צמחי', [['טופו', '150 גרם'], ['אדממה', 'כוס']]], ['דגים', [['טונה במים', 'קופסה מסוננת'], ['סלמון', '80 גרם']]]],
+    C: [['לחם', [['לחם קל', '3 פרוסות'], ['פיתה מלאה', '½ פיתה']]], ['דגנים', [['אורז מלא', 'כוס מבושל'], ['קינואה', '¾ כוס מבושלת'], ['שיבולת שועל', '4 כפות']]], ['פירות', [['בננה', 'בינונית'], ['תפוח', 'גדול']]], ['ירקות עמילניים', [['בטטה', 'בינונית קטנה'], ['תירס', '½ כוס']]]],
+    F: [['פירות שומניים', [['אבוקדו', '⅓ בינוני']]], ['ממרחים', [['טחינה גולמית', 'כף'], ['חמאת בוטנים', 'כף']]], ['שמנים', [['שמן זית', 'כף']]], ['אגוזים', [['שקדים', '15 יחידות'], ['אגוזי מלך', '7 חצאים']]]],
+    S: [['מתוקים', [['חטיף חלבון', 'יחידה'], ['שוקולד מריר', '2 קוביות'], ['גלידת יוגורט', 'כדור']]]]
+  };
+  var MEALS = [['ארוחת בוקר', '08:00', [[['P', 'יוגורט יווני 0%', 'גביע'], ['C', 'שיבולת שועל', '4 כפות'], ['F', 'שקדים', '15 יח׳']], [['P', 'ביצים', '2'], ['C', 'לחם קל', '3 פרוסות'], ['F', 'אבוקדו', '⅓']]], 1], ['צהריים', '13:00', [[['P', 'טופו', '150 ג׳'], ['C', 'אורז מלא', 'כוס'], ['F', 'טחינה', 'כף']]], 0], ['ביניים', '16:30', [[['C', 'בננה', 'בינונית'], ['F', 'חמאת בוטנים', 'כף']]], 0], ['ערב', '20:00', [[['P', 'קוטג׳ 5%', '¾ גביע'], ['C', 'לחם קל', '3 פרוסות'], ['F', 'שמן זית', 'כף']]], 0]];
+  var mode = 'portions', sel = 1, grp = 'P', q = '', coachOpen = false;
+  var DAYS = [['א׳', 18, 0.9], ['ב׳', 19, 0.5], ['ג׳', 20, 0], ['ד׳', 21, 0], ['ה׳', 22, 0], ['ו׳', 23, 0], ['ש׳', 24, 0]];
+  function days() {
+    document.getElementById('days').innerHTML = DAYS.map(function (d, i) { return '<button class="day' + (i > 1 ? ' fut' : '') + '" type="button" role="tab" data-day="' + i + '" aria-pressed="' + (i === sel) + '"' + (i > 1 ? ' disabled' : '') + '><small>' + d[0] + '</small><b>' + d[1] + '</b><span class="ring"><i style="--v:' + d[2] * 100 + '%"></i></span></button>'; }).join('');
+  }
+  function totals() { var t = 0, g = 0; KEYS.forEach(function (k) { t += eaten[k]; g += G[k][1]; }); return [t, g]; }
+  var GI = {
+    P: '<circle cx="12" cy="5.5" r="2.6"/><circle cx="12" cy="13" r="2.3"/><circle cx="5.5" cy="17.5" r="2.6"/><circle cx="18.5" cy="17.5" r="2.6"/><path d="M12 13V7M12 13l-5.5 3.8M12 13l5.5 3.8" fill="none" stroke="currentColor" stroke-width="2"/>',
+    C: '<path d="M12 22V9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 2.5c2 2 2 5 0 7-2-2-2-5 0-7z"/><path d="M11.6 13.5c-3 .2-5.2-1.6-6.1-4 3-.2 5.2 1.4 6.1 4z"/><path d="M12.4 13.5c3 .2 5.2-1.6 6.1-4-3-.2-5.2 1.4-6.1 4z"/><path d="M11.6 18.5c-3 .2-5.2-1.6-6.1-4 3-.2 5.2 1.4 6.1 4z"/><path d="M12.4 18.5c3 .2 5.2-1.6 6.1-4-3-.2-5.2 1.4-6.1 4z"/>',
+    F: '<path d="M11 3.5C7.6 7.8 5.5 11 5.5 14.2a5.5 5.5 0 0 0 11 0c0-3.2-2.1-6.4-5.5-10.7z"/><path d="M17 5.5c-1.1 1.4-1.8 2.5-1.8 3.5a1.8 1.8 0 0 0 3.6 0c0-1-.7-2.1-1.8-3.5z"/>',
+    S: '<path d="M20.5 12.4A8.5 8.5 0 1 1 11.6 3.5a3 3 0 0 0 3.6 3.4 3 3 0 0 0 5.3 5.5z"/><circle cx="9" cy="10" r="1.3" fill="var(--c)"/><circle cx="14" cy="15" r="1.3" fill="var(--c)"/><circle cx="8.5" cy="15.5" r="1.1" fill="var(--c)"/>'
+  };
+  function gic(k, s) { return '<svg width="' + (s || 20) + '" height="' + (s || 20) + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + GI[k] + '</svg>'; }
+  function fx(a, b) { return '<bdi dir="ltr">' + fr(a).replace(/<[^>]+>/g, '') + '<small>/' + fr(b).replace(/<[^>]+>/g, '') + '</small></bdi>'; }
+  var prevE = {};
+  function cells(k) {
+    var goal = G[k][1], halves = Math.round(goal * 2), on = Math.round(eaten[k] * 2), was = Math.round((prevE[k] == null ? eaten[k] : prevE[k]) * 2), h = '';
+    for (var p = 0; p < Math.ceil(goal); p++) {
+      var n = Math.min(2, halves - p * 2), full = on >= p * 2 + n;
+      h += '<div class="fc-p' + (n === 1 ? ' hf' : '') + (full ? ' full' : '') + '"><span class="fc-num" aria-hidden="true">' + (n === 1 ? '½' : p + 1) + '</span>';
+      for (var c = 0; c < n; c++) {
+        var idx = p * 2 + c, isOn = on > idx, d = isOn && idx >= was ? (idx - was) * 45 : !isOn && idx < was ? (was - 1 - idx) * 45 : 0;
+        h += '<button type="button" class="fc-c' + (isOn ? ' on' : '') + (isOn && idx === Math.min(on, halves) - 1 ? ' tip' : '') + '" style="--d:' + d + 'ms" data-c="' + k + ':' + idx + '" aria-label="' + G[k][0] + ': ' + fr((idx + 1) / 2).replace(/<[^>]+>/g, '') + ' מנות"></button>';
+      }
+      h += '</div>';
+    }
+    return h;
+  }
+  function body() {
+    var t = totals(), h = '';
+    h += '<button class="coach' + (coachOpen ? ' open' : '') + '" type="button" data-coach><span class="av">שק</span><div><b>הודעה משקד</b><p>שבוע טוב! השבוע מתמקדות בחלבון בכל ארוחה. אם יש ערב עם אירוע, תשמרי 2 מנות פחמימה לערב ותכתבי לי.</p></div>' + ic('<path d="m6 9 6 6 6-6"/>') + '</button>';
+    h += '<div class="sum"><div class="big"><b class="n">' + fr(t[0]) + '<small> / ' + fr(t[1]) + '</small></b><span>מנות היום · ' + (mode === 'menu' ? 'לפי התפריט שלך' : 'בחרי מה שבא לך מכל קבוצה') + '</span></div>' +
+      '<div class="mix-w"><span class="eyb"><code aria-hidden="true">MIX</code></span><div class="mix">' + KEYS.map(function (k) { return '<i style="--c:var(--' + k + ');--w:' + (eaten[k] / t[1] * 100) + '%"></i>'; }).join('') + '</div></div></div>';
+    h += '<div class="groups">' + KEYS.map(function (k) {
+      var goal = G[k][1], left = goal - eaten[k];
+      var meta = left > 0 ? 'נשארו <b>' + fr(left) + '</b> ' + (left === 1 ? 'מנה' : 'מנות') : left === 0 ? '<span class="ok">' + ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>', 13) + 'השלמת להיום</span>' : '<span class="ok">' + ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>', 13) + 'הושלם</span><span class="ov">+' + fr(-left) + ' מעבר</span>';
+      return '<section class="fc-row" data-row="' + k + '" style="--c:var(--' + k + ');--t:var(--' + k + 't);--s:var(--' + k + 's)"><div class="fc-h"><span class="fc-ic">' + gic(k) + '</span><b>' + G[k][0] + '</b><span class="fc-cnt">' + fx(eaten[k], goal) + '</span></div>' +
+        '<div class="fc-bar" data-bar="' + k + '">' + cells(k) + '</div><div class="fc-meta">' + meta + '<button class="fc-opt" type="button" data-opts="' + k + '">מה אפשר?' + ic('<path d="m15 6-6 6 6 6"/>', 14) + '</button></div></section>';
+    }).join('') + '<div class="veg"><b>ירקות</b>חופשי, בכל ארוחה ובכל כמות</div></div>';
+    if (mode === 'menu') {
+      h += '<div class="sh"><h2 class="eyb"><code aria-hidden="true">MENU</code>התפריט שלך</h2><span style="font-size:12px;color:var(--muted)">אפשר להחליף כל פריט בפריט מאותה קבוצה</span></div>';
+      h += MEALS.map(function (m, i) {
+        var opt = m[4] || 0;
+        return '<article class="meal"><div class="mh"><b>' + m[0] + '</b><time class="n">' + m[1] + '</time><button class="done' + (m[3] ? ' ok' : '') + '" type="button" data-meal="' + i + '">' + (m[3] ? ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>', 14) + 'נאכל' : 'אכלתי') + '</button></div>' +
+          (m[2].length > 1 ? '<div class="mo">' + m[2].map(function (_, j) { return '<button type="button" data-mopt="' + i + ':' + j + '" aria-pressed="' + (j === opt) + '">אפשרות ' + 'אבג'[j] + '׳</button>'; }).join('') + '</div>' : '') +
+          m[2][opt].map(function (it) { return '<div class="mi" style="--s:var(--' + it[0] + 's);--t:var(--' + it[0] + 't)"><i>1</i><span>' + it[1] + ' <small>· ' + it[2] + '</small></span><button class="sw" type="button" data-opts="' + it[0] + '">' + ic('<path d="M7 7h11l-3-3M17 17H6l3 3"/>', 12) + 'החלפה</button></div>'; }).join('') + '</article>';
+      }).join('');
+    }
+    h += '<div class="sh"><h2 class="eyb"><code aria-hidden="true">PHOTOS</code>תמונות היום</h2><button type="button" data-photo>הוספה</button></div><div class="photos"><button class="ph add" type="button" data-photo><i>' + ic('<path d="M12 5v14M5 12h14"/>') + '</i>תמונה</button>' +
+      [['בוקר', 'linear-gradient(160deg,#FFE9D6,#F6B98A)'], ['צהריים', 'linear-gradient(160deg,#E8F0D8,#B9C98E)']].map(function (p) { return '<button class="ph" type="button" style="--g:' + p[1] + '"><span>' + p[0] + '</span></button>'; }).join('') + '</div>';
+    document.getElementById('body').innerHTML = h; prevE = Object.assign({}, eaten);
+  }
+  function render() { days(); body(); }
+  render();
+
+  var toastT;
+  function toast(m) { var t = document.getElementById('toast'); t.innerHTML = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 1600); }
+  function popRow(k) { if (RM) return; var r = document.querySelector('[data-row="' + k + '"]'); if (r) { r.classList.remove('pop'); void r.offsetWidth; r.classList.add('pop'); } }
+  function setHalves(k, n) { var prev = eaten[k]; eaten[k] = n / 2; if (eaten[k] === prev) return; body(); if (eaten[k] >= G[k][1] && prev < G[k][1]) { popRow(k); toast('השלמת את מנות ה' + G[k][0] + ' להיום'); } }
+  // fuel cells: tap a cell = fill up to it (tap the last filled cell = empty it); drag along the bar to fill/empty
+  var fdrag = null;
+  document.getElementById('body').addEventListener('pointerdown', function (e) { var c = e.target.closest('[data-c]'); if (!c) return; var p = c.dataset.c.split(':'); fdrag = { k: p[0], i: +p[1], moved: false }; });
+  document.getElementById('body').addEventListener('pointermove', function (e) { if (!fdrag) return; var el = document.elementFromPoint(e.clientX, e.clientY), c = el && el.closest && el.closest('[data-c^="' + fdrag.k + ':"]'); if (!c) return; var i = +c.dataset.c.split(':')[1]; if (i !== fdrag.i) { fdrag.moved = true; fdrag.i = i; setHalves(fdrag.k, i + 1); } });
+  document.addEventListener('pointerup', function () { if (!fdrag) return; var d = fdrag; fdrag = null; if (!d.moved) { var cur = Math.round(eaten[d.k] * 2); setHalves(d.k, cur === d.i + 1 ? d.i : d.i + 1); } });
+
+  // sheet
+  var sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim'), shc = document.getElementById('shc'), lastF;
+  function sheetHtml() {
+    var list = FOODS[grp].map(function (c) {
+      var items = c[1].filter(function (f) { return !q || f[0].indexOf(q) > -1; }); if (!items.length) return '';
+      return '<div class="fcat">' + c[0] + '</div>' + items.map(function (f) { return '<button class="fo" type="button" data-food="' + f[0] + '"><div><b>' + f[0] + '</b><small>מנה = ' + f[1] + '</small></div><span class="add">' + ic('<path d="M12 5v14M5 12h14"/>', 12) + 'אכלתי</span></button>'; }).join('');
+    }).join('') || '<p style="color:var(--muted);font-size:13px;margin-top:20px">לא נמצא. נסי מילה אחרת</p>';
+    return '<div class="sh-h" style="--t:var(--' + grp + 't);--c:var(--' + grp + ')"><h3><span class="fc-ic">' + gic(grp, 22) + '</span>' + G[grp][0] + '</h3><p>כל אחד מאלה = מנה אחת. נשארו לך היום <b>' + fr(Math.max(0, G[grp][1] - eaten[grp])) + '</b> מנות</p></div>' +
+      '<div class="gtabs">' + KEYS.map(function (k) { return '<button type="button" data-g="' + k + '" aria-pressed="' + (k === grp) + '" style="--c:var(--' + k + ')">' + gic(k, 15) + G[k][0] + '</button>'; }).join('') + '</div>' +
+      '<label class="srch">' + ic('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>') + '<input id="fq" placeholder="חיפוש מזון" value="' + q + '" aria-label="חיפוש מזון"></label>' +
+      '<div class="flist" style="--c:var(--' + grp + ');--t:var(--' + grp + 't);--s:var(--' + grp + 's)">' + list + '<p class="hidden-note">לא מוצגים 3 פריטים שמכילים לקטוז, לפי מה שסימנת בשאלון.</p></div>';
+  }
+  function openSheet(k) { grp = k; q = ''; lastF = document.activeElement; shc.innerHTML = sheetHtml(); sheet.removeAttribute('data-off'); scrim.removeAttribute('data-off'); }
+  function closeSheet() { sheet.setAttribute('data-off', ''); scrim.setAttribute('data-off', ''); if (lastF) lastF.focus({ preventScroll: true }); }
+
+  document.querySelector('.phone').addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-c]'))) { if (e.detail === 0) { var kp = t.dataset.c.split(':'), cur = Math.round(eaten[kp[0]] * 2), ix = +kp[1]; setHalves(kp[0], cur === ix + 1 ? ix : ix + 1); } return; }
+    if ((t = e.target.closest('[data-opts]'))) return openSheet(t.dataset.opts);
+    if ((t = e.target.closest('[data-g]'))) { grp = t.dataset.g; q = ''; shc.innerHTML = sheetHtml(); return; }
+    if ((t = e.target.closest('[data-food]'))) { if (!t.classList.contains('added')) { eaten[grp] += 1; t.classList.add('added'); t.querySelector('.add').innerHTML = ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>', 12) + 'סומן'; body(); toast('סומנה מנת ' + G[grp][0] + ' · ' + t.dataset.food); shc.querySelector('.sh-h p b').innerHTML = fr(Math.max(0, G[grp][1] - eaten[grp])); } return; }
+    if ((t = e.target.closest('[data-meal]'))) { var m = MEALS[+t.dataset.meal]; m[3] = !m[3]; var items = m[2][m[4] || 0]; items.forEach(function (it) { eaten[it[0]] = Math.max(0, eaten[it[0]] + (m[3] ? 1 : -1)); }); body(); if (m[3]) toast(m[0] + ' סומנה · ' + items.length + ' מנות'); return; }
+    if ((t = e.target.closest('[data-mopt]'))) { var mp = t.dataset.mopt.split(':'); MEALS[+mp[0]][4] = +mp[1]; body(); return; }
+    if ((t = e.target.closest('[data-mode]'))) return;
+    if (e.target.closest('[data-coach]')) { coachOpen = !coachOpen; body(); return; }
+    if (e.target.closest('[data-photo]')) { toast(ic('<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/>', 14) + 'כאן תיפתח המצלמה'); return; }
+    if ((t = e.target.closest('[data-day]'))) { sel = +t.dataset.day; if (sel === 0) eaten = { P: 4.5, C: 3.5, F: 3, S: 1 }; else eaten = { P: 2, C: 1.5, F: 2, S: 0 }; render(); return; }
+    if (e.target === scrim) closeSheet();
+  });
+  document.querySelector('.phone').addEventListener('input', function (e) { if (e.target.id === 'fq') { q = e.target.value.trim(); var pos = e.target.selectionStart; shc.innerHTML = sheetHtml(); var i = document.getElementById('fq'); i.focus(); i.setSelectionRange(pos, pos); } });
+  document.querySelector('.review').addEventListener('click', function (e) { var b = e.target.closest('[data-mode]'); if (!b) return; mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); body(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hasAttribute('data-off')) closeSheet(); });
+  var g = sheet.querySelector('.grab'), sy = null;
+  g.addEventListener('pointerdown', function (e) { sy = e.clientY; g.setPointerCapture(e.pointerId); sheet.style.transition = 'none'; });
+  g.addEventListener('pointermove', function (e) { if (sy == null) return; sheet.style.transform = 'translateY(' + Math.max(0, e.clientY - sy) + 'px)'; });
+  g.addEventListener('pointerup', function (e) { var d = e.clientY - sy; sy = null; sheet.style.transition = ''; sheet.style.transform = ''; if (d > 90) closeSheet(); });
+})();
+</script>

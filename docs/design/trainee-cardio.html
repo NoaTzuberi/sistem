@@ -1,0 +1,271 @@
+<title>Sistem Trainee Cardio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone, three screens: session detail -> live player (full-bleed block color) -> finish log. Light-only by design. */
+:root {
+  --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6; --pink: #FF006E; --cherry: #A50047; --blush: #FFE3EF;
+  --z1: #0094FF; --z1s: #E1F1FF; --z1t: #0070C9; --z2: #7C4DFF; --z2s: #EFE7FF; --z2t: #5B2FD6; --z3: #FF7A00; --z3s: #FFEBD6; --z3t: #C75A00; --z4: #FF006E; --z4s: #FFE3EE; --z4t: #C80058; --z5: #A50047; --z5s: #FBE3EC; --z5t: #A50047;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); color: var(--ink); direction: rtl; background: #E9E6EA; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.n { font-family: var(--num); font-weight: 700; font-variant-numeric: tabular-nums; }
+code.e { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; }
+.review { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.review button { height: 32px; padding: 0 12px; border: 0; border-radius: 16px; background: #fff; font-size: 12px; font-weight: 600; }
+.review button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.stage { display: flex; justify-content: center; }
+.phone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 54px; overflow: hidden; background: #fff; box-shadow: 0 0 0 10px #141116, 0 0 0 11px #3a3540, 0 40px 90px rgba(20,17,22,0.3); }
+.island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 60; }
+.view { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; transition: opacity 260ms ease, transform 360ms var(--ease-out); }
+.view::-webkit-scrollbar { display: none; }
+.view[data-off] { opacity: 0; transform: scale(0.96); pointer-events: none; }
+
+/* detail */
+.dt { padding: 58px 20px 120px; }
+.dt-top { display: flex; align-items: center; justify-content: space-between; }
+.ib { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; transition: transform 140ms var(--ease-out); }
+.ib:active { transform: scale(0.94); }
+.dt .e { color: var(--faint); display: block; margin-top: 16px; }
+.dt h1 { margin: 6px 0 0; font-family: var(--he); font-weight: 700; font-size: 64px; line-height: 0.8; }
+.dt h1 bdi { font-family: var(--num); font-style: italic; font-weight: 800; }
+.sb { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; padding: 12px 0; border-block: 1px solid var(--rule); }
+.sb div + div { border-inline-start: 1px solid var(--rule); padding-inline-start: 14px; }
+.sb b { display: block; font-size: 38px; line-height: 0.95; }
+.sb span { font-size: 12px; color: var(--muted); }
+.graph { display: flex; align-items: flex-end; gap: 2px; height: 96px; margin-top: 16px; }
+.graph i { flex-grow: var(--w); flex-basis: 0; min-width: 3px; height: var(--h); background: var(--c); border-radius: 5px 5px 2px 2px; transform-origin: bottom; animation: gUp 520ms var(--ease-out) both; animation-delay: var(--d); }
+@keyframes gUp { from { transform: scaleY(0); } }
+.gx { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--faint); direction: ltr; }
+.note { margin-top: 18px; display: flex; gap: 10px; padding: 12px 14px; border-radius: 20px; background: var(--soft); }
+.note .av { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.note b { font-family: var(--he); font-size: 20px; line-height: 1; display: block; }
+.note p { margin: 3px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink2); }
+.sh { margin: 22px 0 8px; display: flex; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.sh .e { margin: 0; display: inline; color: var(--faint); }
+.st { --c: var(--z1); --t: var(--z1t); --s: var(--z1s); display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.st i { width: 6px; height: 34px; border-radius: 3px; background: var(--c); flex: none; }
+.st b { font-family: var(--he); font-weight: 700; font-size: 26px; line-height: 0.85; }
+.st small { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+.st .tm { margin-inline-start: auto; font-size: 22px; color: var(--t); }
+.rp { margin: 8px 0; padding: 4px 12px 4px; border-radius: 20px; background: var(--soft); }
+.rp-h { display: flex; align-items: center; gap: 8px; padding: 8px 0 2px; font-size: 12px; font-weight: 700; color: var(--ink2); }
+.rp-h b { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 24px; }
+.rp .st:last-child { border-bottom: 0; }
+.opts { margin-top: 18px; display: flex; flex-direction: column; gap: 4px; }
+.sw { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 14px; cursor: pointer; }
+.sw span { flex: 1; } .sw small { display: block; font-size: 12px; color: var(--muted); }
+.sw input { position: absolute; opacity: 0; pointer-events: none; }
+.sw i { width: 46px; height: 28px; border-radius: 14px; background: rgba(118,118,128,0.2); position: relative; flex: none; transition: background-color 200ms ease; }
+.sw i::after { content: ''; position: absolute; top: 2px; inset-inline-start: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 220ms var(--ease-out); }
+.sw input:checked + i { background: var(--cherry); } .sw input:checked + i::after { transform: translateX(-18px); }
+.sw input:focus-visible + i { box-shadow: 0 0 0 3px rgba(255,0,110,0.3); }
+.slide { position: absolute; inset-inline: 20px; bottom: 28px; z-index: 5; height: 66px; border-radius: 33px; background: var(--pink); box-shadow: 0 14px 30px rgba(255,0,110,0.35); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.slide span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--he); font-weight: 700; font-size: 28px; letter-spacing: 0.5px; pointer-events: none; }
+.knob { position: absolute; top: 6px; right: 6px; width: 54px; height: 54px; border: 0; border-radius: 50%; background: #fff; color: var(--pink); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.knob.back { transition: transform 300ms var(--spring); }
+
+/* live */
+.lv { --c: var(--z1); background: var(--c); color: #fff; transition: background-color 450ms ease; display: flex; flex-direction: column; padding: 58px 22px 34px; overflow: hidden; }
+.lv::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.16; background: repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 48px); -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%); mask-image: linear-gradient(to bottom, #000, transparent 70%); }
+.lv > * { position: relative; }
+.lv-top { display: flex; align-items: center; gap: 10px; }
+.lv-top .ib { background: rgba(255,255,255,0.18); color: #fff; }
+.lv-top .e { color: rgba(255,255,255,0.75); margin-inline-start: auto; }
+.lv-kind { margin-top: 34px; font-family: var(--he); font-weight: 700; font-size: 84px; line-height: 0.78; white-space: nowrap; }
+.lv-kind.long { font-size: 64px; }
+.lv-tg { margin-top: 10px; font-size: 15px; font-weight: 600; opacity: 0.92; }
+.lv-tg b { font-family: var(--num); font-size: 22px; }
+.lv-clock { margin-top: 22px; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 150px; line-height: 0.8; letter-spacing: -2px; direction: ltr; text-align: right; }
+.lv-clock.beat { animation: beat 600ms var(--spring); }
+@keyframes beat { 30% { transform: scale(1.08); } }
+.lv-bar { margin-top: 18px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden; }
+.lv-bar i { display: block; height: 100%; width: 100%; background: #fff; border-radius: 4px; transform-origin: right; transform: scaleX(var(--p)); }
+.lv-next { margin-top: 18px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 20px; background: rgba(255,255,255,0.16); }
+.lv-next i { width: 12px; height: 12px; border-radius: 50%; background: var(--nc); box-shadow: 0 0 0 2px #fff; }
+.lv-next span { font-size: 13px; opacity: 0.85; }
+.lv-next b { font-family: var(--he); font-size: 24px; line-height: 0.9; }
+.lv-next .n { margin-inline-start: auto; font-size: 20px; }
+.lv-strip { margin-top: auto; display: flex; align-items: flex-end; gap: 2px; height: 40px; }
+.lv-strip i { flex-grow: var(--w); flex-basis: 0; min-width: 2px; height: var(--h); background: rgba(255,255,255,0.35); border-radius: 3px 3px 1px 1px; transition: background-color 300ms ease; }
+.lv-strip i.done { background: rgba(255,255,255,0.9); }
+.lv-strip i.now { background: #fff; box-shadow: 0 0 0 2px rgba(20,17,22,0.25); }
+.lv-tot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; opacity: 0.85; }
+.lv-tot b { font-family: var(--num); font-size: 18px; }
+.lv-ctl { direction: ltr; display: flex; align-items: center; justify-content: center; gap: 22px; margin-top: 18px; }
+.lv-ctl button { width: 56px; height: 56px; border: 0; border-radius: 50%; background: rgba(255,255,255,0.18); color: #fff; display: flex; align-items: center; justify-content: center; transition: transform 140ms var(--ease-out); }
+.lv-ctl button.big { width: 84px; height: 84px; background: #fff; color: var(--ink); }
+.lv-ctl button:active { transform: scale(0.94); }
+.cd { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: var(--ink); color: #fff; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 220px; }
+.cd b { animation: cdIn 900ms var(--ease-out) both; }
+@keyframes cdIn { from { transform: scale(1.6); opacity: 0; } 30% { opacity: 1; } to { transform: scale(0.9); opacity: 0.2; } }
+
+/* done */
+.dn { padding: 58px 20px 40px; }
+.dn .e { color: var(--faint); }
+.dn h1 { margin: 8px 0 0; font-family: var(--he); font-weight: 700; font-size: 70px; line-height: 0.8; }
+.dn h1 em { font-style: normal; color: var(--pink); }
+.q { margin-top: 24px; }
+.q label, .q > span { display: block; font-size: 13px; font-weight: 600; color: var(--ink2); margin-bottom: 10px; }
+.q label small, .q > span small { font-weight: 400; color: var(--muted); }
+.dist { display: flex; align-items: center; gap: 6px; height: 64px; padding: 0 8px; border-radius: 32px; background: var(--soft); }
+.dist button { width: 48px; height: 48px; border: 0; border-radius: 50%; background: #fff; font-size: 22px; font-weight: 600; transition: transform 120ms var(--ease-out); }
+.dist button:active { transform: scale(0.92); }
+.dist output { flex: 1; text-align: center; font-size: 40px; line-height: 1; }
+.dist output small { font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--muted); }
+.rpe { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+.rpe button { height: 50px; border: 0; border-radius: 12px; background: var(--s); color: var(--t); font-family: var(--num); font-weight: 700; font-size: 20px; transition: transform 160ms var(--spring), background-color 150ms ease, color 150ms ease; }
+.rpe button[aria-pressed="true"] { background: var(--c); color: #fff; transform: translateY(-4px); }
+.rpe-l { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.dn textarea { width: 100%; min-height: 90px; border: 0; border-radius: 18px; background: var(--soft); padding: 12px 14px; line-height: 1.5; resize: none; outline: 0; }
+.dn textarea:focus { background: #fff; box-shadow: 0 0 0 2px var(--pink); }
+.save { width: 100%; height: 58px; margin-top: 22px; border: 0; border-radius: 29px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 700; transition: transform 140ms var(--ease-out); }
+.save:active { transform: scale(0.97); }
+.toast { position: absolute; left: 50%; bottom: 110px; z-index: 80; transform: translate(-50%, 20px); opacity: 0; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; white-space: nowrap; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) {
+  .ib:hover { background: #ECE8EE; } .lv-top .ib:hover, .lv-ctl button:not(.big):hover { background: rgba(255,255,255,0.28); }
+  .dist button:hover { background: #F0ECF2; } .rpe button:not([aria-pressed="true"]):hover { transform: translateY(-2px); } .save:hover { background: var(--ink2); }
+  .review button:not([aria-pressed="true"]):hover { background: #F5F3F6; }
+}
+@media (max-width: 440px) { body { padding: 0; } .review { padding: 10px 16px 0; } .phone { width: 100%; height: calc(100dvh - 60px); border-radius: 0; box-shadow: none; } .island { display: none; } .dt, .lv, .dn { padding-top: max(18px, env(safe-area-inset-top, 0px)); } .lv-clock { font-size: 120px; } }
+@media (prefers-reduced-motion: reduce) { .view, .lv, .lv-strip i, .knob.back, .sw i::after, .toast { transition-duration: 1ms !important; } .graph i, .lv-clock.beat, .cd b { animation: none !important; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="review"><span>לבדיקה:</span><button type="button" data-goto="dt" aria-pressed="true">פרטי האימון</button><button type="button" data-goto="lv" aria-pressed="false">באמצע ריצה</button><button type="button" data-goto="dn" aria-pressed="false">סיום</button><button type="button" data-speed aria-pressed="false">מהירות ×20</button></div>
+<div class="stage"><div class="phone">
+  <div class="island" aria-hidden="true"></div>
+
+  <section class="view dt" id="dt" aria-label="פרטי אימון">
+    <div class="dt-top"><button class="ib" type="button" aria-label="חזרה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button><button class="ib" type="button" aria-label="אפשרויות"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button></div>
+    <code class="e" aria-hidden="true">RUN · INTERVALS · TUE 20.10</code>
+    <h1>אינטרוולים <bdi dir="ltr">1:1</bdi></h1>
+    <div class="sb"><div><b class="n">26′</b><span>זמן כולל</span></div><div><b class="n">8</b><span>סבבים</span></div><div><b class="n">8:00</b><span>בעצימות גבוהה</span></div></div>
+    <div class="graph" id="graph" aria-hidden="true"></div><div class="gx"><span>0′</span><span>13′</span><span>26′</span></div>
+    <div class="note"><span class="av">שק</span><div><b>שקד</b><p>בקטעים המהירים רוצה שתרגישי שקשה לדבר. בהתאוששות הליכה מהירה, לא לעצור.</p></div></div>
+    <div class="sh"><code class="e" aria-hidden="true">STEPS</code>מבנה האימון</div>
+    <div id="steps"></div>
+    <div class="opts">
+      <label class="sw"><span>הנחיות קוליות<small>"עוד 10 שניות", "עבודה!", "התאוששות"</small></span><input type="checkbox" checked><i></i></label>
+      <label class="sw"><span>רטט במעבר קטע</span><input type="checkbox" checked><i></i></label>
+    </div>
+    <div style="height:70px"></div>
+  </section>
+  <div class="slide" id="slide"><span>החלקה להתחלה</span><button class="knob" id="knob" type="button" aria-label="התחלת האימון"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg></button></div>
+
+  <section class="view lv" id="lv" aria-label="אימון פעיל" data-off>
+    <div class="lv-top"><button class="ib" type="button" data-end aria-label="סיום האימון"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button><code class="e" id="lvE" aria-hidden="true"></code></div>
+    <div class="lv-kind" id="lvK"></div>
+    <div class="lv-tg" id="lvT"></div>
+    <div class="lv-clock" id="lvC" role="timer" aria-live="off"></div>
+    <div class="lv-bar"><i id="lvB"></i></div>
+    <div class="lv-next" id="lvN"></div>
+    <div class="lv-strip" id="lvS" aria-hidden="true"></div>
+    <div class="lv-tot"><span>עבר <b id="lvEl"></b></span><span>נשאר <b id="lvRm"></b></span></div>
+    <div class="lv-ctl"><button type="button" data-prev aria-label="לקטע הקודם"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 6v12L8.5 12z"/><rect x="5" y="6" width="2" height="12" rx="1"/></svg></button><button type="button" class="big" data-pause aria-label="השהיה" id="pz"></button><button type="button" data-next aria-label="לקטע הבא"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 6v12l8.5-6z"/><rect x="17" y="6" width="2" height="12" rx="1"/></svg></button></div>
+    <div class="cd" id="cd" hidden></div>
+  </section>
+
+  <section class="view dn" id="dn" aria-label="סיום" data-off>
+    <code class="e" aria-hidden="true">DONE · 26:00</code>
+    <h1 id="dnH">סגרת <em>8</em> סבבים</h1>
+    <div class="sb"><div><b class="n" id="dnT">26:00</b><span>זמן</span></div><div><b class="n" id="dnR">8/8</b><span>סבבים</span></div><div><b class="n" id="dnW">8:00</b><span>בעצימות גבוהה</span></div></div>
+    <div class="q"><span>כמה קילומטר יצא? <small>(לא חובה)</small></span><div class="dist"><button type="button" data-km="1" aria-label="עוד 100 מטר">+</button><output class="n" id="km">3.6 <small>ק״מ</small></output><button type="button" data-km="-1" aria-label="פחות 100 מטר">−</button></div></div>
+    <div class="q"><span>כמה היה קשה?</span><div class="rpe" id="rpe"></div><div class="rpe-l"><span>קליל</span><span>מקסימום</span></div></div>
+    <div class="q"><label for="nt">משהו לשקד? <small>(לא חובה)</small></label><textarea id="nt" placeholder="למשל: בסבב 6 הייתי צריכה ללכת"></textarea></div>
+    <button class="save" type="button" data-save>שמירה ושליחה לשקד</button>
+  </section>
+  <div class="toast" id="toast" role="status"></div>
+</div></div>
+
+<script>
+(function () {
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var Z = ['z1', 'z2', 'z3', 'z4', 'z5'];
+  function z(l) { return Z[l <= 3 ? 0 : l <= 5 ? 1 : l === 6 ? 2 : l <= 8 ? 3 : 4]; }
+  var KN = { warm: 'חימום', work: 'עבודה', rest: 'התאוששות', cool: 'שחרור' };
+  var TIP = { warm: 'ריצה קלה, נשימה רגועה', work: 'קשה לדבר', rest: 'הליכה מהירה, לא לעצור', cool: 'מורידים קצב בהדרגה' };
+  var PLAN = [['warm', 300, 3], { rep: 8, items: [['work', 60, 8], ['rest', 60, 4]] }, ['cool', 300, 3]];
+  var F = []; PLAN.forEach(function (b) { if (b.rep) { for (var r = 0; r < b.rep; r++) b.items.forEach(function (it) { F.push({ k: it[0], d: it[1], l: it[2], r: r + 1, of: b.rep }); }); } else F.push({ k: b[0], d: b[1], l: b[2] }); });
+  var TOT = F.reduce(function (a, f) { return a + f.d; }, 0);
+  function mmss(s) { s = Math.max(0, Math.ceil(s)); var m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+  function vs(l) { var c = z(l); return '--c:var(--' + c + ');--t:var(--' + c + 't);--s:var(--' + c + 's)'; }
+  // detail
+  document.getElementById('graph').innerHTML = F.map(function (f, i) { return '<i style="--w:' + f.d + ';--h:' + (18 + f.l * 8) + '%;--c:var(--' + z(f.l) + ');--d:' + i * 22 + 'ms"></i>'; }).join('');
+  function st(k, d, l) { return '<div class="st" style="' + vs(l) + '"><i></i><div><b>' + KN[k] + '</b><small>מאמץ ' + l + '/10 · ' + TIP[k] + '</small></div><span class="tm n">' + mmss(d) + '</span></div>'; }
+  document.getElementById('steps').innerHTML = PLAN.map(function (b) { return b.rep ? '<div class="rp"><div class="rp-h"><b class="n">×' + b.rep + '</b>סבבים</div>' + b.items.map(function (it) { return st(it[0], it[1], it[2]); }).join('') + '</div>' : st(b[0], b[1], b[2]); }).join('');
+
+  // views
+  var views = { dt: document.getElementById('dt'), lv: document.getElementById('lv'), dn: document.getElementById('dn') }, slide = document.getElementById('slide');
+  function show(v) { Object.keys(views).forEach(function (k) { if (k === v) views[k].removeAttribute('data-off'); else views[k].setAttribute('data-off', ''); }); slide.hidden = v !== 'dt'; document.querySelectorAll('[data-goto]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.goto === v); }); }
+
+  // live engine
+  var idx = 0, left = F[0].d, paused = false, raf = null, last = 0, speed = 1, lastSec = null;
+  var I = { pause: '<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg>', play: '<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>' };
+  var strip = document.getElementById('lvS');
+  strip.innerHTML = F.map(function (f) { return '<i style="--w:' + f.d + ';--h:' + (18 + f.l * 8) + '%"></i>'; }).join('');
+  function elapsed() { var e = 0; for (var i = 0; i < idx; i++) e += F[i].d; return e + (F[idx].d - left); }
+  function paint(full) {
+    var f = F[idx], nx = F[idx + 1];
+    if (full) {
+      views.lv.style.setProperty('--c', 'var(--' + z(f.l) + ')');
+      var kEl = document.getElementById('lvK'); kEl.textContent = KN[f.k]; kEl.classList.toggle('long', KN[f.k].length > 5);
+      document.getElementById('lvE').textContent = f.of ? 'ROUND ' + f.r + '/' + f.of : (f.k === 'warm' ? 'WARM UP' : 'COOL DOWN');
+      document.getElementById('lvT').innerHTML = 'מאמץ <b class="n">' + f.l + '/10</b> · ' + TIP[f.k];
+      document.getElementById('lvN').innerHTML = nx ? '<i style="--nc:var(--' + z(nx.l) + ')"></i><div><span>הבא</span><br><b>' + KN[nx.k] + '</b></div><span class="n">' + mmss(nx.d) + '</span>' : '<div><span>זה הקטע האחרון</span><br><b>כמעט שם</b></div>';
+      strip.querySelectorAll('i').forEach(function (el, i) { el.className = i < idx ? 'done' : i === idx ? 'now' : ''; });
+    }
+    var c = document.getElementById('lvC'), s = Math.ceil(left);
+    c.textContent = mmss(left);
+    if (s <= 3 && s > 0 && s !== lastSec && !RM) { c.classList.remove('beat'); void c.offsetWidth; c.classList.add('beat'); }
+    lastSec = s;
+    document.getElementById('lvB').style.setProperty('--p', left / f.d);
+    var el = elapsed(); document.getElementById('lvEl').textContent = mmss(el); document.getElementById('lvRm').textContent = mmss(TOT - el);
+    document.getElementById('pz').innerHTML = paused ? I.play : I.pause; document.getElementById('pz').setAttribute('aria-label', paused ? 'המשך' : 'השהיה');
+  }
+  function go(i) { if (i < 0) i = 0; if (i >= F.length) return finish(); idx = i; left = F[i].d; paint(true); }
+  function tick(t) { if (!last) last = t; var dt = (t - last) / 1000 * speed; last = t; if (!paused) { left -= dt; if (left <= 0) { go(idx + 1); if (idx >= F.length) return; } else paint(false); } raf = requestAnimationFrame(tick); }
+  function start() { idx = 0; left = F[0].d; paused = false; last = 0; show('lv'); paint(true); var cd = document.getElementById('cd'), n = 3; if (RM) { raf = requestAnimationFrame(tick); return; } cd.hidden = false; (function step() { if (!n) { cd.hidden = true; last = 0; raf = requestAnimationFrame(tick); return; } cd.innerHTML = '<b>' + n + '</b>'; n--; setTimeout(step, 800); })(); }
+  function stop() { cancelAnimationFrame(raf); raf = null; }
+  function finish() {
+    stop(); var el = elapsed(), done = 0, w = 0, acc = 0;
+    F.forEach(function (f) { var d = Math.max(0, Math.min(f.d, el - acc)); acc += f.d; if (f.k === 'work') { w += d; if (d >= f.d) done++; } });
+    document.getElementById('dnT').textContent = mmss(el); document.getElementById('dnR').innerHTML = '<bdi dir="ltr">' + done + '/8</bdi>'; document.getElementById('dnW').textContent = mmss(w);
+    document.getElementById('dnH').innerHTML = done === 8 ? 'סגרת <em>8</em> סבבים' : 'עשית <em>' + done + '</em> מתוך 8 סבבים';
+    show('dn');
+  }
+
+  // slide to start
+  var knob = document.getElementById('knob'), sx = null, max = 0;
+  knob.addEventListener('pointerdown', function (e) { sx = e.clientX; max = slide.clientWidth - knob.offsetWidth - 12; knob.setPointerCapture(e.pointerId); knob.classList.remove('back'); });
+  knob.addEventListener('pointermove', function (e) { if (sx == null) return; var d = Math.min(max, Math.max(0, sx - e.clientX)); knob.style.transform = 'translateX(' + -d + 'px)'; });
+  knob.addEventListener('pointerup', function (e) { if (sx == null) return; var d = sx - e.clientX; sx = null; knob.classList.add('back'); knob.style.transform = ''; if (d > max * 0.8) start(); });
+  knob.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); } });
+
+  // rpe
+  var rpe = 8; function drawR() { document.getElementById('rpe').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (v) { return '<button type="button" style="' + vs(v) + '" data-rpe="' + v + '" aria-pressed="' + (v === rpe) + '" aria-label="קושי ' + v + ' מתוך 10">' + v + '</button>'; }).join(''); } drawR();
+  var km = 36;
+  var tt; function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 1800); }
+
+  document.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-goto]'))) { var v = t.dataset.goto; stop(); if (v === 'lv') { show('lv'); idx = 6; left = 34; paused = false; last = 0; paint(true); raf = requestAnimationFrame(tick); } else show(v); return; }
+    if ((t = e.target.closest('[data-speed]'))) { speed = speed === 1 ? 20 : 1; t.setAttribute('aria-pressed', speed > 1); return; }
+    if (e.target.closest('[data-pause]')) { paused = !paused; paint(false); return; }
+    if (e.target.closest('[data-next]')) return go(idx + 1);
+    if (e.target.closest('[data-prev]')) return go(F[idx].d - left > 3 ? idx : idx - 1);
+    if (e.target.closest('[data-end]')) return finish();
+    if ((t = e.target.closest('[data-rpe]'))) { rpe = +t.dataset.rpe; return drawR(); }
+    if ((t = e.target.closest('[data-km]'))) { km = Math.max(0, km + +t.dataset.km); document.getElementById('km').innerHTML = (km / 10).toFixed(1) + ' <small>ק״מ</small>'; return; }
+    if (e.target.closest('[data-save]')) { toast('נשמר ונשלח לשקד'); setTimeout(function () { show('dt'); }, 900); }
+  });
+})();
+</script>
