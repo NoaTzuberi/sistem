@@ -1,0 +1,353 @@
+<title>Sistem Workout Player</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone. Active workout (top bar, progress, current exercise + set rows, up-next queue, pinned finish) with a rest overlay; then the summary (pink stage + scoreboard, recap, rating, note, photo, save). Light-only by design. */
+:root {
+  --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6; --pink: #FF006E; --cherry: #A50047; --blush: #FFE3EF; --purple: #7C4DFF;
+  --z1: #0094FF; --z1s: #E1F1FF; --z1t: #0070C9; --z2: #7C4DFF; --z2s: #EFE7FF; --z2t: #5B2FD6; --z3: #FF7A00; --z3s: #FFEBD6; --z3t: #C75A00; --z4: #FF006E; --z4s: #FFE3EE; --z4t: #C80058; --z5: #A50047; --z5s: #FBE3EC; --z5t: #A50047;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1); --sheet: cubic-bezier(.32,.72,0,1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); color: var(--ink); direction: rtl; background: #E9E6EA; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.n { font-family: var(--num); font-weight: 700; font-variant-numeric: tabular-nums; }
+code.e { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.review { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.review button { height: 32px; padding: 0 12px; border: 0; border-radius: 16px; background: #fff; font-size: 12px; font-weight: 600; }
+.review button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.stage { display: flex; justify-content: center; }
+.phone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 54px; overflow: hidden; background: #fff; box-shadow: 0 0 0 10px #141116, 0 0 0 11px #3a3540, 0 40px 90px rgba(20,17,22,0.3); }
+.island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 60; }
+.view { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; transition: opacity 260ms ease, transform 360ms var(--ease-out); }
+.view::-webkit-scrollbar { display: none; }
+.view[data-off] { opacity: 0; transform: scale(0.97); pointer-events: none; }
+
+/* ===== active ===== */
+.wk { padding-bottom: 120px; }
+.wk-top { position: sticky; top: 0; z-index: 10; padding: 56px 20px 10px; background: rgba(255,255,255,0.92); -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%); }
+.wk-bar { display: flex; align-items: center; gap: 8px; }
+.ib { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; flex: none; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.ib:active { transform: scale(0.94); }
+.ib[aria-pressed="false"] { color: var(--faint); }
+.wk-t { flex: 1; min-width: 0; text-align: center; }
+.wk-t code { display: block; white-space: nowrap; }
+.wk-t b { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 30px; line-height: 1; direction: ltr; display: block; margin-top: 2px; }
+.prog { display: flex; gap: 3px; margin-top: 12px; direction: rtl; }
+.prog span { flex: var(--n); display: flex; gap: 2px; }
+.prog i { flex: 1; height: 5px; border-radius: 3px; background: var(--soft); transition: background-color 250ms ease; }
+.prog i.on { background: var(--ink); }
+.prog span.cur i:not(.on) { background: #E2DDE6; }
+.prog-l { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.prog-l b { font-family: var(--num); font-size: 14px; color: var(--ink); }
+
+.pad { padding: 0 20px; }
+.tip { margin-top: 12px; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 18px; background: var(--soft); font-size: 13px; line-height: 1.45; }
+.tip svg { flex: none; margin-top: 2px; color: var(--purple); }
+.tip div { flex: 1; } .tip p { margin: 0; color: var(--ink2); }
+.tip-a { display: flex; gap: 14px; margin-top: 6px; } .tip-a button { border: 0; background: none; padding: 0; font-size: 12px; font-weight: 700; color: var(--ink); } .tip-a button + button { color: var(--muted); font-weight: 600; }
+
+.ex { margin-top: 18px; }
+.ex-tag { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 12px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; }
+.ex-tag i { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+.ex h1 { margin: 10px 0 0; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 38px; line-height: 0.9; text-transform: uppercase; direction: ltr; text-align: right; letter-spacing: -0.3px; }
+.chips { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; direction: ltr; justify-content: flex-end; }
+.chips span { height: 26px; padding: 0 10px; border-radius: 13px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); display: inline-flex; align-items: center; }
+.rx { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 14px; padding: 10px 0; border-block: 1px solid var(--rule); }
+.rx div + div { border-inline-start: 1px solid var(--rule); padding-inline-start: 12px; }
+.rx b { display: block; font-size: 26px; line-height: 1; }
+.rx span { font-size: 11px; color: var(--muted); }
+.last { margin-top: 10px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.last b { color: var(--ink); font-weight: 600; }
+
+.sets { margin-top: 14px; }
+.sh { display: grid; grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) 52px; gap: 8px; padding: 0 2px 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.sh span:nth-child(2), .sh span:nth-child(3) { text-align: center; }
+.set { display: grid; grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) 52px; gap: 8px; align-items: center; padding: 6px 2px; border-radius: 20px; transition: background-color 200ms ease; }
+.set + .set { margin-top: 4px; }
+.set .no { width: 30px; height: 30px; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; font-family: var(--num); font-weight: 700; font-size: 16px; color: var(--muted); }
+.set.cur { background: var(--soft); }
+.set.cur .no { background: var(--ink); color: #fff; }
+.set.done .no { background: var(--cherry); color: #fff; }
+.stp { display: flex; align-items: center; height: 48px; padding: 0 4px; border-radius: 24px; background: #fff; box-shadow: inset 0 0 0 1px var(--rule); }
+.set.cur .stp { box-shadow: none; }
+.stp button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--soft); font-size: 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none; transition: transform 120ms var(--ease-out); }
+.set.cur .stp button { background: var(--soft); }
+.stp button:active { transform: scale(0.88); }
+.stp output { flex: 1; text-align: center; font-family: var(--num); font-weight: 700; font-size: 24px; }
+.stp output.ph { color: var(--faint); font-size: 20px; }
+.set.done .stp { background: transparent; box-shadow: none; }
+.set.done .stp button { visibility: hidden; }
+.chk { width: 52px; height: 48px; border: 0; border-radius: 24px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--rule); color: var(--faint); display: flex; align-items: center; justify-content: center; transition: background-color 200ms ease, color 200ms ease, transform 160ms var(--spring); }
+.set.cur .chk { background: var(--ink); color: #fff; box-shadow: none; }
+.set.done .chk { background: var(--blush); color: var(--cherry); box-shadow: none; }
+.chk:active { transform: scale(0.9); }
+.set.pop .chk { animation: pop 420ms var(--spring); }
+@keyframes pop { 40% { transform: scale(1.18); } }
+.addset { margin-top: 8px; border: 0; background: none; padding: 6px 2px; font-size: 13px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+
+.qh { display: flex; align-items: baseline; gap: 8px; margin: 26px 0 6px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.q { width: 100%; border: 0; background: none; padding: 12px 0; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--rule); text-align: start; }
+.q .ix { width: 28px; height: 28px; border-radius: 50%; background: var(--soft); font-family: var(--num); font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; flex: none; color: var(--muted); }
+.q.done .ix { background: var(--cherry); color: #fff; }
+.q.cur .ix { background: var(--pink); color: #fff; }
+.q b { flex: 1; min-width: 0; font-family: var(--num); font-style: italic; font-weight: 700; font-size: 20px; text-transform: uppercase; direction: ltr; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.q.done b { color: var(--muted); }
+.pips { display: flex; gap: 3px; flex: none; }
+.pips i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
+.pips i.on { background: var(--cherry); }
+.q.cur .pips i.on { background: var(--pink); }
+
+.fin { position: absolute; inset-inline: 20px; bottom: 26px; z-index: 12; height: 58px; border: 0; border-radius: 29px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 14px 30px rgba(20,17,22,0.3); transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.fin small { font-family: var(--num); font-size: 16px; opacity: 0.6; direction: ltr; }
+.fin:active { transform: scale(0.97); }
+.fade { position: absolute; inset-inline: 0; bottom: 0; height: 120px; z-index: 11; background: linear-gradient(to top, #fff 45%, rgba(255,255,255,0)); pointer-events: none; }
+
+/* rest overlay */
+.rest { position: absolute; inset-inline: 0; bottom: 0; z-index: 20; padding: 18px 20px 28px; border-radius: 32px 32px 0 0; background: var(--ink); color: #fff; box-shadow: 0 -20px 50px rgba(20,17,22,0.3); transition: transform 300ms var(--sheet); }
+.rest[data-off] { transform: translateY(105%); transition-duration: 200ms; }
+.rest .grab { width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: -6px auto 12px; }
+.rest-h { display: flex; align-items: center; gap: 10px; }
+.rest-h b { font-family: var(--he); font-weight: 700; font-size: 34px; line-height: 0.85; }
+.rest-h code { color: rgba(255,255,255,0.5); margin-inline-start: auto; }
+.rest-m { display: flex; align-items: center; gap: 18px; margin-top: 14px; }
+.ring { position: relative; width: 120px; height: 120px; flex: none; }
+.ring svg { transform: rotate(-90deg); }
+.ring circle.v { transition: stroke-dashoffset 250ms linear; }
+.ring b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 44px; direction: ltr; }
+.rest-n { flex: 1; min-width: 0; }
+.rest-n span { font-size: 12px; color: rgba(255,255,255,0.6); }
+.rest-n b { display: block; font-family: var(--num); font-style: italic; font-weight: 700; font-size: 22px; text-transform: uppercase; direction: ltr; text-align: right; margin-top: 2px; }
+.rest-n p { margin: 4px 0 0; font-size: 13px; color: rgba(255,255,255,0.8); }
+.rest-a { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; margin-top: 16px; }
+.rest-a button { height: 48px; border: 0; border-radius: 24px; background: rgba(255,255,255,0.12); color: #fff; font-weight: 700; font-size: 14px; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.rest-a button.go { background: #fff; color: var(--ink); }
+.rest-a button:active { transform: scale(0.97); }
+
+/* finish confirm */
+.scrim { position: absolute; inset: 0; z-index: 30; background: rgba(20,17,22,0.4); transition: opacity 220ms ease; }
+.scrim[data-off] { opacity: 0; pointer-events: none; }
+.cf { position: absolute; inset-inline: 0; bottom: 0; z-index: 31; padding: 22px 20px 28px; border-radius: 32px 32px 0 0; background: #fff; transition: transform 300ms var(--sheet); }
+.cf[data-off] { transform: translateY(105%); transition-duration: 200ms; }
+.cf h3 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 40px; line-height: 0.85; }
+.cf p { margin: 8px 0 0; font-size: 14px; color: var(--ink2); line-height: 1.5; }
+.cf .b2 { display: grid; gap: 8px; margin-top: 18px; }
+.cf .b2 button { height: 54px; border: 0; border-radius: 27px; font-weight: 700; font-size: 15px; background: var(--soft); transition: transform 140ms var(--ease-out); }
+.cf .b2 button.pri { background: var(--ink); color: #fff; }
+.cf .b2 button:active { transform: scale(0.97); }
+
+/* ===== summary ===== */
+.sm-st { position: relative; background: var(--pink); color: #fff; padding: 56px 20px 26px; border-radius: 0 0 40px 40px; overflow: hidden; }
+.sm-st::before { content: ''; position: absolute; inset: 0; opacity: 0.14; background: repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 44px); -webkit-mask-image: linear-gradient(to bottom, transparent 5%, #000); mask-image: linear-gradient(to bottom, transparent 5%, #000); pointer-events: none; }
+.sm-st > * { position: relative; }
+.sm-top { display: flex; align-items: center; justify-content: space-between; }
+.sm-top .ib { background: rgba(255,255,255,0.2); color: #fff; }
+.sm-top code { color: rgba(255,255,255,0.75); }
+.medal { width: 74px; height: 74px; margin-top: 14px; }
+.medal circle { stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw 900ms var(--ease-out) 200ms forwards; }
+.medal path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw 500ms var(--ease-out) 900ms forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.sm-st h1 { margin: 10px 0 0; font-family: var(--he); font-weight: 700; font-size: 68px; line-height: 0.8; }
+.sm-st h1 + p { margin: 8px 0 0; font-size: 14px; opacity: 0.9; }
+.sm-st h1 + p bdi { font-family: var(--num); font-style: italic; font-weight: 700; font-size: 17px; }
+.sb { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.3); }
+.sb div + div { border-inline-start: 1px solid rgba(255,255,255,0.3); padding-inline-start: 10px; }
+.sb b { display: block; font-size: 32px; line-height: 0.95; }
+.sb b small { font-size: 15px; opacity: 0.8; margin-inline-start: 2px; }
+.sb span { font-size: 11px; opacity: 0.85; }
+.sm { padding: 0 20px 40px; }
+.sm h2 { margin: 24px 0 8px; display: flex; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.rc { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.rc i { width: 8px; height: 8px; border-radius: 50%; background: var(--cherry); flex: none; }
+.rc b { flex: 1; min-width: 0; font-family: var(--num); font-style: italic; font-weight: 700; font-size: 18px; text-transform: uppercase; direction: ltr; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc span { font-size: 12px; color: var(--muted); flex: none; }
+.rc em { font-style: normal; height: 20px; padding: 0 8px; border-radius: 10px; background: var(--blush); color: var(--cherry); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; flex: none; }
+.rate { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.rate button { height: 64px; border: 0; border-radius: 18px; background: var(--s); color: var(--t); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: transform 160ms var(--spring), background-color 150ms ease, color 150ms ease; }
+.rate button b { font-family: var(--num); font-weight: 700; font-size: 26px; line-height: 1; }
+.rate button small { font-size: 10px; font-weight: 600; }
+.rate button[aria-pressed="true"] { background: var(--c); color: #fff; transform: translateY(-4px); }
+.sm textarea { width: 100%; min-height: 90px; border: 0; border-radius: 18px; background: var(--soft); padding: 12px 14px; line-height: 1.5; resize: none; outline: 0; }
+.sm textarea:focus { background: #fff; box-shadow: 0 0 0 2px var(--pink); }
+.pump { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 22px; background: var(--soft); }
+.pump .pi { width: 46px; height: 46px; border-radius: 14px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
+.pump div { flex: 1; min-width: 0; } .pump b { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 22px; line-height: 1; display: block; white-space: nowrap; direction: ltr; text-align: right; } .pump small { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+.pump .pb { display: flex; gap: 6px; }
+.pump .pb button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; transition: transform 140ms var(--ease-out); }
+.pump .pb button:active { transform: scale(0.94); }
+.nx { margin-top: 18px; display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 22px; box-shadow: inset 0 0 0 1px var(--rule); }
+.nx .r { position: relative; width: 48px; height: 48px; flex: none; } .nx .r svg { transform: rotate(-90deg); }
+.nx .r b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--num); font-weight: 700; font-size: 15px; }
+.nx div b { font-family: var(--he); font-size: 24px; line-height: 0.9; display: block; } .nx div small { font-size: 12px; color: var(--muted); }
+.save { width: 100%; height: 58px; margin-top: 22px; border: 0; border-radius: 29px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 700; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.save:active { transform: scale(0.97); }
+.toast { position: absolute; left: 50%; bottom: 100px; z-index: 80; transform: translate(-50%, 20px); opacity: 0; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; white-space: nowrap; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) {
+  .ib:hover { background: #ECE8EE; } .sm-top .ib:hover { background: rgba(255,255,255,0.3); }
+  .stp button:hover { background: #ECE8EE; } .chk:hover { color: var(--ink); } .set.cur .chk:hover { background: var(--ink2); color: #fff; }
+  .q:hover b { color: var(--pink); } .fin:hover, .save:hover { background: var(--ink2); }
+  .rest-a button:hover { background: rgba(255,255,255,0.2); } .rest-a button.go:hover { background: #F0ECF2; }
+  .rate button:not([aria-pressed="true"]):hover { transform: translateY(-2px); }
+  .review button:not([aria-pressed="true"]):hover { background: #F5F3F6; }
+}
+@media (max-width: 440px) { body { padding: 0; } .review { padding: 10px 16px 0; } .phone { width: 100%; height: calc(100dvh - 60px); border-radius: 0; box-shadow: none; } .island { display: none; } .wk-top, .sm-st { padding-top: max(16px, env(safe-area-inset-top, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .view, .rest, .cf, .scrim, .toast, .prog i, .ring circle.v { transition-duration: 1ms !important; } .ex-tag i, .set.pop .chk, .medal circle, .medal path { animation: none !important; } .medal circle, .medal path { stroke-dashoffset: 0; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="review"><span>לבדיקה:</span><button type="button" data-goto="wk" aria-pressed="true">באמצע אימון</button><button type="button" data-goto="rest" aria-pressed="false">מנוחה</button><button type="button" data-goto="sm" aria-pressed="false">סיכום</button></div>
+<div class="stage"><div class="phone">
+  <div class="island" aria-hidden="true"></div>
+  <section class="view wk" id="wk" aria-label="אימון פעיל">
+    <header class="wk-top">
+      <div class="wk-bar">
+        <button class="ib" type="button" data-end aria-label="סיום אימון"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        <button class="ib" type="button" data-sound aria-pressed="true" aria-label="צלילים"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+        <div class="wk-t"><code class="e" aria-hidden="true">FULL BODY B</code><b class="n" id="clock" role="timer">0:11</b></div>
+        <button class="ib" type="button" aria-label="אפשרויות"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+        <span style="width:40px;flex:none" aria-hidden="true"></span>
+      </div>
+      <div class="prog" id="prog" aria-hidden="true"></div>
+      <div class="prog-l"><span>תרגיל <b id="exi">1</b> מתוך <b>5</b></span><span><b id="sd">0</b> / 18 סטים</span></div>
+    </header>
+    <div class="pad">
+      <div class="tip" id="tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3zM9.5 19h5M10.5 22h3"/></svg><div><p>הפעילי מצב "נא לא להפריע" כדי ששום דבר לא יקטע לך את האימון.</p><div class="tip-a"><button type="button" data-tip>הבנתי</button><button type="button" data-tip>לא להציג שוב</button></div></div></div>
+      <div id="ex"></div>
+      <div class="qh"><code class="e" aria-hidden="true">UP NEXT</code>האימון</div>
+      <div id="queue"></div>
+    </div>
+  </section>
+  <div class="fade" id="fade" aria-hidden="true"></div>
+  <button class="fin" type="button" id="fin" data-end>סיום אימון <small id="finS">0/18</small></button>
+
+  <section class="rest" id="rest" role="dialog" aria-label="מנוחה" data-off>
+    <div class="grab"></div>
+    <div class="rest-h"><b>מנוחה</b><code class="e" aria-hidden="true">REST</code></div>
+    <div class="rest-m">
+      <div class="ring"><svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="10"/><circle class="v" id="rv" cx="60" cy="60" r="52" fill="none" stroke="#FF006E" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><b id="rt" role="timer">1:00</b></div>
+      <div class="rest-n"><span>הבא</span><b id="rnx">Bodyweight Reverse Lunge</b><p id="rnp">סט 2 · 12 חזרות</p></div>
+    </div>
+    <div class="rest-a"><button type="button" data-rest="-15" aria-label="פחות 15 שניות">−15</button><button type="button" data-rest="15" aria-label="עוד 15 שניות">+15</button><button type="button" class="go" data-skip>דילוג</button></div>
+  </section>
+
+  <div class="scrim" id="scrim" data-off></div>
+  <section class="cf" id="cf" role="dialog" aria-label="סיום אימון" data-off>
+    <h3>לסיים עכשיו?</h3><p id="cfp">נשארו 15 סטים. מה שסימנת יישמר, והשאר יופיע כלא בוצע.</p>
+    <div class="b2"><button type="button" class="pri" data-done>סיום ושמירה</button><button type="button" data-cfx>חזרה לאימון</button></div>
+  </section>
+
+  <section class="view" id="sm" aria-label="סיכום אימון" data-off>
+    <div class="sm-st">
+      <div class="sm-top"><code class="e" aria-hidden="true">DONE · FULL BODY B · 20.10</code><button class="ib" type="button" data-goto="wk" aria-label="סגירה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <svg class="medal" viewBox="0 0 74 74" fill="none" aria-hidden="true"><circle cx="37" cy="37" r="34" stroke="#fff" stroke-width="3"/><path d="m24 38 9 9 17-19" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h1>האימון הושלם</h1><p><bdi dir="ltr">Full Body B</bdi> · יום ג׳, 20 באוקטובר · 14:36</p>
+      <div class="sb"><div><b class="n" id="smT">40<small>′</small></b><span>משך</span></div><div><b class="n" id="smS">18</b><span>סטים</span></div><div><b class="n">—</b><span>נפח</span></div><div><b class="n">0</b><span>שיאים</span></div></div>
+    </div>
+    <div class="sm">
+      <h2><code class="e" aria-hidden="true">RECAP</code>מה עשית</h2>
+      <div id="recap"></div>
+      <h2><code class="e" aria-hidden="true">FEEL</code>איך היה?</h2>
+      <div class="rate" id="rate"></div>
+      <h2><label for="nt">משהו לשקד?</label></h2>
+      <textarea id="nt" placeholder="משהו לזכור או לספר למאמנת?"></textarea>
+      <h2><code class="e" aria-hidden="true">DAILY PUMP</code>תמונה של היום</h2>
+      <div class="pump"><span class="pi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span><div><b>Daily Pump</b><small><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>גלוי רק לך ולמאמנת שלך</small></div>
+        <div class="pb"><button type="button" data-ph aria-label="צילום"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/></svg></button><button type="button" data-ph aria-label="גלריה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></button></div></div>
+      <div class="nx"><span class="r"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="#FFE3EF" stroke-width="5"/><circle cx="24" cy="24" r="20" fill="none" stroke="#FF006E" stroke-width="5" stroke-linecap="round" stroke-dasharray="110 126"/></svg><b>22</b></span><div><b>עוד 3 אימונים ל-25</b><small>ההישג הבא שלך</small></div></div>
+      <button class="save" type="button" data-save>שמירה ושליחה לשקד</button>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status"></div>
+</div></div>
+
+<script>
+(function () {
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var EX = [
+    { n: 'Bodyweight Reverse Lunge', tags: ['Quadriceps', 'Bodyweight', 'Intermediate'], sets: 3, reps: '12–15', r: 12, kg: null, rest: 60, last: '3 × 12 · משקל גוף' },
+    { n: 'FYR2 Dumbbell Hip Thrust', tags: ['Glutes', 'Dumbbell', 'Intermediate'], sets: 3, reps: '10–12', r: 10, kg: 12, rest: 90, last: '3 × 10 · 10 ק״ג' },
+    { n: 'Push-up', tags: ['Chest', 'Bodyweight', 'Beginner'], sets: 4, reps: '8–10', r: 8, kg: null, rest: 60, last: '4 × 8' },
+    { n: 'Band Seated Row', tags: ['Back', 'Band', 'Beginner'], sets: 4, reps: '12', r: 12, kg: null, rest: 60, last: '' },
+    { n: 'Dumbbell Lateral Raise', tags: ['Shoulders', 'Dumbbell', 'Beginner'], sets: 4, reps: '12–15', r: 12, kg: 3, rest: 45, last: '4 × 12 · 3 ק״ג' }
+  ];
+  EX.forEach(function (e) { e.log = []; for (var i = 0; i < e.sets; i++) e.log.push({ kg: e.kg, r: e.r, done: false }); });
+  var cur = 0, t0 = Date.now() - 11000;
+  function I(p, s) { return '<svg width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  var CHK = '<path d="m5 12.5 4.5 4.5L19 7.5"/>';
+  function doneN() { return EX.reduce(function (a, e) { return a + e.log.filter(function (s) { return s.done; }).length; }, 0); }
+  function nextIdx(e) { for (var i = 0; i < e.log.length; i++) if (!e.log[i].done) return i; return -1; }
+  function render() {
+    var e = EX[cur], ni = nextIdx(e);
+    document.getElementById('ex').innerHTML = '<div class="ex"><span class="ex-tag"><i></i>עכשיו</span><h1>' + e.n + '</h1><div class="chips">' + e.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>' +
+      '<div class="rx"><div><b class="n">' + e.sets + '</b><span>סטים</span></div><div><b class="n"><bdi dir="ltr">' + e.reps + '</bdi></b><span>חזרות</span></div><div><b class="n">' + (e.rest >= 60 ? (e.rest / 60) + '′' : e.rest + '″') + '</b><span>מנוחה</span></div></div>' +
+      (e.last ? '<div class="last">' + I('<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/>', 14) + 'בפעם הקודמת: <b><bdi dir="ltr">' + e.last + '</bdi></b></div>' : '') +
+      '<div class="sets"><div class="sh"><span>סט</span><span>ק״ג</span><span>חזרות</span><span></span></div>' + e.log.map(function (s, i) {
+        var st = s.done ? ' done' : i === ni ? ' cur' : '';
+        return '<div class="set' + st + '" data-row="' + i + '"><span class="no">' + (s.done ? I(CHK, 14) : i + 1) + '</span>' +
+          '<div class="stp"><button type="button" data-kg="' + i + ':-1" aria-label="פחות משקל">−</button><output class="' + (s.kg == null ? 'ph' : '') + '">' + (s.kg == null ? 'גוף' : s.kg) + '</output><button type="button" data-kg="' + i + ':1" aria-label="עוד משקל">+</button></div>' +
+          '<div class="stp"><button type="button" data-r="' + i + ':-1" aria-label="פחות חזרות">−</button><output>' + s.r + '</output><button type="button" data-r="' + i + ':1" aria-label="עוד חזרות">+</button></div>' +
+          '<button type="button" class="chk" data-chk="' + i + '" aria-pressed="' + s.done + '" aria-label="סט ' + (i + 1) + ' בוצע">' + I(CHK, 22) + '</button></div>';
+      }).join('') + '</div><button class="addset" type="button" data-add>' + I('<path d="M12 5v14M5 12h14"/>', 14) + 'סט נוסף</button></div>';
+    document.getElementById('queue').innerHTML = EX.map(function (x, i) { var d = x.log.filter(function (s) { return s.done; }).length, all = d === x.sets; return '<button class="q' + (i === cur ? ' cur' : all ? ' done' : '') + '" type="button" data-q="' + i + '"><span class="ix">' + (all && i !== cur ? I(CHK, 14) : i + 1) + '</span><b>' + x.n + '</b><span class="pips">' + x.log.map(function (s) { return '<i class="' + (s.done ? 'on' : '') + '"></i>'; }).join('') + '</span></button>'; }).join('');
+    document.getElementById('prog').innerHTML = EX.map(function (x, i) { return '<span class="' + (i === cur ? 'cur' : '') + '" style="--n:' + x.sets + '">' + x.log.map(function (s) { return '<i class="' + (s.done ? 'on' : '') + '"></i>'; }).join('') + '</span>'; }).join('');
+    var dn = doneN(); document.getElementById('sd').textContent = dn; document.getElementById('finS').textContent = dn + '/18'; document.getElementById('exi').textContent = cur + 1;
+  }
+  render();
+  setInterval(function () { var s = Math.floor((Date.now() - t0) / 1000); document.getElementById('clock').textContent = Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }, 1000);
+
+  // rest
+  var rest = document.getElementById('rest'), rLeft = 0, rTot = 60, rInt = null;
+  function rPaint() { var c = 326.7; document.getElementById('rt').textContent = Math.floor(rLeft / 60) + ':' + ('0' + Math.max(0, rLeft) % 60).slice(-2); document.getElementById('rv').style.strokeDashoffset = (c * (1 - rLeft / rTot)).toFixed(1); }
+  function openRest(sec, nxName, nxTxt) { rLeft = rTot = sec; document.getElementById('rnx').textContent = nxName; document.getElementById('rnp').textContent = nxTxt; rPaint(); rest.removeAttribute('data-off'); clearInterval(rInt); rInt = setInterval(function () { rLeft--; if (rLeft <= 0) { closeRest(); toast('יאללה, הסט הבא'); if (navigator.vibrate) try { navigator.vibrate([30, 60, 30]); } catch (x) {} return; } rPaint(); }, 1000); }
+  function closeRest() { clearInterval(rInt); rest.setAttribute('data-off', ''); }
+  var tt; function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 1600); }
+
+  // views
+  var V = { wk: document.getElementById('wk'), sm: document.getElementById('sm') };
+  function show(v) { V.wk.toggleAttribute('data-off', v !== 'wk'); V.sm.toggleAttribute('data-off', v !== 'sm'); document.getElementById('fin').hidden = v !== 'wk'; document.getElementById('fade').hidden = v !== 'wk'; if (v === 'sm') { V.sm.scrollTop = 0; recap(); } }
+  var rate = 0;
+  function drawRate() { var Z = ['z1', 'z2', 'z3', 'z4', 'z5'], L = ['קליל', '', 'בדיוק', '', 'קשה מאוד']; document.getElementById('rate').innerHTML = [1, 2, 3, 4, 5].map(function (v) { var z = Z[v - 1]; return '<button type="button" data-rate="' + v + '" aria-pressed="' + (v === rate) + '" style="--c:var(--' + z + ');--s:var(--' + z + 's);--t:var(--' + z + 't)"><b>' + v + '</b><small>' + (L[v - 1] || '&nbsp;') + '</small></button>'; }).join(''); }
+  drawRate();
+  function recap() { document.getElementById('recap').innerHTML = EX.map(function (x) { var d = x.log.filter(function (s) { return s.done; }); return '<div class="rc"><i style="background:' + (d.length ? 'var(--cherry)' : 'var(--rule)') + '"></i><b>' + x.n + '</b><span><bdi dir="ltr">' + d.length + '/' + x.sets + '</bdi> סטים' + (d.length ? ' · ' + d[0].r + ' חזרות' : '') + '</span></div>'; }).join(''); var dn = doneN(); document.getElementById('smS').innerHTML = '<bdi dir="ltr">' + dn + '</bdi>'; var m = Math.max(1, Math.round((Date.now() - t0) / 60000)); document.getElementById('smT').innerHTML = m + '<small>′</small>'; }
+  var scrim = document.getElementById('scrim'), cf = document.getElementById('cf');
+  function openCf() { var left = 18 - doneN(); if (!left) { show('sm'); return; } document.getElementById('cfp').textContent = 'נשארו ' + left + ' סטים. מה שסימנת יישמר, והשאר יופיע כלא בוצע.'; scrim.removeAttribute('data-off'); cf.removeAttribute('data-off'); }
+  function closeCf() { scrim.setAttribute('data-off', ''); cf.setAttribute('data-off', ''); }
+
+  document.addEventListener('click', function (ev) {
+    var t, p;
+    if ((t = ev.target.closest('[data-goto]'))) { var g = t.dataset.goto; closeCf(); if (g === 'rest') { show('wk'); openRest(60, EX[cur].n, 'סט 2 · ' + EX[cur].r + ' חזרות'); } else { closeRest(); show(g); } document.querySelectorAll('.review [data-goto]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.goto === g); }); return; }
+    if ((t = ev.target.closest('[data-chk]'))) {
+      var i = +t.dataset.chk, e = EX[cur], s = e.log[i]; s.done = !s.done; render();
+      if (s.done) { var row = document.querySelector('[data-row="' + i + '"]'); if (row && !RM) row.classList.add('pop'); if (navigator.vibrate) try { navigator.vibrate(15); } catch (x) {}
+        var ni = nextIdx(e);
+        if (ni > -1) openRest(e.rest, e.n, 'סט ' + (ni + 1) + ' · ' + e.log[ni].r + ' חזרות');
+        else if (cur < EX.length - 1) { var nx = EX[cur + 1]; openRest(e.rest, nx.n, 'תרגיל חדש · ' + nx.sets + ' סטים'); setTimeout(function () { cur++; render(); V.wk.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); }, 350); }
+        else { toast('כל הסטים בוצעו'); setTimeout(openCf, 500); }
+      }
+      return;
+    }
+    if ((t = ev.target.closest('[data-kg]'))) { p = t.dataset.kg.split(':'); var s2 = EX[cur].log[+p[0]]; s2.kg = Math.max(0, (s2.kg || 0) + 0.5 * +p[1]) || null; return render(); }
+    if ((t = ev.target.closest('[data-r]'))) { p = t.dataset.r.split(':'); var s3 = EX[cur].log[+p[0]]; s3.r = Math.max(1, s3.r + +p[1]); return render(); }
+    if (ev.target.closest('[data-add]')) { var e2 = EX[cur], l = e2.log[e2.log.length - 1]; e2.log.push({ kg: l.kg, r: l.r, done: false }); return render(); }
+    if ((t = ev.target.closest('[data-q]'))) { cur = +t.dataset.q; render(); V.wk.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); return; }
+    if ((t = ev.target.closest('[data-rest]'))) { rLeft = Math.max(5, rLeft + +t.dataset.rest); rTot = Math.max(rTot, rLeft); rPaint(); return; }
+    if (ev.target.closest('[data-skip]')) return closeRest();
+    if (ev.target.closest('[data-tip]')) { document.getElementById('tip').hidden = true; return; }
+    if ((t = ev.target.closest('[data-sound]'))) { t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') !== 'true'); return; }
+    if (ev.target.closest('[data-end]')) return openCf();
+    if (ev.target.closest('[data-cfx]') || ev.target === scrim) return closeCf();
+    if (ev.target.closest('[data-done]')) { closeCf(); closeRest(); show('sm'); return; }
+    if ((t = ev.target.closest('[data-rate]'))) { rate = +t.dataset.rate; return drawRate(); }
+    if (ev.target.closest('[data-ph]')) return toast('כאן תיפתח המצלמה / הגלריה');
+    if (ev.target.closest('[data-save]')) { toast('נשמר ונשלח לשקד'); return; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCf(); closeRest(); } });
+})();
+</script>
