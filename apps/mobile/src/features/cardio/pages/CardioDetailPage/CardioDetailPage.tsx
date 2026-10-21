@@ -6,7 +6,7 @@ import { cardioRunPath } from '../../../../app/config/routes';
 import { SlideToStart } from '../../../../components/common/SlideToStart/SlideToStart';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { appCopy } from '../../../../copy';
-import { getCardioSession } from '../../../../services/cardio/cardioService';
+import { getCardioWorkout } from '../../../../services/cardio/cardioService';
 import { BackButton } from '../../../workouts/components/BackButton/BackButton';
 import { CardioCoachNote } from '../../components/CardioCoachNote/CardioCoachNote';
 import { CardioGraph } from '../../components/CardioGraph/CardioGraph';
@@ -24,28 +24,29 @@ import './CardioDetailPage.css';
 /** The slide shows its done state this long before the 3-2-1 starts. */
 const START_DELAY_MS = 500;
 
-/** One cardio session on one of its days (docs/design/trainee-cardio.html): its shape, the coach's note, the steps, start. */
+/** One cardio workout of her plan (docs/design/trainee-cardio.html): its shape, the coach's note, the steps, start. */
 export function CardioDetailPage() {
   const copy = useCopy(cardioCopy);
   const weekdays = useCopy(appCopy).eyebrow.weekdays;
   const navigate = useNavigate();
-  const { sessionId = '', date = '' } = useParams();
+  const { planId = '', workoutId = '' } = useParams();
   const savedMessage = (useLocation().state as { saved?: string } | null)?.saved;
-  const load = useCallback(() => getCardioSession(sessionId, date), [sessionId, date]);
+  const load = useCallback(() => getCardioWorkout(planId, workoutId), [planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
   const { prefs, change } = useCardioPrefs();
   const startTimer = useRef<number | undefined>(undefined);
   // A full-screen page opens at its top (the list it came from may have been scrolled).
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [sessionId, date]);
+  }, [planId, workoutId]);
   useEffect(() => () => window.clearTimeout(startTimer.current), []);
 
-  const session = data?.occurrence.session;
-  const frames = useMemo(() => (session ? cardioTimeline(session.steps) : []), [session]);
-  const totals = useMemo(() => (session ? cardioTotals(session.steps) : null), [session]);
+  const workout = data?.workout;
+  const cardio = workout?.cardio;
+  const frames = useMemo(() => (cardio ? cardioTimeline(cardio.steps) : []), [cardio]);
+  const totals = useMemo(() => (cardio ? cardioTotals(cardio.steps) : null), [cardio]);
 
-  if (!data || !session || !totals) {
+  if (!data || !workout || !cardio || !totals) {
     return (
       <div className="cp-detail">
         <div className="cp-detail-top">
@@ -57,11 +58,11 @@ export function CardioDetailPage() {
     );
   }
 
-  const isDone = data.occurrence.status === 'done';
+  const isDone = data.status === 'done';
 
   function start() {
     window.clearTimeout(startTimer.current);
-    startTimer.current = window.setTimeout(() => navigate(cardioRunPath(sessionId, date)), START_DELAY_MS);
+    startTimer.current = window.setTimeout(() => navigate(cardioRunPath(planId, workoutId)), START_DELAY_MS);
   }
 
   return (
@@ -70,9 +71,9 @@ export function CardioDetailPage() {
         <BackButton />
       </div>
       <code className="cp-detail-eyebrow" aria-hidden="true">
-        {detailEyebrow(session.sport, date, weekdays)}
+        {detailEyebrow(cardio.sport, data.date, weekdays)}
       </code>
-      <CardioTitle title={session.name} className="cp-detail-title" />
+      <CardioTitle title={workout.title} className="cp-detail-title" />
       {isDone && (
         <p className="cp-detail-done">
           <IconCheck size={16} stroke={2.5} aria-hidden="true" />
@@ -93,8 +94,8 @@ export function CardioDetailPage() {
         ]}
       />
       <CardioGraph frames={frames} totalSec={totals.totalSec} />
-      {session.note && <CardioCoachNote name={data.coach?.name ?? null} note={session.note} />}
-      <CardioSteps steps={session.steps} metric={session.metric} />
+      {workout.notes && <CardioCoachNote name={data.coach?.name ?? null} note={workout.notes} />}
+      <CardioSteps steps={cardio.steps} metric={cardio.metric} />
 
       {data.canStart && (canSpeak() || canVibrate()) && (
         <div className="cp-detail-options">

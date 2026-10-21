@@ -1,11 +1,11 @@
 import type { CardioFrame, CardioSkip } from '@sistem/shared';
 
 // THE live run as timestamps (device clock): nothing counts down in memory, so the clock is right after
-// the phone was locked or the app was in the background. Pure; stored per session day on the phone.
+// the phone was locked or the app was in the background. Pure; stored per cardio workout on the phone.
 
 export interface CardioRunState {
-  sessionId: string;
-  date: string;
+  planId: string;
+  workoutId: string;
   /** When the timeline starts (after the 3-2-1), ms since epoch. */
   startsAt: number;
   /** Set while paused. */
@@ -24,8 +24,8 @@ export const COUNTDOWN_SEC = 3;
 /** "Previous" restarts the block when she is more than this far into it. */
 export const RESTART_WITHIN_SEC = 3;
 
-export function newRun(sessionId: string, date: string, now: number, withCountdown: boolean): CardioRunState {
-  return { sessionId, date, startsAt: now + (withCountdown ? COUNTDOWN_SEC * 1000 : 0), pausedAt: null, pausedMs: 0, shiftSec: 0, skips: [], endedAtSec: null };
+export function newRun(planId: string, workoutId: string, now: number, withCountdown: boolean): CardioRunState {
+  return { planId, workoutId, startsAt: now + (withCountdown ? COUNTDOWN_SEC * 1000 : 0), pausedAt: null, pausedMs: 0, shiftSec: 0, skips: [], endedAtSec: null };
 }
 
 /** Seconds into the timeline (0 during the countdown), clamped to the session. */
@@ -74,11 +74,11 @@ export function endEarly(run: CardioRunState, now: number, totalSec: number): Ca
 
 const STORAGE_KEY = 'sistem.cardioRun';
 
-export function loadRun(sessionId: string, date: string): CardioRunState | null {
+export function loadRun(planId: string, workoutId: string): CardioRunState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const run = raw ? (JSON.parse(raw) as CardioRunState) : null;
-    return run && run.sessionId === sessionId && run.date === date ? run : null;
+    return run && run.planId === planId && run.workoutId === workoutId ? run : null;
   } catch {
     return null;
   }

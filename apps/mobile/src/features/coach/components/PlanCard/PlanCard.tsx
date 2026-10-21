@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { CoachPlan } from '@sistem/types';
 import { IconChevronDown } from '@tabler/icons-react';
 import { Badge } from '../../../../components/common/Badge/Badge';
-import { dayName, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { cardioMinutesLabel, cardioTotals, dayName, sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { PlanExerciseList } from '../../../workouts/components/PlanExerciseList/PlanExerciseList';
 import './PlanCard.css';
 
@@ -14,7 +14,8 @@ interface PlanCardProps {
 
 /** One weekly plan, read-only: plans are edited on the web dashboard (PRD §6). */
 export function PlanCard({ plan, children }: PlanCardProps) {
-  const copy = useCopy(sharedCopy).coach;
+  const shared = useCopy(sharedCopy);
+  const copy = shared.coach;
   const { language, plural } = useI18n();
   return (
     <div className="plan-card">
@@ -41,7 +42,9 @@ export function PlanCard({ plan, children }: PlanCardProps) {
               </span>
               <span className="plan-workout-meta">
                 {workout.dayOfWeek !== undefined && `${dayName(workout.dayOfWeek, language)} · `}
-                {plural(copy.exerciseCount, workout.exercises.length)}
+                {workout.kind === 'cardio' && workout.cardio
+                  ? `${shared.cardio.cardioTag} · ${cardioMinutesLabel(cardioTotals(workout.cardio.steps).totalSec, language)}`
+                  : plural(copy.exerciseCount, workout.exercises.length)}
               </span>
             </span>
             <IconChevronDown className="plan-workout-chevron" size={20} aria-hidden="true" />

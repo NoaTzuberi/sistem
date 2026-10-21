@@ -25,8 +25,8 @@ const TEN_SECONDS_FROM = 20;
 export type CardioRunPhase = 'countdown' | 'live' | 'finished';
 
 interface RunOptions {
-  sessionId: string;
-  date: string;
+  planId: string;
+  workoutId: string;
   steps: CardioStep[];
   prefs: CardioPrefs;
   reducedMotion: boolean;
@@ -37,10 +37,10 @@ interface RunOptions {
  * pause / skip / end early, the wake lock, and the cues on block change (voice, buzz — only when switched
  * on). Ticks only while the page is visible; the run is stored on the phone after every change.
  */
-export function useCardioRun({ sessionId, date, steps, prefs, reducedMotion }: RunOptions) {
+export function useCardioRun({ planId, workoutId, steps, prefs, reducedMotion }: RunOptions) {
   const frames = useMemo(() => cardioTimeline(steps), [steps]);
   const totals = useMemo(() => cardioTotals(steps), [steps]);
-  const [run, setRun] = useState<CardioRunState>(() => loadRun(sessionId, date) ?? newRun(sessionId, date, Date.now(), !reducedMotion));
+  const [run, setRun] = useState<CardioRunState>(() => loadRun(planId, workoutId) ?? newRun(planId, workoutId, Date.now(), !reducedMotion));
   const [now, setNow] = useState(() => Date.now());
 
   const update = useCallback((change: (current: CardioRunState, at: number) => CardioRunState) => {

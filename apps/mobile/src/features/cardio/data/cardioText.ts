@@ -4,8 +4,9 @@ import type { CardioSport } from '@sistem/types';
 
 const SPORT_EYEBROW: Record<CardioSport, string[]> = { run: ['RUN'], intervals: ['RUN', 'INTERVALS'], walk: ['WALK'], bike: ['RIDE'] };
 
-/** "RUN · INTERVALS · TUE 20.10" — read off the 'YYYY-MM-DD' string, no locale involved. */
-export function detailEyebrow(sport: CardioSport, date: string, weekdays: readonly string[]): string {
+/** "RUN · INTERVALS · TUE 20.10" — read off the 'YYYY-MM-DD' string, no locale involved (no date: no day part). */
+export function detailEyebrow(sport: CardioSport, date: string | null, weekdays: readonly string[]): string {
+  if (!date) return SPORT_EYEBROW[sport].join(' · ');
   const [, month, day] = date.split('-');
   const weekday = weekdays[new Date(`${date}T00:00:00Z`).getUTCDay()] ?? '';
   return [...SPORT_EYEBROW[sport], `${weekday} ${day}.${month}`].join(' · ');

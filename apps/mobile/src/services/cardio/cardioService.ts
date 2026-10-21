@@ -1,5 +1,5 @@
 import { createCardioApi } from '@sistem/api-client';
 import { apiClient } from '../api/apiClient';
 
-// Her cardio sessions; each day's status is computed on the server.
-export const { getCardioWeek, getCardioSession, saveCardioLog } = createCardioApi(apiClient);
+// Her cardio workouts (plan workouts of kind 'cardio'): one workout's page and its log.
+export const { getCardioWorkout, saveCardioLog } = createCardioApi(apiClient);

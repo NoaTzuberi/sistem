@@ -8,13 +8,12 @@ import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../hooks/useStartWorkout';
 import { useWeekPlan } from '../../hooks/useWeekPlan';
-import { useCardioWeek } from '../../../cardio/hooks/useCardioWeek';
 import { CardioWeekList } from '../../../cardio/components/CardioWeekList/CardioWeekList';
 import { cardioCopy } from '../../../cardio/copy';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFreeWorkout } from '../../hooks/useFreeWorkout';
 import { FREE_WORKOUT_ENABLED } from '../../data/freeWorkout';
-import { toPlannedWorkouts, type PlannedWorkout } from '../../data/weekPlanDisplay';
+import { toPlannedWorkouts, type PlannedWorkout, type WeekPlan } from '../../data/weekPlanDisplay';
 import { addMonths, HISTORY_FILTERS, weekStartOf, type HistoryFilter, type MonthKey } from '../../data/historyDisplay';
 import { StartConflictModal } from '../StartConflictModal/StartConflictModal';
 import { LargeTitleHeader } from '../LargeTitleHeader/LargeTitleHeader';
@@ -47,6 +46,11 @@ const FILTERS: HistoryFilter[] = FREE_WORKOUT_ENABLED ? HISTORY_FILTERS : HISTOR
  * month calendar and by week). The tab lives in the URL (?tab=history). Nothing is made up: a part
  * without data is not drawn.
  */
+/** The week's cardio workouts (they have their own section; the tickets are strength). */
+function cardioOf(weekPlan: WeekPlan) {
+  return weekPlan.workouts.filter(({ workout }) => workout.kind === 'cardio').map(({ workout }) => workout);
+}
+
 export function WorkoutsScreen() {
   const copy = useCopy(workoutCopy);
   const eyebrow = useCopy(appCopy).eyebrow;
@@ -55,10 +59,8 @@ export function WorkoutsScreen() {
   const tab: WorkoutsTab = params.get(TAB_PARAM) === 'history' ? 'history' : 'plan';
 
   const { weekPlan, activeLog, error, isLoading, reload } = useWeekPlan();
-  const cardioWeek = useCardioWeek();
   const cardioText = useCopy(cardioCopy);
   const sharedText = useCopy(sharedCopy);
-  const cardioItems = cardioWeek.data?.items ?? [];
   const starter = useStartWorkout();
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
   const [isFreeOpen, setIsFreeOpen] = useState(false);
@@ -125,7 +127,8 @@ export function WorkoutsScreen() {
     setDay(null);
   }, []);
 
-  const nextWeekFirst = weekPlan ? (toPlannedWorkouts(weekPlan.nextWeek.plan)[0] ?? null) : null;
+  // The preview sheet is a strength workout's; a cardio workout opens its own page later in the week.
+  const nextWeekFirst = weekPlan ? (toPlannedWorkouts(weekPlan.nextWeek.plan).find(({ workout }) => workout.kind !== 'cardio') ?? null) : null;
 
   const planPanel = (
     <>
@@ -161,14 +164,14 @@ export function WorkoutsScreen() {
                 </h2>
               </div>
               <WorkoutTicketCarousel
-                workouts={weekPlan.workouts}
+                workouts={weekPlan.workouts.filter(({ workout }) => workout.kind !== 'cardio')}
                 label={copy.plan.allWorkouts}
                 onOpen={(planned) => setPreview({ planned, isNextWeek: false })}
               />
             </>
           )}
 
-          {cardioItems.length > 0 && (
+          {weekPlan.plan && cardioOf(weekPlan).length > 0 && (
             <>
               <div className="workouts-section-head">
                 <h2 className="workouts-section-title">
@@ -176,7 +179,7 @@ export function WorkoutsScreen() {
                   {sharedText.cardio.cardioTag}
                 </h2>
               </div>
-              <CardioWeekList items={cardioItems} />
+              <CardioWeekList planId={weekPlan.plan.id} workouts={cardioOf(weekPlan)} />
             </>
           )}
 

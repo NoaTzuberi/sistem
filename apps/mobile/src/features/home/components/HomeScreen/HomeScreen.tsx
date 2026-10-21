@@ -21,7 +21,6 @@ import type { QuickReply } from '../QuickReplies/QuickReplies';
 import { NextAchievement } from '../NextAchievement/NextAchievement';
 import { MiniAchievements } from '../MiniAchievements/MiniAchievements';
 import { FuelToday } from '../FuelToday/FuelToday';
-import { useCardioWeek } from '../../../cardio/hooks/useCardioWeek';
 import './HomeScreen.css';
 
 /**
@@ -35,7 +34,6 @@ export function HomeScreen() {
   const navigate = useNavigate();
   const home = useHomeData();
   const starter = useStartWorkout();
-  const cardioWeek = useCardioWeek();
   const { week, stage, days, activeLog } = home;
   const data = week.data;
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -105,13 +103,7 @@ export function HomeScreen() {
             )}
           </div>
           <WeekTrack days={days} selected={selected} onSelect={setSelectedDay} label={copy.week.days} />
-          {days[selected] && (
-            <WeekDayDetail
-              day={days[selected]}
-              planId={data.plan?.id ?? null}
-              cardio={cardioWeek.data?.items.filter((item) => item.date === days[selected].date)}
-            />
-          )}
+          {days[selected] && <WeekDayDetail day={days[selected]} planId={data.plan?.id ?? null} />}
         </section>
       )}
 

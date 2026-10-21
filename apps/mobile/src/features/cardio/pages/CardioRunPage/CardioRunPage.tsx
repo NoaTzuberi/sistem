@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { extractErrorMessage } from '@sistem/api-client';
-import type { TraineeCardioSessionResponse } from '@sistem/types';
+import type { TraineeCardioWorkoutResponse } from '@sistem/types';
 import { fill, getActiveLanguage, useCopy, useLoad } from '@sistem/shared';
 import { cardioDetailPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
-import { getCardioSession, saveCardioLog } from '../../../../services/cardio/cardioService';
+import { getCardioWorkout, saveCardioLog } from '../../../../services/cardio/cardioService';
 import { BackButton } from '../../../workouts/components/BackButton/BackButton';
 import { CardioFinish, type CardioFinishValues } from '../../components/CardioFinish/CardioFinish';
 import { CardioPlayer } from '../../components/CardioPlayer/CardioPlayer';
@@ -19,8 +19,8 @@ import './CardioRunPage.css';
 /** The live run (full screen): 3-2-1, the player, then the finish log. */
 export function CardioRunPage() {
   const copy = useCopy(cardioCopy);
-  const { sessionId = '', date = '' } = useParams();
-  const load = useCallback(() => getCardioSession(sessionId, date), [sessionId, date]);
+  const { planId = '', workoutId = '' } = useParams();
+  const load = useCallback(() => getCardioWorkout(planId, workoutId), [planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
 
   if (!data) {
@@ -40,16 +40,16 @@ export function CardioRunPage() {
       </div>
     );
   }
-  return <CardioRun data={data} sessionId={sessionId} date={date} />;
+  return <CardioRun data={data} planId={planId} workoutId={workoutId} />;
 }
 
-function CardioRun({ data, sessionId, date }: { data: TraineeCardioSessionResponse; sessionId: string; date: string }) {
+function CardioRun({ data, planId, workoutId }: { data: TraineeCardioWorkoutResponse; planId: string; workoutId: string }) {
   const navigate = useNavigate();
-  const session = data.occurrence.session;
+  const workout = data.workout;
   const coachName = data.coach?.name ?? null;
   const { prefs } = useCardioPrefs();
   const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const run = useCardioRun({ sessionId, date, steps: session.steps, prefs, reducedMotion });
+  const run = useCardioRun({ planId, workoutId, steps: workout.cardio.steps, prefs, reducedMotion });
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   // The finish screen opens at its top.
@@ -63,9 +63,9 @@ function CardioRun({ data, sessionId, date }: { data: TraineeCardioSessionRespon
     setSaveError(null);
     const text = cardioCopy[getActiveLanguage()];
     try {
-      await saveCardioLog({ sessionId, date, ...run.progress, ...values });
+      await saveCardioLog({ planId, workoutId, ...run.progress, ...values });
       run.clear();
-      navigate(cardioDetailPath(sessionId, date), { replace: true, state: { saved: coachName ? fill(text.saved, { name: coachName }) : text.savedNoCoach } });
+      navigate(cardioDetailPath(planId, workoutId), { replace: true, state: { saved: coachName ? fill(text.saved, { name: coachName }) : text.savedNoCoach } });
     } catch (caught) {
       setSaveError(extractErrorMessage(caught, text.saveError));
       setIsSaving(false);
@@ -75,7 +75,7 @@ function CardioRun({ data, sessionId, date }: { data: TraineeCardioSessionRespon
   if (run.phase === 'finished') {
     return (
       <CardioFinish
-        sessionName={session.name}
+        sessionName={workout.title}
         completedSec={run.progress.completedSec}
         roundsDone={run.progress.roundsDone}
         roundsTotal={run.totals.rounds}
@@ -97,7 +97,7 @@ function CardioRun({ data, sessionId, date }: { data: TraineeCardioSessionRespon
       frameLeft={run.frameLeft}
       position={run.position}
       totalSec={run.totals.totalSec}
-      metric={session.metric}
+      metric={workout.cardio.metric}
       countdown={run.countdown}
       isPaused={run.isPaused}
       onEnd={run.end}
