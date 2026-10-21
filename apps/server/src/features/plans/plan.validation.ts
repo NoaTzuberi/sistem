@@ -12,6 +12,8 @@ import {
   MAX_PLAN_TEXT_LENGTH,
 } from './plan.constants';
 import { isSunday } from './planWeek';
+import { parsePlanCardio } from '../cardio/cardio.validation';
+import type { PlanCardioFields } from './plan.types';
 import { validatePlanExerciseTargets } from './planSets';
 
 /** Ids of the coach's training config (workout types, slots, splits — Phase 12b). */
@@ -60,6 +62,9 @@ export interface PlanWorkoutInputFields {
   dayOfWeek?: number;
   notes?: string;
   workoutType?: string;
+  /** Set only for cardio (missing = strength). */
+  kind?: 'cardio';
+  cardio?: PlanCardioFields;
   exercises: PlanExerciseInputFields[];
 }
 
@@ -252,10 +257,20 @@ export function parseSavePlanPayload(body: unknown): ParseResult<SavePlanInput> 
   const workouts: PlanWorkoutInputFields[] = [];
   body.workouts.forEach((raw, workoutIndex) => {
     const problems: ServerMessage[] = [];
-    if (!isRecord(raw) || !Array.isArray(raw.exercises)) {
+    const isCardio = isRecord(raw) && raw.kind === 'cardio';
+    if (!isRecord(raw) || (!isCardio && !Array.isArray(raw.exercises)) || (!isMissing(raw.kind) && raw.kind !== 'cardio' && raw.kind !== 'strength')) {
       issues.push({ ...msg('plan_workout_invalid'), workoutIndex });
       return;
     }
+    // A cardio workout: its blocks instead of exercises (the same rules as the cardio builder's).
+    let cardio: PlanCardioFields | undefined;
+    if (isCardio) {
+      const parsed = parsePlanCardio(raw.cardio);
+      if (parsed.value) cardio = parsed.value;
+      else problems.push(parsed.error);
+      if (Array.isArray(raw.exercises) && raw.exercises.length > 0) problems.push(msg('plan_cardio_no_exercises'));
+    }
+    const rawExercises: unknown[] = isCardio ? [] : (raw.exercises as unknown[]);
 
     const title = typeof raw.title === 'string' ? raw.title.trim() : '';
     if (!title) problems.push(msg('plan_workout_title_required'));
@@ -277,20 +292,29 @@ export function parseSavePlanPayload(body: unknown): ParseResult<SavePlanInput> 
       if (typeof raw.workoutType === 'string' && TRAINING_ID_PATTERN.test(raw.workoutType)) workoutType = raw.workoutType;
       else problems.push(msg('plan_workout_type_unknown'));
     }
-    if (raw.exercises.length > MAX_WORKOUT_EXERCISES) {
+    if (rawExercises.length > MAX_WORKOUT_EXERCISES) {
       problems.push(msg('plan_too_many_exercises', { max: MAX_WORKOUT_EXERCISES }));
     }
     issues.push(...problems.map((problem) => ({ ...problem, workoutIndex })));
 
     const exercises: PlanExerciseInputFields[] = [];
-    raw.exercises.slice(0, MAX_WORKOUT_EXERCISES).forEach((rawExercise, exerciseIndex) => {
+    rawExercises.slice(0, MAX_WORKOUT_EXERCISES).forEach((rawExercise, exerciseIndex) => {
       const exerciseProblems: ServerMessage[] = [];
       const exercise = parseExercise(rawExercise, exerciseProblems);
       if (exercise) exercises.push(exercise);
       issues.push(...exerciseProblems.map((problem) => ({ ...problem, workoutIndex, exerciseIndex })));
     });
 
-    workouts.push({ id: optionalId(raw.id), title, dayOfWeek, notes: workoutNotes, workoutType, exercises });
+    workouts.push({
+      id: optionalId(raw.id),
+      title,
+      dayOfWeek,
+      notes: workoutNotes,
+      // A cardio workout has no slot template.
+      workoutType: isCardio ? undefined : workoutType,
+      ...(isCardio && cardio ? { kind: 'cardio' as const, cardio } : {}),
+      exercises,
+    });
   });
 
   if (issues.length > 0) return { value: null, issues };
@@ -319,6 +343,7 @@ export function checkTrainingIds(input: SavePlanInput, config: TrainingConfig): 
 }
 
 interface PublishableWorkout {
+  kind?: string | null;
   exercises: { supersetGroup?: string | null; interval?: boolean | null }[];
 }
 
@@ -333,6 +358,8 @@ export function findPublishIssues(workouts: PublishableWorkout[]): PlanProblem[]
 
   const issues: PlanProblem[] = [];
   workouts.forEach((workout, workoutIndex) => {
+    // A cardio workout's blocks were checked on save (at least one block, durations, rounds).
+    if (workout.kind === 'cardio') return;
     if (workout.exercises.length === 0) {
       issues.push({ ...msg('plan_workout_needs_exercise'), workoutIndex });
       return;

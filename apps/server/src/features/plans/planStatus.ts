@@ -63,9 +63,11 @@ export function toTraineePlan(plan: Plan, logs: WorkoutLogRef[], today: string):
  */
 export function pickNextWorkoutId(plan: TraineePlan): string | null {
   if (plan.period !== 'current') return null;
+  // "Start next workout" opens a strength session; cardio workouts start from their own page.
+  const strength = plan.workouts.filter((workout) => workout.kind !== 'cardio');
   const next =
-    plan.workouts.find((workout) => workout.inProgress) ??
-    plan.workouts.find((workout) => workout.status === 'upcoming') ??
-    plan.workouts.find((workout) => workout.status === 'missed');
+    strength.find((workout) => workout.inProgress) ??
+    strength.find((workout) => workout.status === 'upcoming') ??
+    strength.find((workout) => workout.status === 'missed');
   return next?.id ?? null;
 }

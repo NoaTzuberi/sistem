@@ -1,8 +1,9 @@
 import { Schema } from 'mongoose';
-import { SET_TYPE_IDS, DEFAULT_SET_TYPE, MIN_DAY_OF_WEEK, MAX_DAY_OF_WEEK, SUPERSET_GROUP_PATTERN } from './plan.constants';
+import { WORKOUT_KIND_IDS, SET_TYPE_IDS, DEFAULT_SET_TYPE, MIN_DAY_OF_WEEK, MAX_DAY_OF_WEEK, SUPERSET_GROUP_PATTERN } from './plan.constants';
 import { deriveSetCount, validatePlanExerciseTargets } from './planSets';
 import { translate } from '../../i18n';
-import type { PlanExerciseFields, PlanSetTargetFields, PlanWorkoutFields } from './plan.types';
+import { CARDIO_METRIC_IDS, CARDIO_SPORT_IDS } from '../cardio/cardio.constants';
+import type { PlanCardioFields, PlanExerciseFields, PlanSetTargetFields, PlanWorkoutFields } from './plan.types';
 
 // Shared by Plan and Template, so a template workout drops straight into a plan.
 // Units: weights kg, durations and rest seconds.
@@ -56,12 +57,26 @@ planExerciseSchema.pre('validate', function derivePlanExerciseSets() {
   if (error) this.invalidate('sets', translate('en', error));
 });
 
-// Keeps its _id: WorkoutLog.workoutId points at it, so edits must preserve it.
+// A cardio workout's content. The steps (blocks / repeat sets) are checked in code before every
+// save (cardio.validation.ts); Mixed keeps the union as sent.
+const planCardioSchema = new Schema<PlanCardioFields>(
+  {
+    sport: { type: String, enum: CARDIO_SPORT_IDS, required: true },
+    metric: { type: String, enum: CARDIO_METRIC_IDS, required: true },
+    steps: { type: Schema.Types.Mixed, required: true },
+  },
+  { _id: false },
+);
+
+// Keeps its _id: WorkoutLog.workoutId (and CardioLog.workoutId) point at it, so edits must preserve it.
 export const planWorkoutSchema = new Schema<PlanWorkoutFields>({
   title: { type: String, required: true, trim: true },
   dayOfWeek: { type: Number, min: MIN_DAY_OF_WEEK, max: MAX_DAY_OF_WEEK },
   order: { type: Number, required: true, min: 0 },
   notes: { type: String, trim: true },
   workoutType: { type: String, trim: true },
+  // Missing = strength (every plan from before cardio).
+  kind: { type: String, enum: WORKOUT_KIND_IDS, default: undefined },
+  cardio: { type: planCardioSchema, default: undefined },
   exercises: { type: [planExerciseSchema], default: [] },
 });

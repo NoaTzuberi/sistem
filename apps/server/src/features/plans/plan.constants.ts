@@ -1,6 +1,8 @@
 export const PLAN_STATUS_IDS = ['draft', 'published'] as const;
 export const DEFAULT_PLAN_STATUS = 'draft';
 
+export const WORKOUT_KIND_IDS = ['strength', 'cardio'] as const;
+
 export const SET_TYPE_IDS = ['warmup', 'working', 'drop'] as const;
 export const DEFAULT_SET_TYPE = 'working';
 

@@ -1,3 +1,4 @@
+import { cardioLogRefs } from '../cardio/cardio.service';
 import { Types } from 'mongoose';
 import type { CoachPlan, CoachPlanProgress } from '@sistem/types';
 import { emitAppEvent } from '../../events/appEvents';
@@ -94,7 +95,12 @@ export async function listCoachPlans(traineeId: string, now: Date = new Date()):
   const doneLogs = await WorkoutLog.find({ planId: { $in: published.map((plan) => plan.id) }, status: 'completed' })
     .select('planId workoutId')
     .lean<{ planId: Types.ObjectId; workoutId: Types.ObjectId }[]>();
-  const done = new Set(doneLogs.map((log) => `${String(log.planId)}:${String(log.workoutId)}`));
+  // A cardio workout is done by its cardio log.
+  const cardioDone = await cardioLogRefs(traineeId, published.map((plan) => new Types.ObjectId(plan.id)));
+  const done = new Set([
+    ...doneLogs.map((log) => `${String(log.planId)}:${String(log.workoutId)}`),
+    ...cardioDone.map((log) => `${log.planId}:${log.workoutId}`),
+  ]);
 
   return coachPlans.map((plan) => {
     if (plan.status !== 'published') return plan;

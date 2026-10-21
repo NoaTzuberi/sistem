@@ -1,5 +1,6 @@
 import type { Types } from 'mongoose';
-import type { PlanStatus, SetType } from '@sistem/types';
+import type { CardioMetric, CardioSport, PlanStatus, SetType, WorkoutKind } from '@sistem/types';
+import type { CardioStepFields } from '../cardio/cardio.types';
 
 // Units: weights kg, durations and rest seconds.
 export interface PlanSetTargetFields {
@@ -35,7 +36,17 @@ export interface PlanWorkoutFields {
   notes?: string;
   /** Phase 12b, coach-only: the workout type (slot template); missing = free workout. */
   workoutType?: string;
+  /** Missing = strength. */
+  kind?: WorkoutKind;
+  /** A cardio workout's blocks (it has no exercises). */
+  cardio?: PlanCardioFields;
   exercises: (PlanExerciseFields & { _id: Types.ObjectId })[];
+}
+
+export interface PlanCardioFields {
+  sport: CardioSport;
+  metric: CardioMetric;
+  steps: CardioStepFields[];
 }
 
 export interface PlanDocument {

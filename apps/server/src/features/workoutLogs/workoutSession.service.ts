@@ -164,7 +164,8 @@ export async function startWorkout(
   ]);
   if (!plan) throw new PlanNotFoundError('plan_not_found');
   const workout = await loadPlannedWorkout(plan, workoutId);
-  if (!workout) throw new PlanNotFoundError('workout_not_found');
+  // A cardio workout runs in its own player and is logged as a cardio log, never as sets.
+  if (!workout || workout.kind === 'cardio') throw new PlanNotFoundError('workout_not_found');
 
   // Same rule as Home: a workout is doable until its week ends, never before it starts.
   if (plan.weekStartDate !== weekStartOf(today)) {

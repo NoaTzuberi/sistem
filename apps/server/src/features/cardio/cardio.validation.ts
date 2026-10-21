@@ -1,17 +1,13 @@
 import mongoose from 'mongoose';
-import type { SaveCardioLogPayload, SaveCardioSessionPayload } from '@sistem/types';
-import { isDateString, isSunday } from '../plans/planWeek';
-import { MAX_DAY_OF_WEEK, MIN_DAY_OF_WEEK } from '../plans/plan.constants';
+import type { SaveCardioLogPayload } from '@sistem/types';
+import type { PlanCardioFields } from '../plans/plan.types';
 import { type ServerMessage, msg } from '../../i18n';
 import {
   CARDIO_BLOCK_KIND_IDS,
   CARDIO_METRIC_IDS,
-  CARDIO_SESSION_STATUS_IDS,
   CARDIO_SPORT_IDS,
   MAX_BLOCK_SEC,
   MAX_CARDIO_LOG_NOTE_LENGTH,
-  MAX_CARDIO_NAME_LENGTH,
-  MAX_CARDIO_NOTE_LENGTH,
   MAX_CARDIO_STEPS,
   MAX_DISTANCE_KM,
   MAX_INTENSITY,
@@ -33,16 +29,8 @@ const isIntIn = (value: unknown, min: number, max: number): value is number =>
 const isOneOf = <T extends string>(ids: readonly T[], value: unknown): value is T => typeof value === 'string' && (ids as readonly string[]).includes(value);
 const isStepId = (value: unknown): value is string => typeof value === 'string' && value.length > 0 && value.length <= MAX_STEP_ID_LENGTH;
 
-export function validateCardioSessionId(value: unknown): ServerMessage | null {
-  return typeof value === 'string' && mongoose.isValidObjectId(value) ? null : msg('cardio_session_id_invalid');
-}
-
-export function validateCardioWeekQuery(value: unknown): ServerMessage | null {
-  return value === undefined || (typeof value === 'string' && isSunday(value)) ? null : msg('cardio_week_invalid');
-}
-
-export function validateCardioDateQuery(value: unknown): ServerMessage | null {
-  return isDateString(value) ? null : msg('body_date_invalid');
+export function validateObjectId(value: unknown): ServerMessage | null {
+  return typeof value === 'string' && mongoose.isValidObjectId(value) ? null : msg('cardio_workout_id_invalid');
 }
 
 function parseBlock(value: unknown): Parsed<CardioBlockFields> {
@@ -86,49 +74,20 @@ function parseNote(value: unknown, max: number): Parsed<string | null> {
   return { value: value.trim() || null, error: null };
 }
 
-export function parseSaveCardioSessionPayload(body: unknown): Parsed<SaveCardioSessionPayload & { steps: CardioStepFields[] }> {
-  if (!isRecord(body)) return fail(msg('cardio_steps_invalid'));
-  const name = typeof body.name === 'string' ? body.name.trim() : '';
-  if (name.length === 0 || name.length > MAX_CARDIO_NAME_LENGTH) return fail(msg('cardio_name_invalid', { max: MAX_CARDIO_NAME_LENGTH }));
-  if (!isOneOf(CARDIO_SPORT_IDS, body.sport)) return fail(msg('cardio_sport_invalid'));
-  if (!isOneOf(CARDIO_METRIC_IDS, body.metric)) return fail(msg('cardio_metric_invalid'));
-  if (!isOneOf(CARDIO_SESSION_STATUS_IDS, body.status)) return fail(msg('cardio_status_invalid'));
-  if (typeof body.weekStartDate !== 'string' || !isSunday(body.weekStartDate)) return fail(msg('cardio_week_invalid'));
-  if (typeof body.repeatsWeekly !== 'boolean') return fail(msg('cardio_steps_invalid'));
-
-  const days = body.days;
-  if (!Array.isArray(days) || !days.every((day) => isIntIn(day, MIN_DAY_OF_WEEK, MAX_DAY_OF_WEEK)) || new Set(days).size !== days.length) {
-    return fail(msg('cardio_days_invalid'));
-  }
-  // A draft may be unscheduled; one in her app needs a day.
-  if (body.status === 'active' && days.length === 0) return fail(msg('cardio_days_required'));
-
-  const steps = parseCardioSteps(body.steps);
+/** A cardio plan workout's own content: type, metric and blocks. */
+export function parsePlanCardio(value: unknown): Parsed<PlanCardioFields> {
+  if (!isRecord(value)) return fail(msg('cardio_steps_invalid'));
+  if (!isOneOf(CARDIO_SPORT_IDS, value.sport)) return fail(msg('cardio_sport_invalid'));
+  if (!isOneOf(CARDIO_METRIC_IDS, value.metric)) return fail(msg('cardio_metric_invalid'));
+  const steps = parseCardioSteps(value.steps);
   if (!steps.value) return steps;
-  const note = parseNote(body.note, MAX_CARDIO_NOTE_LENGTH);
-  if (note.error) return note;
-
-  return {
-    value: {
-      name,
-      sport: body.sport,
-      metric: body.metric,
-      steps: steps.value,
-      note: note.value,
-      days: [...(days as number[])].sort((a, b) => a - b),
-      repeatsWeekly: body.repeatsWeekly,
-      weekStartDate: body.weekStartDate,
-      status: body.status,
-    },
-    error: null,
-  };
+  return { value: { sport: value.sport, metric: value.metric, steps: steps.value }, error: null };
 }
 
-/** Her numbers; the service checks them against the session (rounds, length). */
+/** Her numbers; the service checks them against the workout (rounds, length). */
 export function parseSaveCardioLogPayload(body: unknown): Parsed<SaveCardioLogPayload> {
   if (!isRecord(body)) return fail(msg('cardio_log_invalid'));
-  if (validateCardioSessionId(body.sessionId)) return fail(msg('cardio_session_id_invalid'));
-  if (!isDateString(body.date)) return fail(msg('body_date_invalid'));
+  if (validateObjectId(body.planId) || validateObjectId(body.workoutId)) return fail(msg('cardio_workout_id_invalid'));
   const counts = [body.completedSec, body.roundsDone, body.highIntensitySec];
   if (!counts.every((value) => isIntIn(value, 0, Number.MAX_SAFE_INTEGER))) return fail(msg('cardio_log_invalid'));
   if (!isIntIn(body.rpe, 1, 10)) return fail(msg('cardio_rpe_invalid'));
@@ -140,8 +99,8 @@ export function parseSaveCardioLogPayload(body: unknown): Parsed<SaveCardioLogPa
   if (note.error) return note;
   return {
     value: {
-      sessionId: body.sessionId as string,
-      date: body.date,
+      planId: body.planId as string,
+      workoutId: body.workoutId as string,
       completedSec: body.completedSec as number,
       roundsDone: body.roundsDone as number,
       highIntensitySec: body.highIntensitySec as number,

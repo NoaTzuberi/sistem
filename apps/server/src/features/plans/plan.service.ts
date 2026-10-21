@@ -1,5 +1,5 @@
 import type { Types } from 'mongoose';
-import type { Plan as PublicPlan, PlanExercise, PlanWorkout } from '@sistem/types';
+import type { CardioStep, Plan as PublicPlan, PlanExercise, PlanWorkout } from '@sistem/types';
 import { getExerciseFactsByIds } from '../exercises/exercise.service';
 import { Plan } from './plan.model';
 import { resolvePlanExerciseSets } from './planSets';
@@ -35,6 +35,9 @@ function toPublicWorkout(workout: PlanWorkoutFields & { _id: Types.ObjectId }): 
     dayOfWeek: workout.dayOfWeek,
     order: workout.order,
     notes: workout.notes,
+    ...(workout.kind === 'cardio' && workout.cardio
+      ? { kind: 'cardio' as const, cardio: { sport: workout.cardio.sport, metric: workout.cardio.metric, steps: workout.cardio.steps as CardioStep[] } }
+      : {}),
     exercises: workout.exercises.map(toPublicExercise),
   };
 }

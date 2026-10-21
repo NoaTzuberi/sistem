@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware';
-import { getMyCardioSession, getMyCardioWeek, postMyCardioLog } from './cardio.controller';
+import { getMyCardioWorkout, postMyCardioLog } from './cardio.controller';
 
-// The trainee's cardio sessions and logs, scoped to the caller. The coach builds sessions and
-// reads logs through /api/coach/trainees/:traineeId/cardio.
+// The trainee's cardio workouts (plan workouts of kind 'cardio') and her logs, scoped to the caller.
+// The coach builds them in the plan builder and reads the logs through /api/coach/trainees/:id/cardio-logs.
 export const cardioRouter = Router();
 
 cardioRouter.use(requireAuth, requireRole('trainee'));
 
-cardioRouter.get('/week', getMyCardioWeek);
-cardioRouter.get('/sessions/:sessionId', getMyCardioSession);
+cardioRouter.get('/plans/:planId/workouts/:workoutId', getMyCardioWorkout);
 cardioRouter.post('/logs', postMyCardioLog);
