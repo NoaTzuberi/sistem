@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useMatch } from 'react-router-dom';
+import { ROUTES } from '../../../app/config/routes';
 import { TraineeQuickView } from '../../../features/trainees/components/TraineeQuickView/TraineeQuickView';
 import { TraineeDrawerProvider } from '../../../features/trainees/hooks/useTraineeDrawer';
 import type { PaletteMode } from '../../../hooks/useCommandPalette';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import { useNavigation } from '../../../hooks/useNavigation';
 import { usePaletteHotkey } from '../../../hooks/usePaletteHotkey';
+import { useSlashSearch } from '../../../hooks/useSlashSearch';
+import { useEnterToBlur } from '../../../hooks/useEnterToBlur';
 import { useSidebarCollapse } from '../../../hooks/useSidebarCollapse';
-import { CoachDataProvider } from '../../../services/coach/CoachDataContext';
+import { CoachDataProvider, useCoachData } from '../../../services/coach/CoachDataContext';
 import { CommandPalette } from '../CommandPalette/CommandPalette';
 import { Sidebar } from '../Sidebar/Sidebar';
 import { TopLine } from '../TopLine/TopLine';
@@ -34,6 +37,10 @@ function ShellFrame() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [palette, setPalette] = useState<PaletteMode | null>(null);
   const { pathname, search } = useLocation();
+  // A trainee's pages (profile, builders) add her name to the breadcrumb.
+  const traineeMatch = useMatch(`${ROUTES.TRAINEE}/*`);
+  const { trainees } = useCoachData();
+  const traineeName = traineeMatch ? trainees.find((trainee) => trainee.id === traineeMatch.params.traineeId)?.name : undefined;
 
   // Pages change at once (no transition); the sheet has done its job.
   useEffect(() => {
@@ -57,6 +64,9 @@ function ShellFrame() {
   const togglePalette = useCallback(() => setPalette((open) => (open ? null : 'search')), []);
   const closePalette = useCallback(() => setPalette(null), []);
   usePaletteHotkey(togglePalette);
+  // "/" jumps to the open list page's search (inputs marked data-search-shortcut).
+  useSlashSearch();
+  useEnterToBlur();
 
   return (
     <div className="app-shell">
@@ -77,6 +87,8 @@ function ShellFrame() {
       <div className="app-main">
         <TopLine
           pageName={current?.label}
+          pageTo={traineeName ? current?.to : undefined}
+          detail={traineeName}
           showMenu={isSheet}
           isMenuOpen={isSheetOpen}
           onOpenMenu={() => setIsSheetOpen(true)}

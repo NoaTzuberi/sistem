@@ -150,8 +150,22 @@
   padding-top: 16px;
 }
 
+/* On the canvas the switch reads like the current nav item: a soft rail, the active language on a white
+   pill with ink text (the login card keeps the pink thumb on its brand gradient). */
 .sidebar .sidebar-language {
   display: grid;
+  border-color: transparent;
+  background: var(--surface-pill);
+  box-shadow: none;
+}
+
+.sidebar .sidebar-language .language-toggle-thumb {
+  background: var(--color-card);
+  box-shadow: var(--shadow-panel);
+}
+
+.sidebar .sidebar-language .language-toggle-option-active {
+  color: var(--color-text);
 }
 
 .sidebar-error {

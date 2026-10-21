@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useCopy } from '@sistem/shared';
 import { appCopy } from '../../../copy';
 import { NotificationBell } from '../../../features/notifications/components/NotificationBell/NotificationBell';
@@ -10,6 +11,10 @@ import './TopLine.css';
 interface TopLineProps {
   /** The current page's name, as the sidebar calls it. */
   pageName: string | undefined;
+  /** With a detail, the page name links back to its page. */
+  pageTo?: string;
+  /** The open item inside the page (the trainee on her profile and builders). */
+  detail?: string;
   /** Under 860px: the button that opens the sidebar sheet. */
   showMenu: boolean;
   isMenuOpen: boolean;
@@ -19,7 +24,7 @@ interface TopLineProps {
 }
 
 /** Above every page: where she is, search (⌘K), notifications and "new plan". */
-export function TopLine({ pageName, showMenu, isMenuOpen, onOpenMenu, onOpenSearch, onNewPlan }: TopLineProps) {
+export function TopLine({ pageName, pageTo, detail, showMenu, isMenuOpen, onOpenMenu, onOpenSearch, onNewPlan }: TopLineProps) {
   const copy = useCopy(appCopy);
   const trainees = useCopy(traineesCopy);
 
@@ -36,7 +41,21 @@ export function TopLine({ pageName, showMenu, isMenuOpen, onOpenMenu, onOpenSear
         {pageName && (
           <>
             <span aria-hidden="true"> / </span>
-            <b className="top-line-page">{pageName}</b>
+            {detail && pageTo ? (
+              <Link className="top-line-section" to={pageTo}>
+                {pageName}
+              </Link>
+            ) : (
+              <b className="top-line-page">{pageName}</b>
+            )}
+          </>
+        )}
+        {detail && (
+          <>
+            <span aria-hidden="true"> / </span>
+            <b className="top-line-page">
+              <bdi>{detail}</bdi>
+            </b>
           </>
         )}
       </p>

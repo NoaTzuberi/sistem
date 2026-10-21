@@ -18,6 +18,7 @@ export const en: CopyShape<typeof he> = {
     expand: 'Expand the menu',
     menu: 'Menu',
     search: 'Search',
+    undo: 'Undo',
     coach: 'Coach',
     badge: '{label}, {count}',
   },

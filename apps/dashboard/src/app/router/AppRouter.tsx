@@ -8,7 +8,6 @@ import { StatsPage } from '../../features/stats/pages/StatsPage/StatsPage';
 import { TraineesPage } from '../../features/trainees/pages/TraineesPage/TraineesPage';
 import { TraineeDetailPage } from '../../features/trainees/pages/TraineeDetailPage/TraineeDetailPage';
 import { PlanBuilderPage } from '../../features/planBuilder/pages/PlanBuilderPage/PlanBuilderPage';
-import { CardioBuilderPage } from '../../features/cardio/pages/CardioBuilderPage/CardioBuilderPage';
 import { NutritionBuilderPage } from '../../features/nutrition/pages/NutritionBuilderPage/NutritionBuilderPage';
 import { FoodLibraryPage } from '../../features/nutritionLibrary/pages/FoodLibraryPage/FoodLibraryPage';
 import { ExerciseLibraryPage } from '../../features/exerciseLibrary/pages/ExerciseLibraryPage/ExerciseLibraryPage';
@@ -25,7 +24,6 @@ export function AppRouter() {
           <Route path={ROUTES.TRAINEES} element={<TraineesPage />} />
           <Route path={ROUTES.TRAINEE} element={<TraineeDetailPage />} />
           <Route path={ROUTES.PLAN} element={<PlanBuilderPage />} />
-          <Route path={ROUTES.CARDIO} element={<CardioBuilderPage />} />
           <Route path={ROUTES.EXERCISES} element={<ExerciseLibraryPage />} />
           <Route path={ROUTES.TRAINEE_NUTRITION} element={<NutritionBuilderPage />} />
           {/* The nutrition library: one page, its tab in the path. */}

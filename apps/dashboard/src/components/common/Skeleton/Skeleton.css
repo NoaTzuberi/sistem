@@ -1,0 +1,138 @@
+/* Placeholder widgets: white cards on the canvas (the real widgets' radius and shadow) with soft inner bars. */
+.skeleton {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.skeleton-block {
+  display: block;
+  min-width: 0;
+  border-radius: var(--radius-panel);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-panel);
+  animation: skeleton-pulse 1.4s var(--ease-standard) infinite alternate;
+}
+
+@keyframes skeleton-pulse {
+  to {
+    opacity: var(--opacity-muted);
+  }
+}
+
+.skeleton-hero {
+  grid-column: span 4;
+  height: 270px;
+}
+
+.skeleton-wide {
+  grid-column: span 5;
+  height: 300px;
+}
+
+.skeleton-wide-major {
+  grid-column: span 7;
+}
+
+.skeleton-tile {
+  grid-column: span 3;
+  height: 120px;
+}
+
+.skeleton-chart {
+  grid-column: span 7;
+  height: 320px;
+}
+
+.skeleton-chart + .skeleton-chart {
+  grid-column: span 5;
+}
+
+.skeleton-header {
+  grid-column: 1 / -1;
+  height: 150px;
+}
+
+/* The tab rail: a pill at the start of the row. */
+.skeleton-tabs {
+  grid-column: span 6;
+  height: 48px;
+  border-radius: var(--radius-round);
+}
+
+.skeleton-profile .skeleton-tabs {
+  grid-column: 1 / span 6;
+}
+
+.skeleton-profile .skeleton-chart {
+  grid-column: 1 / span 7;
+}
+
+.skeleton-profile .skeleton-chart-side {
+  grid-column: 8 / -1;
+}
+
+.skeleton-panel-body {
+  grid-column: 1 / -1;
+  height: 320px;
+}
+
+.skeleton-table {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-3);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 64px;
+  border-block-end: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.skeleton-row:last-child {
+  border-block-end: 0;
+}
+
+.skeleton-dot {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.skeleton-line {
+  width: 30%;
+  height: 12px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.skeleton-line-short {
+  width: 14%;
+  margin-inline-start: auto;
+}
+
+/* Narrow screens: the widgets stack, as the real ones do. */
+@media (max-width: 860px) {
+  .skeleton-block,
+  .skeleton-profile .skeleton-tabs,
+  .skeleton-profile .skeleton-chart,
+  .skeleton-profile .skeleton-chart-side,
+  .skeleton-chart + .skeleton-chart {
+    grid-column: 1 / -1;
+  }
+
+  .skeleton-tile {
+    grid-column: span 6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block {
+    animation: none;
+  }
+}

@@ -108,6 +108,13 @@ button {
   --workout-solid: var(--color-workout-5);
 }
 
+/* A cardio workout, whatever its place: the cardio purple (its solid keeps white text at 6.2:1). */
+.workout-kind-cardio {
+  --workout-color: var(--color-zone-2);
+  --workout-color-soft: var(--tint-purple);
+  --workout-solid: var(--ink-purple);
+}
+
 /*
  * A movement pattern's color, by its group (patternGroupClass in exerciseLibrary/data/patternGroups.ts).
  * --pattern-color strong, --pattern-soft soft. Identity only — never a status.

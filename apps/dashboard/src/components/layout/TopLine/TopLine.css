@@ -18,6 +18,23 @@
   white-space: nowrap;
 }
 
+.top-line-section {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .top-line-section:hover {
+    color: var(--color-text);
+  }
+}
+
+.top-line-section:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-square);
+}
+
 .top-line-page {
   font-weight: var(--font-weight-medium);
   color: var(--color-text);

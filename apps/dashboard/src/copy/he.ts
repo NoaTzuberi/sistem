@@ -19,6 +19,7 @@ export const he = {
     expand: 'הרחבת התפריט',
     menu: 'תפריט',
     search: 'חיפוש',
+    undo: 'ביטול',
     coach: 'מאמנת',
     // {count} is spoken after the item's name: "מחכות לתוכנית, 2".
     badge: '{label}, {count}',
