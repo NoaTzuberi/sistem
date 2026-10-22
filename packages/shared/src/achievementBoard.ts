@@ -1,10 +1,10 @@
 import type { AchievementOverview, AchievementProgress, AchievementType } from '@sistem/types';
-import { achievementProgressFraction } from '@sistem/shared';
-import { ACHIEVEMENT_CATEGORIES, achievementCategory } from './achievementCategories';
-import type { AchievementCategory } from './achievementCategories';
+import { ACHIEVEMENT_CATEGORIES, achievementCategory, achievementProgressFraction } from './achievementDisplay';
+import type { AchievementCategory } from './achievementDisplay';
 
-// The Achievements tab's board, read from GET …/achievements. Pure: what is unlocked, what is next,
-// what to show in each group. Everything is computed by the server; this only arranges it.
+// The achievements board, read from GET /api/achievements (trainee) or …/trainees/:id/achievements (coach).
+// Pure: what is unlocked, what is next, what each group shows. Everything is computed by the server;
+// this only arranges it. Used by the dashboard's Achievements tab and the trainee's Profile tab.
 
 export type AchievementFilter = 'all' | 'unlocked' | 'locked';
 
@@ -26,7 +26,7 @@ export interface AchievementBoard {
   latest: BadgeEntry | null;
 }
 
-export function buildAchievementBoard(overview: AchievementOverview): AchievementBoard {
+export function buildAchievementBoard(overview: Pick<AchievementOverview, 'progress' | 'unlocked'>): AchievementBoard {
   const badges = overview.progress.map((progress) => ({
     type: progress.type,
     progress,

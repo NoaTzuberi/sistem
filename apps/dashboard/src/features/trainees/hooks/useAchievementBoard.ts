@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react';
 import type { AchievementType } from '@sistem/types';
 import { getActiveLanguage, useLoad } from '@sistem/shared';
 import { getTraineeAchievements } from '../../../services/coach/coachService';
-import { buildAchievementBoard } from '../data/achievementBoard';
-import type { AchievementFilter } from '../data/achievementBoard';
+import { buildAchievementBoard } from '@sistem/shared';
+import type { AchievementFilter } from '@sistem/shared';
 import { traineesCopy } from '../copy';
 
 /** The Achievements tab: her overview from the server, the board built from it, the filter and the open badge. */

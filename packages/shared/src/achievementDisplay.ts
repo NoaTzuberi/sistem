@@ -39,6 +39,55 @@ const COUNTED: Partial<Record<AchievementType, Counted>> = {
   streak_52: { kind: 'streak', count: 52 },
 };
 
+/** The design's achievement groups (identity colors --color-ach-<category>; the dashboard's Achievements tab,
+ * the trainee's Profile badges). The body-tracking ones have no place in the design's five: "tracking". */
+export type AchievementCategory = 'workouts' | 'streaks' | 'perfect' | 'records' | 'volume' | 'tracking';
+
+/** Display order of the groups. */
+export const ACHIEVEMENT_CATEGORIES: readonly AchievementCategory[] = ['workouts', 'streaks', 'perfect', 'records', 'volume', 'tracking'];
+
+const CATEGORY_OF: Record<AchievementType, AchievementCategory> = {
+  first_workout: 'workouts',
+  workouts_5: 'workouts',
+  workouts_10: 'workouts',
+  workouts_25: 'workouts',
+  workouts_50: 'workouts',
+  workouts_100: 'workouts',
+  // The Daily Pump is a workout's last step.
+  first_pump_photo: 'workouts',
+  streak_2: 'streaks',
+  streak_4: 'streaks',
+  streak_8: 'streaks',
+  streak_12: 'streaks',
+  streak_26: 'streaks',
+  streak_52: 'streaks',
+  comeback: 'streaks',
+  perfect_week: 'perfect',
+  first_weight_pr: 'records',
+  first_reps_pr: 'records',
+  prs_10: 'records',
+  prs_25: 'records',
+  prs_50: 'records',
+  volume_10k: 'volume',
+  volume_50k: 'volume',
+  volume_100k: 'volume',
+  volume_500k: 'volume',
+  volume_1m: 'volume',
+  first_measurement: 'tracking',
+  first_progress_photo: 'tracking',
+  weigh_ins_10: 'tracking',
+};
+
+export function achievementCategory(type: AchievementType): AchievementCategory {
+  return CATEGORY_OF[type] ?? 'workouts';
+}
+
+/** The count a numbered achievement is about (25 workouts, 4 weeks, 10 PRs) — the number on its badge; null otherwise. */
+export function achievementBadgeNumber(type: AchievementType): number | null {
+  const counted = COUNTED[type];
+  return counted && counted.kind !== 'volume' ? counted.count : null;
+}
+
 const NAMED = ['first_workout', 'first_weight_pr', 'first_reps_pr', 'perfect_week', 'comeback', 'first_pump_photo', 'first_measurement', 'first_progress_photo', 'weigh_ins_10'] as const;
 type NamedAchievement = (typeof NAMED)[number];
 

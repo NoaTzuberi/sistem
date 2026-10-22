@@ -12,6 +12,7 @@ export * from './units';
 export * from './bodyChart';
 export * from './bodyMetricsDisplay';
 export * from './achievementDisplay';
+export * from './achievementBoard';
 export * from './nutritionDisplay';
 export * from './textSearch';
 export * from './planIssues';
