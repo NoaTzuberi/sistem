@@ -1,0 +1,59 @@
+.qn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.qn-text-label {
+  font-size: var(--text-subscreen-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}
+
+.qn-text-body {
+  display: -webkit-box;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-qn-body);
+  line-height: 1.5;
+  color: var(--color-ink);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-align: start;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.qn-text-open {
+  display: block;
+  overflow: visible;
+}
+
+.qn-text-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  margin-block: calc((var(--touch-target-min) - 1lh) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.qn-text-more:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qn-text-more {
+    transition: none;
+  }
+}

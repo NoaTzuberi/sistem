@@ -1,44 +1,151 @@
-.settings-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
+/* "הגדרות" (direction B): the soft page surface, settings grouped in white cards. */
+.st-screen {
+  min-height: 100dvh;
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
-.settings-page-section {
+.st-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-block: var(--space-2) var(--space-5);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+}
+
+.st-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.settings-page-heading {
-  margin: 0 0 var(--space-1);
-  font-size: var(--text-sm);
+/* A mono Latin eyebrow + a Hebrew label: 13px / 600, never letter-spaced. */
+.st-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline: var(--space-1);
+  font-size: var(--text-subscreen-label);
   font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
+  letter-spacing: 0; /* Hebrew is never letter-spaced (the global h2 tightens it) */
+  color: var(--color-ink-raised);
 }
 
-.settings-page-row {
+.st-section-title .eyebrow {
+  color: var(--color-text-faint);
+}
+
+.st-card {
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-card);
+  background-color: var(--color-card);
+}
+
+.st-card-padded {
+  padding-block: var(--space-3);
+}
+
+/* Label at the start, the control at the end; hairlines only between rows. */
+.st-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
-  min-height: var(--touch-target-min);
+  min-height: calc(var(--touch-target-min) + var(--space-3));
+  padding-block: var(--space-2);
 }
 
-.settings-page-value {
-  color: var(--color-text-muted);
-  overflow-wrap: anywhere;
+.st-row + .st-row {
+  border-block-start: var(--border-width-thin) solid var(--color-subscreen-rule);
 }
 
-.settings-page-hint {
-  margin: 0;
+.st-row-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-profile-icon-tile);
+  height: var(--size-profile-icon-tile);
+  border-radius: var(--radius-profile-icon-tile);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink-raised);
+}
+
+.st-row-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-base);
+  color: var(--color-ink);
+}
+
+.st-row-control {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.st-value {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.settings-page-error {
+.st-hint {
   margin: 0;
-  font-size: var(--text-sm);
+  padding-inline: var(--space-1);
+  font-size: var(--text-xs);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+.st-error {
+  margin: 0;
+  padding-inline: var(--space-1);
+  font-size: var(--text-xs);
   color: var(--color-error);
+}
+
+/* Log out: a full-width white pill with Cherry text. */
+.st-logout {
+  width: 100%;
+  min-height: var(--size-profile-logout);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--color-primary-deep);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.st-logout:active {
+  transform: scale(var(--press-scale));
+}
+
+.st-logout:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.st-version {
+  margin: 0;
+  text-align: center;
+  color: var(--color-text-faint);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .st-logout:hover {
+    background-color: var(--tint-pink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-logout {
+    transition: none;
+  }
 }

@@ -1,0 +1,54 @@
+.st-logout-title {
+  margin: 0;
+  font-size: var(--text-profile-sheet-title);
+  color: var(--color-ink);
+}
+
+.st-logout-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-4);
+}
+
+.st-logout-button {
+  min-height: var(--size-profile-logout);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.st-logout-confirm {
+  background-color: var(--color-primary-deep);
+  color: var(--on-pink);
+}
+
+.st-logout-button:active {
+  transform: scale(var(--press-scale));
+}
+
+.st-logout-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .st-logout-button:not(.st-logout-confirm):hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-logout-button {
+    transition: none;
+  }
+}

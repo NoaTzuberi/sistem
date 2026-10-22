@@ -1,0 +1,208 @@
+.qn-sheet-title {
+  margin: 0;
+  font-size: var(--text-profile-sheet-title);
+  color: var(--color-ink);
+}
+
+.qn-sheet-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-start: var(--space-3);
+}
+
+.qn-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.qn-field-label {
+  font-size: var(--text-subscreen-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}
+
+.qn-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* A 44px tap target; selected = the section's tint + its text color (no border, no filled block). */
+.qn-pick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink-raised);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qn-pick-chip[aria-pressed='true'] {
+  background-color: var(--qn-soft);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--qn-ink) 30%, transparent);
+  color: var(--qn-ink);
+}
+
+.qn-pick-chip:active {
+  transform: scale(var(--press-scale));
+}
+
+.qn-pick-chip:focus-visible,
+.qn-sheet-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.qn-pick-emoji {
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+
+.qn-input,
+.qn-textarea {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-field);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base); /* 16px: no zoom on focus */
+}
+
+.qn-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.qn-input:focus-visible,
+.qn-textarea:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 0;
+}
+
+.qn-sheet-note {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* The onboarding's own "Nutrition & goal" step inside the sheet: its chips in the section's tint. */
+.qn-sheet-nutrition .selectable-chip {
+  border-color: transparent;
+  background-color: var(--color-fill-soft);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.qn-sheet-nutrition .selectable-chip-selected,
+.qn-sheet-nutrition .selectable-chip-selected:active {
+  border-color: color-mix(in srgb, var(--qn-ink) 30%, transparent);
+  background-color: var(--qn-soft);
+  color: var(--qn-ink);
+}
+
+/* … its small labels: Hebrew is never letter-spaced or uppercased here. */
+.qn-sheet-nutrition .text-label {
+  font-size: var(--text-subscreen-label);
+  color: var(--color-ink-raised);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* … its sections and fields in the sheet's soft look (the onboarding itself is unchanged). */
+.qn-sheet-nutrition .accordion-section {
+  border-color: var(--color-subscreen-rule);
+  border-radius: var(--radius-field);
+}
+
+.qn-sheet-nutrition .accordion-section-open {
+  border-color: color-mix(in srgb, var(--qn-ink) 30%, transparent);
+}
+
+.qn-sheet-nutrition .input-field {
+  border-color: transparent;
+  border-radius: var(--radius-field);
+  background-color: var(--color-fill-soft);
+}
+
+.qn-sheet-nutrition .input-field:focus,
+.qn-sheet-nutrition .input-field:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.qn-sheet-error {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-error);
+}
+
+.qn-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: var(--space-2);
+}
+
+.qn-sheet-button {
+  min-height: var(--size-profile-logout);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qn-sheet-save {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.qn-sheet-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.qn-sheet-button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .qn-pick-chip:not([aria-pressed='true']):hover,
+  .qn-sheet-button:not(.qn-sheet-save):hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+
+  .qn-sheet-save:hover:not(:disabled) {
+    background-color: var(--color-ink-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qn-pick-chip,
+  .qn-sheet-button {
+    transition: none;
+  }
+}

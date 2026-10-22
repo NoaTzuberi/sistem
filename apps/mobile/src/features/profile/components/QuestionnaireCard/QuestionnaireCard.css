@@ -1,0 +1,150 @@
+/* A white card, no border; the section's tint lives on the icon tile and the chips inside it. */
+.qn-card {
+  --qn-soft: var(--color-qn-health-soft);
+  --qn-ink: var(--color-qn-health-ink);
+  padding: var(--space-3) var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background-color: var(--color-card);
+}
+
+.qn-tint-goals { --qn-soft: var(--color-qn-goals-soft); --qn-ink: var(--color-qn-goals-ink); }
+.qn-tint-schedule { --qn-soft: var(--color-qn-schedule-soft); --qn-ink: var(--color-qn-schedule-ink); }
+.qn-tint-activities { --qn-soft: var(--color-qn-activities-soft); --qn-ink: var(--color-qn-activities-ink); }
+.qn-tint-equipment { --qn-soft: var(--color-qn-equipment-soft); --qn-ink: var(--color-qn-equipment-ink); }
+.qn-tint-nutrition { --qn-soft: var(--color-qn-nutrition-soft); --qn-ink: var(--color-qn-nutrition-ink); }
+.qn-tint-health { --qn-soft: var(--color-qn-health-soft); --qn-ink: var(--color-qn-health-ink); }
+
+.qn-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qn-card-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-qn-tile);
+  height: var(--size-qn-tile);
+  border-radius: var(--radius-profile-icon-tile);
+  background-color: var(--qn-soft);
+  color: var(--qn-ink);
+}
+
+.qn-card-heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.qn-card-heading .eyebrow {
+  color: var(--color-text-faint);
+}
+
+.qn-card-title {
+  margin: 0;
+  font-size: var(--text-qn-section);
+  color: var(--color-ink);
+  overflow-wrap: break-word;
+}
+
+/* 44px hit area, a 36px soft round button. */
+.qn-card-edit {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  margin-inline-end: calc((var(--touch-target-min) - var(--size-qn-tile)) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-raised);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qn-card-edit-disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-qn-tile);
+  height: var(--size-qn-tile);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.qn-card-edit:active .qn-card-edit-disc {
+  transform: scale(var(--press-scale));
+}
+
+.qn-card-edit:focus-visible {
+  outline: none;
+}
+
+.qn-card-edit:focus-visible .qn-card-edit-disc {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.qn-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+}
+
+.qn-card-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.qn-card-add {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  margin-block: calc((var(--touch-target-min) - 1lh) / -2);
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qn-card-add:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .qn-card-edit:hover .qn-card-edit-disc {
+    background-color: var(--color-fill-soft-hover);
+  }
+
+  .qn-card-add:hover {
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qn-card-edit-disc,
+  .qn-card-add {
+    transition: none;
+  }
+}

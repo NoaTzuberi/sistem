@@ -1,109 +1,148 @@
 import { useState } from 'react';
-import type { Language, UnitPreferences } from '@sistem/types';
-import { unitLabel, useCopy, useI18n } from '@sistem/shared';
+import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconClock, IconRuler2, IconScale } from '@tabler/icons-react';
+import { LANGUAGES, fill, sharedCopy, unitLabel, useCopy } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
-import { LogoutButton } from '../../../../components/common/LogoutButton/LogoutButton';
-import { LanguageSwitch } from '../../../../components/common/LanguageSwitch/LanguageSwitch';
+import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { ROUTES } from '../../../../app/config/routes';
 import { useAuth } from '../../../../services/auth/AuthContext';
-import { updatePreferences } from '../../../../services/users/usersService';
-import { SubPageHeader } from '../../components/SubPageHeader/SubPageHeader';
-import { UnitToggle } from '../../components/UnitToggle/UnitToggle';
+import { SubScreenHeader } from '../../components/SubScreenHeader/SubScreenHeader';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
+import { LogoutSheet } from '../../components/LogoutSheet/LogoutSheet';
+import { useLanguagePreference } from '../../hooks/useLanguagePreference';
+import { useUnitPreferences } from '../../hooks/useUnitPreferences';
 import { profileCopy } from '../../copy';
-import { useMyUnits } from '../../hooks/useMyBody';
 import './SettingsPage.css';
 
 const WEIGHT_UNITS = ['kg', 'lb'] as const;
 const LENGTH_UNITS = ['cm', 'in'] as const;
 
-// Settings (PRD §5.5): units for body tracking, the language (Phase 15), her time zone, log out.
-// Notification settings come with push (Phase 5b — owner decision).
+function SettingsRow({ icon, label, labelId, children }: { icon: ReactNode; label: string; labelId: string; children: ReactNode }) {
+  return (
+    <div className="st-row">
+      <span className="st-row-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="st-row-label" id={labelId}>
+        {label}
+      </span>
+      <div className="st-row-control">{children}</div>
+    </div>
+  );
+}
+
+function SectionTitle({ eyebrow, id, children }: { eyebrow: string; id: string; children: string }) {
+  return (
+    <h2 className="st-section-title" id={id}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      {children}
+    </h2>
+  );
+}
+
+/**
+ * Settings (PRD §5.5, direction B): units, language, account (time zone), log out, the app version.
+ * Notification switches, personal details and privacy screens don't exist yet (push is Phase 5b) — not shown.
+ */
 export function SettingsPage() {
   const copy = useCopy(profileCopy);
-  const { language, setLanguage } = useI18n();
-  const { user, updateUser } = useAuth();
-  const { units } = useMyUnits();
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<'units' | 'language' | null>(null);
+  const shared = useCopy(sharedCopy);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const units = useUnitPreferences();
+  const language = useLanguagePreference();
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const busy = units.isSaving || language.isSaving;
 
-  async function changeUnits(patch: Partial<UnitPreferences>) {
-    setError(null);
-    setIsSaving(true);
-    try {
-      const updated = await updatePreferences({ units: patch });
-      updateUser({ units: updated.units });
-    } catch {
-      setError('units');
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  // The screen has already switched (LanguageSwitch); saving makes it her language on every device.
-  async function saveLanguage(next: Language, previous: Language) {
-    setError(null);
-    setIsSaving(true);
-    try {
-      const updated = await updatePreferences({ language: next });
-      updateUser({ language: updated.language });
-    } catch {
-      setLanguage(previous);
-      setError('language');
-    } finally {
-      setIsSaving(false);
-    }
+  function handleLogout() {
+    logout();
+    navigate(ROUTES.LOGIN, { replace: true });
   }
 
   return (
-    <AppShell>
-      <div className="settings-page">
-        <SubPageHeader title={copy.settingsTitle} fallbackPath={ROUTES.PROFILE} />
+    <AppShell bleed>
+      <div className="st-screen">
+        <SubScreenHeader title={copy.settingsTitle} fallbackPath={ROUTES.PROFILE} />
 
-        <section className="settings-page-section">
-          <h2 className="settings-page-heading">{copy.unitsTitle}</h2>
-          <UnitToggle
-            label={copy.weightUnit}
-            options={WEIGHT_UNITS}
-            optionLabel={(unit) => unitLabel(unit, language)}
-            value={units.weight}
-            disabled={isSaving}
-            onChange={(weight) => void changeUnits({ weight })}
-          />
-          <UnitToggle
-            label={copy.lengthUnit}
-            options={LENGTH_UNITS}
-            optionLabel={(unit) => unitLabel(unit, language)}
-            value={units.length}
-            disabled={isSaving}
-            onChange={(length) => void changeUnits({ length })}
-          />
-          <p className="settings-page-hint">{copy.unitsHint}</p>
-          {error === 'units' && (
-            <p className="settings-page-error" role="alert">
-              {copy.unitsSaveError}
-            </p>
-          )}
-        </section>
+        <div className="st-content">
+          <section className="st-section" aria-labelledby="st-units">
+            <SectionTitle eyebrow={copy.eyebrow.units} id="st-units">
+              {copy.unitsTitle}
+            </SectionTitle>
+            <div className="st-card">
+              <SettingsRow icon={<IconScale size={18} />} label={copy.weightUnit} labelId="st-weight-label">
+                <SegmentedControl
+                  label={copy.weightUnit}
+                  options={WEIGHT_UNITS.map((unit) => ({ value: unit, label: unitLabel(unit, language.language) }))}
+                  value={units.units.weight}
+                  disabled={busy}
+                  onChange={(weight) => void units.changeUnits({ weight })}
+                />
+              </SettingsRow>
+              <SettingsRow icon={<IconRuler2 size={18} />} label={copy.lengthUnit} labelId="st-length-label">
+                <SegmentedControl
+                  label={copy.lengthUnit}
+                  options={LENGTH_UNITS.map((unit) => ({ value: unit, label: unitLabel(unit, language.language) }))}
+                  value={units.units.length}
+                  disabled={busy}
+                  onChange={(length) => void units.changeUnits({ length })}
+                />
+              </SettingsRow>
+            </div>
+            <p className="st-hint">{copy.unitsHint}</p>
+            {units.failed && (
+              <p className="st-error" role="alert">
+                {copy.unitsSaveError}
+              </p>
+            )}
+          </section>
 
-        <section className="settings-page-section">
-          <h2 className="settings-page-heading">{copy.languageTitle}</h2>
-          <LanguageSwitch disabled={isSaving} onChange={(next) => void saveLanguage(next, language)} />
-          <p className="settings-page-hint">{copy.languageHint}</p>
-          {error === 'language' && (
-            <p className="settings-page-error" role="alert">
-              {copy.languageSaveError}
-            </p>
-          )}
-        </section>
+          <section className="st-section" aria-labelledby="st-language">
+            <SectionTitle eyebrow={copy.eyebrow.language} id="st-language">
+              {copy.languageTitle}
+            </SectionTitle>
+            <div className="st-card st-card-padded">
+              <SegmentedControl
+                block
+                label={copy.languageTitle}
+                options={LANGUAGES.map((option) => ({ value: option, label: shared.languageNames[option], lang: option }))}
+                value={language.language}
+                disabled={busy}
+                onChange={(next) => void language.changeLanguage(next)}
+              />
+            </div>
+            <p className="st-hint">{copy.languageHint}</p>
+            {language.failed && (
+              <p className="st-error" role="alert">
+                {copy.languageSaveError}
+              </p>
+            )}
+          </section>
 
-        <section className="settings-page-section">
-          <h2 className="settings-page-heading">{copy.account}</h2>
-          <div className="settings-page-row">
-            <span>{copy.timezone}</span>
-            <span className="settings-page-value">{user?.timezone}</span>
-          </div>
-          <LogoutButton />
-        </section>
+          <section className="st-section" aria-labelledby="st-account">
+            <SectionTitle eyebrow={copy.eyebrow.account} id="st-account">
+              {copy.account}
+            </SectionTitle>
+            <div className="st-card">
+              <SettingsRow icon={<IconClock size={18} />} label={copy.timezone} labelId="st-timezone-label">
+                <bdi className="st-value" dir="ltr">
+                  {user?.timezone}
+                </bdi>
+              </SettingsRow>
+            </div>
+          </section>
+
+          <button type="button" className="st-logout" onClick={() => setConfirmLogout(true)}>
+            {shared.common.logout}
+          </button>
+
+          <p className="st-version">
+            <Eyebrow keepInEnglish>{fill(copy.eyebrow.version, { version: __APP_VERSION__ })}</Eyebrow>
+          </p>
+        </div>
+
+        <LogoutSheet isOpen={confirmLogout} onClose={() => setConfirmLogout(false)} onConfirm={handleLogout} />
       </div>
     </AppShell>
   );

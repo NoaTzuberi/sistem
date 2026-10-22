@@ -1,0 +1,82 @@
+/* Sticky on the frosted page surface; the safe area is drawn here (the screen is full-bleed). */
+.ssh {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-overlay);
+  padding-block: calc(var(--space-2) + var(--safe-top)) var(--space-3);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  background-color: var(--surface-subscreen-bar);
+  -webkit-backdrop-filter: var(--blur-header);
+  backdrop-filter: var(--blur-header);
+}
+
+/* 44px hit area around a 40px white disc. */
+.ssh-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  margin-inline-start: calc((var(--touch-target-min) - var(--size-subscreen-back)) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ssh-back-disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-subscreen-back);
+  height: var(--size-subscreen-back);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.ssh-back:active .ssh-back-disc {
+  transform: scale(var(--press-scale));
+}
+
+.ssh-back:focus-visible {
+  outline: none;
+}
+
+.ssh-back:focus-visible .ssh-back-disc {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ssh-title {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-subscreen-title);
+  color: var(--color-ink);
+  overflow-wrap: break-word;
+}
+
+.ssh-subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-subscreen-label);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ssh-back:hover .ssh-back-disc {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ssh-back-disc {
+    transition: none;
+  }
+}
+
+/* The screens with this bar sit on the soft page surface, down to under the dock. */
+.app-shell:has(.ssh) {
+  background-color: var(--color-subscreen-page);
+}

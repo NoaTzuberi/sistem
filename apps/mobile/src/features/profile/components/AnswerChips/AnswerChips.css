@@ -1,0 +1,41 @@
+.qn-chips-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* A small Hebrew label: 13px / 600, never letter-spaced. */
+.qn-chips-label {
+  font-size: var(--text-subscreen-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}
+
+.qn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Tint + its text color come from the card (--qn-soft / --qn-ink). */
+.qn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-qn-chip);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-qn-chip);
+  background-color: var(--qn-soft, var(--color-fill-soft));
+  color: var(--qn-ink, var(--color-ink));
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.qn-chip-emoji {
+  font-size: var(--text-sm);
+  line-height: 1;
+}

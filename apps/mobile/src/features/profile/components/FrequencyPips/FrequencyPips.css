@@ -1,0 +1,47 @@
+.qn-freq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.qn-freq-pips {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.qn-freq-pip {
+  width: var(--size-qn-pip-width);
+  height: var(--size-qn-pip-height);
+  border-radius: var(--radius-qn-pip);
+  background-color: var(--color-qn-pip-rest);
+}
+
+.qn-freq-pip-full {
+  background-color: var(--qn-ink);
+}
+
+.qn-freq-pip-half {
+  background-color: var(--qn-soft);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--qn-ink) 35%, transparent);
+}
+
+.qn-freq-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-ink-raised);
+}
+
+.qn-freq-num {
+  font-family: var(--font-num);
+  font-size: var(--text-qn-pip-count);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.qn-freq-flex {
+  color: var(--color-text-muted);
+}

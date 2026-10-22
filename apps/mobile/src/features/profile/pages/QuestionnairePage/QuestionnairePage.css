@@ -1,279 +1,114 @@
-/* Her onboarding answers (moved from the Profile screen in the profile redesign). */
-.questionnaire-page {
+/* "השאלון שלי" (direction B): the soft page surface, white cards separated by spacing. */
+.qn-screen {
+  min-height: 100dvh;
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* The AppShell keeps the bottom clear of the dock; this adds the cards' own breathing room. */
+.qn-content {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding-block: var(--space-2) var(--space-5);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
 }
 
-.profile-loading-inline {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-4) 0;
-}
-
-.training-block-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.training-block-goals {
-  grid-column: span 8;
-}
-
-.training-block-frequency {
-  grid-column: span 4;
-}
-
-.training-block-activities {
-  grid-column: span 8;
-}
-
-.training-block-equipment {
-  grid-column: span 4;
-}
-
-.training-block-nutrition {
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 900px) { /* = --breakpoint-xl */
-  .training-block-goals,
-  .training-block-frequency,
-  .training-block-activities,
-  .training-block-equipment {
-    grid-column: 1 / -1;
-  }
-}
-
-.training-block-rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+/* Nutrition rows: label at the start, her answer at the end, hairlines only between rows. */
+.qn-rows {
   margin: 0;
 }
 
-.training-block-row {
+.qn-row {
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
+  padding-block: var(--space-2);
+  font-size: var(--text-sm);
 }
 
-.training-block-row dt {
+.qn-row + .qn-row {
+  border-block-start: var(--border-width-thin) solid var(--color-subscreen-rule);
+}
+
+.qn-row dt {
+  flex: none;
+  max-width: 45%;
   color: var(--color-text-muted);
 }
 
-.training-block-row dd {
+.qn-row dd {
   margin: 0;
+  color: var(--color-ink);
+  font-weight: var(--font-weight-medium);
   text-align: end;
   overflow-wrap: anywhere;
 }
 
-.training-block {
+.qn-empty {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-3);
-  border-inline-start-width: var(--border-width-thick);
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-card);
+  background-color: var(--color-card);
 }
 
-.training-block-orange {
-  border-inline-start-color: var(--color-primary);
+.qn-empty-text {
+  margin: 0;
+  font-size: var(--text-qn-body);
+  line-height: 1.5;
 }
 
-.training-block-blue {
-  border-inline-start-color: var(--color-border);
-}
-
-.training-block-teal {
-  border-inline-start-color: var(--color-primary-deep);
-}
-
-.training-block-gray {
-  border-inline-start-color: var(--color-border);
-}
-
-.training-block-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.training-block-edit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--touch-target-min);
-  min-height: var(--touch-target-min);
-  margin-inline-start: auto;
-  flex-shrink: 0;
-  border-radius: var(--radius-none);
-  border: var(--border-width-thin) solid var(--color-border);
-  color: var(--color-text-muted);
-  transition:
-    border-color var(--transition-fast) var(--ease-standard),
-    color var(--transition-fast) var(--ease-standard),
-    background-color var(--transition-fast) var(--ease-standard);
-}
-
-.training-block-edit svg {
-  width: 13px;
-  height: 13px;
-}
-
-.training-block-edit:active {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
-}
-
-.training-block-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: var(--radius-none);
-}
-
-.training-block-icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.training-block-icon-orange {
-  border: var(--border-width-thin) solid var(--color-primary);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
-}
-
-.training-block-icon-blue {
-  border: var(--border-width-thin) solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-}
-
-.training-block-icon-teal {
-  border: var(--border-width-thin) solid var(--color-primary);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
-}
-
-.training-block-icon-gray {
-  border: var(--border-width-thin) solid var(--color-border);
-  background-color: var(--color-border);
-  color: var(--color-text);
-}
-
-.training-block-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.training-block-caption {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-.frequency-strip {
-  display: flex;
-  gap: 4px;
-}
-
-.frequency-segment {
-  flex: 1;
-  height: 10px;
-  border-radius: var(--radius-none);
-  background-color: var(--color-surface);
-}
-
-.frequency-segment-filled {
-  background-color: var(--color-border);
-}
-
-.frequency-segment-tinted {
-  background-color: var(--color-surface);
-}
-
-.profile-summary-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-/* Replaces the shared Badge component for this page's goal/equipment/
-   activity tags — same visual language (tinted bg + colored border) the
-   rest of the flat redesign uses for tags. */
-.profile-tag {
+.qn-empty-button {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-none);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  justify-content: center;
+  min-height: var(--size-profile-logout);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-profile-cta);
+  color: var(--on-pink);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.profile-tag-accent {
-  background-color: var(--color-primary-soft);
-  border: var(--border-width-thin) solid var(--color-primary);
-  color: var(--color-primary-deep);
+.qn-empty-button:active {
+  transform: scale(var(--press-scale));
 }
 
-.profile-tag-neutral {
-  background-color: var(--color-border);
-  border: var(--border-width-thin) solid var(--color-border);
-  color: var(--color-text);
-}
-
-.profile-tag-success {
-  background-color: var(--color-primary-soft);
-  border: var(--border-width-thin) solid var(--color-primary);
-  color: var(--color-primary-deep);
-}
-
-.profile-summary-empty {
-  color: var(--color-text-muted);
+.qn-redo {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: var(--touch-target-min);
   font-size: var(--text-sm);
-}
-
-.profile-redo-onboarding-link {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-muted);
-  transition: color var(--transition-fast) var(--ease-standard);
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 3px;
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.profile-redo-onboarding-link:active {
-  color: var(--color-primary-deep);
+.qn-redo:active {
+  transform: scale(var(--press-scale));
 }
 
-.profile-error {
-  color: var(--color-error);
-  font-size: var(--text-sm);
-}
-
-/* Hover only where a real pointer exists; touch uses the :active state above. */
-@media (hover: hover) {
-  .training-block-edit:hover {
-    border-color: var(--color-primary);
-    background-color: var(--color-primary-soft);
-    color: var(--color-primary-deep);
+@media (hover: hover) and (pointer: fine) {
+  .qn-redo:hover {
+    color: var(--color-ink);
   }
+}
 
-  .profile-redo-onboarding-link:hover {
-    color: var(--color-primary-deep);
+@media (prefers-reduced-motion: reduce) {
+  .qn-empty-button,
+  .qn-redo {
+    transition: none;
   }
 }

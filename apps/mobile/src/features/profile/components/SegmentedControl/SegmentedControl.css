@@ -1,0 +1,83 @@
+/* The track: soft, rounded, 3px inside; the options share it equally. */
+.st-seg {
+  position: relative;
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(var(--seg-count), minmax(0, 1fr));
+  padding: var(--size-profile-track-inset);
+  border-radius: var(--radius-segment-track);
+  background-color: var(--color-segment-track);
+}
+
+.st-seg-block {
+  width: 100%;
+}
+
+/* The white thumb under the chosen option; it slides with the reading direction (spring, 320ms). */
+.st-seg-thumb {
+  position: absolute;
+  inset-block: var(--size-profile-track-inset);
+  inset-inline-start: var(--size-profile-track-inset);
+  width: calc((100% - 2 * var(--size-profile-track-inset)) / var(--seg-count));
+  border-radius: var(--radius-segment-thumb);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-segment-soft);
+  transform: translateX(calc(var(--seg-index) * 100%));
+  transition: transform var(--transition-profile-thumb) var(--ease-slide-snap);
+}
+
+:root[dir='rtl'] .st-seg-thumb {
+  transform: translateX(calc(var(--seg-index) * -100%));
+}
+
+/* 36px drawn; the 4px around it on the track keeps the hit area at 44px with the row. */
+.st-seg-option {
+  position: relative;
+  z-index: var(--z-raised);
+  min-width: var(--touch-target-min);
+  min-height: var(--size-segment-option);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-segment-thumb);
+  background: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.st-seg-option[aria-checked='true'] {
+  color: var(--color-ink);
+}
+
+.st-seg-option:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.st-seg-option:disabled {
+  cursor: progress;
+}
+
+.st-seg-option:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: calc(-1 * var(--border-width-medium));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .st-seg-option:not([aria-checked='true']):hover {
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-seg-thumb,
+  .st-seg-option {
+    transition: none;
+  }
+}

@@ -1,0 +1,101 @@
+.qn-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+}
+
+.qn-stepper-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}
+
+.qn-stepper-control {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--size-profile-track-inset);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.qn-stepper-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qn-stepper-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.qn-stepper-button:disabled {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+/* The value reads left → right (numbers) in both languages. */
+.qn-stepper-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: var(--size-profile-stepper-value);
+  direction: ltr;
+}
+
+.qn-stepper-number,
+.qn-stepper-input {
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.qn-stepper-input {
+  width: 4.5ch;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: center;
+}
+
+.qn-stepper-input:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-qn-pip);
+}
+
+.qn-stepper-unit {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .qn-stepper-button:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qn-stepper-button {
+    transition: none;
+  }
+}
