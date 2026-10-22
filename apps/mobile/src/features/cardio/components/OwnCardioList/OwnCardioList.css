@@ -1,0 +1,54 @@
+.sg-cardio-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sg-cardio-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-fr-option-row);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-fr-option);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sg-cardio-row:active {
+  transform: scale(var(--scale-fr-press-card));
+}
+
+.sg-cardio-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sg-cardio-name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.sg-cardio-meta {
+  color: var(--color-fr-muted);
+  font-size: var(--text-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sg-cardio-row:hover {
+    background-color: var(--color-fr-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-cardio-row {
+    transition: none;
+  }
+}

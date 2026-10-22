@@ -15,10 +15,12 @@ export const config = {
   // CORS allow-list (comma-separated in CLIENT_ORIGINS). Never '*'.
   clientOrigins: parseClientOrigins(process.env.CLIENT_ORIGINS, process.env.NODE_ENV || 'development'),
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // The coach dashboard (the admin's "set password" links open there).
+  dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:5174',
+  // Accounts with this email get the admin role at server start (idempotent; empty = none).
+  adminEmail: (process.env.ADMIN_EMAIL || '').trim().toLowerCase(),
   resendApiKey: process.env.RESEND_API_KEY || '',
   emailFrom: process.env.EMAIL_FROM || 'Sistem <onboarding@resend.dev>',
-  // The coach new trainees are assigned to on sign-up (one coach for now).
-  defaultCoachEmail: (process.env.DEFAULT_COACH_EMAIL || '').trim().toLowerCase(),
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
     apiKey: process.env.CLOUDINARY_API_KEY || '',

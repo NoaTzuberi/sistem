@@ -15,9 +15,11 @@ import {
   InvalidCredentialsError,
   UserNotFoundError,
   InvalidResetTokenError,
+  SetPasswordTokenError,
+  setPasswordWithToken,
 } from './auth.service';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { sendError } from '../../i18n';
+import { requestLanguage, sendError, translate } from '../../i18n';
 
 export async function register(req: Request, res: Response) {
   const validationError = validateRegisterInput(req.body);
@@ -26,11 +28,12 @@ export async function register(req: Request, res: Response) {
     return;
   }
 
-  const { name, email, password, timezone, language } = req.body;
+  const { name, email, password, timezone, language, inviteCode } = req.body;
 
   try {
-    const result = await registerUser(name, email, password, timezone, language);
-    res.status(201).json(result);
+    const { inviteError, ...result } = await registerUser(name, email, password, timezone, language, inviteCode);
+    // The account exists either way; an unusable code comes back as a sentence the app can show.
+    res.status(201).json(inviteError ? { ...result, inviteError: { code: inviteError.code, message: translate(requestLanguage(req), inviteError) } } : result);
   } catch (error) {
     if (error instanceof EmailAlreadyInUseError) {
       sendError(res, 409, error.serverMessage);
@@ -86,6 +89,24 @@ export async function resetPassword(req: Request, res: Response) {
     sendError(res, 200, 'password_reset_done');
   } catch (error) {
     if (error instanceof InvalidResetTokenError) {
+      sendError(res, 400, error.serverMessage);
+      return;
+    }
+    throw error;
+  }
+}
+
+/** The admin's one-time link: sets the password and signs her in (AuthResponse). */
+export async function setPassword(req: Request, res: Response) {
+  const validationError = validateResetPasswordInput(req.body);
+  if (validationError) {
+    sendError(res, 400, validationError);
+    return;
+  }
+  try {
+    res.status(200).json(await setPasswordWithToken(req.body.token, req.body.password));
+  } catch (error) {
+    if (error instanceof SetPasswordTokenError) {
       sendError(res, 400, error.serverMessage);
       return;
     }

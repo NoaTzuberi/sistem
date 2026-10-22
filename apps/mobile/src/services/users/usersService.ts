@@ -1,4 +1,4 @@
-import { createAuthApi } from '@sistem/api-client';
+import { createAuthApi, createTraineeApi } from '@sistem/api-client';
 import type { NutritionPreferences, WeightGoal } from '@sistem/types';
 import { apiClient } from '../api/apiClient';
 
@@ -45,5 +45,8 @@ export async function getMyProfile(): Promise<MyProfileResponse> {
   return data.user;
 }
 
-// Her display units (Settings, Phase 10) and UI language (Phase 15).
-export const { updatePreferences } = createAuthApi(apiClient);
+// Her display units (Settings, Phase 10), UI language (Phase 15) and profile photo.
+export const { updatePreferences, uploadAvatar, removeAvatar, fetchAvatar } = createAuthApi(apiClient);
+
+// First run: "on my own" (remembered on the server; resumes in the questionnaire).
+export const { chooseSelfGuided } = createTraineeApi(apiClient);

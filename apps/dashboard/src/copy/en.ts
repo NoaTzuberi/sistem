@@ -72,4 +72,17 @@ export const en: CopyShape<typeof he> = {
     great: 'Great',
     toProfile: "To {name}'s profile",
   },
+  setPassword: {
+    title: 'Choose a password',
+    subtitle: 'Your account is almost ready. Choose a password of at least 8 characters.',
+    password: 'New password',
+    confirm: 'Confirm password',
+    submit: 'Save and sign in',
+    saving: 'Saving…',
+    mismatch: "The passwords don't match. Type them again.",
+    tooShort: 'The password is too short. Use at least 8 characters.',
+    missingToken: 'The link is missing or incomplete. Ask the Sistem admin for a new one.',
+    failed: "Couldn't save the password. Try again.",
+    toLogin: 'To the login screen',
+  },
 };

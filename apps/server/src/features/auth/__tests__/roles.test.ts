@@ -1,3 +1,5 @@
+import { ensureCoachSetup } from '../../coachProfiles/coachProfile.service';
+import { CoachProfile } from '../../coachProfiles/coachProfile.model';
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 import { connectTestDatabase, disconnectTestDatabase, clearTestDatabase } from '../../exercises/__tests__/testDb';
@@ -63,29 +65,30 @@ describe('roles and app state', () => {
 
     expect(res.statusCode).toBe(201);
     const stored = await User.findOne({ email: 'sneaky@example.com' });
-    expect(stored?.role).toBe('trainee');
+    expect(stored?.roles).toEqual(['trainee']);
     expect((res.body as { user: { role: string } }).user.role).toBe('trainee');
   });
 
-  it('a new trainee resolves to the onboarding state', async () => {
+  it('a new trainee without an invite starts on the "how do you want to train" choice', async () => {
     const res = await registerViaController({ name: 'New', email: 'new@example.com', password: PASSWORD });
     const { user } = res.body as { user: { appState: string; onboardingStatus: string; onboardingCompleted: boolean } };
     expect(user.onboardingStatus).toBe('not_started');
     expect(user.onboardingCompleted).toBe(false);
-    expect(user.appState).toBe('onboarding');
+    expect(user.appState).toBe('choose_path');
   });
 
-  it('an onboarded trainee without a published plan resolves to waiting', async () => {
+  it('an onboarded trainee without any coach is self-guided (Home)', async () => {
     await registerViaController({ name: 'Done', email: 'done@example.com', password: PASSWORD });
     const stored = await User.findOneAndUpdate({ email: 'done@example.com' }, { onboardingStatus: 'completed' }, { new: true });
 
     const user = await getCurrentUser(String(stored!._id));
-    expect(user.appState).toBe('waiting');
+    expect(user.appState).toBe('home');
+    expect(user.coachingStatus).toBeNull();
   });
 
   it('a coach resolves to the coach state on login', async () => {
     await registerViaController({ name: 'Coach', email: 'coach@example.com', password: PASSWORD });
-    await User.updateOne({ email: 'coach@example.com' }, { role: 'coach' });
+    await User.updateOne({ email: 'coach@example.com' }, { roles: ['coach'] });
 
     const { user } = await loginUser('coach@example.com', PASSWORD);
     expect(user.role).toBe('coach');
@@ -93,11 +96,27 @@ describe('roles and app state', () => {
   });
 
   it('resolveAppState follows the PRD §4.2 table', () => {
-    expect(resolveAppState({ role: 'trainee', onboardingStatus: 'not_started' }, false)).toBe('onboarding');
-    expect(resolveAppState({ role: 'trainee', onboardingStatus: 'in_progress' }, true)).toBe('onboarding');
-    expect(resolveAppState({ role: 'trainee', onboardingStatus: 'completed' }, false)).toBe('waiting');
-    expect(resolveAppState({ role: 'trainee', onboardingStatus: 'completed' }, true)).toBe('home');
-    expect(resolveAppState({ role: 'coach', onboardingStatus: 'not_started' }, false)).toBe('coach');
+    const trainee = (onboardingStatus: 'not_started' | 'in_progress' | 'completed', extra: { selfGuidedAt?: Date; onboardingCompletedAt?: Date } = {}) => ({
+      roles: ['trainee' as const],
+      onboardingStatus,
+      onboardingCompletedAt: onboardingStatus === 'completed' ? new Date('2026-01-10') : null,
+      ...extra,
+    });
+    const none = { coaching: null, hasPlan: false };
+    const waiting = (startedAt: string) => ({ coaching: { status: 'waiting' as const, startedAt: new Date(startedAt) }, hasPlan: false });
+    // First run: no coach and no choice yet → "how do you want to train"; a choice or a coach → questionnaire.
+    expect(resolveAppState(trainee('not_started'), none)).toBe('choose_path');
+    expect(resolveAppState(trainee('not_started', { selfGuidedAt: new Date() }), none)).toBe('onboarding');
+    expect(resolveAppState(trainee('in_progress'), waiting('2026-01-01'))).toBe('onboarding');
+    // Self-guided is a normal state → Home.
+    expect(resolveAppState(trainee('completed'), none)).toBe('home');
+    // Joined in the first run → the waiting screen; joined after onboarding → Home (a waiting card).
+    expect(resolveAppState(trainee('completed'), waiting('2026-01-01'))).toBe('waiting');
+    expect(resolveAppState(trainee('completed'), waiting('2026-02-01'))).toBe('home');
+    expect(resolveAppState(trainee('completed'), { ...waiting('2026-01-01'), hasPlan: true })).toBe('home');
+    expect(resolveAppState({ roles: ['coach'], onboardingStatus: 'not_started' }, none)).toBe('coach');
+    expect(resolveAppState({ roles: ['admin', 'coach'], onboardingStatus: 'not_started' }, none)).toBe('coach');
+    expect(resolveAppState({ roles: ['admin'], onboardingStatus: 'not_started' }, none)).toBe('admin');
   });
 
   describe('requireRole', () => {
@@ -124,10 +143,22 @@ describe('roles and app state', () => {
 
     it('lets a coach through', async () => {
       await registerViaController({ name: 'C', email: 'c@example.com', password: PASSWORD });
-      const coach = await User.findOneAndUpdate({ email: 'c@example.com' }, { role: 'coach' }, { new: true });
+      const coach = await User.findOneAndUpdate({ email: 'c@example.com' }, { roles: ['coach'] }, { new: true });
+      await ensureCoachSetup(coach!._id, 'C');
 
       const { next } = await runRequireRole(String(coach!._id));
       expect(next).toHaveBeenCalledOnce();
+    });
+
+    it('a suspended coach gets 403 on every coach route', async () => {
+      await registerViaController({ name: 'S', email: 's@example.com', password: PASSWORD });
+      const coach = await User.findOneAndUpdate({ email: 's@example.com' }, { roles: ['coach'] }, { new: true });
+      await ensureCoachSetup(coach!._id, 'S');
+      await CoachProfile.updateOne({ userId: coach!._id }, { status: 'suspended' });
+
+      const { res, next } = await runRequireRole(String(coach!._id));
+      expect(res.statusCode).toBe(403);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 });

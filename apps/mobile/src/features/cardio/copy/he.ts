@@ -50,8 +50,41 @@ export const he = {
   noteQuestionNoCoach: 'משהו למאמנת?', // DRAFT — no coach name
   notePlaceholder: 'למשל: בסבב 6 הייתי צריכה ללכת',
   save: 'שמירה ושליחה ל{name}',
-  saveNoCoach: 'שמירה ושליחה', // DRAFT
+  saveNoCoach: 'שמירה', // DRAFT (no coach: nothing is sent)
   saved: 'נשמר ונשלח ל{name}',
   savedNoCoach: 'נשמר', // DRAFT
   saveError: 'השמירה לא הצליחה. נסי שוב.', // DRAFT
+  // Her own cardio workouts (self-guided) — PLACEHOLDER drafts.
+  ownEdit: 'עריכה',
+  builder: {
+    titleNew: 'אימון ריצה חדש',
+    titleEdit: 'עריכת אימון',
+    name: 'שם האימון',
+    namePlaceholder: 'למשל: ריצת בוקר',
+    nameRequired: 'צריך לתת לאימון שם.',
+    sport: 'סוג',
+    preview: 'מבנה האימון',
+    blocks: 'קטעים',
+    kind: 'סוג הקטע',
+    duration: 'משך',
+    intensity: 'עצימות',
+    times: 'סבבים',
+    increase: 'הוספה ל{what}',
+    decrease: 'הפחתה מ{what}',
+    removeBlock: 'הסרת הקטע',
+    addBlock: 'הוספת קטע',
+    addRepeat: 'הוספת סט חוזר',
+    addToRepeat: 'הוספת קטע לסט',
+    save: 'שמירה',
+    saving: 'שומרת…',
+    saveError: 'לא הצלחנו לשמור. אפשר לנסות שוב.',
+    delete: 'מחיקת האימון',
+    deleteQuestion: 'למחוק את האימון? הריצות שכבר עשית יישארו בהיסטוריה.',
+    deleteYes: 'מחיקה',
+    cancel: 'ביטול',
+    total: 'בסך הכול כ-{minutes} דקות',
+  },
+  own: {
+    runs: plural({ one: 'ריצה אחת', two: '2 ריצות', other: '{count} ריצות' }), // PLACEHOLDER
+  },
 };

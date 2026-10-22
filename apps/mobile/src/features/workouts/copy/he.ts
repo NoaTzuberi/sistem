@@ -205,6 +205,19 @@ export const he = {
     pickLog: 'בחרי אימון',
     noLogs: 'עדיין אין אימונים שהושלמו.',
     start: 'התחלה',
+    // PLACEHOLDER drafts (self-guided, adding exercises during a free workout).
+    introSelf: 'אימון שאת בונה לבד. הוא יישמר בהיסטוריה שלך.',
+    addExercise: 'הוספת תרגיל',
+    searchLabel: 'חיפוש תרגיל',
+    searchPlaceholder: 'שם התרגיל',
+    searching: 'מחפשת…',
+    noResults: 'לא מצאנו תרגיל כזה. אפשר לנסות שם אחר.',
+    loadError: 'לא הצלחנו לטעון תרגילים. אפשר לנסות שוב.',
+    addOffline: 'אין חיבור. אפשר להוסיף תרגיל כשהחיבור יחזור.',
+    addError: 'לא הצלחנו להוסיף את התרגיל. אפשר לנסות שוב.',
+    added: 'נוסף לאימון: {name}',
+    emptyTitle: 'אימון ריק',
+    emptyText: 'מוסיפים את התרגיל הראשון וממשיכים משם.',
   },
   history: {
     total: 'אימונים בסך הכל',
@@ -292,5 +305,16 @@ export const he = {
     text: 'טיפ: הפעילי מיקוד / נא לא להפריע כדי ששום דבר לא יפריע לאימון שלך.',
     gotIt: 'הבנתי',
     dontShowAgain: 'לא להציג שוב',
+  },
+  // Self-guided (no coach) — PLACEHOLDER drafts.
+  selfGuided: {
+    title: 'האימונים שלך, בקצב שלך',
+    text: 'בונים אימון מהתרגילים שמתאימים לציוד שלך, ושומרים כל סט.',
+    action: 'אימון חופשי',
+    cardioTitle: 'הריצות שלי',
+    cardioEmptyTitle: 'ריצה משלך',
+    cardioEmptyText: 'בונים ריצה מקטעים וסטים חוזרים, והנגן מוביל אותך קטע אחרי קטע.',
+    cardioAction: 'בניית אימון ריצה',
+    newRun: 'אימון ריצה חדש',
   },
 } as const;

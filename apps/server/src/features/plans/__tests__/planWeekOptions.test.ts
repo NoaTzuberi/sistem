@@ -58,7 +58,7 @@ describe('plan week options', () => {
     const oct11 = await plan('2026-10-11', 'draft');
     await plan('2026-10-18', 'published');
 
-    const options = await listPlanWeekOptions(trainee.id, NOW);
+    const options = await listPlanWeekOptions(trainee.id, trainee.coachingId!, NOW);
 
     expect(options.currentWeekStart).toBe('2026-10-04');
     expect(options.defaultNewWeek).toBe('2026-10-04');
@@ -73,14 +73,14 @@ describe('plan week options', () => {
 
   it('only the Sep 27 plan: this week is free and the default for both actions', async () => {
     await plan('2026-09-27', 'published');
-    const options = await listPlanWeekOptions(trainee.id, NOW);
+    const options = await listPlanWeekOptions(trainee.id, trainee.coachingId!, NOW);
     expect(options.defaultNewWeek).toBe('2026-10-04');
     expect(options.defaultDuplicateWeek).toBe('2026-10-04');
     expect(options.weeks[0]).toEqual({ weekStartDate: '2026-10-04', relation: 'this', plan: null, copiesFromWeek: '2026-09-27' });
   });
 
   it('offers consecutive Sundays from this week on — never a past week', async () => {
-    const options = await listPlanWeekOptions(trainee.id, NOW);
+    const options = await listPlanWeekOptions(trainee.id, trainee.coachingId!, NOW);
     expect(options.weeks).toHaveLength(PLAN_WEEKS_OFFERED);
     options.weeks.forEach((week, index) => {
       expect(week.weekStartDate).toBe(addDays('2026-10-04', index * 7));
@@ -94,8 +94,8 @@ describe('plan week options', () => {
     // Saturday 22:30 UTC: already Sunday 11 Oct in Jerusalem, still Saturday in New York.
     const saturdayNight = new Date('2026-10-10T22:30:00Z');
     const newYorker = await createTestUser('ny@example.com', { coachId: coach.user._id, timezone: 'America/New_York' });
-    expect((await listPlanWeekOptions(trainee.id, saturdayNight)).currentWeekStart).toBe('2026-10-11');
-    expect((await listPlanWeekOptions(newYorker.id, saturdayNight)).currentWeekStart).toBe('2026-10-04');
+    expect((await listPlanWeekOptions(trainee.id, trainee.coachingId!, saturdayNight)).currentWeekStart).toBe('2026-10-11');
+    expect((await listPlanWeekOptions(newYorker.id, newYorker.coachingId!, saturdayNight)).currentWeekStart).toBe('2026-10-04');
   });
 
   describe('GET /coach/trainees/:traineeId/plan-weeks', () => {

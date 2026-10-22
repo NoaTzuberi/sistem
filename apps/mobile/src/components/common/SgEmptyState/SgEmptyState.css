@@ -1,0 +1,86 @@
+.sg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: calc(var(--space-3) + var(--space-1));
+  border-radius: var(--radius-fr-panel);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-fr-solo);
+  color: var(--color-ink);
+}
+
+.sg-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-icon-tile);
+  height: var(--size-fr-icon-tile);
+  border-radius: var(--radius-fr-icon-tile);
+  background-color: var(--color-ink);
+  color: var(--color-pink-on-ink);
+}
+
+.sg-empty-title {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-qn-section);
+  line-height: var(--line-height-display);
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.sg-empty-text {
+  margin: 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.sg-empty-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  margin-block-start: var(--space-1);
+  padding: 0 calc(var(--space-3) + var(--space-1));
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  box-shadow: var(--shadow-profile-cta);
+  transition: transform var(--transition-press) var(--ease-fr-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sg-empty-action:active:not([disabled]) {
+  transform: scale(var(--scale-fr-press));
+}
+
+.sg-empty-action[disabled] {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-ink);
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sg-empty-action {
+    transition: transform var(--transition-press) var(--ease-fr-out), background-color var(--transition-hover) ease;
+  }
+
+  .sg-empty-action:not([disabled]):hover {
+    background-color: var(--color-primary-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-empty-action {
+    transition: none;
+  }
+}

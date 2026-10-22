@@ -10,6 +10,7 @@ import { OnboardingBackground } from '../../components/OnboardingBackground/Onbo
 import { QuestionCard } from '../../components/QuestionCard/QuestionCard';
 import { StepHeading } from '../../components/StepHeading/StepHeading';
 import { WelcomeStep } from '../../steps/WelcomeStep/WelcomeStep';
+import { useJoiningCoach } from '../../../firstRun/hooks/useJoiningCoach';
 import { BasicProfileStep } from '../../steps/BasicProfileStep/BasicProfileStep';
 import { GoalsStep } from '../../steps/GoalsStep/GoalsStep';
 import { FrequencyStep } from '../../steps/FrequencyStep/FrequencyStep';
@@ -195,6 +196,8 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, updateUser } = useAuth();
+  // The intro line names her coach (a link at sign-up, or a code in the first run).
+  const joiningCoach = useJoiningCoach(user?.coachingStatus != null);
   const params = useParams<{ step?: string }>();
   const editStepId = isEditableStepId(params.step) ? params.step : undefined;
   const isEditMode = params.step !== undefined;
@@ -529,7 +532,7 @@ export function OnboardingPage() {
   }
 
   const cardSteps: Partial<Record<OnboardingStepId, ReactNode>> = {
-    welcome: <WelcomeStep />,
+    welcome: <WelcomeStep hasCoach={user?.coachingStatus != null} coachName={joiningCoach} />,
     basic_profile: <BasicProfileStep formState={formState} updateFormState={updateFormState} />,
     goals: <GoalsStep formState={formState} updateFormState={updateFormState} />,
     frequency: <FrequencyStep formState={formState} updateFormState={updateFormState} />,

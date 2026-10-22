@@ -14,6 +14,7 @@ import { LoginField } from '../../components/LoginField/LoginField';
 import { ArrowIcon, LockIcon, MailIcon } from '../../components/LoginIcons/LoginIcons';
 import { FORGOT_PASSWORD_ENABLED, REMEMBER_ME_ENABLED } from '../../data/authConfig';
 import { useLoginEntrance } from '../../hooks/useLoginEntrance';
+import { dashboardHome } from '../../data/roles';
 import './Login.css';
 
 const FEATURES = ['trainees', 'plans', 'nutrition'] as const;
@@ -31,8 +32,9 @@ export function Login() {
   // Shown only behind REMEMBER_ME_ENABLED; the auth doesn't read it yet.
   const [rememberMe, setRememberMe] = useState(false);
 
-  if (user?.role === 'coach') {
-    return <Navigate to={ROUTES.HOME} replace />;
+  const signedInHome = dashboardHome(user, { home: ROUTES.HOME, admin: ROUTES.ADMIN_COACHES });
+  if (signedInHome) {
+    return <Navigate to={signedInHome} replace />;
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -41,14 +43,15 @@ export function Login() {
     setIsSubmitting(true);
     try {
       const loggedInUser = await login({ email, password });
-      // The dashboard is coach-only. The server enforces this on every coach
-      // endpoint too; this only keeps trainees out of an empty UI.
-      if (loggedInUser.role !== 'coach') {
+      // The dashboard is for coaches (and the admin). The server enforces this on every coach /
+      // admin endpoint too; this only keeps trainees out of an empty UI.
+      const home = dashboardHome(loggedInUser, { home: ROUTES.HOME, admin: ROUTES.ADMIN_COACHES });
+      if (!home) {
         logout();
         setError(copy.coachOnly);
         return;
       }
-      navigate(ROUTES.HOME, { replace: true });
+      navigate(home, { replace: true });
     } catch (loginError) {
       setError((loginError instanceof Error && loginError.message) || copy.loginFailed);
     } finally {

@@ -10,22 +10,25 @@ import './AuthScreen.css';
 
 interface AuthScreenProps {
   title: string;
-  /** The pill next to the title that leads to the other screen (log in ↔ sign up). */
-  switchLabel: string;
-  switchTo: string;
+  /** The pill next to the title that leads to the other screen (log in ↔ sign up); none on the join screens. */
+  switchLabel?: string;
+  switchTo?: string;
   /** A quiet line right under the card; it rises and fades in with the card. */
   footer?: ReactNode;
+  /** A slim line at the very top (the "joining <coach>" banner of a coach's link). */
+  banner?: ReactNode;
   children: ReactNode;
 }
 
 // The login / sign-up screen: track background, brand, glass card. Not inside PageLayout — its
 // page-enter transform would pin the fixed background and fight the entrance timeline.
-export function AuthScreen({ title, switchLabel, switchTo, footer, children }: AuthScreenProps) {
+export function AuthScreen({ title, switchLabel, switchTo, footer, banner, children }: AuthScreenProps) {
   const copy = useCopy(authCopy);
   const { riseRef, intro } = useAuthEntrance<HTMLDivElement>();
 
   return (
     <div className="auth-screen">
+      {banner}
       <TrackBackground intro={intro} />
       <main className="auth-screen-content">
         <header className="auth-screen-brand">
@@ -36,9 +39,11 @@ export function AuthScreen({ title, switchLabel, switchTo, footer, children }: A
           <section className="auth-glass-card">
             <div className="auth-glass-head">
               <h1 className="auth-glass-title display-title">{title}</h1>
-              <Link className="auth-glass-switch" to={switchTo}>
-                {switchLabel}
-              </Link>
+              {switchTo && switchLabel && (
+                <Link className="auth-glass-switch" to={switchTo}>
+                  {switchLabel}
+                </Link>
+              )}
             </div>
             {children}
           </section>

@@ -168,16 +168,17 @@ describe('exercise families & training config (Phase 12b)', () => {
     expect(names((await families('workoutType=lower&slotId=squat')).body)).toContain('Squat to Overhead Press to Row');
 
     const barbell = ids.get('Barbell Romanian Deadlift')!;
-    await WorkoutLog.create({
+    const barbellLog = await WorkoutLog.create({
       traineeId: trainee.user._id,
       planId: new Types.ObjectId(),
+      coachingId: trainee.coachingId!,
       workoutId: new Types.ObjectId(),
       workoutTitle: 'Lower',
       status: 'completed',
       finishedAt: new Date('2026-10-01T10:00:00Z'),
       sets: [{ exerciseId: barbell, setIndex: 0, reps: 8, weight: 40, completed: true }],
     });
-    await PersonalRecord.create({ userId: trainee.user._id, exerciseId: barbell, logId: new Types.ObjectId(), previousValue: 35, newValue: 40, type: 'weight' });
+    await PersonalRecord.create({ userId: trainee.user._id, exerciseId: barbell, logId: barbellLog._id, previousValue: 35, newValue: 40, type: 'weight' });
 
     const history = await api.request('GET', `/coach/trainees/${trainee.id}/exercise-history?familyId=${await familyOf('Dumbbell Romanian Deadlift')}`, {
       token: coach.token,

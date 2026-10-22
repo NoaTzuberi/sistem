@@ -1,0 +1,16 @@
+.fr-steps {
+  display: flex;
+  gap: var(--space-1);
+  margin-block-start: var(--space-3);
+}
+
+.fr-step {
+  flex: 1;
+  height: var(--size-fr-step-height);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fr-step-rest);
+}
+
+.fr-step[data-on] {
+  background-color: var(--color-ink);
+}

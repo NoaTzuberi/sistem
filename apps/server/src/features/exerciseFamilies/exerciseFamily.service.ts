@@ -23,6 +23,7 @@ import { VARIANT_IDS } from './exerciseFamily.constants';
 import { ExerciseFamily, type ExerciseFamilyFields } from './exerciseFamily.model';
 import { familyDisplayName, plainNameRank } from './exerciseFamilyGrouping';
 import { refreshFamilyMembers } from './exerciseFamilyGrouping.service';
+import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 
 // The coach's view of the library by family (Phase 12b): the slot-filtered picker, the library
 // review screen and her edits (name, patterns, primary, merge, split). Only primaries are offered
@@ -290,14 +291,18 @@ export async function splitFamily(familyId: string, exerciseIds: string[]): Prom
   return getFamilyDetail(String(newId));
 }
 
-/** Her history per variant of one family — PRs and "last time" stay per variant (40 kg barbell ≠ dumbbells). */
-export async function getFamilyHistory(traineeId: string, familyId: string): Promise<FamilyHistory> {
+/**
+ * Her history per variant of one family — PRs and "last time" stay per variant (40 kg barbell ≠ dumbbells).
+ * Coach view: only the logs (and PRs set in logs) of this coach's coaching with her.
+ */
+export async function getFamilyHistory(traineeId: string, coachingId: string, familyId: string): Promise<FamilyHistory> {
   const family = await loadFamily(familyId);
   const members = await Exercise.find({ familyId: family._id }).select(MEMBER_FIELDS).lean<LeanMember[]>();
   const ids = members.map((member) => String(member._id));
+  const logIds = (await WorkoutLog.distinct('_id', { traineeId, coachingId })) as Types.ObjectId[];
   const [last, records] = await Promise.all([
-    findLastPerformance(traineeId, ids),
-    PersonalRecord.find({ userId: traineeId, exerciseId: { $in: ids } }).sort({ date: -1 }).lean(),
+    findLastPerformance(traineeId, ids, undefined, coachingId),
+    PersonalRecord.find({ userId: traineeId, exerciseId: { $in: ids }, logId: { $in: logIds } }).sort({ date: -1 }).lean(),
   ]);
   const variants = members
     .map((member) => {

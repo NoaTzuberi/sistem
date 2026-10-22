@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { coachingIdField, fillCoachingFromPair } from '../coachings/coachingRef';
 import { CALORIE_TARGET_SOURCE_IDS, FORMULA_SEX_IDS, NUTRITION_GOAL_IDS, NUTRITION_PLAN_MODE_IDS } from './nutrition.constants';
 import { nutritionMealSchema, nutritionTipSchema, portionCountsSchema } from './nutritionMeal.schema';
 import type {
@@ -51,9 +52,10 @@ const calorieTargetSchema = new Schema<CalorieTargetFields>(
 
 const nutritionPlanSchema = new Schema<NutritionPlanDocument>(
   {
-    traineeId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-    // Copied from the trainee when the plan is created.
+    traineeId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     coachId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    // ONE working copy per coaching (was per trainee): the coach reads it only through it.
+    coachingId: { ...coachingIdField, unique: true },
     calorieTarget: { type: calorieTargetSchema, required: true },
     // null = saved before modes (nutritionPlanMode.ts decides on read).
     mode: { type: String, enum: [...NUTRITION_PLAN_MODE_IDS, null], default: null },
@@ -74,7 +76,9 @@ const nutritionPlanSchema = new Schema<NutritionPlanDocument>(
   { timestamps: true },
 );
 
+fillCoachingFromPair(nutritionPlanSchema);
 nutritionPlanSchema.index({ coachId: 1, updatedAt: -1 });
+nutritionPlanSchema.index({ traineeId: 1 });
 
 export const NutritionPlan = model<NutritionPlanDocument>('NutritionPlan', nutritionPlanSchema);
 
@@ -83,6 +87,7 @@ const nutritionPlanVersionSchema = new Schema<NutritionPlanVersionDocument>(
     planId: { type: Schema.Types.ObjectId, ref: 'NutritionPlan', required: true },
     traineeId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     coachId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    coachingId: coachingIdField,
     version: { type: Number, required: true, min: 1 },
     publishedAt: { type: Date, required: true },
     calorieTarget: { type: calorieTargetSchema, required: true },
@@ -107,5 +112,7 @@ const nutritionPlanVersionSchema = new Schema<NutritionPlanVersionDocument>(
 // The unique pair makes two publishes at once produce one version each, never a clash.
 nutritionPlanVersionSchema.index({ planId: 1, version: 1 }, { unique: true });
 nutritionPlanVersionSchema.index({ traineeId: 1, version: -1 });
+nutritionPlanVersionSchema.index({ coachingId: 1, version: -1 });
+fillCoachingFromPair(nutritionPlanVersionSchema);
 
 export const NutritionPlanVersion = model<NutritionPlanVersionDocument>('NutritionPlanVersion', nutritionPlanVersionSchema);

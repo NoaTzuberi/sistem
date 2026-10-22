@@ -20,9 +20,13 @@ export type CardioStepFields = CardioBlockFields | CardioRepeatFields;
 
 export interface CardioLogDocument {
   traineeId: Types.ObjectId;
-  planId: Types.ObjectId;
+  /** Plan cardio only; her own cardio belongs to no coaching. */
+  coachingId: Types.ObjectId | null;
+  planId: Types.ObjectId | null;
   /** The PlanWorkout subdocument _id (a cardio workout). */
-  workoutId: Types.ObjectId;
+  workoutId: Types.ObjectId | null;
+  /** Her own cardio workout (OwnCardioWorkout) — set instead of planId / workoutId. */
+  ownWorkoutId: Types.ObjectId | null;
   workoutTitle: string;
   sport: CardioSport;
   date: string;

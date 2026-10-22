@@ -3,12 +3,14 @@ import { PLAN_STATUS_IDS, DEFAULT_PLAN_STATUS } from './plan.constants';
 import { planWorkoutSchema } from './planWorkout.schema';
 import { isSunday } from './planWeek';
 import type { PlanDocument } from './plan.types';
+import { coachingIdField, fillCoachingFromPair } from '../coachings/coachingRef';
 
 const planSchema = new Schema<PlanDocument>(
   {
     traineeId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    // Copied from the trainee when the plan is created.
     coachId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    // The coaching (trainee ↔ this coach) the plan belongs to: coaches read plans only through it.
+    coachingId: coachingIdField,
     // 'YYYY-MM-DD' of the Sunday that starts the week, in the trainee's time zone.
     weekStartDate: {
       type: String,
@@ -31,8 +33,11 @@ const planSchema = new Schema<PlanDocument>(
   { timestamps: true },
 );
 
-// One plan per trainee per week: a draft becomes published in place.
-planSchema.index({ traineeId: 1, weekStartDate: 1 }, { unique: true });
+fillCoachingFromPair(planSchema);
+
+// One plan per coaching per week: a draft becomes published in place. (Per coaching, not per
+// trainee, so two coaches can each plan the same week once multi-coach is on.)
+planSchema.index({ coachingId: 1, weekStartDate: 1 }, { unique: true });
 planSchema.index({ traineeId: 1, status: 1, weekStartDate: -1 });
 planSchema.index({ coachId: 1, status: 1, weekStartDate: -1 });
 

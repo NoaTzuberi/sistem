@@ -54,7 +54,6 @@ export const en: CopyShape<typeof he> = {
   },
   welcome: {
     title: 'Build a profile that moves with you.',
-    body: 'Sistem uses your answers to adapt training, activities, and guidance around your real life.',
   },
   basicProfile: {
     title: "Let's start with you.",

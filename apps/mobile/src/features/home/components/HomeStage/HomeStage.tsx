@@ -13,6 +13,8 @@ import { DailyObject3D } from '../DailyObject3D/DailyObject3D';
 import { TodayWorkoutHeadline } from '../TodayWorkoutHeadline/TodayWorkoutHeadline';
 import { type WorkoutFact, WorkoutFacts } from '../WorkoutFacts/WorkoutFacts';
 import { SlideToStart } from '../../../../components/common/SlideToStart/SlideToStart';
+import { AvatarPhoto } from '../../../../components/common/AvatarPhoto/AvatarPhoto';
+import { useMyAvatar } from '../../../../hooks/useMyAvatar';
 import './HomeStage.css';
 
 /** The slide shows "started" this long, then resets (if Home is still on screen). */
@@ -53,6 +55,7 @@ export function HomeStage(props: HomeStageProps) {
   const eyebrow = useCopy(appCopy).eyebrow;
   const workoutText = useCopy(workoutCopy);
   const language = useLanguage();
+  const avatar = useMyAvatar();
   const firstName = name.trim().split(' ')[0] ?? '';
 
   const weekFact: WorkoutFact[] = weekCount
@@ -85,6 +88,7 @@ export function HomeStage(props: HomeStageProps) {
       <div className="home-stage-bar">
         <span className="home-stage-avatar" aria-hidden="true">
           {initialsOf(name)}
+          <AvatarPhoto url={avatar.url} onExpired={avatar.refreshExpired} />
         </span>
         <div className="home-stage-hello">
           <p className="home-stage-greeting display-title" id="home-stage-greeting">

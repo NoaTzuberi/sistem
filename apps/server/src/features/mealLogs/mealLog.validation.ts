@@ -13,8 +13,9 @@ export function validateMealLogDateParam(value: unknown): ServerMessage | null {
   return isDateString(value) ? null : msg('body_date_invalid');
 }
 
+/** A plan meal's ObjectId, or a default meal id ('breakfast', 'afternoon_snack' …). */
 export function validateMealIdParam(value: unknown): ServerMessage | null {
-  return typeof value === 'string' && mongoose.isValidObjectId(value) ? null : msg('meal_log_meal_id_invalid');
+  return typeof value === 'string' && (mongoose.isValidObjectId(value) || /^[a-z_]{3,20}$/.test(value)) ? null : msg('meal_log_meal_id_invalid');
 }
 
 export function validateWeekStartQuery(value: unknown): ServerMessage | null {

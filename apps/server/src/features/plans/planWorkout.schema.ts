@@ -59,7 +59,7 @@ planExerciseSchema.pre('validate', function derivePlanExerciseSets() {
 
 // A cardio workout's content. The steps (blocks / repeat sets) are checked in code before every
 // save (cardio.validation.ts); Mixed keeps the union as sent.
-const planCardioSchema = new Schema<PlanCardioFields>(
+export const planCardioSchema = new Schema<PlanCardioFields>(
   {
     sport: { type: String, enum: CARDIO_SPORT_IDS, required: true },
     metric: { type: String, enum: CARDIO_METRIC_IDS, required: true },

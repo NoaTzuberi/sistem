@@ -18,3 +18,11 @@ export const MAX_SETS_PER_EXERCISE = 20;
 export const MAX_LOGGED_REPS = 1000;
 export const MAX_LOGGED_WEIGHT = 1000;
 export const MAX_LOGGED_DURATION_SEC = 6 * 60 * 60;
+
+/** 'plan' = a coach's plan workout; 'free' = one she built herself (trainee-owned). */
+export const WORKOUT_LOG_SOURCE_IDS = ['plan', 'free'] as const;
+/** A free workout: exercises per muscle pick, the sets each new exercise starts with, its reps. */
+export const FREE_WORKOUT_MUSCLE_EXERCISES = 5;
+export const FREE_WORKOUT_MAX_EXERCISES = 20;
+export const FREE_EXERCISE_DEFAULT_SETS = 3;
+export const FREE_EXERCISE_DEFAULT_REPS = 10;

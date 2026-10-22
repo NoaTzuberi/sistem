@@ -22,6 +22,7 @@ import { useIntervalRun } from '../../hooks/useIntervalRun';
 import { useHoldTimer } from '../../hooks/useHoldTimer';
 import { useRestTimer } from '../../hooks/useRestTimer';
 import { useWorkoutSession } from '../../hooks/useWorkoutSession';
+import { FreeExerciseSheet } from '../../components/FreeExerciseSheet/FreeExerciseSheet';
 import { IntervalTimer } from '../../components/IntervalTimer/IntervalTimer';
 import { PlayerHeader } from '../../components/PlayerHeader/PlayerHeader';
 import { PlayerTip } from '../../components/PlayerTip/PlayerTip';
@@ -76,8 +77,10 @@ export function WorkoutSessionPage() {
   const location = useLocation();
   // Only a fresh start (useStartWorkout) shows the tip; read once, so a reload or a resume doesn't.
   const [showTip] = useState(() => (location.state as { justStarted?: boolean } | null)?.justStarted === true);
-  const { session, model, values, loadError, ended, syncState, rest, finishQueued, editSet, addSet, setCompleted, adjustRest, endRest, finish, discard } =
+  const { session, model, values, loadError, ended, syncState, rest, finishQueued, editSet, addSet, setCompleted, adjustRest, endRest, finish, discard, addExercise } =
     useWorkoutSession(logId);
+  // A free workout (hers, no plan): exercises are added during the session.
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const { toastMessage, showToast } = useToast();
 
   const [openBlockId, setOpenBlockId] = useState<string | null>(null);
@@ -305,7 +308,21 @@ export function WorkoutSessionPage() {
             />
           )}
 
+          {session.log.source === 'free' && model.blocks.length === 0 && (
+            <div className="wp-free-empty">
+              <h2 className="wp-free-empty-title">{copy.free.emptyTitle}</h2>
+              <p className="wp-free-empty-text">{copy.free.emptyText}</p>
+            </div>
+          )}
+
           <PlayerQueue items={groups} currentId={openId} onSelect={jumpTo} />
+
+          {session.log.source === 'free' && (
+            <button type="button" className="wp-free-add" onClick={() => setIsPickerOpen(true)}>
+              <IconPlus size={18} aria-hidden="true" />
+              {copy.free.addExercise}
+            </button>
+          )}
         </div>
       </div>
 
@@ -320,6 +337,18 @@ export function WorkoutSessionPage() {
           </button>
         </div>,
         document.body,
+      )}
+
+      {session.log.source === 'free' && (
+        <FreeExerciseSheet
+          isOpen={isPickerOpen}
+          onClose={() => setIsPickerOpen(false)}
+          onPick={async (exercise) => {
+            const problem = await addExercise(exercise.id);
+            if (!problem) showToast(fill(workoutCopy[getActiveLanguage()].free.added, { name: exercise.name }));
+            return problem;
+          }}
+        />
       )}
 
       <RestSheet rest={rest && restRemainingMs !== null && restRemainingMs > 0 ? rest : null} remainingMs={restRemainingMs} next={restNext} onAdjust={adjustRest} onSkip={endRest} />

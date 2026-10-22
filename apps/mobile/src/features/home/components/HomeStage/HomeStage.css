@@ -36,6 +36,8 @@
 }
 
 .home-stage-avatar {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex: none;
   align-items: center;

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { coachingIdField, fillCoachingFromPair } from '../coachings/coachingRef';
 import {
   AI_RECOMMENDATION_STATUS_IDS,
   AI_RECOMMENDATION_TRIGGER_IDS,
@@ -29,6 +30,8 @@ const aiRecommendationSchema = new Schema<AiRecommendationDocument>(
   {
     traineeId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     coachId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    // The coaching the draft was made for: read only through it.
+    coachingId: coachingIdField,
     type: { type: String, enum: AI_RECOMMENDATION_TYPE_IDS, required: true },
     status: { type: String, enum: AI_RECOMMENDATION_STATUS_IDS, required: true, default: 'pending' },
     trigger: { type: String, enum: AI_RECOMMENDATION_TRIGGER_IDS, required: true },
@@ -47,11 +50,13 @@ const aiRecommendationSchema = new Schema<AiRecommendationDocument>(
   { timestamps: true },
 );
 
+fillCoachingFromPair(aiRecommendationSchema);
 aiRecommendationSchema.index({ traineeId: 1, type: 1, createdAt: -1 });
-// One run at a time per trainee and type: a second start while one is active fails here.
+aiRecommendationSchema.index({ coachingId: 1, type: 1, createdAt: -1 });
+// One run at a time per coaching and type: a second start while one is active fails here.
 aiRecommendationSchema.index(
-  { traineeId: 1, type: 1 },
-  { unique: true, partialFilterExpression: { active: true }, name: 'one_active_per_trainee_type' },
+  { coachingId: 1, type: 1 },
+  { unique: true, partialFilterExpression: { active: true }, name: 'one_active_per_coaching_type' },
 );
 
 export const AiRecommendation = model<AiRecommendationDocument>('AiRecommendation', aiRecommendationSchema);

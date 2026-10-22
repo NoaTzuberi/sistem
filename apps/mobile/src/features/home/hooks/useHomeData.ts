@@ -57,10 +57,12 @@ const loadUpdates = () => listNotifications({ limit: UPDATE_LOOKBACK, unread: tr
  * the nutrition intro), her unread "plan published" notification and the timer's last interval
  * (this device). Anything without data is null and its section is not drawn.
  */
-export function useHomeData() {
+export function useHomeData(coachingId?: string) {
   const copy = useCopy(homeCopy);
   const { user } = useAuth();
-  const week = useLoad(getWeek, copy.loadError);
+  // Coaching-aware: one coach's week when asked (later multi-coach UI), else her current coaching.
+  const loadWeek = useCallback(() => getWeek(coachingId), [coachingId]);
+  const week = useLoad(loadWeek, copy.loadError);
   const { data: achievements } = useMyAchievements();
   const startingPhoto = useStartingPhotoReminder();
   const mealLogs = useOptionalLoad(getMealLogs);

@@ -20,6 +20,7 @@ export interface RecommendationAttempt {
 
 export interface AiRecommendationDocument {
   traineeId: Types.ObjectId;
+  coachingId: Types.ObjectId;
   coachId: Types.ObjectId;
   type: AiRecommendationType;
   status: AiRecommendationStatus;

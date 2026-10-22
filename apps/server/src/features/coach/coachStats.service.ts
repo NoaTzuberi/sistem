@@ -9,9 +9,10 @@ import { PhotoStorageUnavailableError, toPublicPhoto } from '../privatePhotos/pr
 import { resolveTraineeStatus } from './coach.service';
 import { buildCoachStats } from './coachStats';
 import type { StatsLog, StatsPlan, StatsTrainee } from './coachStats';
+import { listCoachCoachings } from '../coachings/coaching.service';
 
 // GET /coach/stats: read-only aggregates for the dashboard's Statistics and Overview pages.
-// Like everything in this folder it starts from the coach's OWN trainees (coachId) — plans and
+// Like everything in this folder it starts from the coach's OWN live coachings — plans and
 // logs are only ever looked up by those trainee ids.
 
 const PUMP_PREVIEW_COUNT = 3;
@@ -61,9 +62,12 @@ function toPumpPhotos(logs: LogRow[], names: Map<string, string>): CoachPumpPhot
 }
 
 export async function getCoachStats(coachId: string, range: CoachStatsRange, now: Date = new Date()): Promise<CoachStats> {
+  // Her live coachings only; plans and logs are read through them (never another coach's records).
+  const coachings = await listCoachCoachings(coachId);
+  const coachingIds = coachings.map((coaching) => coaching._id);
   const [coach, users] = await Promise.all([
     User.findById(coachId).select('timezone').lean<{ timezone: string }>(),
-    User.find({ role: 'trainee', coachId }).select('name timezone createdAt onboardingStatus onboardingCompletedAt').lean<
+    User.find({ _id: { $in: coachings.map((coaching) => coaching.traineeId) } }).select('name timezone createdAt onboardingStatus onboardingCompletedAt').lean<
       {
         _id: Types.ObjectId;
         name: string;
@@ -78,10 +82,10 @@ export async function getCoachStats(coachId: string, range: CoachStatsRange, now
 
   const ids = users.map((user) => user._id);
   const [planRows, logRows, answerRows] = await Promise.all([
-    Plan.find({ traineeId: { $in: ids } })
+    Plan.find({ coachingId: { $in: coachingIds } })
       .select('traineeId weekStartDate status publishedAt splitId workouts._id workouts.dayOfWeek')
       .lean<PlanRow[]>(),
-    WorkoutLog.find({ traineeId: { $in: ids }, status: 'completed' })
+    WorkoutLog.find({ coachingId: { $in: coachingIds }, status: 'completed' })
       .select('traineeId planId workoutId workoutTitle startedAt finishedAt rating stats.prCount pumpPhoto')
       .lean<LogRow[]>(),
     OnboardingResponse.find({ userId: { $in: ids } }).select('userId answers.goals answers.trainingFrequency').lean<AnswersRow[]>(),

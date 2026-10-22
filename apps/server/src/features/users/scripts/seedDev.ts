@@ -26,7 +26,10 @@ import type { OnboardingAnswersPayload } from '@sistem/types';
 import { connectDatabase } from '../../../config/database';
 import { User } from '../user.model';
 import { DEFAULT_TIMEZONE } from '../users.constants';
-import { resolveDefaultCoachId, assignUnassignedTrainees } from '../coachAssignment.service';
+import { ensureCoachSetup } from '../../coachProfiles/coachProfile.service';
+import { startCoaching } from '../../coachings/coaching.service';
+import { getPrimaryCommunityId, joinCommunity } from '../../communities/community.service';
+import { hasRole } from '../user.model';
 import { completeOnboarding } from '../../onboarding/onboarding.service';
 import { validateCompleteOnboardingPayload } from '../../onboarding/onboarding.validation';
 import { Plan } from '../../plans/plan.model';
@@ -106,18 +109,18 @@ const TRAINEES: {
 async function findOrCreateUser(name: string, email: string, fields: Record<string, unknown>) {
   const existing = await User.findOne({ email });
   if (existing) {
-    console.log(`  exists   ${email} (${existing.role}) — left unchanged`);
+    console.log(`  exists   ${email} (${existing.roles.join(', ')}) — left unchanged`);
     return { user: existing, created: false };
   }
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, SALT_ROUNDS);
   const user = await User.create({ name, email, passwordHash, timezone: DEFAULT_TIMEZONE, ...fields });
-  console.log(`  created  ${email} (${user.role})`);
+  console.log(`  created  ${email} (${user.roles.join(', ')})`);
   return { user, created: true };
 }
 
-async function seedPlan(traineeId: Types.ObjectId, coachId: Types.ObjectId, timezone: string) {
+async function seedPlan(traineeId: Types.ObjectId, coachId: Types.ObjectId, coachingId: Types.ObjectId, timezone: string) {
   const weekStartDate = currentWeekStart(timezone);
-  if (await Plan.exists({ traineeId, weekStartDate })) {
+  if (await Plan.exists({ coachingId, weekStartDate })) {
     console.log(`  exists   plan for week ${weekStartDate} — left unchanged`);
     return;
   }
@@ -154,6 +157,7 @@ async function seedPlan(traineeId: Types.ObjectId, coachId: Types.ObjectId, time
   await Plan.create({
     traineeId,
     coachId,
+    coachingId,
     weekStartDate,
     status: 'published',
     publishedAt: new Date(),
@@ -203,18 +207,25 @@ async function main() {
   await connectDatabase();
   try {
     console.log('Coach:');
-    const { user: coach } = await findOrCreateUser(COACH.name, COACH.email, { role: 'coach', coachId: null });
-    if (coach.role !== 'coach') {
+    const { user: coach } = await findOrCreateUser(COACH.name, COACH.email, { roles: ['coach'] });
+    if (!hasRole(coach, 'coach')) {
       console.error(`${COACH.email} exists but is not a coach — stopping.`);
       process.exitCode = 1;
       return;
     }
+    // Her profile + primary community (idempotent).
+    await ensureCoachSetup(coach._id, coach.name);
+    const communityId = await getPrimaryCommunityId(coach._id);
 
     console.log('Trainees:');
     for (const trainee of TRAINEES) {
-      const { user, created } = await findOrCreateUser(trainee.name, trainee.email, { coachId: coach._id });
-      if (trainee.withBodyMetrics && user.role === 'trainee') await seedBodyMetrics(user._id, user.timezone);
+      const { user, created } = await findOrCreateUser(trainee.name, trainee.email, {});
+      if (!hasRole(user, 'trainee')) continue;
+      if (trainee.withBodyMetrics) await seedBodyMetrics(user._id, user.timezone);
       if (!created) continue;
+      // As if she joined through the coach's link: a coaching + her primary community.
+      const { coaching } = await startCoaching(user._id, coach._id);
+      if (communityId) await joinCommunity(user._id, communityId);
 
       const payload = { name: trainee.name, ...trainee.onboarding };
       const validationError = validateCompleteOnboardingPayload(payload);
@@ -223,7 +234,7 @@ async function main() {
       console.log('           onboarding completed');
 
       if (trainee.withPlan) {
-        await seedPlan(user._id, coach._id, user.timezone);
+        await seedPlan(user._id, coach._id, coaching._id, user.timezone);
       }
     }
 
@@ -235,13 +246,6 @@ async function main() {
       console.log(`Nutrition (${file.split('/').pop()}): ${result.foodsCreated} food item(s) created.`);
     }
 
-    const defaultCoachId = await resolveDefaultCoachId();
-    if (defaultCoachId?.equals(coach._id)) {
-      const assigned = await assignUnassignedTrainees(coach._id);
-      if (assigned > 0) console.log(`Assigned ${assigned} other unassigned trainee(s) to ${COACH.email}.`);
-    } else {
-      console.log(`Note: ${COACH.email} is not the default coach for new sign-ups (see DEFAULT_COACH_EMAIL).`);
-    }
 
     console.log(
       OWN_SEED_PASSWORD

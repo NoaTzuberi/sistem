@@ -6,7 +6,6 @@ import { plural } from '@sistem/shared';
 export const he = {
   noEntries: 'עדיין לא תועד דבר',
   settings: 'הגדרות',
-  nutritionPreferencesTitle: 'תזונה ומטרה',
   weightGoalLabel: 'המטרה שלי',
   settingsTitle: 'הגדרות',
   unitsTitle: 'יחידות',
@@ -16,13 +15,7 @@ export const he = {
   unitsSaveError: 'לא הצלחנו לשנות את היחידות. נסי שוב.',
   timezone: 'אזור זמן',
   account: 'חשבון',
-  notSetYet: 'עדיין לא הוגדר',
-  goals: 'מטרות',
-  trainingFrequency: 'תדירות אימונים',
-  daysPerWeek: '{min}–{max} ימים בשבוע',
   flexibleSchedule: ' · לו״ז גמיש',
-  preferredActivities: 'פעילויות מועדפות',
-  equipment: 'ציוד',
   redoOnboarding: 'מילוי השאלון מחדש',
   editLabel: 'עריכת {title}',
   loadError: 'לא הצלחנו לטעון את הפרופיל שלך.',
@@ -32,11 +25,18 @@ export const he = {
 
   // ── The Profile screen (redesign) ──
   title: 'פרופיל',
-  coachChip: 'המאמנת: {name}',
+  profileCard: 'הפרופיל שלי', // screen readers only
+  trainsWith: 'מתאמנת אצל',
+  // From the design (docs/design/trainee-profile.html).
+  communities: 'הקהילות שלי',
+  editProfile: 'עריכת פרופיל',
+  avatarAdd: 'הוספת תמונת פרופיל',
+  avatarChange: 'החלפת תמונת פרופיל',
+  avatarUploading: 'שומרת את התמונה…', // PLACEHOLDER (screen readers only)
   scoreLabel: 'המספרים שלי', // PLACEHOLDER (screen readers only)
   scoreWorkouts: 'אימונים',
   scoreStreak: 'שבועות ברצף',
-  scorePrs: 'שיאים אישיים',
+  scorePrs: 'שיאים',
   tabsLabel: 'אזורים',
   tabs: { body: 'גוף', photos: 'תמונות', achievements: 'הישגים' },
   // Body
@@ -90,9 +90,47 @@ export const he = {
   save: 'שמירה',
   saved: 'המדידה נשמרה',
   weightRequired: 'צריך משקל כדי לשמור.', // PLACEHOLDER
+  // The profile photo sheet
+  photoSheet: {
+    title: 'תמונת פרופיל',
+    hint: 'התמונה מוצגת לך ולמאמנת שלך.', // PLACEHOLDER — the design also names communities, which don't exist yet
+    camera: 'צילום תמונה',
+    gallery: 'בחירה מהגלריה',
+    remove: 'הסרת התמונה',
+    cropTitle: 'התאמה',
+    cropHint: 'גררי כדי למקם, והגדילי עם הסרגל.',
+    cropArea: 'מיקום התמונה. אפשר לגרור או להזיז בחיצים.', // PLACEHOLDER (screen readers only)
+    zoom: 'הגדלה',
+    cancel: 'ביטול',
+    save: 'שמירה',
+    saved: 'תמונת הפרופיל עודכנה',
+    removed: 'התמונה הוסרה',
+    notImage: 'אפשר לבחור רק קובץ תמונה.', // PLACEHOLDER
+    tooLarge: 'התמונה גדולה מדי. אפשר עד 10MB.', // PLACEHOLDER
+    unreadable: 'לא הצלחנו לפתוח את התמונה. נסי תמונה אחרת.', // PLACEHOLDER
+    saveError: 'לא הצלחנו לשמור את התמונה. נסי שוב.', // PLACEHOLDER
+    removeError: 'לא הצלחנו להסיר את התמונה. נסי שוב.', // PLACEHOLDER
+  },
+  // "השאלון שלי" (direction B). Wording from the brief; marked lines are PLACEHOLDER.
+  questionnaire: {
+    intro: 'התשובות שלך, כפי שהמאמנת רואה אותן. אפשר לעדכן בכל זמן',
+    notAnswered: 'לא ענית',
+    add: 'הוספה',
+    addLabel: 'הוספת {title}', // PLACEHOLDER (screen readers only)
+    more: 'עוד',
+    less: 'פחות', // PLACEHOLDER
+    saved: 'התשובות עודכנו',
+    saveError: 'לא הצלחנו לשמור את התשובות. נסי שוב.', // PLACEHOLDER
+    emptyText: 'עוד לא מילאת את השאלון. לפי התשובות המאמנת בונה את התוכנית שלך.', // PLACEHOLDER
+    fill: 'מילוי השאלון',
+    age: 'גיל', // PLACEHOLDER
+    dayUp: 'עוד יום', // PLACEHOLDER (screen readers only)
+    dayDown: 'פחות יום', // PLACEHOLDER (screen readers only)
+    daysPips: '{days} ימים בשבוע', // PLACEHOLDER (screen readers only)
+  },
   // The small Latin mono eyebrows (decoration, aria-hidden) — the same in both languages.
   eyebrow: {
-    memberSince: 'MEMBER SINCE {month} · WK{week}',
+    since: 'SINCE {month}',
     weight: 'WEIGHT · {unit}',
     measurements: 'MEASUREMENTS',
     progress: 'PROGRESS',
@@ -102,6 +140,19 @@ export const he = {
     chartStart: 'START · W{week}',
     chartMonth: '4 WEEKS AGO',
     chartNow: 'NOW',
+    questionnaire: {
+      basic_profile: 'BODY',
+      goals: 'GOALS',
+      frequency: 'SCHEDULE',
+      activities: 'ACTIVITIES',
+      exercise_preferences: 'EXERCISES',
+      recovery: 'HEALTH',
+      equipment: 'EQUIPMENT',
+      nutrition_preferences: 'NUTRITION',
+    },
+    units: 'UNITS',
+    language: 'LANGUAGE',
+    account: 'ACCOUNT',
     version: 'SISTEM · V{version}',
   },
 } as const;

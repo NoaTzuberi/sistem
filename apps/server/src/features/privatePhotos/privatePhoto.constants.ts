@@ -15,3 +15,4 @@ export const MAX_STORED_PHOTO_EDGE_PX = 2000;
 export const PUMP_PHOTO_FOLDER = 'sistem/pump-photos';
 export const PROGRESS_PHOTO_FOLDER = 'sistem/progress-photos';
 export const MEAL_PHOTO_FOLDER = 'sistem/meal-photos';
+export const AVATAR_PHOTO_FOLDER = 'sistem/avatars';

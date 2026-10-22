@@ -1,25 +1,14 @@
-import type { WorkoutLog } from '@sistem/types';
+import type { FreeWorkoutMuscle, StartFreeWorkoutPayload, WorkoutLog } from '@sistem/types';
 
-// Free workouts ("אימון חופשי"): a workout she builds herself, outside the coach's plan. NOT supported
-// by the server yet — a workout log always belongs to a plan workout. The model / API change is proposed
-// in docs/phase-reports/design-trainee-workouts.md and waits for the owner's approval; until it is built
-// the entry points stay hidden (VITE_FEATURE_FREE_WORKOUT=true shows the UI for review in dev only).
+// Free workouts ("אימון חופשי"): a workout she builds herself, outside any coach's plan (server:
+// POST /workout-logs/free — the log is trainee-owned, source 'free').
 
-export const FREE_WORKOUT_ENABLED = import.meta.env.VITE_FEATURE_FREE_WORKOUT === 'true';
-
-export type FreeWorkoutMode = 'scratch' | 'repeat' | 'muscle';
+export type FreeWorkoutMode = StartFreeWorkoutPayload['mode'];
+export type { FreeWorkoutMuscle, StartFreeWorkoutPayload };
 
 /** The onboarding muscle-focus ids (MUSCLE_FOCUS_IDS on the server) — the picker reuses their labels. */
-export const FREE_WORKOUT_MUSCLES = ['legs', 'glutes', 'back', 'chest', 'shoulders', 'arms', 'core', 'full_body'] as const;
-export type FreeWorkoutMuscle = (typeof FREE_WORKOUT_MUSCLES)[number];
+export const FREE_WORKOUT_MUSCLES: FreeWorkoutMuscle[] = ['legs', 'glutes', 'back', 'chest', 'shoulders', 'arms', 'core', 'full_body'];
 
-/** PROPOSED body of POST /workout-logs/free (see the report). */
-export type StartFreeWorkoutPayload =
-  | { mode: 'scratch' }
-  | { mode: 'repeat'; fromLogId: string }
-  | { mode: 'muscle'; muscles: FreeWorkoutMuscle[] };
-
-/** PROPOSED: a log carries `source: 'free'` when it is not from the plan. Reads false until the server sends it. */
-export function isFreeLog(log: WorkoutLog): boolean {
-  return (log as WorkoutLog & { source?: 'plan' | 'free' }).source === 'free';
+export function isFreeLog(log: Pick<WorkoutLog, 'source'>): boolean {
+  return log.source === 'free';
 }

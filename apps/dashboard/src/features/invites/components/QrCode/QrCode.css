@@ -1,0 +1,23 @@
+.qr-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 176px;
+  aspect-ratio: 1;
+  padding: var(--space-2);
+  border-radius: var(--radius-block);
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+
+.qr-code-image,
+.qr-code-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.qr-code-placeholder {
+  border-radius: var(--radius-block);
+  background: var(--color-surface);
+}

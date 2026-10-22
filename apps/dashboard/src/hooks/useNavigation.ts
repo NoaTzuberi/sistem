@@ -7,6 +7,9 @@ import { appCopy } from '../copy';
 import { exerciseLibraryCopy } from '../features/exerciseLibrary/copy';
 import { nutritionCopy } from '../features/nutrition/copy';
 import { useCoachData } from '../services/coach/CoachDataContext';
+import { useAuth } from '../services/auth/AuthContext';
+import { hasRole } from '../features/auth/data/roles';
+import { adminCopy } from '../features/admin/copy';
 
 export interface NavItem {
   id: string;
@@ -37,6 +40,9 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
   const exercises = useCopy(exerciseLibraryCopy);
   const { pathname, search } = useLocation();
   const { trainees } = useCoachData();
+  const admin = useCopy(adminCopy);
+  const { user } = useAuth();
+  const isAdmin = hasRole(user, 'admin');
 
   return useMemo(() => {
     const isWaitingList = pathname === ROUTES.TRAINEES && new URLSearchParams(search).get(TRAINEE_FILTER_PARAM) === WAITING_FILTER;
@@ -100,7 +106,15 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
         ],
       },
     ];
+    // The platform admin also manages coach accounts (a page of its own).
+    if (isAdmin) {
+      groups.push({
+        id: 'admin',
+        label: admin.navGroup,
+        items: [{ id: 'coaches', to: ROUTES.ADMIN_COACHES, label: admin.title, icon: 'person', isCurrent: under(ROUTES.ADMIN_COACHES) }],
+      });
+    }
 
     return { groups, current: groups.flatMap((group) => group.items).find((item) => item.isCurrent) };
-  }, [copy, nutrition, exercises, pathname, search, trainees]);
+  }, [copy, nutrition, exercises, admin, isAdmin, pathname, search, trainees]);
 }

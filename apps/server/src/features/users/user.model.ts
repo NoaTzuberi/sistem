@@ -1,8 +1,9 @@
-import { Schema, Types, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import type { OnboardingStatus, UserRole } from '@sistem/types';
 import {
   USER_ROLES,
   DEFAULT_USER_ROLE,
+  ROLE_PRIORITY,
   ONBOARDING_STATUS_IDS,
   DEFAULT_ONBOARDING_STATUS,
   DEFAULT_TIMEZONE,
@@ -32,21 +33,24 @@ export interface PushToken {
 export interface UserDocument {
   name: string;
   email: string;
-  passwordHash: string;
-  role: UserRole;
+  /** Empty until an admin-created coach sets it through her one-time link. */
+  passwordHash?: string | null;
+  roles: UserRole[];
   passwordResetTokenHash?: string;
   passwordResetExpires?: Date;
   preferences?: UserPreferences;
   onboardingStatus: OnboardingStatus;
   onboardingCompletedAt?: Date | null;
-  /** Trainees only; null until a coach exists. Never assume a single coach in queries. */
-  coachId?: Types.ObjectId | null;
+  /** First run: when she chose "on my own" (or finished onboarding without a coach). Never cleared. */
+  selfGuidedAt?: Date | null;
   pushTokens: PushToken[];
   timezone: string;
   /** When she last opened each tab that shows an "unseen update" dot (Phase 13a). */
   tabSeenAt?: { workouts?: Date | null; nutrition?: Date | null };
   /** The newest nutrition version whose intro she has read (Phase 13a+; 0 = none). */
   nutritionIntroSeenVersion?: number;
+  /** Her profile photo: a private asset (privatePhotos flow) — only the storage id is kept. */
+  avatar?: { publicId: string; uploadedAt: Date } | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,8 +80,12 @@ const userSchema = new Schema<UserDocument>(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    passwordHash: { type: String, required: true },
-    role: { type: String, enum: USER_ROLES, default: DEFAULT_USER_ROLE, required: true },
+    passwordHash: { type: String, default: null },
+    roles: {
+      type: [{ type: String, enum: USER_ROLES }],
+      default: () => [DEFAULT_USER_ROLE],
+      validate: { validator: (roles: string[]) => roles.length > 0, message: 'A user needs at least one role.' },
+    },
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
     preferences: { type: preferencesSchema },
@@ -88,7 +96,7 @@ const userSchema = new Schema<UserDocument>(
       required: true,
     },
     onboardingCompletedAt: { type: Date, default: null },
-    coachId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    selfGuidedAt: { type: Date, default: null },
     // Device tokens are never sent to clients.
     pushTokens: { type: [pushTokenSchema], default: [], select: false },
     timezone: {
@@ -102,15 +110,28 @@ const userSchema = new Schema<UserDocument>(
       nutrition: { type: Date, default: null },
     },
     nutritionIntroSeenVersion: { type: Number, default: 0 },
+    avatar: {
+      type: new Schema({ publicId: { type: String, required: true }, uploadedAt: { type: Date, required: true } }, { _id: false }),
+      default: null,
+    },
   },
   { timestamps: true },
 );
 
-userSchema.index({ coachId: 1, role: 1, createdAt: -1 });
+userSchema.index({ roles: 1 });
 // Phase 5b removes invalid/expired tokens by value.
 userSchema.index({ 'pushTokens.token': 1 }, { sparse: true });
 
 export const User = model<UserDocument>('User', userSchema);
+
+export function hasRole(user: Pick<UserDocument, 'roles'>, role: UserRole): boolean {
+  return (user.roles ?? []).includes(role);
+}
+
+/** admin > coach > trainee — for the one `role` older client code still reads. */
+export function primaryRole(user: Pick<UserDocument, 'roles'>): UserRole {
+  return ROLE_PRIORITY.find((role) => hasRole(user, role)) ?? DEFAULT_USER_ROLE;
+}
 
 export function isOnboardingCompleted(user: Pick<UserDocument, 'onboardingStatus'>): boolean {
   return user.onboardingStatus === 'completed';

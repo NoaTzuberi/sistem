@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IconPlus } from '@tabler/icons-react';
+import { IconBarbell, IconPlus, IconRun } from '@tabler/icons-react';
 import { sharedCopy, useCopy } from '@sistem/shared';
-import { workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
+import { OWN_CARDIO_NEW, workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
+import { SgEmptyState } from '../../../../components/common/SgEmptyState/SgEmptyState';
+import { useAuth } from '../../../../services/auth/AuthContext';
+import { OwnCardioList } from '../../../cardio/components/OwnCardioList/OwnCardioList';
+import { useOwnCardioWorkouts } from '../../../cardio/hooks/useOwnCardioWorkouts';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
@@ -12,7 +16,6 @@ import { CardioWeekList } from '../../../cardio/components/CardioWeekList/Cardio
 import { cardioCopy } from '../../../cardio/copy';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFreeWorkout } from '../../hooks/useFreeWorkout';
-import { FREE_WORKOUT_ENABLED } from '../../data/freeWorkout';
 import { toPlannedWorkouts, type PlannedWorkout, type WeekPlan } from '../../data/weekPlanDisplay';
 import { addMonths, HISTORY_FILTERS, weekStartOf, type HistoryFilter, type MonthKey } from '../../data/historyDisplay';
 import { StartConflictModal } from '../StartConflictModal/StartConflictModal';
@@ -38,7 +41,7 @@ const TAB_PARAM = 'tab';
 const panelId = (tab: WorkoutsTab) => `workouts-panel-${tab}`;
 
 /** The free filter only exists once free workouts do. */
-const FILTERS: HistoryFilter[] = FREE_WORKOUT_ENABLED ? HISTORY_FILTERS : HISTORY_FILTERS.filter((filter) => filter !== 'free');
+const FILTERS: HistoryFilter[] = HISTORY_FILTERS;
 
 /**
  * Trainee Workouts (PRD §5.4; docs/design/trainee-workouts.html): a sticky large title, the "Plan" tab
@@ -65,6 +68,9 @@ export function WorkoutsScreen() {
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
   const [isFreeOpen, setIsFreeOpen] = useState(false);
   const free = useFreeWorkout(isFreeOpen);
+  // Self-guided = no live coaching: no "waiting for your coach" lines, her own tools instead.
+  const selfGuided = useAuth().user?.coachingStatus == null;
+  const ownCardio = useOwnCardioWorkouts();
 
   // History: loaded the first time the tab opens, then kept.
   const [historySeen, setHistorySeen] = useState(tab === 'history');
@@ -138,7 +144,16 @@ export function WorkoutsScreen() {
         <>
           <WeekHeader weekStartDate={weekPlan.weekStartDate} workouts={weekPlan.workouts} doneCount={weekPlan.doneCount} />
 
-          {!weekPlan.plan ? (
+          {!weekPlan.plan && selfGuided ? (
+            <SgEmptyState
+              icon={<IconBarbell size={24} />}
+              title={copy.selfGuided.title}
+              text={copy.selfGuided.text}
+              actionLabel={copy.selfGuided.action}
+              actionIcon={<IconPlus size={16} stroke={3} aria-hidden="true" />}
+              onAction={openFree}
+            />
+          ) : !weekPlan.plan ? (
             <div className="workouts-empty">
               <StateMessage>{copy.list.noPlanThisWeek}</StateMessage>
             </div>
@@ -154,7 +169,7 @@ export function WorkoutsScreen() {
                 onPreview={() => weekPlan.next && setPreview({ planned: weekPlan.next, isNextWeek: false })}
                 isStarting={starter.isStarting}
                 error={preview ? null : starter.error}
-                onFreeWorkout={FREE_WORKOUT_ENABLED ? openFree : undefined}
+                onFreeWorkout={openFree}
               />
 
               <div className="workouts-section-head">
@@ -183,19 +198,53 @@ export function WorkoutsScreen() {
             </>
           )}
 
-          <div className="workouts-section-head">
-            <h2 className="workouts-section-title">
-              <Eyebrow>{eyebrow.nextWeek}</Eyebrow>
-              {copy.list.nextWeek}
-            </h2>
-          </div>
-          <NextWeekLock
-            weekStartDate={weekPlan.nextWeek.weekStartDate}
-            firstWorkout={nextWeekFirst}
-            onOpen={(planned) => setPreview({ planned, isNextWeek: true })}
-          />
+          {/* Her own runs (built by her, no plan) — for every trainee; the one action when there are none. */}
+          {ownCardio.isLoaded && (
+            <>
+              <div className="workouts-section-head">
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{cardioText.eyebrowCardio}</Eyebrow>
+                  {copy.selfGuided.cardioTitle}
+                </h2>
+                {ownCardio.workouts.length > 0 && (
+                  <button type="button" className="workouts-section-link" onClick={() => navigate(OWN_CARDIO_NEW)}>
+                    {copy.selfGuided.newRun}
+                  </button>
+                )}
+              </div>
+              {ownCardio.workouts.length > 0 ? (
+                <OwnCardioList workouts={ownCardio.workouts} />
+              ) : (
+                <SgEmptyState
+                  icon={<IconRun size={24} />}
+                  title={copy.selfGuided.cardioEmptyTitle}
+                  text={copy.selfGuided.cardioEmptyText}
+                  actionLabel={copy.selfGuided.cardioAction}
+                  onAction={() => navigate(OWN_CARDIO_NEW)}
+                />
+              )}
+            </>
+          )}
 
-          {FREE_WORKOUT_ENABLED && (
+          {/* Next week comes from a coach: nothing to lock for a self-guided trainee. */}
+          {!selfGuided && (
+            <>
+              <div className="workouts-section-head">
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{eyebrow.nextWeek}</Eyebrow>
+                  {copy.list.nextWeek}
+                </h2>
+              </div>
+              <NextWeekLock
+                weekStartDate={weekPlan.nextWeek.weekStartDate}
+                firstWorkout={nextWeekFirst}
+                onOpen={(planned) => setPreview({ planned, isNextWeek: true })}
+              />
+            </>
+          )}
+
+          {/* With a plan: a free workout as an extra (without one, the empty state above offers it). */}
+          {weekPlan.plan && (
             <>
               <div className="workouts-section-head">
                 <h2 className="workouts-section-title">
@@ -284,14 +333,12 @@ export function WorkoutsScreen() {
       <LargeTitleHeader
         title={copy.list.title}
         action={
-          FREE_WORKOUT_ENABLED ? (
-            <button type="button" className="workouts-free-pill" onClick={openFree}>
-              <span className="workouts-free-pill-icon" aria-hidden="true">
-                <IconPlus size={13} stroke={3} />
-              </span>
-              {copy.screen.freeWorkout}
-            </button>
-          ) : undefined
+          <button type="button" className="workouts-free-pill" onClick={openFree}>
+            <span className="workouts-free-pill-icon" aria-hidden="true">
+              <IconPlus size={13} stroke={3} />
+            </span>
+            {copy.screen.freeWorkout}
+          </button>
         }
       >
         <SegmentedTabs
@@ -320,7 +367,7 @@ export function WorkoutsScreen() {
         error={starter.error}
       />
 
-      {FREE_WORKOUT_ENABLED && <FreeWorkoutSheet isOpen={isFreeOpen} onClose={() => setIsFreeOpen(false)} free={free} />}
+      <FreeWorkoutSheet isOpen={isFreeOpen} onClose={() => setIsFreeOpen(false)} free={free} />
 
       <StartConflictModal
         active={starter.conflict}

@@ -19,6 +19,15 @@ import type {
   WorkoutLogSetUpdate,
   WorkoutSession,
   WorkoutSummaryPayload,
+  MyCoaching,
+  MyCoachingsResponse,
+  MyCommunity,
+  MyCommunitiesResponse,
+  AuthUser,
+  ExerciseFacts,
+  OwnNutritionTarget,
+  SaveOwnNutritionTargetPayload,
+  StartFreeWorkoutPayload,
 } from '@sistem/types';
 
 // The trainee's own plans and workout logs (/api/plans, /api/workout-logs). The
@@ -27,15 +36,31 @@ import type {
 const MEAL_LOG_SAVE_TIMEOUT_MS = 15_000;
 
 export function createTraineeApi(client: AxiosInstance) {
-  /** This week's plan, the status of each workout and the workout to start next. */
-  async function getWeek(): Promise<TraineeWeek> {
-    const { data } = await client.get<TraineeWeek>('/plans/week');
+  /**
+   * This week's plan, the status of each workout and the workout to start next. Coaching-aware: pass a
+   * coachingId for one coach (the later multi-coach UI); without it the server uses her current coaching.
+   */
+  async function getWeek(coachingId?: string): Promise<TraineeWeek> {
+    const { data } = await client.get<TraineeWeek>('/plans/week', { params: coachingId ? { coachingId } : undefined });
     return data;
   }
 
-  async function listPlans(): Promise<TraineePlanList> {
-    const { data } = await client.get<TraineePlanList>('/plans');
+  /** Her plans; a coachingId narrows them to one coach. */
+  async function listPlans(coachingId?: string): Promise<TraineePlanList> {
+    const { data } = await client.get<TraineePlanList>('/plans', { params: coachingId ? { coachingId } : undefined });
     return data;
+  }
+
+  /** Her live coachings (one today; several once multi-coach is on). */
+  async function listMyCoachings(): Promise<MyCoaching[]> {
+    const { data } = await client.get<MyCoachingsResponse>('/coachings');
+    return data.coachings;
+  }
+
+  /** Her communities — names only. */
+  async function listMyCommunities(): Promise<MyCommunity[]> {
+    const { data } = await client.get<MyCommunitiesResponse>('/communities/mine');
+    return data.communities;
   }
 
   async function getPlan(planId: string): Promise<TraineePlan> {
@@ -43,8 +68,9 @@ export function createTraineeApi(client: AxiosInstance) {
     return data.plan;
   }
 
-  async function listWorkoutLogs(): Promise<WorkoutLog[]> {
-    const { data } = await client.get<{ items: WorkoutLog[] }>('/workout-logs');
+  /** Her history; a coachingId narrows it to one coach. */
+  async function listWorkoutLogs(coachingId?: string): Promise<WorkoutLog[]> {
+    const { data } = await client.get<{ items: WorkoutLog[] }>('/workout-logs', { params: coachingId ? { coachingId } : undefined });
     return data.items;
   }
 
@@ -210,9 +236,9 @@ export function createTraineeApi(client: AxiosInstance) {
     return data.day;
   }
 
-  /** Sends the (already compressed) image as the raw body; replaces that meal's photo. */
+  /** Sends the (already compressed) image as the raw body; ADDS a photo to that meal (a meal can hold several). */
   async function uploadMealPhoto(date: string, mealId: string, photo: Blob, onProgress?: (fraction: number) => void): Promise<MealLogDay> {
-    const { data } = await client.put<{ day: MealLogDay }>(`/meal-logs/${date}/photos/${mealId}`, photo, {
+    const { data } = await client.post<{ day: MealLogDay }>(`/meal-logs/${date}/photos/${mealId}`, photo, {
       headers: { 'Content-Type': photo.type || 'image/jpeg' },
       onUploadProgress: (event) => {
         if (onProgress && event.total) onProgress(event.loaded / event.total);
@@ -221,9 +247,39 @@ export function createTraineeApi(client: AxiosInstance) {
     return data.day;
   }
 
-  async function removeMealPhoto(date: string, mealId: string): Promise<MealLogDay> {
-    const { data } = await client.delete<{ day: MealLogDay }>(`/meal-logs/${date}/photos/${mealId}`);
+  /** Removes ONE photo by its id (MealPhoto.id). */
+  async function removeMealPhoto(date: string, photoId: string): Promise<MealLogDay> {
+    const { data } = await client.delete<{ day: MealLogDay }>(`/meal-logs/${date}/photos/${photoId}`);
     return data.day;
+  }
+
+  /** "היעד שלי": her own daily portions (self-guided, no coach plan). */
+  async function saveOwnNutritionTarget(payload: SaveOwnNutritionTargetPayload): Promise<OwnNutritionTarget> {
+    const { data } = await client.put<{ ownTarget: OwnNutritionTarget }>('/meal-logs/target', payload);
+    return data.ownTarget;
+  }
+
+  // --- Self-guided: free workouts (her own, outside any plan) and the first-run choice.
+
+  async function startFreeWorkout(payload: StartFreeWorkoutPayload): Promise<{ session: WorkoutSession; resumed: boolean }> {
+    const { data } = await client.post<{ session: WorkoutSession; resumed: boolean }>('/workout-logs/free', payload);
+    return data;
+  }
+
+  async function addFreeExercise(logId: string, exerciseId: string): Promise<WorkoutSession> {
+    const { data } = await client.post<{ session: WorkoutSession }>(`/workout-logs/${logId}/exercises`, { exerciseId });
+    return data.session;
+  }
+
+  async function searchFreeExercises(search: string): Promise<ExerciseFacts[]> {
+    const { data } = await client.get<{ items: ExerciseFacts[] }>('/workout-logs/free/exercises', { params: search ? { search } : {} });
+    return data.items;
+  }
+
+  /** First run: "on my own" — remembered on the server, so a reopened app resumes in the questionnaire. */
+  async function chooseSelfGuided(): Promise<AuthUser> {
+    const { data } = await client.post<{ user: AuthUser }>('/users/me/self-guided');
+    return data.user;
   }
 
   // --- The "unseen update" dots on her tab bar (Phase 13a), stored on the server.
@@ -240,6 +296,8 @@ export function createTraineeApi(client: AxiosInstance) {
 
   return {
     getWeek,
+    listMyCoachings,
+    listMyCommunities,
     listPlans,
     getPlan,
     listWorkoutLogs,
@@ -267,6 +325,11 @@ export function createTraineeApi(client: AxiosInstance) {
     saveMealLog,
     uploadMealPhoto,
     removeMealPhoto,
+    saveOwnNutritionTarget,
+    startFreeWorkout,
+    addFreeExercise,
+    searchFreeExercises,
+    chooseSelfGuided,
     getTabUpdates,
     markTabSeen,
   };

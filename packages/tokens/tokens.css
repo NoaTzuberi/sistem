@@ -1045,9 +1045,8 @@
   --size-cardio-save: 58px;
 
   /* ═══ 13. Trainee Profile (docs/design/trainee-profile.html — "training OS", like Home B) ═════ */
-  --text-profile-title: 58px;          /* "פרופיל" (Karantina) */
-  --text-profile-me: 38px;             /* Her name next to the avatar */
-  --text-profile-score: 40px;          /* A scoreboard number (Barlow) */
+  --text-profile-hero-name: 42px;      /* Her name on the profile card (Karantina) */
+  --text-profile-score: 32px;          /* A scoreboard number (Barlow) */
   --text-profile-weight: 58px;         /* The current weight on the ink card (Barlow italic 800) */
   --text-profile-row-name: 26px;       /* A measurement / the coach's name (Karantina) */
   --text-profile-row-value: 24px;      /* A measurement's current value (Barlow) */
@@ -1055,13 +1054,16 @@
   --text-profile-sheet-title: 42px;    /* The measurement sheet's title */
   --text-profile-stepper: 48px;        /* The sheet's big weight (Barlow italic 800) */
   --text-profile-stepper-sm: 20px;     /* A measurement stepper's value */
-  --text-profile-avatar: 34px;         /* Initials in the 76px avatar */
+  --text-profile-avatar: 40px;         /* Initials in the 96px avatar */
   --text-profile-badge: 22px;          /* The number on a badge disc */
-  --size-profile-avatar: 76px;
+  --size-profile-avatar: 96px;
+  --size-profile-camera: 32px;         /* The pink camera badge on the avatar */
+  --size-profile-stage: 200px;         /* The pink stage behind the top */
+  --size-profile-card-offset: 56px;    /* The profile card starts this far below the header row */
+  --size-profile-crop: 280px;          /* The photo crop square … */
+  --size-profile-crop-circle: 236px;   /* … and its circular mask */
   --size-profile-coach-avatar: 46px;
   --size-profile-chip-avatar: 20px;
-  --size-profile-chip: 28px;           /* The coach chip's drawn height */
-  --size-profile-icon-button: 42px;    /* The round settings button (its hit area stays 44px) */
   --size-profile-badge: 54px;          /* A badge disc */
   --size-profile-icon-tile: 36px;      /* A settings row's soft icon tile */
   --size-profile-tab: 40px;            /* A segmented tab's height (the bar keeps 44px of hit area) */
@@ -1083,14 +1085,37 @@
   --size-profile-logout: 50px;         /* The outlined log-out button */
   --size-profile-row-gap: 2px;         /* Under a settings row's title */
   --size-profile-track-inset: 3px;     /* The language switch's track */
+  --radius-profile-stage: 40px;        /* The stage's bottom corners */
+  --radius-profile-hero-card: 30px;    /* The white profile card */
+  --radius-profile-group: 22px;        /* A white grouped card (settings, measurements, photo options) */
+  --space-profile-group-gap: 10px;     /* Between two grouped settings cards */
+  --radius-profile-crop: 24px;
   --radius-profile-card: 26px;         /* The weight card, the compare frame, the next goal */
   --radius-profile-tile: 16px;         /* A photo tile */
   --radius-profile-badge: 20px;        /* A badge cell */
   --radius-profile-icon-tile: 12px;
   --radius-profile-segment: 18px;      /* The segmented track (the thumb: --radius-profile-thumb) */
   --radius-profile-thumb: 14px;
-  --ring-profile-avatar: 0 0 0 3px var(--color-card), 0 0 0 5px var(--color-primary);  /* 3px white + 2px pink */
+  /* 4px white + 2px pink ring, a soft pink glow */
+  --ring-profile-avatar: 0 0 0 4px var(--color-card), 0 0 0 6px var(--color-primary), 0 12px 26px color-mix(in srgb, var(--color-primary) 25%, transparent);
   --ring-profile-camera: 0 0 0 3px var(--color-card);
+  /* The page surface: content sits on white cards over it. */
+  --color-profile-surface: #f6f4f7;
+  --surface-profile-tabs: color-mix(in srgb, var(--color-profile-surface) 92%, transparent);
+  --color-profile-segment-track: var(--color-fill-soft-hover);
+  /* The pink stage: brand pinks only — no glows, circles or stripes; a fine film grain on top. */
+  --color-profile-stage-from: #ff2e86;
+  --color-profile-stage-to: #e0005f;
+  --surface-profile-stage: linear-gradient(160deg, var(--color-profile-stage-from) 0%, var(--color-primary) 55%, var(--color-profile-stage-to) 100%);
+  --texture-profile-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.35 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --opacity-profile-grain: 0.25;
+  --surface-profile-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  --shadow-profile-card: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent), 0 18px 40px color-mix(in srgb, var(--color-stat-purple) 10%, transparent);
+  --shadow-profile-edit: 0 10px 22px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  /* The crop square: ink, the outside of the circle dimmed, a white ring. */
+  --surface-profile-crop-dim: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  --ring-profile-crop: 0 0 0 2px color-mix(in srgb, var(--color-card) 90%, transparent);
+  --surface-profile-avatar-busy: color-mix(in srgb, var(--color-ink) 45%, transparent);
   --ring-profile-selected: 0 0 0 3px var(--color-primary);                           /* The photo picked for the compare */
   --surface-profile-delta: color-mix(in srgb, var(--color-primary) 22%, transparent);  /* The delta pill on the ink card */
   --surface-profile-chip-on-ink: color-mix(in srgb, var(--color-on-primary) 10%, transparent);
@@ -1109,6 +1134,106 @@
   --shadow-profile-badge: inset 0 -4px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
   --transition-profile-thumb: 320ms;   /* The segmented thumb's spring (on --ease-slide-snap) */
   --transition-profile-draw: 1s;       /* The weight line drawing itself */
+
+  /* ═══ 14. Questionnaire + Settings (Profile sub-screens, direction B — like the Profile) ═════ */
+  --color-subscreen-page: #f6f4f7;     /* The page surface under the white cards */
+  --surface-subscreen-bar: color-mix(in srgb, var(--color-subscreen-page) 92%, transparent);  /* The sticky top bar */
+  --color-subscreen-rule: #ece9ee;     /* Hairlines between a card's rows */
+  --color-segment-track: var(--color-fill-soft-hover);  /* #ece8ee — a segmented control's track */
+  --text-subscreen-title: 44px;        /* "השאלון שלי" / "הגדרות" (Karantina) */
+  --text-qn-section: 26px;             /* A questionnaire card's title (Karantina) */
+  --text-qn-score: 32px;               /* A single value in the mini scoreboard (Barlow) */
+  --text-qn-pip-count: 20px;           /* The days number under the pips (Barlow) */
+  --text-subscreen-label: 13px;        /* A section label / subtitle (13px / 600) */
+  --text-qn-body: 15px;                /* Free-text answers */
+  --size-subscreen-back: 40px;         /* The round back button (its hit area stays 44px) */
+  --size-qn-tile: 36px;                /* A card's icon tile / its round edit button */
+  --size-qn-chip: 32px;                /* An answer chip (display only) */
+  --size-qn-pip-width: 28px;
+  --size-qn-pip-height: 8px;
+  --size-segment-option: 36px;         /* A segmented option's drawn height (the row keeps 44px of hit area) */
+  --size-switch-width: 51px;           /* iOS switch */
+  --size-switch-height: 31px;
+  --radius-qn-chip: 16px;
+  --radius-qn-pip: 4px;
+  --radius-segment-track: 14px;
+  --radius-segment-thumb: 11px;
+  --shadow-segment-soft: 0 2px 8px color-mix(in srgb, var(--color-ink) 10%, transparent);
+  /* Section tints: soft fill + its text color (no green, no brown / gold). */
+  --color-qn-goals-soft: var(--tint-pink);                 /* #ffe3ee */
+  --color-qn-goals-ink: #c80058;
+  --color-qn-schedule-soft: var(--tint-purple);            /* #efe7ff */
+  --color-qn-schedule-ink: var(--ink-purple);              /* #5b2fd6 */
+  --color-qn-activities-soft: var(--color-stat-orange-mist); /* #ffebd6 */
+  --color-qn-activities-ink: var(--ink-orange);            /* #c75a00 — text only, never a fill */
+  --color-qn-equipment-soft: var(--tint-blue);             /* #e1f1ff */
+  --color-qn-equipment-ink: var(--solid-blue);             /* #0070c9 */
+  --color-qn-nutrition-soft: #fbe3ec;
+  --color-qn-nutrition-ink: var(--color-primary-deep);     /* #a50047 */
+  --color-qn-health-soft: var(--color-fill-soft);
+  --color-qn-health-ink: var(--color-ink);
+  --color-qn-pip-rest: var(--color-segment-track);
+
+  /* ═══ 15. First run, self-guided, payments, meal photos, progress photos (docs/design/trainee-first-run.html,
+     direction B: the page surface under white cards, Karantina titles, brand tokens only) ═════════════ */
+  --color-fr-page: var(--color-subscreen-page);             /* #f6f4f7 */
+  --color-fr-ink-2: var(--color-ink-raised);                /* #2a2530 — body lines */
+  --color-fr-muted: #7a7380;                                /* captions on white / the page (4.6:1 on white) */
+  --color-fr-rule: var(--color-subscreen-rule);             /* #ece9ee */
+  --color-fr-soft: var(--color-object-chrome);              /* #f5f3f6 — a soft tile / an unselected pill */
+  --color-fr-soft-hover: var(--color-fill-soft-hover);      /* #ece8ee */
+  --color-fr-step-rest: #e4e0e6;                            /* an unreached step of the step bar */
+  --color-fr-blush: var(--color-workout-1-soft);            /* #ffe3ef — a community chip */
+  --color-fr-cherry: var(--color-primary-deep);             /* #a50047 — chip text, the error ring + line */
+  --color-fr-purple: var(--color-stat-purple);              /* #7c4dff — the solo card's icon, the lock */
+  --surface-fr-on-pink: color-mix(in srgb, var(--color-on-primary) 20%, transparent);  /* the coach card's icon tile */
+  --shadow-fr-coach: 0 18px 36px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --shadow-fr-coach-hover: 0 22px 44px color-mix(in srgb, var(--color-primary) 38%, transparent);
+  --shadow-fr-solo: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent), 0 12px 28px color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --shadow-fr-solo-hover: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent), 0 18px 36px color-mix(in srgb, var(--color-ink) 10%, transparent);
+  --shadow-fr-card: 0 18px 40px color-mix(in srgb, var(--color-stat-purple) 10%, transparent);
+  --ring-fr-avatar: 0 0 0 4px var(--color-card), 0 0 0 6px var(--color-primary);
+  --surface-fr-thumb-chip: color-mix(in srgb, var(--color-card) 92%, transparent);   /* a meal / week chip on a photo */
+  --surface-fr-time-chip: color-mix(in srgb, var(--color-ink) 55%, transparent);     /* the time chip on a photo */
+  --text-fr-title: 56px;               /* "איך תרצי להתאמן?" (Karantina) */
+  --text-fr-choice: 40px;              /* A choice card's title */
+  --text-fr-coach-name: 44px;          /* The coach's name on the confirm card */
+  --text-fr-code: 30px;                /* A code box (Barlow) */
+  --text-fr-sheet-title: 44px;         /* "תמונת ארוחה" */
+  --text-fr-tile: 30px;                /* A camera / gallery tile's title */
+  --text-fr-eyebrow: 10px;             /* JetBrains Mono, Latin only, decorative */
+  --size-fr-choice-min: 196px;
+  --size-fr-icon-tile: 52px;
+  --size-fr-go: 36px;
+  --size-fr-code-box: 62px;
+  --size-fr-avatar: 96px;
+  --size-fr-band: 92px;
+  --size-fr-action-tile: 132px;
+  --size-fr-action-icon: 44px;
+  --size-fr-option-icon: 34px;
+  --size-fr-step-height: 4px;
+  --radius-fr-choice: 28px;
+  --radius-fr-card: 30px;
+  --radius-fr-panel: 26px;             /* the starting-photo card */
+  --radius-fr-code: 16px;
+  --radius-fr-tile: 24px;
+  --radius-fr-icon-tile: 16px;
+  --radius-fr-option: 18px;
+  --radius-fr-thumb: 16px;
+  --scale-fr-press: 0.97;
+  --scale-fr-press-card: 0.98;
+  --ease-fr-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-fr-shake: 320ms;
+  --transition-fr-card: 160ms;         /* a big card giving under the finger */
+  --transition-fr-ring: 150ms;         /* a code box's focus / error ring */
+  --transition-fr-shadow: 200ms;       /* a card's shadow lifting under a fine pointer */
+  --size-fr-option-row: 54px;
+  --radius-fr-option-icon: 11px;
+  --border-fr-box: 1.5px;              /* a code box's resting ring */
+  --border-fr-focus: 2px;              /* … focused / refused */
+  --shift-fr-shake: 4px;
+  --size-fr-tag: 28px;
+  --size-fr-cta: 58px;
 }
 
 /* English: the Latin font pair; a display heading is Barlow Condensed italic 800, uppercase. */
@@ -1128,11 +1253,17 @@
   --text-display-xl: 36px;
   --text-display-2xl: 42px;
   --text-display-3xl: 48px;
-  --text-profile-title: 46px;
-  --text-profile-me: 30px;
+  --text-profile-hero-name: 34px;
   --text-profile-row-name: 20px;
   --text-profile-goal: 32px;
   --text-profile-sheet-title: 34px;
+  --text-subscreen-title: 36px;
+  --text-qn-section: 20px;
+  --text-fr-title: 46px;
+  --text-fr-choice: 32px;
+  --text-fr-coach-name: 36px;
+  --text-fr-sheet-title: 36px;
+  --text-fr-tile: 24px;
 }
 
 /* Right-to-left: the same shapes, mirrored (polygons have no logical form). */

@@ -8,6 +8,7 @@ import {
 } from './authService';
 import type { AuthUser } from './authService';
 import { getToken, setToken, clearToken } from './tokenStorage';
+import { clearPendingInvite, getPendingInvite } from '../invites/pendingInvite';
 
 interface LoginPayload {
   email: string;
@@ -21,12 +22,24 @@ interface RegisterPayload {
   confirmPassword: string;
 }
 
+export interface RegisterResult {
+  /** The code that went with the sign-up, if any. */
+  inviteCode: string | null;
+  /** Set when that code could not be used — the account exists anyway. */
+  inviteError: string | null;
+  /** Her new account (its appState decides the next screen). */
+  user: AuthUser;
+}
+
 interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  /** Sign-up; an invite code she opened before is sent with it (see RegisterResult). */
+  register: (payload: RegisterPayload) => Promise<RegisterResult>;
+  /** A fresh user from the server (e.g. after joining a coach). */
+  setUser: (user: AuthUser) => void;
   logout: () => void;
   updateUser: (patch: Partial<AuthUser>) => void;
 }
@@ -76,14 +89,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser);
   }
 
-  async function register(payload: RegisterPayload) {
-    const { token, user: registeredUser } = await registerRequest({
+  async function register(payload: RegisterPayload): Promise<RegisterResult> {
+    const inviteCode = getPendingInvite();
+    const { token, user: registeredUser, inviteError } = await registerRequest({
       ...payload,
       timezone: getDeviceTimezone(),
       language: getActiveLanguage(),
+      ...(inviteCode ? { inviteCode } : {}),
     });
+    clearPendingInvite();
     setToken(token);
     setUser(registeredUser);
+    return { inviteCode, inviteError: inviteError?.message ?? null, user: registeredUser };
   }
 
   function logout() {
@@ -101,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     register,
+    setUser,
     logout,
     updateUser,
   };

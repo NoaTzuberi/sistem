@@ -32,7 +32,53 @@ export const ROUTES = {
   COACH_INBOX: '/coach/inbox',
   COACH_TRAINEES: '/coach/trainees',
   COACH_PROFILE: '/coach/profile',
+  // First run (no invite, no choice yet): "how do you want to train" → the coach code.
+  FIRST_RUN: '/start',
+  FIRST_RUN_CODE: '/start/code',
+  // Joining a coach later (self-guided): the same code + confirm screens, from the Profile.
+  JOIN_COACH_CODE: '/profile/coach-code',
+  // An admin-only account: she uses the dashboard, not the app.
+  ADMIN_ONLY: '/admin-only',
 } as const;
+
+// A coach's invite link (public: works signed out — the sign-up carries the code through).
+export const JOIN_PATH = '/join/:code';
+
+export function joinPath(code: string): string {
+  return `/join/${encodeURIComponent(code)}`;
+}
+
+// "Is this your coach?" after a valid code — in the first run, or when joining later from the Profile.
+export const FIRST_RUN_COACH_PATH = '/start/coach/:code';
+export const JOIN_COACH_CONFIRM_PATH = '/profile/coach-code/:code';
+
+export type CoachCodeMode = 'firstRun' | 'later';
+
+export function coachCodePath(mode: CoachCodeMode): string {
+  return mode === 'firstRun' ? ROUTES.FIRST_RUN_CODE : ROUTES.JOIN_COACH_CODE;
+}
+
+export function coachConfirmPath(mode: CoachCodeMode, code: string): string {
+  return `${mode === 'firstRun' ? '/start/coach' : ROUTES.JOIN_COACH_CODE}/${encodeURIComponent(code)}`;
+}
+
+// Her own cardio workouts (self-guided "build a run"): the builder, one workout, and its run.
+export const OWN_CARDIO_NEW = '/workouts/own-cardio/new';
+export const OWN_CARDIO_EDIT_PATH = '/workouts/own-cardio/:id/edit';
+export const OWN_CARDIO_DETAIL_PATH = '/workouts/own-cardio/:id';
+export const OWN_CARDIO_RUN_PATH = '/workouts/own-cardio/:id/run';
+
+export function ownCardioPath(id: string): string {
+  return `/workouts/own-cardio/${id}`;
+}
+
+export function ownCardioEditPath(id: string): string {
+  return `/workouts/own-cardio/${id}/edit`;
+}
+
+export function ownCardioRunPath(id: string): string {
+  return `/workouts/own-cardio/${id}/run`;
+}
 
 // The exercise library pages are not routed in the mobile app (no trainee library
 // screen). The paths stay for the kept page code, which moves into the coach

@@ -1,4 +1,5 @@
 import { cardioLogRefs } from '../cardio/cardio.service';
+import { markCoachingActive } from '../coachings/coaching.service';
 import { CardioLog } from '../cardio/cardio.model';
 import { Types } from 'mongoose';
 import type { CoachPlan, CoachPlanProgress } from '@sistem/types';
@@ -70,8 +71,9 @@ async function toCoachPlans(plans: LeanPlan[]): Promise<CoachPlan[]> {
   });
 }
 
-async function findPlan(traineeId: string, planId: string): Promise<LeanPlan> {
-  const plan = await Plan.findOne({ _id: planId, traineeId }).lean<LeanPlan>();
+// Coach side: every plan is looked up inside ONE coaching (this coach ↔ this trainee) — never by trainee only.
+async function findPlan(traineeId: string, coachingId: string, planId: string): Promise<LeanPlan> {
+  const plan = await Plan.findOne({ _id: planId, traineeId, coachingId }).lean<LeanPlan>();
   if (!plan) {
     throw new PlanNotFoundError('plan_not_found');
   }
@@ -82,9 +84,9 @@ async function isLocked(planId: string): Promise<boolean> {
   return (await WorkoutLog.exists({ planId })) !== null;
 }
 
-export async function listCoachPlans(traineeId: string, now: Date = new Date()): Promise<CoachPlan[]> {
+export async function listCoachPlans(traineeId: string, coachingId: string, now: Date = new Date()): Promise<CoachPlan[]> {
   const [plans, trainee] = await Promise.all([
-    Plan.find({ traineeId }).sort({ weekStartDate: -1 }).lean<LeanPlan[]>(),
+    Plan.find({ traineeId, coachingId }).sort({ weekStartDate: -1 }).lean<LeanPlan[]>(),
     User.findById(traineeId).select('timezone').lean<{ timezone: string }>(),
   ]);
   const coachPlans = await toCoachPlans(plans);
@@ -115,8 +117,8 @@ export async function listCoachPlans(traineeId: string, now: Date = new Date()):
   });
 }
 
-export async function getCoachPlan(traineeId: string, planId: string): Promise<CoachPlan> {
-  const [plan] = await toCoachPlans([await findPlan(traineeId, planId)]);
+export async function getCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<CoachPlan> {
+  const [plan] = await toCoachPlans([await findPlan(traineeId, coachingId, planId)]);
   return plan;
 }
 
@@ -125,7 +127,7 @@ export async function getCoachPlan(traineeId: string, planId: string): Promise<C
  * plan ("duplicate last week"). The copy gets fresh workout / exercise ids, so its
  * workout logs never mix with the original's.
  */
-export async function createCoachPlan(traineeId: string, coachId: string, input: CreatePlanInput): Promise<CoachPlan> {
+export async function createCoachPlan(traineeId: string, coachingId: string, coachId: string, input: CreatePlanInput): Promise<CoachPlan> {
   const trainee = await User.findById(traineeId).select('timezone').lean();
   if (!trainee) {
     throw new Error('Trainee disappeared after the ownership check.');
@@ -133,7 +135,7 @@ export async function createCoachPlan(traineeId: string, coachId: string, input:
   if (input.weekStartDate < currentWeekStart(trainee.timezone)) {
     throw new PlanConflictError('plan_week_too_early');
   }
-  if (await Plan.exists({ traineeId, weekStartDate: input.weekStartDate })) {
+  if (await Plan.exists({ coachingId, weekStartDate: input.weekStartDate })) {
     throw new PlanConflictError('plan_week_taken');
   }
 
@@ -141,7 +143,7 @@ export async function createCoachPlan(traineeId: string, coachId: string, input:
   let splitId: string | undefined;
   let workouts: unknown[] = [];
   if (input.duplicatePrevious) {
-    const previous = await Plan.findOne({ traineeId, weekStartDate: { $lt: input.weekStartDate } })
+    const previous = await Plan.findOne({ coachingId, weekStartDate: { $lt: input.weekStartDate } })
       .sort({ weekStartDate: -1 })
       .lean<LeanPlan>();
     if (!previous) {
@@ -157,10 +159,10 @@ export async function createCoachPlan(traineeId: string, coachId: string, input:
   }
 
   try {
-    const created = new Plan({ traineeId, coachId, weekStartDate: input.weekStartDate, notes, splitId });
+    const created = new Plan({ traineeId, coachId, coachingId, weekStartDate: input.weekStartDate, notes, splitId });
     created.set('workouts', workouts);
     await created.save();
-    return getCoachPlan(traineeId, String(created._id));
+    return getCoachPlan(traineeId, coachingId, String(created._id));
   } catch (error) {
     // Two creates for the same week at once: the unique index decides.
     if (isDuplicateKeyError(error)) {
@@ -175,8 +177,8 @@ export async function createCoachPlan(traineeId: string, coachId: string, input:
  * have keep it (workout logs point at those ids); everything else gets a new id.
  * A published plan is live for the trainee, so it must stay publishable.
  */
-export async function saveCoachPlan(traineeId: string, planId: string, input: SavePlanInput): Promise<CoachPlan> {
-  const plan = await Plan.findOne({ _id: planId, traineeId });
+export async function saveCoachPlan(traineeId: string, coachingId: string, planId: string, input: SavePlanInput): Promise<CoachPlan> {
+  const plan = await Plan.findOne({ _id: planId, traineeId, coachingId });
   if (!plan) {
     throw new PlanNotFoundError('plan_not_found');
   }
@@ -202,7 +204,7 @@ export async function saveCoachPlan(traineeId: string, planId: string, input: Sa
       }
     });
   });
-  if (input.aiRecommendationId && !(await isLinkableRecommendation(traineeId, input.aiRecommendationId))) {
+  if (input.aiRecommendationId && !(await isLinkableRecommendation(coachingId, input.aiRecommendationId))) {
     issues.push(msg('plan_ai_recommendation_missing'));
   }
   issues.push(...checkTrainingIds(input, await getEffectiveTrainingConfig(String(plan.coachId))));
@@ -251,7 +253,7 @@ export async function saveCoachPlan(traineeId: string, planId: string, input: Sa
   if (plan.status === 'published' && plan.isModified('workouts notes')) plan.set('liveUpdatedAt', new Date());
   await plan.save();
 
-  return getCoachPlan(traineeId, planId);
+  return getCoachPlan(traineeId, coachingId, planId);
 }
 
 /**
@@ -259,10 +261,10 @@ export async function saveCoachPlan(traineeId: string, planId: string, input: Sa
  * notification). Publishing an already published plan changes nothing and
  * announces nothing.
  */
-export async function publishCoachPlan(traineeId: string, planId: string): Promise<CoachPlan> {
-  const plan = await findPlan(traineeId, planId);
+export async function publishCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<CoachPlan> {
+  const plan = await findPlan(traineeId, coachingId, planId);
   if (plan.status === 'published') {
-    return getCoachPlan(traineeId, planId);
+    return getCoachPlan(traineeId, coachingId, planId);
   }
 
   const issues = findPublishIssues(plan.workouts);
@@ -273,12 +275,14 @@ export async function publishCoachPlan(traineeId: string, planId: string): Promi
   // The status in the filter makes two publishes at once emit a single event.
   const publishedAt = new Date();
   const published = await Plan.findOneAndUpdate(
-    { _id: planId, traineeId, status: 'draft' },
+    { _id: planId, traineeId, coachingId, status: 'draft' },
     { $set: { status: 'published', publishedAt, liveUpdatedAt: publishedAt } },
     { returnDocument: 'after' },
   ).lean<LeanPlan>();
 
   if (published) {
+    // Her first published plan with this coach: the coaching leaves 'waiting'.
+    await markCoachingActive(coachingId);
     emitAppEvent('plan.published', {
       planId,
       traineeId,
@@ -287,7 +291,7 @@ export async function publishCoachPlan(traineeId: string, planId: string): Promi
       publishedAt,
     });
   }
-  return getCoachPlan(traineeId, planId);
+  return getCoachPlan(traineeId, coachingId, planId);
 }
 
 
@@ -295,22 +299,22 @@ export async function publishCoachPlan(traineeId: string, planId: string): Promi
  * Back to a draft — only while the trainee has not started any workout from it.
  * Her app state follows on its own: it is computed from her published plans.
  */
-export async function unpublishCoachPlan(traineeId: string, planId: string): Promise<CoachPlan> {
-  const plan = await findPlan(traineeId, planId);
+export async function unpublishCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<CoachPlan> {
+  const plan = await findPlan(traineeId, coachingId, planId);
   if (plan.status === 'published') {
     if (await isLocked(planId)) {
       throw new PlanConflictError('plan_locked');
     }
-    await Plan.updateOne({ _id: planId, traineeId }, { $set: { status: 'draft', publishedAt: null } });
+    await Plan.updateOne({ _id: planId, traineeId, coachingId }, { $set: { status: 'draft', publishedAt: null } });
   }
-  return getCoachPlan(traineeId, planId);
+  return getCoachPlan(traineeId, coachingId, planId);
 }
 
 /** Drafts, and published plans the trainee has not started yet. */
-export async function deleteCoachPlan(traineeId: string, planId: string): Promise<void> {
-  await findPlan(traineeId, planId);
+export async function deleteCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<void> {
+  await findPlan(traineeId, coachingId, planId);
   if (await isLocked(planId)) {
     throw new PlanConflictError('plan_locked');
   }
-  await Plan.deleteOne({ _id: planId, traineeId });
+  await Plan.deleteOne({ _id: planId, traineeId, coachingId });
 }

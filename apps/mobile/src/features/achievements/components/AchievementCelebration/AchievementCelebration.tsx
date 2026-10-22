@@ -7,6 +7,7 @@ import { usePopReveal } from '../../hooks/usePopReveal';
 import { AchievementBadge } from '../AchievementBadge/AchievementBadge';
 import { achievementCopy } from '../../copy';
 import './AchievementCelebration.css';
+import { appRole } from '../../../../services/auth/appRole';
 
 /**
  * The celebration moment (Phase 11), mounted once for the whole app: a sheet with the
@@ -19,7 +20,7 @@ export function AchievementCelebration() {
   const copy = useCopy(achievementCopy);
   const { user } = useAuth();
   const queue = useCelebrationQueue();
-  const isOpen = user?.role === 'trainee' && queue.length > 0;
+  const isOpen = appRole(user) === 'trainee' && queue.length > 0;
   const listRef = usePopReveal<HTMLUListElement>(isOpen ? queue.map((achievement) => achievement.id).join(',') : '');
 
   return (

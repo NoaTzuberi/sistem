@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vites
 import { connectTestDatabase, disconnectTestDatabase, clearTestDatabase } from '../../exercises/__tests__/testDb';
 import { startApiTestClient, createTestUser } from '../../../testing/apiTestClient';
 import type { ApiTestClient } from '../../../testing/apiTestClient';
+import { Coaching } from '../../coachings/coaching.model';
 import { User } from '../../users/user.model';
 import { OnboardingResponse } from '../onboardingResponse.model';
 import { migrateLegacyNutritionPreferences } from '../nutritionPreferencesMigration';
@@ -28,6 +29,13 @@ const FULL_PAYLOAD = {
 
 let api: ApiTestClient;
 let trainee: Awaited<ReturnType<typeof createTestUser>>;
+
+/** She joined a coach (as through an invite link) — onboarding then leads to waiting, not "no coach". */
+async function joinCoach(email = 'joined-coach@example.com') {
+  const coach = await createTestUser(email, { role: 'coach' });
+  await Coaching.create({ traineeId: trainee.user._id, coachId: coach.user._id });
+  return coach;
+}
 
 describe('onboarding (OnboardingResponse)', () => {
   beforeAll(async () => {
@@ -60,7 +68,7 @@ describe('onboarding (OnboardingResponse)', () => {
       },
     });
     expect(res.status).toBe(200);
-    expect(res.body.user).toMatchObject({ name: 'Maya T', onboardingStatus: 'in_progress', appState: 'onboarding' });
+    expect(res.body.user).toMatchObject({ name: 'Maya T', onboardingStatus: 'in_progress', appState: 'choose_path' });
     expect(res.body.onboarding).toMatchObject({ lastStep: 'basic_profile', units: { weight: 'kg', distance: 'km' } });
 
     const stored = await OnboardingResponse.findOne({ userId: trainee.user._id }).lean();
@@ -99,7 +107,15 @@ describe('onboarding (OnboardingResponse)', () => {
     expect(res.status).toBe(400);
   });
 
+  it('without a coach, completing lands on Home (self-guided)', async () => {
+    const res = await api.request('POST', '/onboarding/complete', { token: trainee.token, body: FULL_PAYLOAD });
+    expect(res.status).toBe(200);
+    expect(res.body.user.appState).toBe('home');
+    expect(res.body.user.coachingStatus).toBeNull();
+  });
+
   it('completes with server time and lands on waiting', async () => {
+    await joinCoach();
     const before = Date.now();
     const res = await api.request('POST', '/onboarding/complete', { token: trainee.token, body: FULL_PAYLOAD });
     expect(res.status).toBe(200);
@@ -128,6 +144,8 @@ describe('onboarding (OnboardingResponse)', () => {
   });
 
   it("fires 'trainee.onboarded' once, on the first completion only", async () => {
+    const coachUser = await createTestUser('event-coach@example.com', { role: 'coach' });
+    await Coaching.create({ traineeId: trainee.user._id, coachId: coachUser.user._id });
     const listener = vi.fn<(event: TraineeOnboardedEvent) => void>();
     appEvents.on('trainee.onboarded', listener);
     try {
@@ -139,9 +157,11 @@ describe('onboarding (OnboardingResponse)', () => {
 
     expect(listener).toHaveBeenCalledTimes(1);
     const user = (await User.findById(trainee.id).lean())!;
+    const coaching = (await Coaching.findOne({ traineeId: trainee.id }).lean())!;
     expect(listener.mock.calls[0][0]).toEqual({
       traineeId: trainee.id,
-      coachId: user.coachId ? String(user.coachId) : null,
+      coachId: String(coaching.coachId),
+      coachingId: String(coaching._id),
       completedAt: user.onboardingCompletedAt,
     });
   });
@@ -150,6 +170,7 @@ describe('onboarding (OnboardingResponse)', () => {
     const failing = () => {
       throw new Error('boom');
     };
+    await joinCoach();
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     appEvents.on('trainee.onboarded', failing);
     try {
@@ -166,10 +187,11 @@ describe('onboarding (OnboardingResponse)', () => {
     it('has no deadline before onboarding is finished', async () => {
       const res = await api.request('GET', '/onboarding/waiting', { token: trainee.token });
       expect(res.status).toBe(200);
-      expect(res.body).toMatchObject({ appState: 'onboarding', planDueAt: null });
+      expect(res.body).toMatchObject({ appState: 'choose_path', planDueAt: null });
     });
 
     it('returns server time and a deadline 48h after the completion time', async () => {
+      await joinCoach();
       await api.request('POST', '/onboarding/complete', { token: trainee.token, body: FULL_PAYLOAD });
       const before = Date.now();
       const res = await api.request('GET', '/onboarding/waiting', { token: trainee.token });
@@ -184,8 +206,8 @@ describe('onboarding (OnboardingResponse)', () => {
     });
 
     it('moves to home once a plan is published', async () => {
+      const coach = await joinCoach();
       await api.request('POST', '/onboarding/complete', { token: trainee.token, body: FULL_PAYLOAD });
-      const coach = await createTestUser('coach@example.com', { role: 'coach' });
       await Plan.create({
         traineeId: trainee.id,
         coachId: coach.id,
@@ -459,7 +481,7 @@ describe('onboarding (OnboardingResponse)', () => {
     it('her coach sees them with the other answers; another coach does not', async () => {
       const coach = await createTestUser('coach@example.com', { role: 'coach' });
       const otherCoach = await createTestUser('other@example.com', { role: 'coach' });
-      await User.updateOne({ _id: trainee.user._id }, { $set: { coachId: coach.user._id } });
+      await Coaching.create({ traineeId: trainee.user._id, coachId: coach.user._id });
       await step({ nutritionPreferences: PREFERENCES, weightGoal: { targetWeight: 55, timeframe: null } });
       const res = await api.request('GET', `/coach/trainees/${trainee.id}`, { token: coach.token });
       expect(res.body.trainee.onboarding.answers.nutritionPreferences.allergies).toEqual([{ id: 'tree_nuts' }, { id: 'shellfish' }]);

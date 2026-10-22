@@ -2,15 +2,24 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import type { AuthUser, Language } from '@sistem/types';
-import { User, UserDocument, isOnboardingCompleted } from '../users/user.model';
+
+interface AuthResponse {
+  token: string;
+  user: AuthUser;
+  /** Set when the sign-up's invite code could not be used (the account is made anyway). */
+  inviteError?: ServerMessage;
+}
+import { User, UserDocument, isOnboardingCompleted, primaryRole } from '../users/user.model';
 import { config } from '../../config/env';
 import { sendPasswordResetEmail } from './email.service';
 import { getAppState } from '../users/appState.service';
-import { resolveDefaultCoachId } from '../users/coachAssignment.service';
 import { isValidTimezone } from '../users/timezone';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
+import { toPublicAvatar } from '../users/avatar';
 import { resolveLanguage, resolveUnits } from '../users/units';
 import { LocalizedError } from '../../i18n';
+import type { ServerMessage } from '../../i18n';
+import { extractInviteCode, redeemInvite } from '../invites/invite.service';
 
 const SALT_ROUNDS = 12;
 const TOKEN_EXPIRY = '7d';
@@ -20,6 +29,7 @@ export class EmailAlreadyInUseError extends LocalizedError {}
 export class InvalidCredentialsError extends LocalizedError {}
 export class UserNotFoundError extends LocalizedError {}
 export class InvalidResetTokenError extends LocalizedError {}
+export class SetPasswordTokenError extends LocalizedError {}
 
 function signToken(userId: string): string {
   return jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: TOKEN_EXPIRY });
@@ -31,23 +41,39 @@ function hashResetToken(token: string): string {
 
 export async function toPublicUser(user: UserDocument & { _id: unknown }): Promise<AuthUser> {
   const id = String(user._id);
+  const { appState, coachingStatus } = await getAppState(id, user);
   return {
     id,
     name: user.name,
     email: user.email,
-    role: user.role,
-    appState: await getAppState(id, user),
+    roles: [...user.roles],
+    role: primaryRole(user),
+    appState,
+    coachingStatus,
     onboardingStatus: user.onboardingStatus,
     onboardingCompleted: isOnboardingCompleted(user),
     onboardingCompletedAt: user.onboardingCompletedAt ? user.onboardingCompletedAt.toISOString() : null,
     timezone: user.timezone,
     units: resolveUnits(user.preferences),
     language: resolveLanguage(user.preferences),
+    avatar: toPublicAvatar(user.avatar),
     createdAt: user.createdAt.toISOString(),
   };
 }
 
-export async function registerUser(name: string, email: string, password: string, timezone?: string, language?: Language) {
+/**
+ * Public sign-up — always a trainee (a role from the request never reaches the model) and never
+ * linked to a coach by itself: only an invite code does that. A code that can't be used doesn't
+ * block the sign-up (she can enter one later on the "no coach yet" screen); its message comes back.
+ */
+export async function registerUser(
+  name: string,
+  email: string,
+  password: string,
+  timezone?: string,
+  language?: Language,
+  inviteCode?: string,
+): Promise<AuthResponse> {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new EmailAlreadyInUseError('email_taken');
@@ -59,14 +85,23 @@ export async function registerUser(name: string, email: string, password: string
     name,
     email,
     passwordHash,
-    coachId: await resolveDefaultCoachId(),
     // The device zone is a hint: an unknown value must not block sign-up.
     timezone: isValidTimezone(timezone) ? timezone : DEFAULT_TIMEZONE,
     // The language she signed up in (validated); unset = Hebrew.
     ...(language ? { preferences: { language } } : {}),
   });
 
-  return { token: signToken(String(user._id)), user: await toPublicUser(user) };
+  let inviteError: ServerMessage | undefined;
+  if (inviteCode) {
+    try {
+      await redeemInvite(String(user._id), extractInviteCode(inviteCode));
+    } catch (error) {
+      if (!(error instanceof LocalizedError)) throw error;
+      inviteError = error.serverMessage;
+    }
+  }
+
+  return { token: signToken(String(user._id)), user: await toPublicUser(user), ...(inviteError ? { inviteError } : {}) };
 }
 
 export async function getCurrentUser(userId: string) {
@@ -79,7 +114,8 @@ export async function getCurrentUser(userId: string) {
 
 export async function loginUser(email: string, password: string) {
   const user = await User.findOne({ email });
-  if (!user) {
+  // No password yet (an admin-created coach before her set-password link): same answer as a wrong one.
+  if (!user?.passwordHash) {
     throw new InvalidCredentialsError('invalid_credentials');
   }
 
@@ -125,4 +161,27 @@ export async function resetPassword(token: string, newPassword: string): Promise
   user.passwordResetTokenHash = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
+}
+
+/**
+ * A one-time "set password" link for an account the admin created (no password yet), or a fresh one
+ * for a coach who lost hers. Single use: the token is stored hashed and cleared when used; a new link
+ * replaces the old one.
+ */
+export async function issueSetPasswordLink(userId: string, ttlMs: number, now: Date = new Date()): Promise<{ url: string; expiresAt: Date }> {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(now.getTime() + ttlMs);
+  await User.updateOne({ _id: userId }, { $set: { passwordResetTokenHash: hashResetToken(rawToken), passwordResetExpires: expiresAt } });
+  return { url: `${config.dashboardUrl.replace(/\/+$/, '')}/set-password?token=${rawToken}`, expiresAt };
+}
+
+/** Uses the link: sets the password, burns the token, and signs her in. */
+export async function setPasswordWithToken(token: string, password: string): Promise<AuthResponse> {
+  const user = await User.findOneAndUpdate(
+    { passwordResetTokenHash: hashResetToken(token), passwordResetExpires: { $gt: new Date() } },
+    { $set: { passwordHash: await bcrypt.hash(password, SALT_ROUNDS) }, $unset: { passwordResetTokenHash: 1, passwordResetExpires: 1 } },
+    { returnDocument: 'after' },
+  );
+  if (!user) throw new SetPasswordTokenError('set_password_token_invalid');
+  return { token: signToken(String(user._id)), user: await toPublicUser(user) };
 }

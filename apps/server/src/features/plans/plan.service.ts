@@ -5,6 +5,7 @@ import { Plan } from './plan.model';
 import { resolvePlanExerciseSets } from './planSets';
 import type { PlanDocument, PlanExerciseFields, PlanWorkoutFields } from './plan.types';
 import { LocalizedError } from '../../i18n';
+import { coachingIdsOf } from '../coachings/coaching.service';
 
 export class PlanNotFoundError extends LocalizedError {}
 
@@ -77,6 +78,9 @@ export async function attachExerciseFacts(plans: PublicPlan[]): Promise<void> {
   }
 }
 
+/** A published plan from a LIVE coaching (an ended coach's plans don't keep her on Home). */
 export async function hasPublishedPlan(traineeId: string): Promise<boolean> {
-  return (await Plan.exists({ traineeId, status: 'published' })) !== null;
+  const liveIds = await coachingIdsOf(traineeId);
+  if (liveIds.length === 0) return false;
+  return (await Plan.exists({ traineeId, status: 'published', coachingId: { $in: liveIds } })) !== null;
 }

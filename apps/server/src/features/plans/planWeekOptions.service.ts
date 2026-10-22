@@ -18,14 +18,14 @@ function relationOf(index: number): PlanWeekRelation {
   return index === 1 ? 'next' : 'later';
 }
 
-export async function listPlanWeekOptions(traineeId: string, now: Date = new Date()): Promise<PlanWeekOptions> {
+export async function listPlanWeekOptions(traineeId: string, coachingId: string, now: Date = new Date()): Promise<PlanWeekOptions> {
   const trainee = await User.findById(traineeId).select('timezone').lean();
   const thisWeek = currentWeekStart(trainee?.timezone ?? DEFAULT_TIMEZONE, now);
   const lastWeek = addDays(thisWeek, (PLAN_WEEKS_OFFERED - 1) * WEEK_DAYS);
 
   // Every plan up to the last offered week: the offered ones, and the earlier ones a
   // duplicate would copy from (same rule as createCoachPlan: the most recent earlier plan).
-  const plans = await Plan.find({ traineeId, weekStartDate: { $lte: lastWeek } })
+  const plans = await Plan.find({ coachingId, weekStartDate: { $lte: lastWeek } })
     .select('weekStartDate status')
     .sort({ weekStartDate: -1 })
     .lean();

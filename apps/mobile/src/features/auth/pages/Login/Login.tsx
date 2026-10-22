@@ -11,7 +11,8 @@ import { useAuth } from '../../../../services/auth/AuthContext';
 import { authErrorText, validateEmail, validateLoginPassword, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
-import { ROUTES } from '../../../../app/config/routes';
+import { ROUTES, joinPath } from '../../../../app/config/routes';
+import { clearPendingInvite, getPendingInvite } from '../../../../services/invites/pendingInvite';
 import './Login.css';
 
 export function Login() {
@@ -40,7 +41,10 @@ export function Login() {
     try {
       await login({ email, password });
       // "/" sends the user to the landing screen for their server-decided state.
-      navigate(ROUTES.HOME);
+      // She opened a coach's link first: back to it to confirm joining.
+      const pendingInvite = getPendingInvite();
+      clearPendingInvite();
+      navigate(pendingInvite ? joinPath(pendingInvite) : ROUTES.HOME);
     } catch (error) {
       // The server's message is already in the language on screen; '' = no answer.
       setFormError((error instanceof Error && error.message) || copy.loginFailed);

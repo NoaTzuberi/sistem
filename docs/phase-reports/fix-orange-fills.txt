@@ -1,0 +1,57 @@
+Fix — workout / zone / fat orange rendered brown
+===============================================
+
+Summary
+- Cause: fills used the contrast-safe "solid" shades, not the identity colors. Orange → --solid-orange #b85300
+  (and color-mix of it with ink ≈ #8f4a1a for text), the zone-3 player ground → #c75a00, the nutrition food
+  sheet's selected tab / "added" button → the fat TEXT ink #8a4a00 as a background. No filter, blend or
+  overlay was involved.
+- Fills now use the exact colors: workouts #FF006E / #7C4DFF / #FF7A00 / #0094FF (+ w5), zones = --color-zone-N,
+  nutrition groups = --color-portion-*. The --color-workout-N-solid tokens are gone; new --color-workout-N-text
+  is the text tone on a tint / white (orange = #c75a00, text only). Zone -stage tokens = the zone color.
+- Week track: today is ink even on a rest day (laneLook returned 'rest' → white lane + dot). Lines on a done /
+  today lane are white at 6% (--color-lane-line-on-fill); other lanes keep ink at 5%. done = exact fill,
+  planned = 2px ring, missed = soft + dot, rest = hairline (unchanged).
+
+Files changed (modified)
+- packages/tokens/tokens.css — workout -text tokens (replace -solid), zone -stage = zone color, lane-line-on-fill
+- apps/mobile/src/styles/workoutColors.css — --workout-color-text replaces --workout-color-solid
+- apps/mobile/src/features/home/components/WeekTrack/WeekTrack.css, apps/mobile/src/features/home/data/homeDisplay.ts
+- apps/mobile/src/features/workouts/components/{WorkoutTicket,MonthCalendar,WorkoutPreviewSheet,FreeWorkoutSheet,FeelPicker}/*.css
+- apps/mobile/src/features/cardio/components/{CardioPlayer,CardioFinish}/*.css (contrast-ignore notes only)
+- apps/mobile/src/features/nutrition/components/FoodSheet/FoodSheet.css
+- apps/dashboard/src/styles/globals.css — --workout-solid split into --workout-color (fills) / --workout-text (text)
+- apps/dashboard/src/features/planBuilder/components/{WorkoutTabs,SlotSection,ExerciseRow,WorkoutCard}/*.css
+- apps/dashboard/src/features/trainees/components/CalendarWorkout/CalendarWorkout.css
+- apps/dashboard/src/features/nutritionLibrary/components/PortionSplitBar/PortionSplitBar.css
+- apps/dashboard/src/components/common/PublishModal/PublishModal.css
+
+Dependencies: none.
+
+How to test
+- npm run lint (oxlint + i18n + contrast audit: no findings); npm run dev:all
+- Home week track: a done orange day is bright #FF7A00; today on a rest day is ink with the pink pulse.
+- Workouts: a done "Full Body C" ticket / month calendar day / preview header are bright orange.
+- Nutrition food sheet: the fat tab selected is #FF7A00. Cardio player zone 3 ground is #FF7A00.
+- Dashboard plan builder: the selected orange workout tab / required slot tag are #FF7A00.
+
+Known issues / decisions
+- White text on #FF7A00 is 2.6:1 (WCAG asks ≥ 3:1 large, 4.5:1 small). Kept per the owner's rule; each such
+  line carries a `contrast-ignore` note. The owner may want ink text on orange / sky-blue fills instead.
+- #c75a00 as small text is 4.3:1 on white and 3.7:1 on #FFEBD6 (AA needs 4.5:1). Used for the workout text tone
+  as asked; the nutrition fat TEXT tone stays --ink-orange #8a4a00 (it is text, not a fill, and passes AA).
+- Not changed (not workout / zone / fat fills): --solid-orange #b85300 still used by dashboard achievements,
+  notifications, the consistency card and the profile links; --color-stat-orange / --color-section-exercises
+  #c75a00 are dashboard stat / section TEXT tones (QuickFacts uses stat-orange as a fill — check by eye).
+- brightness() filters left as is: they only darken empty soft cells on hover / press (FuelBar, PortionGroupRow,
+  FoodSheet), plus the dashboard ConsistencyCard hover (brightens) and the screen transition.
+
+Suggested commits
+- fix: use the exact workout, zone and nutrition colors for fills (tokens + mobile + dashboard)
+- docs: orange fills fix report
+
+git add -A -- packages/tokens/tokens.css apps/mobile/src/styles/workoutColors.css apps/mobile/src/features/home/components/WeekTrack/WeekTrack.css apps/mobile/src/features/home/data/homeDisplay.ts apps/mobile/src/features/workouts/components/WorkoutTicket apps/mobile/src/features/workouts/components/MonthCalendar apps/mobile/src/features/workouts/components/WorkoutPreviewSheet apps/mobile/src/features/workouts/components/FreeWorkoutSheet apps/mobile/src/features/workouts/components/FeelPicker apps/mobile/src/features/cardio/components/CardioPlayer apps/mobile/src/features/cardio/components/CardioFinish apps/mobile/src/features/nutrition/components/FoodSheet apps/dashboard/src/styles/globals.css apps/dashboard/src/features/planBuilder/components/WorkoutTabs apps/dashboard/src/features/planBuilder/components/SlotSection apps/dashboard/src/features/planBuilder/components/ExerciseRow apps/dashboard/src/features/planBuilder/components/WorkoutCard apps/dashboard/src/features/trainees/components/CalendarWorkout apps/dashboard/src/features/nutritionLibrary/components/PortionSplitBar apps/dashboard/src/components/common/PublishModal
+git commit -m "fix: use the exact workout, zone and nutrition colors for fills"
+
+git add -A -- docs/phase-reports/fix-orange-fills.txt
+git commit -m "docs: orange fills fix report"

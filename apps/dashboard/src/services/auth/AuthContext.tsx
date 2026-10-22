@@ -9,6 +9,8 @@ interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<AuthUser>;
+  /** A session the server already issued (the one-time set-password link signs her in). */
+  signInWithToken: (token: string, user: AuthUser) => void;
   logout: () => void;
   updateUser: (patch: Partial<AuthUser>) => void;
 }
@@ -48,6 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return loggedInUser;
   }
 
+  function signInWithToken(token: string, signedIn: AuthUser) {
+    setToken(token);
+    setUser(signedIn);
+  }
+
   function logout() {
     clearToken();
     setUser(null);
@@ -57,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((current) => (current ? { ...current, ...patch } : current));
   }
 
-  return <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, isLoading, login, signInWithToken, logout, updateUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

@@ -16,6 +16,9 @@ import { nutritionRouter } from './features/nutrition/nutrition.routes';
 import { mealLogsRouter } from './features/mealLogs/mealLog.routes';
 import { cardioRouter } from './features/cardio/cardio.routes';
 import { tabUpdatesRouter } from './features/tabUpdates/tabUpdates.routes';
+import { adminRouter } from './features/admin/admin.routes';
+import { joinRouter } from './features/invites/invite.routes';
+import { coachingsRouter, communitiesRouter } from './features/coachings/coaching.routes';
 import { registerNotificationListeners } from './features/notifications/notification.listeners';
 import { registerAiRecommendationListeners } from './features/aiRecommendations/aiRecommendation.listeners';
 
@@ -40,6 +43,10 @@ app.use('/api/nutrition-plan', nutritionRouter);
 app.use('/api/meal-logs', mealLogsRouter);
 app.use('/api/cardio', cardioRouter);
 app.use('/api/tab-updates', tabUpdatesRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/join', joinRouter);
+app.use('/api/coachings', coachingsRouter);
+app.use('/api/communities', communitiesRouter);
 
 registerNotificationListeners();
 registerAiRecommendationListeners();

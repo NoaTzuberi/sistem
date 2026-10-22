@@ -1,5 +1,5 @@
 import type { Types } from 'mongoose';
-import type { SetType, WorkoutLogStatus } from '@sistem/types';
+import type { SetType, WorkoutLogSource, WorkoutLogStatus } from '@sistem/types';
 
 // Units: weight kg, durations seconds.
 export interface WorkoutLogSetFields {
@@ -27,10 +27,20 @@ export interface PrivatePhoto {
   uploadedAt: Date;
 }
 
+/** A free workout's own exercise list (its _id is the planExerciseId of its sets). */
+export interface FreeExerciseFields {
+  _id: Types.ObjectId;
+  exerciseId: Types.ObjectId;
+}
+
 export interface WorkoutLogDocument {
   traineeId: Types.ObjectId;
-  planId: Types.ObjectId;
-  workoutId: Types.ObjectId;
+  /** 'plan' = a workout of a coach's plan; 'free' = one she built herself (trainee-owned, no plan / coaching). */
+  source: WorkoutLogSource;
+  coachingId: Types.ObjectId | null;
+  planId: Types.ObjectId | null;
+  workoutId: Types.ObjectId | null;
+  freeExercises?: FreeExerciseFields[];
   workoutTitle: string;
   status: WorkoutLogStatus;
   startedAt: Date;

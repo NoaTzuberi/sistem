@@ -51,6 +51,7 @@ export interface PlanCardioFields {
 
 export interface PlanDocument {
   traineeId: Types.ObjectId;
+  coachingId: Types.ObjectId;
   coachId: Types.ObjectId;
   weekStartDate: string;
   status: PlanStatus;

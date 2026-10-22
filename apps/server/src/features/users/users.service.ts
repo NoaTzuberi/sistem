@@ -40,3 +40,14 @@ export async function updateUserPreferences(userId: string, payload: UpdatePrefe
   }
   return toPublicUser(user);
 }
+
+/** "On my own" in the first run: remembered so a reopened app resumes at the questionnaire. Idempotent. */
+export async function chooseSelfGuided(userId: string, now: Date = new Date()): Promise<AuthUser> {
+  const user = await User.findOneAndUpdate(
+    { _id: userId, selfGuidedAt: null },
+    { $set: { selfGuidedAt: now } },
+    { new: true },
+  ) ?? (await User.findById(userId));
+  if (!user) throw new UserNotFoundError('user_not_found');
+  return toPublicUser(user);
+}

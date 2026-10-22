@@ -41,7 +41,7 @@ async function main() {
   assertDevDatabase(argv.includes('--allow-remote'));
   await connectDatabase();
   try {
-    const coach = await User.findOne({ email, role: 'coach' }).select('_id').lean();
+    const coach = await User.findOne({ email, roles: 'coach' }).select('_id').lean();
     if (!coach) {
       console.error('No coach with that email.');
       process.exitCode = 1;

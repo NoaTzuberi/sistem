@@ -3,7 +3,7 @@ import type { ActiveWorkoutConflictBody } from '@sistem/types';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { PlanNotFoundError } from '../plans/plan.service';
 import { PhotoStorageUnavailableError } from '../privatePhotos/privatePhoto.service';
-import { parseSetUpdates, parseStartWorkoutPayload, parseSummaryPayload, validateWorkoutLogIdParam } from './workoutLog.validation';
+import { parseSetUpdates, parseStartFreeWorkoutPayload, parseStartWorkoutPayload, parseSummaryPayload, validateWorkoutLogIdParam } from './workoutLog.validation';
 import { listWorkoutLogsForTrainee, getWorkoutLogForTrainee, WorkoutLogNotFoundError } from './workoutLog.service';
 import {
   abandonWorkout,
@@ -25,7 +25,9 @@ import {
   setPumpPhoto,
   updateWorkoutSummary,
 } from './workoutSummary.service';
-import { sendError } from '../../i18n';
+import { requestLanguage, sendError, translate } from '../../i18n';
+import { FreeWorkoutError, addFreeExercise, searchFreeExercises, startFreeWorkout } from './freeWorkout.service';
+import { CoachingNotFoundError, readTraineeCoachingParam } from '../coachings/coaching.service';
 
 /** Maps the session and summary errors to HTTP; anything else goes to the error handler. */
 function sendSessionError(res: Response, error: unknown): void {
@@ -44,6 +46,8 @@ function sendSessionError(res: Response, error: unknown): void {
     error instanceof WorkoutLogNotCompletedError
   ) {
     sendError(res, 409, error.serverMessage);
+  } else if (error instanceof FreeWorkoutError) {
+    sendError(res, error.serverMessage.code === 'workout_not_in_progress' ? 409 : 400, error.serverMessage);
   } else if (error instanceof NothingCompletedError || error instanceof UnknownLogSetError || error instanceof InvalidPhotoError) {
     sendError(res, 400, error.serverMessage);
   } else if (error instanceof PhotoStorageUnavailableError) {
@@ -69,8 +73,16 @@ function withLogId(handler: (req: AuthenticatedRequest, res: Response, logId: st
   };
 }
 
+/** Her whole history; `?coachingId=` (one of hers) narrows it to one coach. */
 export async function getMyWorkoutLogs(req: AuthenticatedRequest, res: Response) {
-  const logs = await listWorkoutLogsForTrainee(req.userId!);
+  let coachingId: string | null;
+  try {
+    coachingId = await readTraineeCoachingParam(req.userId!, req.query.coachingId);
+  } catch (error) {
+    if (error instanceof CoachingNotFoundError) return sendError(res, 404, error.serverMessage);
+    throw error;
+  }
+  const logs = await listWorkoutLogsForTrainee(req.userId!, coachingId);
   res.status(200).json({ items: logs });
 }
 
@@ -141,4 +153,31 @@ export const putMyPumpPhoto = withLogId(async (req, res, logId) => {
 
 export const deleteMyPumpPhoto = withLogId(async (req, res, logId) => {
   res.status(200).json({ log: await removePumpPhoto(logId, req.userId!) });
+});
+
+// --- Free workouts (her own, outside any plan) ---------------------------------------
+
+/** POST /workout-logs/free — a new free session; 409 other_workout_active like a plan workout. */
+export async function postStartFreeWorkout(req: AuthenticatedRequest, res: Response) {
+  const parsed = parseStartFreeWorkoutPayload(req.body);
+  if (parsed.error !== undefined) return sendError(res, 400, parsed.error);
+  try {
+    // The stored title is a text in her language at the start (history shows it as saved).
+    const title = translate(requestLanguage(req), 'free_workout_title');
+    res.status(201).json(await startFreeWorkout(req.userId!, parsed.value, title));
+  } catch (error) {
+    sendSessionError(res, error);
+  }
+}
+
+/** GET /workout-logs/free/exercises?search= — her picker: primaries that fit her equipment / level. */
+export async function getFreeExercises(req: AuthenticatedRequest, res: Response) {
+  const search = typeof req.query.search === 'string' ? req.query.search.slice(0, 80) : '';
+  res.status(200).json({ items: await searchFreeExercises(req.userId!, search) });
+}
+
+/** POST /workout-logs/:id/exercises { exerciseId } — add an exercise to her open free workout. */
+export const postFreeExercise = withLogId(async (req, res, logId) => {
+  const exerciseId = typeof req.body?.exerciseId === 'string' ? req.body.exerciseId : '';
+  res.status(200).json({ session: await addFreeExercise(logId, req.userId!, exerciseId) });
 });

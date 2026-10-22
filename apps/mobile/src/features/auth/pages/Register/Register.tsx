@@ -2,7 +2,10 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconAt, IconKey, IconUser } from '@tabler/icons-react';
+import { landingPath } from '../../../../app/router/landingPath';
 import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
+import { JoinBanner } from '../../../firstRun/components/JoinBanner/JoinBanner';
+import { useJoiningCoach } from '../../../firstRun/hooks/useJoiningCoach';
 import { AuthField } from '../../components/AuthField/AuthField';
 import { AuthSubmitButton } from '../../components/AuthSubmitButton/AuthSubmitButton';
 import { SocialButtons } from '../../components/SocialButtons/SocialButtons';
@@ -11,10 +14,12 @@ import { authErrorText, validateName, validateEmail, validatePassword, type Auth
 import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
 import { PasswordVisibilityToggle } from '../../components/PasswordVisibilityToggle/PasswordVisibilityToggle';
-import { ROUTES } from '../../../../app/config/routes';
+import { ROUTES, joinPath } from '../../../../app/config/routes';
 import './Register.css';
 
 export function Register() {
+  // Came through a coach's link: "Joining <coach>'s coaching" from the sign-up on.
+  const joiningCoach = useJoiningCoach(false);
   const navigate = useNavigate();
   const { register } = useAuth();
   const copy = useCopy(authCopy);
@@ -76,8 +81,10 @@ export function Register() {
 
     setIsSubmitting(true);
     try {
-      await register({ name, email, password, confirmPassword });
-      navigate(ROUTES.ONBOARDING);
+      const { inviteCode, inviteError, user } = await register({ name, email, password, confirmPassword });
+      // A code that couldn't be used: its screen says why (no dead end — "Continue" goes on). Otherwise the
+      // server's state: the "how do you want to train" choice, or straight into the questionnaire (a link).
+      navigate(inviteCode && inviteError ? joinPath(inviteCode) : landingPath(user.appState));
     } catch (error) {
       setFormError((error instanceof Error && error.message) || copy.registerFailed);
     } finally {
@@ -86,7 +93,12 @@ export function Register() {
   }
 
   return (
-    <AuthScreen title={copy.registerTitle} switchLabel={copy.loginLink} switchTo={ROUTES.LOGIN}>
+    <AuthScreen
+      title={copy.registerTitle}
+      switchLabel={copy.loginLink}
+      switchTo={ROUTES.LOGIN}
+      banner={joiningCoach ? <JoinBanner coachName={joiningCoach} /> : undefined}
+    >
       <form className="auth-glass-form" onSubmit={handleSubmit} noValidate>
         <AuthField
           type="text"

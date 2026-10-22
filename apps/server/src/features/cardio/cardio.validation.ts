@@ -87,7 +87,11 @@ export function parsePlanCardio(value: unknown): Parsed<PlanCardioFields> {
 /** Her numbers; the service checks them against the workout (rounds, length). */
 export function parseSaveCardioLogPayload(body: unknown): Parsed<SaveCardioLogPayload> {
   if (!isRecord(body)) return fail(msg('cardio_log_invalid'));
-  if (validateObjectId(body.planId) || validateObjectId(body.workoutId)) return fail(msg('cardio_workout_id_invalid'));
+  // Either a plan workout (planId + workoutId) or her own cardio workout (ownWorkoutId).
+  const isOwn = body.ownWorkoutId !== undefined;
+  if (isOwn ? validateObjectId(body.ownWorkoutId) : validateObjectId(body.planId) || validateObjectId(body.workoutId)) {
+    return fail(msg('cardio_workout_id_invalid'));
+  }
   const counts = [body.completedSec, body.roundsDone, body.highIntensitySec];
   if (!counts.every((value) => isIntIn(value, 0, Number.MAX_SAFE_INTEGER))) return fail(msg('cardio_log_invalid'));
   if (!isIntIn(body.rpe, 1, 10)) return fail(msg('cardio_rpe_invalid'));
@@ -99,8 +103,7 @@ export function parseSaveCardioLogPayload(body: unknown): Parsed<SaveCardioLogPa
   if (note.error) return note;
   return {
     value: {
-      planId: body.planId as string,
-      workoutId: body.workoutId as string,
+      ...(isOwn ? { ownWorkoutId: body.ownWorkoutId as string } : { planId: body.planId as string, workoutId: body.workoutId as string }),
       completedSec: body.completedSec as number,
       roundsDone: body.roundsDone as number,
       highIntensitySec: body.highIntensitySec as number,
@@ -111,4 +114,16 @@ export function parseSaveCardioLogPayload(body: unknown): Parsed<SaveCardioLogPa
     },
     error: null,
   };
+}
+
+export const MAX_OWN_CARDIO_TITLE_LENGTH = 60;
+
+/** POST / PUT /cardio/own: a title + the same blocks the coach's cardio builder saves. */
+export function parseOwnCardioWorkoutPayload(body: unknown): Parsed<{ title: string; cardio: PlanCardioFields }> {
+  if (!isRecord(body)) return fail(msg('invalid_body'));
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
+  if (title.length === 0 || title.length > MAX_OWN_CARDIO_TITLE_LENGTH) return fail(msg('own_cardio_title_invalid', { max: MAX_OWN_CARDIO_TITLE_LENGTH }));
+  const cardio = parsePlanCardio(body.cardio);
+  if (!cardio.value) return cardio;
+  return { value: { title, cardio: cardio.value }, error: null };
 }

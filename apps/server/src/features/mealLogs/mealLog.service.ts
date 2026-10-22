@@ -1,7 +1,8 @@
-import type { Types } from 'mongoose';
-import type { CoachMealLogWeek, MealLogDay, MealLogDaysResponse, MealPhoto, PortionCounts } from '@sistem/types';
+import { Types } from 'mongoose';
+import type { CoachMealLogWeek, Language, MealLogDay, MealLogDaysResponse, MealPhoto, PortionCounts } from '@sistem/types';
 import { User } from '../users/user.model';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
+import { resolveLanguage } from '../users/units';
 import { addDays, daysBetween, localDateString, weekStartOf } from '../plans/planWeek';
 import { NutritionPlanVersion } from '../nutrition/nutritionPlan.model';
 import { PORTION_GROUP_IDS, PORTION_STEP } from '../nutrition/nutrition.constants';
@@ -10,38 +11,78 @@ import { toPortionCounts } from '../nutrition/nutritionMapping';
 import { MEAL_PHOTO_FOLDER } from '../privatePhotos/privatePhoto.constants';
 import { deletePrivatePhoto, toPublicPhoto, uploadPrivatePhoto } from '../privatePhotos/privatePhoto.service';
 import { isAcceptedImage } from '../privatePhotos/privatePhoto.validation';
+import { OnboardingResponse } from '../onboarding/onboardingResponse.model';
+import { loadOwnTarget, toPublicOwnTarget } from '../ownNutrition/ownNutritionTarget.service';
+import type { LeanOwnTarget } from '../ownNutrition/ownNutritionTarget.service';
 import { MealLog } from './mealLog.model';
-import { MEAL_LOG_EDITABLE_DAYS } from './mealLog.constants';
+import { DEFAULT_MEAL_COUNT, DEFAULT_MEAL_IDS_BY_COUNT, MAX_MEAL_PHOTOS_PER_DAY, MEAL_LOG_EDITABLE_DAYS } from './mealLog.constants';
 import type { MealLogDocument, MealPhotoFields } from './mealLog.types';
-import { LocalizedError } from '../../i18n';
+import { LocalizedError, translate } from '../../i18n';
+import type { MessageCode } from '../../i18n';
 import { dayPortionsOf } from '../nutrition/nutritionPlanMode';
+import { getCurrentCoaching } from '../coachings/coaching.service';
 
 // Portion tracking (PRD §5.6, Phase 13a+): one MealLog per trainee and day. She marks
 // portions per group against the day's plan — never what she ate, never calories — and
-// may add a private photo per meal. Today follows the newest published version; a past
+// may add private photos per meal. Today follows the newest published version; a past
 // day keeps the version it was logged against (or, if never logged, the one live then).
+// Without a coach's plan, the day is tracked against her own target ("היעד שלי", trainee-owned).
 
 export class MealLogDayError extends LocalizedError {}
 export class MealLogNoPlanError extends LocalizedError {}
 export class InvalidMealPhotoError extends LocalizedError {}
+export class MealPhotoNotFoundError extends LocalizedError {}
 
-type LeanVersion = Pick<NutritionPlanVersionDocument, 'planId' | 'coachId' | 'version' | 'publishedAt' | 'meals'> & {
+type LeanVersion = Pick<NutritionPlanVersionDocument, 'planId' | 'coachId' | 'coachingId' | 'version' | 'publishedAt' | 'meals'> & {
   _id: Types.ObjectId;
 };
 type LeanMealLog = MealLogDocument & { _id: Types.ObjectId };
+type Meal = { id: string; name: string };
 
 const ZERO: PortionCounts = { protein: 0, carb: 0, fat: 0, snack: 0 };
 
-async function traineeTimezone(traineeId: string): Promise<string> {
-  const user = await User.findById(traineeId).select('timezone').lean();
-  return user?.timezone ?? DEFAULT_TIMEZONE;
+/** What a day is tracked against: a coach's plan version or her own target. */
+interface DayBasis {
+  source: 'plan' | 'own';
+  planned: PortionCounts;
+  meals: Meal[];
+  planVersion: number | null;
+  /** Written on the log (upsert). */
+  ref: { source: 'plan' | 'own'; planId: Types.ObjectId | null; planVersion: number | null; coachId: Types.ObjectId | null; coachingId: Types.ObjectId | null };
 }
 
-/** Her versions, newest first (a trainee has a handful). */
-async function loadVersions(traineeId: string): Promise<LeanVersion[]> {
-  return NutritionPlanVersion.find({ traineeId })
+interface TraineeFacts {
+  timezone: string;
+  defaultMeals: Meal[];
+}
+
+async function traineeFacts(traineeId: string): Promise<TraineeFacts> {
+  const [user, response] = await Promise.all([
+    User.findById(traineeId).select('timezone preferences').lean(),
+    OnboardingResponse.findOne({ userId: traineeId }).select('answers.nutritionPreferences.mealsPerDay').lean(),
+  ]);
+  return {
+    timezone: user?.timezone ?? DEFAULT_TIMEZONE,
+    defaultMeals: defaultMeals(response?.answers?.nutritionPreferences?.mealsPerDay ?? null, resolveLanguage(user?.preferences)),
+  };
+}
+
+/** Her "meals per day" answer (else 4) as stable ids + names in her language. */
+function defaultMeals(mealsPerDay: number | null, language: Language): Meal[] {
+  const ids = DEFAULT_MEAL_IDS_BY_COUNT[mealsPerDay ?? DEFAULT_MEAL_COUNT] ?? DEFAULT_MEAL_IDS_BY_COUNT[DEFAULT_MEAL_COUNT];
+  return ids.map((id) => ({ id, name: translate(language, `meal_${id}` as MessageCode) }));
+}
+
+/**
+ * The versions of ONE coaching, newest first (a trainee has a handful): the coach's own (coach view),
+ * else her current coaching's (her app). No coaching → none.
+ */
+async function loadVersions(traineeId: string, coachingId: string | null = null): Promise<LeanVersion[]> {
+  const scope = coachingId ?? (await getCurrentCoaching(traineeId))?._id ?? null;
+  if (!scope) return [];
+  return NutritionPlanVersion.find({ traineeId, coachingId: scope })
     .sort({ version: -1 })
-    .select('planId coachId version publishedAt meals mode dailyPortions')
+    .select('planId coachId coachingId version publishedAt meals mode dailyPortions')
     .lean<LeanVersion[]>();
 }
 
@@ -50,9 +91,27 @@ function versionLiveOn(versions: readonly LeanVersion[], date: string, timezone:
   return versions.find((version) => localDateString(version.publishedAt, timezone) <= date) ?? null;
 }
 
-/** The day's portions of that version: its daily portions (portions mode) or its meals summed (menu mode). */
-function plannedOf(version: LeanVersion): PortionCounts {
-  return dayPortionsOf(version);
+function basisOfVersion(version: LeanVersion, facts: TraineeFacts): DayBasis {
+  const meals = version.meals.map((meal) => ({ id: String(meal._id), name: meal.name }));
+  return {
+    source: 'plan',
+    // Its daily portions (portions mode) or its meals summed (menu mode).
+    planned: dayPortionsOf(version),
+    // A portions-only plan may have no meals: photos then use the default meals.
+    meals: meals.length > 0 ? meals : facts.defaultMeals,
+    planVersion: version.version,
+    ref: { source: 'plan', planId: version.planId, planVersion: version.version, coachId: version.coachId, coachingId: version.coachingId },
+  };
+}
+
+function basisOfOwn(target: LeanOwnTarget | null, facts: TraineeFacts): DayBasis {
+  return {
+    source: 'own',
+    planned: target ? toPortionCounts(target.portions) : { ...ZERO },
+    meals: facts.defaultMeals,
+    planVersion: null,
+    ref: { source: 'own', planId: null, planVersion: null, coachId: null, coachingId: null },
+  };
 }
 
 /** Never more than planned, in steps of 0.5 (a plan that shrank since the tap clamps it). */
@@ -69,92 +128,127 @@ function isEditable(date: string, today: string): boolean {
   return age >= 0 && age < MEAL_LOG_EDITABLE_DAYS;
 }
 
+function photoId(photo: MealPhotoFields): string {
+  // Photos from before several-per-meal have no _id: their meal id stands in (one per meal then).
+  return photo._id ? String(photo._id) : String(photo.mealId);
+}
+
 function toPublicMealPhoto(photo: MealPhotoFields): MealPhoto {
-  return { mealId: String(photo.mealId), mealName: photo.mealName, ...toPublicPhoto(photo) };
+  return { id: photoId(photo), mealId: String(photo.mealId), mealName: photo.mealName, ...toPublicPhoto(photo) };
 }
 
 /**
- * The version a day is shown and saved against: today → the newest; a logged past day →
- * the one it was logged with; otherwise the one live that day.
+ * The basis a day is shown and saved against: today → the newest coach version, else her own target;
+ * a logged past day → what it was logged with; otherwise the version live that day, else her target.
  */
-function versionForDay(
+function basisForDay(
   date: string,
   today: string,
   log: LeanMealLog | null,
   versions: readonly LeanVersion[],
-  timezone: string,
-): LeanVersion | null {
-  if (date === today) return versions[0] ?? null;
-  if (log) return versions.find((version) => version.version === log.planVersion && String(version.planId) === String(log.planId)) ?? null;
-  return versionLiveOn(versions, date, timezone);
+  own: LeanOwnTarget | null,
+  facts: TraineeFacts,
+): DayBasis | null {
+  const ownBasis = own ? basisOfOwn(own, facts) : null;
+  if (date === today) return versions[0] ? basisOfVersion(versions[0], facts) : ownBasis;
+  if (log) {
+    if (log.source === 'own') return basisOfOwn(own, facts);
+    const match = versions.find((version) => version.version === log.planVersion && String(version.planId) === String(log.planId));
+    return match ? basisOfVersion(match, facts) : null;
+  }
+  const live = versionLiveOn(versions, date, facts.timezone);
+  return live ? basisOfVersion(live, facts) : ownBasis;
 }
 
-function toDay(date: string, today: string, log: LeanMealLog | null, version: LeanVersion | null): MealLogDay {
-  // Today follows the newest version; a past log keeps its own snapshot.
-  const planned = date === today && version ? plannedOf(version) : log ? toPortionCounts(log.planned) : version ? plannedOf(version) : { ...ZERO };
+function toDay(date: string, today: string, log: LeanMealLog | null, basis: DayBasis | null): MealLogDay {
+  // Today follows the newest basis; a past log keeps its own snapshot.
+  const planned = date === today && basis ? basis.planned : log ? toPortionCounts(log.planned) : basis ? basis.planned : { ...ZERO };
   return {
     date,
     planned,
     eaten: log ? clampEaten(toPortionCounts(log.eaten), planned) : { ...ZERO },
     photos: (log?.photos ?? []).map(toPublicMealPhoto),
-    planVersion: date === today ? (version?.version ?? null) : (log?.planVersion ?? version?.version ?? null),
+    planVersion: date === today ? (basis?.planVersion ?? null) : (log?.planVersion ?? basis?.planVersion ?? null),
     editable: isEditable(date, today),
     logged: log !== null,
-    meals: (version?.meals ?? []).map((meal) => ({ id: String(meal._id), name: meal.name })),
+    meals: basis?.meals ?? [],
+    source: log?.source ?? basis?.source ?? null,
   };
 }
 
-async function buildDays(traineeId: string, dates: string[], today: string, timezone: string): Promise<MealLogDay[]> {
-  const [versions, logs] = await Promise.all([
-    loadVersions(traineeId),
-    MealLog.find({ traineeId, date: { $in: dates } }).lean<LeanMealLog[]>(),
+async function buildDays(
+  traineeId: string,
+  dates: string[],
+  today: string,
+  facts: TraineeFacts,
+  coachingId: string | null = null,
+): Promise<{ days: MealLogDay[]; versions: LeanVersion[]; own: LeanOwnTarget | null }> {
+  // The coach sees the days tracked against HER plan, plus the days the trainee tracked against
+  // her own target (trainee-owned history).
+  const logFilter: Record<string, unknown> = { traineeId, date: { $in: dates } };
+  if (coachingId) logFilter.$or = [{ coachingId }, { source: 'own' }];
+  const [versions, logs, own] = await Promise.all([
+    loadVersions(traineeId, coachingId),
+    MealLog.find(logFilter).lean<LeanMealLog[]>(),
+    loadOwnTarget(traineeId),
   ]);
   const byDate = new Map(logs.map((log) => [log.date, log]));
-  return dates.map((date) => {
+  const days = dates.map((date) => {
     const log = byDate.get(date) ?? null;
-    return toDay(date, today, log, versionForDay(date, today, log, versions, timezone));
+    // The coach's view never applies the trainee's own target to a day she didn't track.
+    const basis = basisForDay(date, today, log, versions, coachingId && log?.source !== 'own' ? null : own, facts);
+    return toDay(date, today, log, basis);
   });
+  return { days, versions, own };
 }
 
-/** Her editable window (today and the 6 days before), oldest first. */
+/** Her editable window (today and the 6 days before), oldest first, plus her own target. */
 export async function getMyMealLogDays(traineeId: string, now: Date = new Date()): Promise<MealLogDaysResponse> {
-  const timezone = await traineeTimezone(traineeId);
-  const today = localDateString(now, timezone);
+  const facts = await traineeFacts(traineeId);
+  const today = localDateString(now, facts.timezone);
   const dates = Array.from({ length: MEAL_LOG_EDITABLE_DAYS }, (_, index) => addDays(today, index - (MEAL_LOG_EDITABLE_DAYS - 1)));
-  return { today, days: await buildDays(traineeId, dates, today, timezone) };
+  const { days, versions, own } = await buildDays(traineeId, dates, today, facts);
+  return { today, days, ownTarget: toPublicOwnTarget(own), hasCoachPlan: versions.length > 0 };
 }
 
 interface DayContext {
   today: string;
-  timezone: string;
-  version: LeanVersion;
+  basis: DayBasis;
   log: LeanMealLog | null;
 }
 
-/** Refuses a day outside her window or without a live plan. */
+/** Refuses a day outside her window or without a plan / target. */
 async function loadEditableDay(traineeId: string, date: string, now: Date): Promise<DayContext> {
-  const timezone = await traineeTimezone(traineeId);
-  const today = localDateString(now, timezone);
+  const facts = await traineeFacts(traineeId);
+  const today = localDateString(now, facts.timezone);
   if (!isEditable(date, today)) {
     throw new MealLogDayError('meal_log_day_out_of_window', { days: MEAL_LOG_EDITABLE_DAYS - 1 });
   }
-  const [versions, log] = await Promise.all([loadVersions(traineeId), MealLog.findOne({ traineeId, date }).lean<LeanMealLog>()]);
-  const version = versionForDay(date, today, log, versions, timezone);
-  if (!version) throw new MealLogNoPlanError('meal_log_no_plan');
-  return { today, timezone, version, log };
+  const [versions, log, own] = await Promise.all([
+    loadVersions(traineeId),
+    MealLog.findOne({ traineeId, date }).lean<LeanMealLog>(),
+    loadOwnTarget(traineeId),
+  ]);
+  const basis = basisForDay(date, today, log, versions, own, facts);
+  if (!basis) throw new MealLogNoPlanError('meal_log_no_plan');
+  return { today, basis, log };
 }
 
 async function dayResponse(traineeId: string, date: string, context: DayContext): Promise<MealLogDay> {
   const log = await MealLog.findOne({ traineeId, date }).lean<LeanMealLog>();
-  return toDay(date, context.today, log, context.version);
+  return toDay(date, context.today, log, context.basis);
+}
+
+/** Today is saved against the newest basis; a past day keeps its snapshot. */
+function plannedToSave(date: string, context: DayContext): PortionCounts {
+  return date === context.today || !context.log ? context.basis.planned : toPortionCounts(context.log.planned);
 }
 
 /** PUT /meal-logs/:date — the whole day's marks, last write wins (the phone sends its full state). */
 export async function saveMyMealLog(traineeId: string, date: string, eaten: PortionCounts, now: Date = new Date()): Promise<MealLogDay> {
   const context = await loadEditableDay(traineeId, date, now);
-  const { version, log } = context;
-  // Today is saved against the newest version; a past day keeps its snapshot.
-  const planned = date === context.today || !log ? plannedOf(version) : toPortionCounts(log.planned);
+  const { basis, log } = context;
+  const planned = plannedToSave(date, context);
   const marks = clampEaten(eaten, planned);
   const empty = PORTION_GROUP_IDS.every((group) => marks[group] === 0);
 
@@ -162,12 +256,10 @@ export async function saveMyMealLog(traineeId: string, date: string, eaten: Port
     // Nothing left to keep: an un-marked day is no log at all.
     await MealLog.deleteOne({ traineeId, date, photos: { $size: 0 } });
   } else {
+    // The day follows what it is tracked against now (her own target → a coach's plan once one is live).
     await MealLog.updateOne(
       { traineeId, date },
-      {
-        $set: { planId: version.planId, planVersion: version.version, planned, eaten: marks },
-        $setOnInsert: { coachId: version.coachId, photos: [] },
-      },
+      { $set: { ...basis.ref, planned, eaten: marks }, $setOnInsert: { photos: [] } },
       { upsert: true },
     );
   }
@@ -182,8 +274,8 @@ async function deleteQuietly(publicId: string): Promise<void> {
   }
 }
 
-/** Uploads (or replaces) the photo of one meal on one day. */
-export async function setMyMealPhoto(
+/** Adds one photo to a meal on one day (a meal can hold several; the day is capped). */
+export async function addMyMealPhoto(
   traineeId: string,
   date: string,
   mealId: string,
@@ -191,47 +283,44 @@ export async function setMyMealPhoto(
   now: Date = new Date(),
 ): Promise<MealLogDay> {
   const context = await loadEditableDay(traineeId, date, now);
-  const meal = context.version.meals.find((candidate) => String(candidate._id) === mealId);
+  const meal = context.basis.meals.find((candidate) => candidate.id === mealId);
   if (!meal) throw new InvalidMealPhotoError('meal_log_meal_unknown');
+  if ((context.log?.photos.length ?? 0) >= MAX_MEAL_PHOTOS_PER_DAY) {
+    throw new InvalidMealPhotoError('meal_log_photos_full', { max: MAX_MEAL_PHOTOS_PER_DAY });
+  }
   if (!isAcceptedImage(data)) throw new InvalidMealPhotoError('photo_invalid_image');
 
-  const publicId = await uploadPrivatePhoto(data, `${MEAL_PHOTO_FOLDER}/${traineeId}`, `${date}-${mealId}`);
-  const photo: MealPhotoFields = { mealId: meal._id, mealName: meal.name, publicId, uploadedAt: now };
-  let replaced: MealPhotoFields | undefined;
+  const id = new Types.ObjectId();
+  const publicId = await uploadPrivatePhoto(data, `${MEAL_PHOTO_FOLDER}/${traineeId}`, `${date}-${String(id)}`);
+  // A plan meal keeps its ObjectId; a default meal its string id.
+  const storedMealId = Types.ObjectId.isValid(meal.id) && meal.id.length === 24 ? new Types.ObjectId(meal.id) : meal.id;
+  const photo: MealPhotoFields = { _id: id, mealId: storedMealId, mealName: meal.name, publicId, uploadedAt: now };
   try {
-    const { version } = context;
-    const planned = date === context.today || !context.log ? plannedOf(version) : toPortionCounts(context.log.planned);
     await MealLog.updateOne(
       { traineeId, date },
-      {
-        $setOnInsert: { coachId: version.coachId, planId: version.planId, planVersion: version.version, planned, eaten: { ...ZERO } },
-      },
+      { $setOnInsert: { ...context.basis.ref, planned: plannedToSave(date, context), eaten: { ...ZERO } } },
       { upsert: true },
     );
-    const before = await MealLog.findOneAndUpdate(
-      { traineeId, date },
-      { $pull: { photos: { mealId: meal._id } } },
-      { returnDocument: 'before' },
-    ).lean<LeanMealLog>();
-    replaced = before?.photos.find((old) => String(old.mealId) === mealId);
-    await MealLog.updateOne({ traineeId, date }, { $push: { photos: photo } });
+    const result = await MealLog.updateOne(
+      { traineeId, date, [`photos.${MAX_MEAL_PHOTOS_PER_DAY - 1}`]: { $exists: false } },
+      { $push: { photos: photo } },
+    );
+    if (result.matchedCount === 0) throw new InvalidMealPhotoError('meal_log_photos_full', { max: MAX_MEAL_PHOTOS_PER_DAY });
   } catch (error) {
     await deleteQuietly(publicId);
     throw error;
   }
-  if (replaced) await deleteQuietly(replaced.publicId);
   return dayResponse(traineeId, date, context);
 }
 
-export async function removeMyMealPhoto(traineeId: string, date: string, mealId: string, now: Date = new Date()): Promise<MealLogDay> {
+/** Removes one photo by its id (an old photo without an id: by its meal id). */
+export async function removeMyMealPhoto(traineeId: string, date: string, id: string, now: Date = new Date()): Promise<MealLogDay> {
   const context = await loadEditableDay(traineeId, date, now);
-  const before = await MealLog.findOneAndUpdate(
-    { traineeId, date },
-    { $pull: { photos: { mealId } } },
-    { returnDocument: 'before' },
-  ).lean<LeanMealLog>();
-  const removed = before?.photos.find((photo) => String(photo.mealId) === mealId);
-  if (removed) await deleteQuietly(removed.publicId);
+  const removed = context.log?.photos.find((photo) => photoId(photo) === id);
+  if (!removed) throw new MealPhotoNotFoundError('meal_photo_not_found');
+  const pull = removed._id ? { _id: removed._id } : { mealId: removed.mealId, publicId: removed.publicId };
+  await MealLog.updateOne({ traineeId, date }, { $pull: { photos: pull } });
+  await deleteQuietly(removed.publicId);
   // A day with no marks and no photos left is no log at all.
   await MealLog.deleteOne({
     traineeId,
@@ -247,12 +336,12 @@ export async function removeMyMealPhoto(traineeId: string, date: string, mealId:
 }
 
 /** The coach's read-only week (Sunday → Saturday; null = her current week) — marked vs planned, photos. */
-export async function getCoachMealLogWeek(traineeId: string, requestedWeek: string | null, now: Date = new Date()): Promise<CoachMealLogWeek> {
-  const timezone = await traineeTimezone(traineeId);
-  const today = localDateString(now, timezone);
+export async function getCoachMealLogWeek(traineeId: string, coachingId: string, requestedWeek: string | null, now: Date = new Date()): Promise<CoachMealLogWeek> {
+  const facts = await traineeFacts(traineeId);
+  const today = localDateString(now, facts.timezone);
   const weekStart = requestedWeek ?? weekStartOf(today);
   const dates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
-  const days = await buildDays(traineeId, dates, today, timezone);
+  const { days } = await buildDays(traineeId, dates, today, facts, coachingId);
   const totals = { planned: { ...ZERO }, eaten: { ...ZERO } };
   // Days still to come count for neither side.
   for (const day of days) {

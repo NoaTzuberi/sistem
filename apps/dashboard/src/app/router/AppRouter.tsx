@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes';
 import { Login } from '../../features/auth/pages/Login/Login';
-import { RequireCoach } from '../../features/auth/components/RequireCoach/RequireCoach';
+import { RequireRole } from '../../features/auth/components/RequireRole/RequireRole';
+import { SetPasswordPage } from '../../features/auth/pages/SetPasswordPage/SetPasswordPage';
+import { CoachesPage } from '../../features/admin/pages/CoachesPage/CoachesPage';
 import { AppShell } from '../../components/layout/AppShell/AppShell';
 import { OverviewPage } from '../../features/overview/pages/OverviewPage/OverviewPage';
 import { StatsPage } from '../../features/stats/pages/StatsPage/StatsPage';
@@ -16,8 +18,12 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path={ROUTES.LOGIN} element={<Login />} />
-      {/* Client-side gate only; every /api/coach route checks role=coach itself. */}
-      <Route element={<RequireCoach />}>
+      <Route path={ROUTES.SET_PASSWORD} element={<SetPasswordPage />} />
+      {/* Client-side gates only; every /api/admin and /api/coach route checks the role itself. */}
+      <Route element={<RequireRole role="admin" />}>
+        <Route path={ROUTES.ADMIN_COACHES} element={<CoachesPage />} />
+      </Route>
+      <Route element={<RequireRole role="coach" />}>
         <Route element={<AppShell />}>
           <Route path={ROUTES.HOME} element={<OverviewPage />} />
           <Route path={ROUTES.STATS} element={<StatsPage />} />

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { directionOf, poseLabel, useCopy, useI18n } from '@sistem/shared';
+import { directionOf, getActiveLanguage, poseLabel, useCopy, useI18n } from '@sistem/shared';
 import { IconLock } from '@tabler/icons-react';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
@@ -12,6 +12,7 @@ import { SegmentedTabs } from '../../../workouts/components/SegmentedTabs/Segmen
 import { achievementCopy } from '../../../achievements/copy';
 import { bodyCopy } from '../../../bodyTracking/copy';
 import { ProfileHero } from '../../components/ProfileHero/ProfileHero';
+import { useMyCommunities } from '../../hooks/useMyCommunities';
 import { WeightCard } from '../../components/WeightCard/WeightCard';
 import { MeasurementList } from '../../components/MeasurementList/MeasurementList';
 import { MeasurementSheet } from '../../components/MeasurementSheet/MeasurementSheet';
@@ -20,6 +21,8 @@ import { PhotoGrid } from '../../components/PhotoGrid/PhotoGrid';
 import { AchievementsTab } from '../../../achievements/components/AchievementsTab/AchievementsTab';
 import { CoachCard } from '../../components/CoachCard/CoachCard';
 import { ProfileSettings } from '../../components/ProfileSettings/ProfileSettings';
+import { ProfilePhotoSheet } from '../../components/ProfilePhotoSheet/ProfilePhotoSheet';
+import { useAvatarUpload } from '../../hooks/useAvatarUpload';
 import { memberWeek } from '../../data/profileDisplay';
 import { useProfile } from '../../hooks/useProfile';
 import { useProfileTab } from '../../hooks/useProfileTab';
@@ -56,6 +59,7 @@ export function ProfilePage() {
   const { language, plural } = useI18n();
   const rtl = directionOf(language) === 'rtl';
   const profile = useProfile();
+  const communities = useMyCommunities();
   const { units } = useMyUnits();
   const { tab, selectTab } = useProfileTab();
   const body = useMeasurements(units, profile.today);
@@ -63,6 +67,8 @@ export function ProfilePage() {
   const photos = useProfilePhotos(body.list?.items, timezone, copy.photosLoadError);
   const compare = usePhotoCompare(photos.photos, rtl);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [photoSheetOpen, setPhotoSheetOpen] = useState(false);
+  const avatar = useAvatarUpload();
   const { toastMessage, showToast } = useToast();
   const coachRef = useRef<HTMLElement>(null);
   const settingsRef = useRef<HTMLHeadingElement>(null);
@@ -74,6 +80,23 @@ export function ProfilePage() {
     body.reload();
     photos.reloadLogs();
   };
+
+  // The sheet is closed by now: the avatar shows a spinner, then the new photo — or a toast and the old one.
+  function saveAvatar(photo: Blob) {
+    const text = profileCopy[getActiveLanguage()].photoSheet;
+    avatar.save(photo).then(
+      () => showToast(text.saved),
+      () => showToast(text.saveError),
+    );
+  }
+
+  function removeAvatar() {
+    const text = profileCopy[getActiveLanguage()].photoSheet;
+    avatar.remove().then(
+      () => showToast(text.removed),
+      () => showToast(text.removeError),
+    );
+  }
 
   const tabs = [
     { id: 'body' as const, label: copy.tabs.body },
@@ -90,9 +113,13 @@ export function ProfilePage() {
           name={profile.name}
           initials={profile.initials}
           joinDate={profile.joinDate}
-          week={profile.week}
           coach={profile.coach}
+          communities={communities}
           overview={overview}
+          avatarUrl={avatar.avatarUrl}
+          isUploading={avatar.isUploading}
+          onAvatarExpired={avatar.refreshExpired}
+          onOpenPhoto={() => setPhotoSheetOpen(true)}
           onOpenSettings={() => jumpTo(settingsRef.current)}
           onOpenCoach={() => jumpTo(coachRef.current)}
         />
@@ -179,6 +206,13 @@ export function ProfilePage() {
           lastValues={body.lastValues}
           onSave={body.saveEntry}
           onSaved={() => showToast(copy.saved)}
+        />
+        <ProfilePhotoSheet
+          isOpen={photoSheetOpen}
+          onClose={() => setPhotoSheetOpen(false)}
+          hasPhoto={avatar.hasAvatar}
+          onSave={saveAvatar}
+          onRemove={removeAvatar}
         />
         <Toast message={toastMessage} />
       </div>

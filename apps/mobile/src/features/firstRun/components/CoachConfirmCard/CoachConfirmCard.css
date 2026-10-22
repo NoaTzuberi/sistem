@@ -1,0 +1,89 @@
+.fr-coach-card {
+  margin-block-start: var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-fr-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-fr-card);
+  text-align: center;
+}
+
+.fr-coach-band {
+  height: var(--size-fr-band);
+  background: var(--surface-profile-stage);
+}
+
+.fr-coach-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-avatar);
+  height: var(--size-fr-avatar);
+  margin: calc(-1 * var(--size-fr-avatar) / 2 - var(--space-1)) auto 0;
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  box-shadow: var(--ring-fr-avatar);
+  color: var(--color-on-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-display-2xl);
+  font-weight: var(--font-display-weight);
+}
+
+.fr-coach-name {
+  margin: calc(var(--space-2) + var(--space-1)) 0 0;
+  padding-inline: var(--space-3);
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-fr-coach-name);
+  line-height: 0.85;
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.fr-coach-meta {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-subscreen-label);
+  color: var(--color-fr-muted);
+}
+
+.fr-coach-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--space-1) * 1.5);
+  margin: calc(var(--space-2) + var(--space-1)) 0 calc(var(--space-3) + var(--space-1) / 2);
+  padding: 0 var(--space-3);
+  list-style: none;
+}
+
+.fr-coach-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-fr-tag);
+  padding: 0 calc(var(--space-2) + var(--space-1) / 2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fr-blush);
+  color: var(--color-fr-cherry);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.fr-coach-access {
+  display: flex;
+  gap: calc(var(--space-2) + var(--space-1) / 2);
+  margin: 0;
+  padding: var(--space-3);
+  border-block-start: var(--border-width-thin) solid var(--color-fr-rule);
+  color: var(--color-fr-ink-2);
+  font-size: var(--text-subscreen-label);
+  line-height: 1.55;
+  text-align: start;
+}
+
+.fr-coach-lock {
+  flex: none;
+  margin-block-start: calc(var(--space-1) / 2);
+  color: var(--color-fr-purple);
+}

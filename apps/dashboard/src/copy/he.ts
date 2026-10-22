@@ -78,4 +78,18 @@ export const he = {
     great: 'מעולה',
     toProfile: 'לפרופיל של {name}',
   },
+  // The one-time "set password" link a new coach opens (accounts). PLACEHOLDER drafts.
+  setPassword: {
+    title: 'בחירת סיסמה',
+    subtitle: 'עוד רגע והחשבון שלך מוכן. בחרי סיסמה של 8 תווים לפחות.',
+    password: 'סיסמה חדשה',
+    confirm: 'אימות הסיסמה',
+    submit: 'שמירה וכניסה',
+    saving: 'שומרת…',
+    mismatch: 'הסיסמאות לא זהות. אפשר להקליד שוב.',
+    tooShort: 'הסיסמה קצרה מדי. צריך לפחות 8 תווים.',
+    missingToken: 'הקישור חסר או לא שלם. אפשר לבקש קישור חדש ממנהלת המערכת.',
+    failed: 'לא הצלחנו לשמור את הסיסמה. אפשר לנסות שוב.',
+    toLogin: 'למסך הכניסה',
+  },
 } as const;

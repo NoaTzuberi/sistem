@@ -17,7 +17,7 @@ import {
   PlanConflictError,
 } from '../plans/planBuilder.service';
 import { validatePlanIdParam, parseCreatePlanPayload, parseSavePlanPayload, type PlanProblem } from '../plans/plan.validation';
-import { listWorkoutLogsForTrainee } from '../workoutLogs/workoutLog.service';
+import { listWorkoutLogsForCoaching } from '../workoutLogs/workoutLog.service';
 import { listBodyMetricsForTrainee } from '../bodyMetrics/bodyMetric.service';
 import { getAchievementOverview } from '../achievements/achievement.service';
 import { listCoachExercises } from '../exercises/exercise.service';
@@ -58,26 +58,27 @@ export async function getExercises(req: AuthenticatedRequest, res: Response) {
   res.status(200).json(await listCoachExercises(params));
 }
 
-// Everything below runs after loadCoachTrainee, which set req.traineeId.
+// Everything below runs after loadCoachTrainee, which set req.traineeId and req.coachingId.
+// Coach-owned data (plans, logs) is read through the coaching; trainee-owned data through the trainee.
 
 export async function getTrainee(req: AuthenticatedRequest, res: Response) {
   const now = new Date();
-  const trainee = await getCoachTraineeDetail(req.traineeId!, now);
+  const trainee = await getCoachTraineeDetail(req.traineeId!, req.coachingId!, now);
   res.status(200).json({ trainee, serverTime: now.toISOString() });
 }
 
 export async function getTraineePlans(req: AuthenticatedRequest, res: Response) {
-  const plans = await listCoachPlans(req.traineeId!);
+  const plans = await listCoachPlans(req.traineeId!, req.coachingId!);
   res.status(200).json({ items: plans });
 }
 
 /** The weeks a new plan can be made for (this week onwards), with what each one holds. */
 export async function getTraineePlanWeeks(req: AuthenticatedRequest, res: Response) {
-  res.status(200).json(await listPlanWeekOptions(req.traineeId!));
+  res.status(200).json(await listPlanWeekOptions(req.traineeId!, req.coachingId!));
 }
 
 export async function getTraineeWorkoutLogs(req: AuthenticatedRequest, res: Response) {
-  const logs = await listWorkoutLogsForTrainee(req.traineeId!);
+  const logs = await listWorkoutLogsForCoaching(req.coachingId!, req.traineeId!);
   res.status(200).json({ items: logs });
 }
 
@@ -135,7 +136,7 @@ export async function createTraineePlan(req: AuthenticatedRequest, res: Response
   }
 
   try {
-    const plan = await createCoachPlan(req.traineeId!, req.userId!, value);
+    const plan = await createCoachPlan(req.traineeId!, req.coachingId!, req.userId!, value);
     res.status(201).json({ plan });
   } catch (createError) {
     sendPlanError(res, createError);
@@ -147,7 +148,7 @@ export async function getTraineePlan(req: AuthenticatedRequest, res: Response) {
   if (!planId) return;
 
   try {
-    res.status(200).json({ plan: await getCoachPlan(req.traineeId!, planId) });
+    res.status(200).json({ plan: await getCoachPlan(req.traineeId!, req.coachingId!, planId) });
   } catch (error) {
     sendPlanError(res, error);
   }
@@ -164,7 +165,7 @@ export async function saveTraineePlan(req: AuthenticatedRequest, res: Response) 
   }
 
   try {
-    res.status(200).json({ plan: await saveCoachPlan(req.traineeId!, planId, value) });
+    res.status(200).json({ plan: await saveCoachPlan(req.traineeId!, req.coachingId!, planId, value) });
   } catch (error) {
     sendPlanError(res, error);
   }
@@ -175,7 +176,7 @@ export async function publishTraineePlan(req: AuthenticatedRequest, res: Respons
   if (!planId) return;
 
   try {
-    res.status(200).json({ plan: await publishCoachPlan(req.traineeId!, planId) });
+    res.status(200).json({ plan: await publishCoachPlan(req.traineeId!, req.coachingId!, planId) });
   } catch (error) {
     sendPlanError(res, error);
   }
@@ -186,7 +187,7 @@ export async function unpublishTraineePlan(req: AuthenticatedRequest, res: Respo
   if (!planId) return;
 
   try {
-    res.status(200).json({ plan: await unpublishCoachPlan(req.traineeId!, planId) });
+    res.status(200).json({ plan: await unpublishCoachPlan(req.traineeId!, req.coachingId!, planId) });
   } catch (error) {
     sendPlanError(res, error);
   }
@@ -197,7 +198,7 @@ export async function deleteTraineePlan(req: AuthenticatedRequest, res: Response
   if (!planId) return;
 
   try {
-    await deleteCoachPlan(req.traineeId!, planId);
+    await deleteCoachPlan(req.traineeId!, req.coachingId!, planId);
     res.status(204).end();
   } catch (error) {
     sendPlanError(res, error);

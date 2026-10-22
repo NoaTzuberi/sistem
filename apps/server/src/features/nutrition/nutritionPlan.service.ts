@@ -50,6 +50,8 @@ import { computeNutritionKcal, findNutritionPublishIssues, hasBlockingIssues, ty
 import type { NutritionPlanDocument, NutritionPlanVersionDocument, TipFields } from './nutrition.types';
 import { dayPortionsOf, portionsKcalOf, resolveDailyPortions, resolvePlanMode, resolveVegetablesFree } from './nutritionPlanMode';
 import { LocalizedError, msg } from '../../i18n';
+import { findLiveCoaching, getCurrentCoaching } from '../coachings/coaching.service';
+import { getCoachName } from '../coachProfiles/coachProfile.service';
 
 // The coach's side of nutrition plans (PRD §5.6, dashboard builder). Every function
 // takes the trainee id loadCoachTrainee already checked and the calling coach's id.
@@ -159,8 +161,22 @@ function publishableContent(
   });
 }
 
-async function findLatestVersion(traineeId: string): Promise<LeanVersion | null> {
-  return NutritionPlanVersion.findOne({ traineeId }).sort({ version: -1 }).lean<LeanVersion>();
+// Coach side: her working copy / versions are found through the live coaching of THIS coach and this
+// trainee (one working copy per coaching) — never by trainee only.
+async function coachingFor(traineeId: string, coachId: string): Promise<string> {
+  const coaching = await findLiveCoaching(traineeId, coachId);
+  if (!coaching) throw new Error('No live coaching after the ownership check.');
+  return String(coaching._id);
+}
+
+async function findLatestVersion(coachingId: string): Promise<LeanVersion | null> {
+  return NutritionPlanVersion.findOne({ coachingId }).sort({ version: -1 }).lean<LeanVersion>();
+}
+
+/** Trainee side: the newest version from her current coaching (the single-coach app). */
+async function findTraineeLatestVersion(traineeId: string): Promise<LeanVersion | null> {
+  const coaching = await getCurrentCoaching(traineeId);
+  return coaching ? findLatestVersion(String(coaching._id)) : null;
 }
 
 function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersion | null): CoachNutritionPlan {
@@ -304,9 +320,10 @@ export async function findRecentFoodIds(coachId: string): Promise<Record<FoodGro
 }
 
 export async function getCoachNutritionPlan(traineeId: string, coachId: string): Promise<CoachNutritionPlanResult> {
+  const coachingId = await coachingFor(traineeId, coachId);
   const [plan, latest, foodList, config, preferences, goal, recentFoodIds] = await Promise.all([
-    NutritionPlan.findOne({ traineeId }).lean<LeanPlan>(),
-    findLatestVersion(traineeId),
+    NutritionPlan.findOne({ coachingId }).lean<LeanPlan>(),
+    findLatestVersion(coachingId),
     listCoachFoods(coachId),
     getEffectiveNutritionConfig(coachId),
     getNutritionPreferences(traineeId),
@@ -362,19 +379,20 @@ export async function saveCoachNutritionPlan(
   coachId: string,
   input: SaveNutritionPlanPayload,
 ): Promise<CoachNutritionPlanResult> {
+  const coachingId = await coachingFor(traineeId, coachId);
   const foodGroups = await checkFoodLines(coachId, input.meals);
-  if (input.aiRecommendationId && !(await isLinkableRecommendation(traineeId, input.aiRecommendationId, 'nutrition_plan'))) {
+  if (input.aiRecommendationId && !(await isLinkableRecommendation(coachingId, input.aiRecommendationId, 'nutrition_plan'))) {
     throw new NutritionPlanValidationError([
       { severity: 'error', code: 'ai_recommendation_missing', message: msg('ai_recommendation_missing') },
     ]);
   }
   const now = new Date();
   const [existing, inputs, config] = await Promise.all([
-    NutritionPlan.findOne({ traineeId }),
+    NutritionPlan.findOne({ coachingId }),
     loadCalorieInputs(traineeId, now),
     getEffectiveNutritionConfig(coachId),
   ]);
-  const plan = existing ?? new NutritionPlan({ traineeId, coachId, calorieTarget: { goal: input.calorieTarget.goal } });
+  const plan = existing ?? new NutritionPlan({ traineeId, coachId, coachingId, calorieTarget: { goal: input.calorieTarget.goal } });
 
   const { kcal, source, goal, formulaSex, confirmBelowFloor } = input.calorieTarget;
   // Omitted = the overrides she set before stay.
@@ -421,14 +439,15 @@ async function defaultGoal(traineeId: string): Promise<NutritionGoal> {
  * publish rule fails, and when nothing changed since the last version.
  */
 export async function publishCoachNutritionPlan(traineeId: string, coachId: string): Promise<CoachNutritionPlanResult> {
-  const plan = await NutritionPlan.findOne({ traineeId }).lean<LeanPlan>();
+  const coachingId = await coachingFor(traineeId, coachId);
+  const plan = await NutritionPlan.findOne({ coachingId }).lean<LeanPlan>();
   if (!plan) throw new NutritionPlanNotFoundError('nutrition_plan_none');
 
   const [config, foods, preferences, latest] = await Promise.all([
     getEffectiveNutritionConfig(coachId),
     findCoachFoods(coachId),
     getNutritionPreferences(traineeId),
-    findLatestVersion(traineeId),
+    findLatestVersion(coachingId),
   ]);
   const issues = await findIssues(plan, coachId, { foods, config, preferences });
   if (hasBlockingIssues(issues)) throw new NutritionPlanValidationError(issues);
@@ -449,6 +468,7 @@ export async function publishCoachNutritionPlan(traineeId: string, coachId: stri
       planId: plan._id,
       traineeId: plan.traineeId,
       coachId: plan.coachId,
+      coachingId: plan.coachingId,
       version,
       publishedAt,
       calorieTarget: plan.calorieTarget,
@@ -534,7 +554,7 @@ export async function createNutritionTemplateFromPlan(
   coachId: string,
   input: CreateNutritionTemplatePayload,
 ): Promise<NutritionTemplate> {
-  const plan = await NutritionPlan.findOne({ traineeId }).lean<LeanPlan>();
+  const plan = await NutritionPlan.findOne({ coachingId: await coachingFor(traineeId, coachId) }).lean<LeanPlan>();
   if (!plan || plan.meals.length === 0) {
     throw new NutritionPlanConflictError('nutrition_template_needs_meal');
   }
@@ -560,8 +580,9 @@ export async function applyNutritionTemplate(traineeId: string, coachId: string,
   const template = await Template.findOne({ _id: templateId, coachId, type: 'nutrition_plan' }).lean<LeanTemplate>();
   if (!template?.nutrition) throw new NutritionPlanNotFoundError('nutrition_template_not_found');
 
-  const plan = (await NutritionPlan.findOne({ traineeId })) ??
-    new NutritionPlan({ traineeId, coachId, calorieTarget: { goal: await defaultGoal(traineeId) } });
+  const coachingId = await coachingFor(traineeId, coachId);
+  const plan = (await NutritionPlan.findOne({ coachingId })) ??
+    new NutritionPlan({ traineeId, coachId, coachingId, calorieTarget: { goal: await defaultGoal(traineeId) } });
   if ((plan.calorieTarget.kcal ?? null) === null && template.nutrition.targetKcal) {
     plan.set('calorieTarget.kcal', template.nutrition.targetKcal);
     plan.set('calorieTarget.source', 'override');
@@ -588,18 +609,18 @@ export async function applyNutritionTemplate(traineeId: string, coachId: string,
 export async function getTraineeNutritionPlan(
   traineeId: string,
 ): Promise<{ plan: NutritionPlanView | null; introUnseen: boolean; coach: { name: string } | null }> {
-  const latest = await findLatestVersion(traineeId);
+  const latest = await findTraineeLatestVersion(traineeId);
   if (!latest) return { plan: null, introUnseen: false, coach: null };
-  const [foods, user, coach] = await Promise.all([
+  const [foods, user, coachName] = await Promise.all([
     findCoachFoods(String(latest.coachId)),
     User.findById(traineeId).select('nutritionIntroSeenVersion').lean(),
-    User.findById(latest.coachId).select('name').lean(),
+    getCoachName(latest.coachId),
   ]);
   const plan = buildPlanView(latest, foods, getNutritionFeatures().waterTracking);
   return {
     plan,
     introUnseen: plan.intro !== null && (user?.nutritionIntroSeenVersion ?? 0) < latest.version,
-    coach: coach ? { name: coach.name } : null,
+    coach: coachName ? { name: coachName } : null,
   };
 }
 
@@ -613,6 +634,6 @@ export async function markNutritionIntroSeen(traineeId: string, version: number)
 
 /** When her newest version was published (the Nutrition tab dot). */
 export async function latestNutritionPublishTime(traineeId: string): Promise<Date | null> {
-  const latest = await NutritionPlanVersion.findOne({ traineeId }).sort({ version: -1 }).select('publishedAt').lean();
+  const latest = await findTraineeLatestVersion(traineeId);
   return latest?.publishedAt ?? null;
 }

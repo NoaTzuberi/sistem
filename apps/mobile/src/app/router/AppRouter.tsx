@@ -9,7 +9,20 @@ import {
   CARDIO_RUN_PATH,
   WORKOUT_SUMMARY_PATH,
   ONBOARDING_EDIT_PATH,
+  JOIN_PATH,
+  FIRST_RUN_COACH_PATH,
+  JOIN_COACH_CONFIRM_PATH,
+  OWN_CARDIO_NEW,
+  OWN_CARDIO_EDIT_PATH,
+  OWN_CARDIO_DETAIL_PATH,
+  OWN_CARDIO_RUN_PATH,
 } from '../config/routes';
+import { JoinPage } from '../../features/join/pages/JoinPage/JoinPage';
+import { ChoosePathPage } from '../../features/firstRun/pages/ChoosePathPage/ChoosePathPage';
+import { CoachCodePage } from '../../features/firstRun/pages/CoachCodePage/CoachCodePage';
+import { CoachConfirmPage } from '../../features/firstRun/pages/CoachConfirmPage/CoachConfirmPage';
+import { OwnCardioBuilderPage } from '../../features/cardio/pages/OwnCardioBuilderPage/OwnCardioBuilderPage';
+import { AdminOnlyPage } from '../../features/join/pages/AdminOnlyPage/AdminOnlyPage';
 import { Login } from '../../features/auth/pages/Login/Login';
 import { Register } from '../../features/auth/pages/Register/Register';
 import { ForgotPassword } from '../../features/auth/pages/ForgotPassword/ForgotPassword';
@@ -56,8 +69,17 @@ function AppRoutes({ location }: { location: Location }) {
         <Route path={ROUTES.REGISTER} element={<Register />} />
         <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
         <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
+        {/* A coach's invite link: public — signed out it leads to the sign-up with the code kept. */}
+        <Route path={JOIN_PATH} element={<JoinPage />} />
 
         <Route element={<ProtectedRoute />}>
+          {/* First run without an invite: "how do you want to train" → the coach's code → confirm. */}
+          <Route element={<AppStateGuard allow={['choose_path']} />}>
+            <Route path={ROUTES.FIRST_RUN} element={<ChoosePathPage />} />
+            <Route path={ROUTES.FIRST_RUN_CODE} element={<CoachCodePage mode="firstRun" />} />
+            <Route path={FIRST_RUN_COACH_PATH} element={<CoachConfirmPage mode="firstRun" />} />
+          </Route>
+
           <Route element={<AppStateGuard allow={['onboarding']} />}>
             <Route path={ROUTES.ONBOARDING} element={<OnboardingPage />} />
           </Route>
@@ -84,11 +106,23 @@ function AppRoutes({ location }: { location: Location }) {
             <Route path={WORKOUT_SESSION_PATH} element={<WorkoutSessionPage />} />
             <Route path={CARDIO_DETAIL_PATH} element={<CardioDetailPage />} />
             <Route path={CARDIO_RUN_PATH} element={<CardioRunPage />} />
+            {/* Her own cardio workouts (self-guided): build, open, run. */}
+            <Route path={OWN_CARDIO_NEW} element={<OwnCardioBuilderPage />} />
+            <Route path={OWN_CARDIO_EDIT_PATH} element={<OwnCardioBuilderPage />} />
+            <Route path={OWN_CARDIO_DETAIL_PATH} element={<CardioDetailPage own />} />
+            <Route path={OWN_CARDIO_RUN_PATH} element={<CardioRunPage own />} />
+            {/* Joining a coach later (from the Profile): the first run's code + confirm screens. */}
+            <Route path={ROUTES.JOIN_COACH_CODE} element={<CoachCodePage mode="later" />} />
+            <Route path={JOIN_COACH_CONFIRM_PATH} element={<CoachConfirmPage mode="later" />} />
             <Route path={WORKOUT_SUMMARY_PATH} element={<WorkoutSummaryPage />} />
             <Route path={ROUTES.INTERVAL_TIMER} element={<IntervalTimerPage />} />
             <Route path={ROUTES.NUTRITION} element={<NutritionPage />} />
             <Route path={ONBOARDING_EDIT_PATH} element={<OnboardingPage />} />
             <Route path={ROUTES.TRAINEE_HOME} element={<HomePage />} />
+          </Route>
+
+          <Route element={<AppStateGuard allow={['admin']} />}>
+            <Route path={ROUTES.ADMIN_ONLY} element={<AdminOnlyPage />} />
           </Route>
 
           <Route element={<AppStateGuard allow={['coach']} />}>

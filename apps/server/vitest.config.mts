@@ -15,6 +15,11 @@ export default defineConfig({
       VOYAGE_API_KEY: '',
       FEATURE_NUTRITION_RECIPES: '',
       FEATURE_WATER_TRACKING: '',
+      // One coach per trainee unless a test turns multi-coach on (setMultiCoachForTests); no admin by env.
+      MULTI_COACH_ENABLED: '',
+      // Never send real email from tests (the admin's set-password link is copied instead).
+      RESEND_API_KEY: '',
+      ADMIN_EMAIL: '',
     },
   },
 });

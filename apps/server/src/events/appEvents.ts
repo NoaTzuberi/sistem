@@ -4,9 +4,14 @@ import { EventEmitter } from 'node:events';
 // (notifications since Phase 5a, the AI recommendation in Phase 12) subscribe
 // without the emitter knowing about them.
 
+/**
+ * An onboarded trainee and a coach meet: emitted once per live coaching when she completes
+ * onboarding, and when an already-onboarded trainee joins a coach. (No coaching → not emitted.)
+ */
 export interface TraineeOnboardedEvent {
   traineeId: string;
-  coachId: string | null;
+  coachId: string;
+  coachingId: string;
   completedAt: Date;
 }
 

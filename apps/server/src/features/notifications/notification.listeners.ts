@@ -6,15 +6,14 @@ import type {
   WorkoutCompletedEvent,
 } from '../../events/appEvents';
 import { User } from '../users/user.model';
+import { WorkoutLog } from '../workoutLogs/workoutLog.model';
+import { Coaching } from '../coachings/coaching.model';
 import { notify } from './notification.service';
 
 // Turns domain events into notifications (PRD §9). The features that emit the
 // events know nothing about notifications.
 
 export async function onTraineeOnboarded(event: TraineeOnboardedEvent): Promise<void> {
-  // No coach assigned yet: there is nobody to tell.
-  if (!event.coachId) return;
-
   const trainee = await User.findById(event.traineeId).select('name').lean();
   if (!trainee) return;
 
@@ -31,15 +30,26 @@ export async function onPlanPublished(event: PlanPublishedEvent): Promise<void> 
   });
 }
 
-/** To her coach — read from the trainee now, so a later coach change is respected. */
+/**
+ * To the coach of the coaching the workout belongs to — and only while that coaching is live. A free
+ * workout (her own, no coaching) goes to every coach she has now (it is in their log lists too).
+ */
 export async function onWorkoutCompleted(event: WorkoutCompletedEvent): Promise<void> {
-  const trainee = await User.findById(event.traineeId).select('name coachId').lean();
-  if (!trainee?.coachId) return;
+  const [trainee, log] = await Promise.all([
+    User.findById(event.traineeId).select('name').lean(),
+    WorkoutLog.findById(event.logId).select('coachingId source').lean(),
+  ]);
+  if (!trainee || !log) return;
+  const coachings = log.source === 'free'
+    ? await Coaching.find({ traineeId: event.traineeId, live: true }).select('coachId').lean()
+    : await Coaching.find({ _id: log.coachingId, live: true }).select('coachId').lean();
 
-  await notify(String(trainee.coachId), {
-    type: 'workout_completed',
-    data: { traineeId: event.traineeId, traineeName: trainee.name, logId: event.logId, workoutTitle: event.workoutTitle },
-  });
+  for (const coaching of coachings) {
+    await notify(String(coaching.coachId), {
+      type: 'workout_completed',
+      data: { traineeId: event.traineeId, traineeName: trainee.name, logId: event.logId, workoutTitle: event.workoutTitle },
+    });
+  }
 }
 
 /** To the trainee — her app builds the wording; tap → the Nutrition tab. */

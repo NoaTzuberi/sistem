@@ -83,6 +83,7 @@ export interface CalorieTargetFields {
 
 export interface NutritionPlanDocument {
   traineeId: Types.ObjectId;
+  coachingId: Types.ObjectId;
   coachId: Types.ObjectId;
   calorieTarget: CalorieTargetFields;
   /** null / missing = saved before modes (see nutritionPlanMode.ts). */
@@ -106,6 +107,7 @@ export interface NutritionPlanDocument {
 export interface NutritionPlanVersionDocument {
   planId: Types.ObjectId;
   traineeId: Types.ObjectId;
+  coachingId: Types.ObjectId;
   coachId: Types.ObjectId;
   version: number;
   publishedAt: Date;

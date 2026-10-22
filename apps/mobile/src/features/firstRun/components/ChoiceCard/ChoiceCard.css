@@ -1,0 +1,142 @@
+.fr-choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + var(--space-1) / 2);
+  width: 100%;
+  min-height: var(--size-fr-choice-min);
+  padding: calc(var(--space-3) + var(--space-1));
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-fr-choice);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-fr-card) var(--ease-fr-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fr-choice:active {
+  transform: scale(var(--scale-fr-press-card));
+}
+
+.fr-choice[disabled] {
+  cursor: default;
+}
+
+.fr-choice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-icon-tile);
+  height: var(--size-fr-icon-tile);
+  border-radius: var(--radius-fr-icon-tile);
+}
+
+.fr-choice-go {
+  position: absolute;
+  inset-block-start: calc(var(--space-3) + var(--space-1));
+  inset-inline-end: calc(var(--space-3) + var(--space-1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-go);
+  height: var(--size-fr-go);
+  border-radius: var(--radius-round);
+}
+
+.fr-choice-title {
+  margin-block-start: auto;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-fr-choice);
+  line-height: 0.85;
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.fr-choice-body {
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+/* With a coach: the brand pink, white type, a fine grain. */
+.fr-choice[data-tone='coach'] {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-fr-coach);
+}
+
+.fr-choice[data-tone='coach']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--texture-profile-grain);
+  opacity: var(--opacity-profile-grain);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.fr-choice[data-tone='coach'] > :not(.fr-choice-go) {
+  position: relative;
+}
+
+.fr-choice[data-tone='coach'] .fr-choice-icon {
+  background-color: var(--surface-fr-on-pink);
+}
+
+.fr-choice[data-tone='coach'] .fr-choice-go {
+  background-color: var(--color-card);
+  color: var(--color-primary);
+}
+
+/* On my own: a white card, a purple icon, an ink arrow. */
+.fr-choice[data-tone='solo'] {
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-fr-solo);
+}
+
+.fr-choice[data-tone='solo'] .fr-choice-icon {
+  background-color: var(--color-fr-soft);
+  color: var(--color-fr-purple);
+}
+
+.fr-choice[data-tone='solo'] .fr-choice-body {
+  color: var(--color-fr-muted);
+}
+
+.fr-choice[data-tone='solo'] .fr-choice-go {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.fr-choice:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-ink);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fr-choice {
+    transition: transform var(--transition-fr-card) var(--ease-fr-out), box-shadow var(--transition-fr-shadow) ease;
+  }
+
+  .fr-choice[data-tone='coach']:hover {
+    box-shadow: var(--shadow-fr-coach-hover);
+  }
+
+  .fr-choice[data-tone='solo']:hover {
+    box-shadow: var(--shadow-fr-solo-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fr-choice {
+    transition: none;
+  }
+
+  .fr-choice:active {
+    transform: none;
+  }
+}

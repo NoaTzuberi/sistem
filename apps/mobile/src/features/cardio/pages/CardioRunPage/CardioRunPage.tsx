@@ -4,9 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { extractErrorMessage } from '@sistem/api-client';
 import type { TraineeCardioWorkoutResponse } from '@sistem/types';
 import { fill, getActiveLanguage, useCopy, useLoad } from '@sistem/shared';
-import { cardioDetailPath } from '../../../../app/config/routes';
+import { cardioDetailPath, ownCardioPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
-import { getCardioWorkout, saveCardioLog } from '../../../../services/cardio/cardioService';
+import { getCardioWorkout, getOwnCardioWorkout, saveCardioLog } from '../../../../services/cardio/cardioService';
 import { BackButton } from '../../../workouts/components/BackButton/BackButton';
 import { CardioFinish, type CardioFinishValues } from '../../components/CardioFinish/CardioFinish';
 import { CardioPlayer } from '../../components/CardioPlayer/CardioPlayer';
@@ -16,11 +16,14 @@ import { useCardioRun } from '../../hooks/useCardioRun';
 import '../../cardioZones.css';
 import './CardioRunPage.css';
 
-/** The live run (full screen): 3-2-1, the player, then the finish log. */
-export function CardioRunPage() {
+/** The live run (full screen): 3-2-1, the player, then the finish log. `own` = her own cardio workout. */
+export function CardioRunPage({ own = false }: { own?: boolean }) {
   const copy = useCopy(cardioCopy);
-  const { planId = '', workoutId = '' } = useParams();
-  const load = useCallback(() => getCardioWorkout(planId, workoutId), [planId, workoutId]);
+  const params = useParams();
+  // Her own workout: its run is kept on the phone under ('own', id).
+  const planId = own ? 'own' : (params.planId ?? '');
+  const workoutId = own ? (params.id ?? '') : (params.workoutId ?? '');
+  const load = useCallback(() => (own ? getOwnCardioWorkout(workoutId) : getCardioWorkout(planId, workoutId)), [own, planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
 
   if (!data) {
@@ -40,10 +43,10 @@ export function CardioRunPage() {
       </div>
     );
   }
-  return <CardioRun data={data} planId={planId} workoutId={workoutId} />;
+  return <CardioRun data={data} planId={planId} workoutId={workoutId} own={own} />;
 }
 
-function CardioRun({ data, planId, workoutId }: { data: TraineeCardioWorkoutResponse; planId: string; workoutId: string }) {
+function CardioRun({ data, planId, workoutId, own }: { data: TraineeCardioWorkoutResponse; planId: string; workoutId: string; own: boolean }) {
   const navigate = useNavigate();
   const workout = data.workout;
   const coachName = data.coach?.name ?? null;
@@ -63,9 +66,10 @@ function CardioRun({ data, planId, workoutId }: { data: TraineeCardioWorkoutResp
     setSaveError(null);
     const text = cardioCopy[getActiveLanguage()];
     try {
-      await saveCardioLog({ planId, workoutId, ...run.progress, ...values });
+      await saveCardioLog({ ...(own ? { ownWorkoutId: workoutId } : { planId, workoutId }), ...run.progress, ...values });
       run.clear();
-      navigate(cardioDetailPath(planId, workoutId), { replace: true, state: { saved: coachName ? fill(text.saved, { name: coachName }) : text.savedNoCoach } });
+      const saved = coachName ? fill(text.saved, { name: coachName }) : text.savedNoCoach;
+      navigate(own ? ownCardioPath(workoutId) : cardioDetailPath(planId, workoutId), { replace: true, state: { saved } });
     } catch (caught) {
       setSaveError(extractErrorMessage(caught, text.saveError));
       setIsSaving(false);

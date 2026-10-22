@@ -23,8 +23,8 @@ function monthsBetween(from: MonthKey, to: MonthKey): number {
   return (toYear - fromYear) * 12 + (toMonth - fromMonth);
 }
 
-async function loadHistory() {
-  const [logs, plans] = await Promise.all([listWorkoutLogs(), listPlans()]);
+async function loadHistory(coachingId?: string) {
+  const [logs, plans] = await Promise.all([listWorkoutLogs(coachingId), listPlans(coachingId)]);
   return { logs, plans: plans.items, today: plans.today };
 }
 
@@ -33,12 +33,13 @@ async function loadHistory() {
  * here by month: it starts at the calendar's month and `loadMore` adds the month before it.
  * `day` (a calendar tap) narrows the list to that day.
  */
-export function useWorkoutHistory(month: MonthKey | null, filter: HistoryFilter, day: string | null, enabled: boolean) {
+/** Coaching-aware: a coachingId narrows the history to one coach (later multi-coach UI). */
+export function useWorkoutHistory(month: MonthKey | null, filter: HistoryFilter, day: string | null, enabled: boolean, coachingId?: string) {
   const copy = useCopy(workoutCopy);
   const { user } = useAuth();
   const timeZone = user?.timezone ?? DEFAULT_TIME_ZONE;
   // Not loaded until the tab is first opened.
-  const load = useCallback(() => (enabled ? loadHistory() : new Promise<never>(() => undefined)), [enabled]);
+  const load = useCallback(() => (enabled ? loadHistory(coachingId) : new Promise<never>(() => undefined)), [enabled, coachingId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.list.loadError);
   const [monthsShown, setMonthsShown] = useState(1);
 

@@ -5,6 +5,7 @@ import type { ApiTestClient } from '../../../testing/apiTestClient';
 import { addDays, localDateString, weekStartOf } from '../../plans/planWeek';
 import { FoodItem } from '../../nutrition/foodItem.model';
 import { NutritionPlanVersion } from '../../nutrition/nutritionPlan.model';
+import { Coaching } from '../../coachings/coaching.model';
 import { MealLog } from '../mealLog.model';
 
 // Portion tracking (Phase 13a+, PRD §5.6): marks per group for a day against that day's
@@ -53,7 +54,7 @@ function mark(date: string, eaten: Record<string, number>, user = trainee) {
 }
 
 function uploadPhoto(date: string, mealId: string, data = JPEG) {
-  return api.request('PUT', `/meal-logs/${date}/photos/${mealId}`, { token: trainee.token, raw: { data, contentType: 'image/jpeg' } });
+  return api.request('POST', `/meal-logs/${date}/photos/${mealId}`, { token: trainee.token, raw: { data, contentType: 'image/jpeg' } });
 }
 
 async function days() {
@@ -174,21 +175,24 @@ describe('portion tracking (meal logs)', () => {
     expect((await mark(yesterday, { protein: 3 })).body.day).toMatchObject({ planned: { protein: 1, carb: 1, fat: 1, snack: 0 }, eaten: { protein: 1 } });
   });
 
-  it('a meal photo per meal per day: private, replaced and removed (the old one deleted)', async () => {
+  it('meal photos: several per meal, private, each removed by its own id', async () => {
     await publishPlan(2);
-    const [breakfast] = (await days()).days.at(-1)!.meals;
+    const [breakfast, lunch] = (await days()).days.at(-1)!.meals;
 
     const first = await uploadPhoto(today, breakfast.id);
-    expect(first.status).toBe(200);
+    expect(first.status).toBe(201);
     expect(first.body.day.photos).toEqual([
-      expect.objectContaining({ mealId: breakfast.id, mealName: 'Meal 1', url: expect.stringContaining('sistem/meal-photos/') }),
+      expect.objectContaining({ id: expect.any(String), mealId: breakfast.id, mealName: 'Meal 1', url: expect.stringContaining('sistem/meal-photos/') }),
     ]);
     expect(storage.upload.mock.calls[0][1]).toBe(`sistem/meal-photos/${trainee.id}`);
     expect(first.body.day.eaten).toEqual({ protein: 0, carb: 0, fat: 0, snack: 0 });
 
-    const replaced = await uploadPhoto(today, breakfast.id);
-    expect(replaced.body.day.photos).toHaveLength(1);
-    expect(storage.remove).toHaveBeenCalledTimes(1);
+    // A second photo of the same meal is added, not replaced.
+    const second = await uploadPhoto(today, breakfast.id);
+    const third = await uploadPhoto(today, lunch.id);
+    expect(second.body.day.photos).toHaveLength(2);
+    expect(third.body.day.photos.map((photo: { mealId: string }) => photo.mealId)).toEqual([breakfast.id, breakfast.id, lunch.id]);
+    expect(storage.remove).not.toHaveBeenCalled();
 
     // A photo keeps the day even with nothing marked.
     await mark(today, { protein: 0 });
@@ -197,10 +201,43 @@ describe('portion tracking (meal logs)', () => {
     expect((await uploadPhoto(today, '0123456789abcdef01234567')).status).toBe(400);
     expect((await uploadPhoto(today, breakfast.id, Buffer.from('not an image'))).status).toBe(400);
 
-    const removed = await api.request('DELETE', `/meal-logs/${today}/photos/${breakfast.id}`, { token: trainee.token });
-    expect(removed.body.day.photos).toEqual([]);
-    expect(storage.remove).toHaveBeenCalledTimes(2);
+    const ids = third.body.day.photos.map((photo: { id: string }) => photo.id);
+    const removed = await api.request('DELETE', `/meal-logs/${today}/photos/${ids[0]}`, { token: trainee.token });
+    expect(removed.body.day.photos.map((photo: { id: string }) => photo.id)).toEqual([ids[1], ids[2]]);
+    expect(storage.remove).toHaveBeenCalledTimes(1);
+    expect((await api.request('DELETE', `/meal-logs/${today}/photos/${ids[0]}`, { token: trainee.token })).status).toBe(404);
+    for (const id of ids.slice(1)) await api.request('DELETE', `/meal-logs/${today}/photos/${id}`, { token: trainee.token });
     expect(await MealLog.countDocuments()).toBe(0);
+  });
+
+  it('self-guided: her own target ("היעד שלי") drives tracking and photos on default meals; a coach plan takes over', async () => {
+    const own = await createTestUser('solo@example.com', { timezone: TIMEZONE });
+    const read = async () => (await api.request('GET', '/meal-logs', { token: own.token })).body;
+    expect(await read()).toMatchObject({ ownTarget: null, hasCoachPlan: false });
+    expect((await mark(today, { protein: 1 }, own)).status).toBe(409);
+
+    expect((await api.request('PUT', '/meal-logs/target', { token: own.token, body: { portions: { protein: 0, carb: 0, fat: 0, snack: 0 } } })).status).toBe(400);
+    expect((await api.request('PUT', '/meal-logs/target', { token: own.token, body: { portions: { protein: 1.25 } } })).status).toBe(400);
+    const saved = await api.request('PUT', '/meal-logs/target', { token: own.token, body: { portions: { protein: 4, carb: 3, fat: 2, snack: 1 }, freeVegetables: true } });
+    expect(saved.status).toBe(200);
+    expect(saved.body.ownTarget).toMatchObject({ portions: { protein: 4, carb: 3, fat: 2, snack: 1 }, freeVegetables: true });
+
+    const todayRow = (await read()).days.at(-1);
+    expect(todayRow).toMatchObject({ source: 'own', planned: { protein: 4, carb: 3, fat: 2, snack: 1 } });
+    expect(todayRow.meals.map((meal: { id: string }) => meal.id)).toEqual(['breakfast', 'lunch', 'snack', 'dinner']);
+
+    const marked = await mark(today, { protein: 9, carb: 1 }, own);
+    expect(marked.body.day).toMatchObject({ source: 'own', eaten: { protein: 4, carb: 1, fat: 0, snack: 0 } });
+    const photo = await api.request('POST', `/meal-logs/${today}/photos/lunch`, { token: own.token, raw: { data: JPEG, contentType: 'image/jpeg' } });
+    expect(photo.status).toBe(201);
+    expect(photo.body.day.photos[0]).toMatchObject({ mealId: 'lunch' });
+    const stored = await MealLog.findOne({ traineeId: own.id }).lean();
+    expect(stored).toMatchObject({ source: 'own', coachingId: null, planId: null });
+
+    // She joins a coach: the coach sees her own-target days as history; once his plan is live, today follows it.
+    await Coaching.create({ traineeId: own.id, coachId: coach.user._id, status: 'active' });
+    const week = await api.request('GET', `/coach/trainees/${own.id}/meal-logs`, { token: coach.token });
+    expect(week.body.days.find((day: { date: string }) => day.date === today)).toMatchObject({ source: 'own', logged: true });
   });
 
   it('the coach reads her week (Sunday → Saturday) read-only; nobody else can', async () => {

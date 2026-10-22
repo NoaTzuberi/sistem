@@ -21,7 +21,7 @@ async function main() {
 
   await connectDatabase();
   try {
-    const trainees = await User.find({ role: 'trainee' }).select('email').lean();
+    const trainees = await User.find({ roles: 'trainee' }).select('email').lean();
     let total = 0;
     for (const trainee of trainees) {
       const created = await evaluateAchievements(String(trainee._id), { backfill: true });

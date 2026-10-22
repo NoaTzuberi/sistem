@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import type { StartWorkoutPayload, WorkoutLogSetUpdate, WorkoutSummaryPayload } from '@sistem/types';
+import type { StartFreeWorkoutPayload, StartWorkoutPayload, WorkoutLogSetUpdate, WorkoutSummaryPayload } from '@sistem/types';
 import {
   MAX_LOGGED_DURATION_SEC,
   MAX_LOGGED_REPS,
@@ -9,7 +9,7 @@ import {
   MAX_SET_UPDATES,
   MIN_RATING,
 } from './workoutLog.constants';
-import { type ServerMessage, msg } from '../../i18n';
+import { type MessageCode, type ServerMessage, msg } from '../../i18n';
 
 export function validateWorkoutLogIdParam(id: unknown): ServerMessage | null {
   if (typeof id !== 'string' || !mongoose.isValidObjectId(id)) {
@@ -98,4 +98,22 @@ export function parseSummaryPayload(body: unknown): Result<WorkoutSummaryPayload
     value.notes = notes === '' ? null : notes;
   }
   return { value };
+}
+
+const FREE_MUSCLE_IDS = ['chest', 'back', 'shoulders', 'arms', 'core', 'glutes', 'legs', 'full_body'];
+
+/** POST /workout-logs/free: { mode: 'scratch' } | { mode: 'repeat', fromLogId } | { mode: 'muscle', muscles }. */
+export function parseStartFreeWorkoutPayload(body: unknown): { value: StartFreeWorkoutPayload; error?: undefined } | { value?: undefined; error: MessageCode } {
+  const raw = (body ?? {}) as { mode?: unknown; fromLogId?: unknown; muscles?: unknown };
+  if (raw.mode === 'scratch') return { value: { mode: 'scratch' } };
+  if (raw.mode === 'repeat') {
+    if (typeof raw.fromLogId !== 'string' || raw.fromLogId.length === 0) return { error: 'invalid_body' };
+    return { value: { mode: 'repeat', fromLogId: raw.fromLogId } };
+  }
+  if (raw.mode === 'muscle') {
+    if (!Array.isArray(raw.muscles) || raw.muscles.length === 0) return { error: 'free_workout_muscles_required' };
+    if (raw.muscles.some((muscle) => typeof muscle !== 'string' || !FREE_MUSCLE_IDS.includes(muscle))) return { error: 'invalid_body' };
+    return { value: { mode: 'muscle', muscles: [...new Set(raw.muscles as string[])] } };
+  }
+  return { error: 'invalid_body' };
 }

@@ -106,6 +106,7 @@ function planWith(exercise: Record<string, unknown>) {
   return new Plan({
     traineeId: new Types.ObjectId(),
     coachId: new Types.ObjectId(),
+    coachingId: new Types.ObjectId(),
     weekStartDate: '2026-10-04',
     workouts: [{ title: 'Day 1', order: 0, exercises: [{ exerciseId: new Types.ObjectId(), ...exercise }] }],
   });

@@ -15,6 +15,9 @@ export const ROUTES = {
   TRAINEE_NUTRITION: '/trainees/:traineeId/nutrition',
   // Phase 12b: the exercise library by family — review patterns, families, primaries.
   EXERCISES: '/exercises',
+  // Accounts: the admin's coach list, and the one-time "set password" link a new coach opens.
+  ADMIN_COACHES: '/admin/coaches',
+  SET_PASSWORD: '/set-password',
 } as const;
 
 export const TRAINEE_TABS = ['onboarding', 'plans', 'nutrition', 'logs', 'metrics', 'achievements'] as const;

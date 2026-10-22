@@ -1,3 +1,4 @@
+import { Coaching } from '../../coachings/coaching.model';
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { connectTestDatabase, disconnectTestDatabase, clearTestDatabase } from '../../exercises/__tests__/testDb';
 import { startApiTestClient, createTestUser } from '../../../testing/apiTestClient';
@@ -340,10 +341,10 @@ describe('workout session', () => {
       expect(week.body.activeLog).toBeNull();
     });
 
-    it('a trainee without a coach finishes without a notification', async () => {
-      await trainee.user.updateOne({ coachId: null });
+    it('a workout whose coaching ended meanwhile finishes without a notification', async () => {
       const plan = await createPlan(trainee);
       const logId = (await start(plan)).body.session.log.id;
+      await Coaching.updateMany({ traineeId: trainee.user._id }, { $set: { status: 'ended', live: false, endedAt: new Date() } });
       const res = await api.request('POST', `/workout-logs/${logId}/finish`, {
         token: trainee.token,
         body: { sets: [setUpdate(plan, 0, 0, { completed: true })] },

@@ -1,8 +1,8 @@
 import { matchPath } from 'react-router-dom';
-import type { UserRole } from '@sistem/types';
 import { CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, ROUTES, WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH } from './routes';
 
-// The dock's tabs by role (PRD §5 trainee tabs, §6 coach mode), in dock order — the order decides
+// The dock's tabs by app side (PRD §5 trainee tabs, §6 coach mode — services/auth/appRole; an admin
+// without a coach role has no dock), in dock order — the order decides
 // the direction of the screen transition (a higher index = forward).
 
 export type TabId = 'home' | 'workouts' | 'nutrition' | 'profile' | 'inbox' | 'trainees';
@@ -12,7 +12,7 @@ export interface TabRoute {
   to: string;
 }
 
-export const TABS: Record<UserRole, TabRoute[]> = {
+export const TABS: Record<'trainee' | 'coach', TabRoute[]> = {
   trainee: [
     { id: 'home', to: ROUTES.TRAINEE_HOME },
     { id: 'workouts', to: ROUTES.WORKOUTS },

@@ -44,6 +44,13 @@ import {
 } from '../nutrition/nutrition.controller';
 import { getTraineeMealLogs } from '../mealLogs/mealLog.controller';
 import { getTraineeCardioLogs } from '../cardio/cardio.controller';
+import {
+  getMyInvites,
+  postPersonalInvite,
+  postRegenerateInvite,
+  deleteInvite,
+  getMyCommunityInvite,
+} from '../invites/invite.controller';
 import { getTrainingConfig, putTrainingSettings } from '../trainingSplits/trainingSplit.controller';
 import {
   getFamilies,
@@ -57,7 +64,9 @@ import {
 
 // The human Coach (PRD §6) — the ATLAS AI chat that used /api/coach is gone.
 // Every route needs role=coach; every :traineeId route also needs that trainee to
-// be hers (loadCoachTrainee), and plans are looked up inside that trainee only.
+// have a live coaching with her (loadCoachTrainee), and coach-owned data is read through that coaching only.
+import { getMyPayment, putMyPayment } from '../coachProfiles/coachProfile.controller';
+
 export const coachRouter = Router();
 
 coachRouter.use(requireAuth, requireRole('coach'));
@@ -76,6 +85,17 @@ coachRouter.post('/exercise-families/:familyId/split', postFamilySplit);
 
 // Read-only aggregates over her own trainees (the dashboard's Statistics and Overview pages).
 coachRouter.get('/stats', getStats);
+
+// Invites: her permanent coaching link (+ QR in the dashboard), personal single-use links, and her
+// community-only link. Every query is scoped to the calling coach.
+// Temporary payment links shown to her trainees (Profile coach card).
+coachRouter.get('/profile/payment', getMyPayment);
+coachRouter.put('/profile/payment', putMyPayment);
+coachRouter.get('/invites', getMyInvites);
+coachRouter.post('/invites', postPersonalInvite);
+coachRouter.post('/invites/regenerate', postRegenerateInvite);
+coachRouter.get('/invites/community', getMyCommunityInvite);
+coachRouter.delete('/invites/:inviteId', deleteInvite);
 
 coachRouter.get('/trainees', getTrainees);
 coachRouter.get('/trainees/:traineeId', loadCoachTrainee, getTrainee);

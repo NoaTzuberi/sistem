@@ -1,3 +1,4 @@
+import { Coaching } from '../../coachings/coaching.model';
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import type { MockInstance } from 'vitest';
 import { connectTestDatabase, disconnectTestDatabase, clearTestDatabase } from '../../exercises/__tests__/testDb';
@@ -126,7 +127,8 @@ async function createAnswers(answers: Record<string, unknown> = ANSWERS, user = 
 }
 
 async function runDraft(traineeId = trainee.id) {
-  const started = await startRecommendation({ traineeId, coachId: coach.id, type: 'nutrition_plan', trigger: 'coach' });
+  const coachingId = String((await Coaching.findOne({ traineeId, coachId: coach.id, live: true }).lean())!._id);
+  const started = await startRecommendation({ traineeId, coachId: coach.id, coachingId, type: 'nutrition_plan', trigger: 'coach' });
   await started.run;
   return AiRecommendation.findById(started.recommendation._id).lean();
 }

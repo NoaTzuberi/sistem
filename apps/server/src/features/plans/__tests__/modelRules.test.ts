@@ -22,17 +22,22 @@ describe('model rules backed by indexes', () => {
     await clearTestDatabase();
   });
 
-  it('allows one plan per trainee per week', async () => {
+  it('allows one plan per coaching per week (another coaching of hers may plan the same week)', async () => {
     const traineeId = new Types.ObjectId();
-    const base = { traineeId, coachId: new Types.ObjectId(), weekStartDate: '2026-10-04' };
+    const base = { traineeId, coachId: new Types.ObjectId(), coachingId: new Types.ObjectId(), weekStartDate: '2026-10-04' };
     await Plan.create(base);
     await expect(Plan.create(base)).rejects.toThrow(/duplicate key/);
     await expect(Plan.create({ ...base, weekStartDate: '2026-10-11' })).resolves.toBeDefined();
+    await expect(Plan.create({ ...base, coachId: new Types.ObjectId(), coachingId: new Types.ObjectId() })).resolves.toBeDefined();
+  });
+
+  it('a plan without a coaching is refused', async () => {
+    await expect(Plan.create({ traineeId: new Types.ObjectId(), coachId: new Types.ObjectId(), weekStartDate: '2026-10-04' })).rejects.toThrow(/coachingId/);
   });
 
   it('allows one in-progress workout log per trainee, any number of finished ones', async () => {
     const traineeId = new Types.ObjectId();
-    const base = { traineeId, planId: new Types.ObjectId(), workoutId: new Types.ObjectId(), workoutTitle: 'Day 1' };
+    const base = { traineeId, planId: new Types.ObjectId(), coachingId: new Types.ObjectId(), workoutId: new Types.ObjectId(), workoutTitle: 'Day 1' };
     await WorkoutLog.create({ ...base, status: 'completed' });
     await WorkoutLog.create({ ...base, status: 'completed' });
     await WorkoutLog.create({ ...base, status: 'in_progress' });
@@ -43,6 +48,7 @@ describe('model rules backed by indexes', () => {
     const log = await WorkoutLog.create({
       traineeId: new Types.ObjectId(),
       planId: new Types.ObjectId(),
+      coachingId: new Types.ObjectId(),
       workoutId: new Types.ObjectId(),
       workoutTitle: 'Core',
       sets: [{ exerciseId: new Types.ObjectId(), setIndex: 0, type: 'warmup', durationSec: 45, completed: true }],

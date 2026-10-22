@@ -40,6 +40,8 @@ function isDuplicateKeyError(error: unknown): boolean {
 export interface StartRecommendationInput {
   traineeId: string;
   coachId: string;
+  /** The coaching the draft is for — it is read back only through it. */
+  coachingId: string;
   type: AiRecommendationType;
   trigger: AiRecommendationTrigger;
   request?: RecommendationRequest | null;
@@ -53,7 +55,7 @@ export interface StartedRecommendation {
   run: Promise<void> | null;
 }
 
-/** Creates a pending recommendation and runs it in the background. One active run per trainee + type. */
+/** Creates a pending recommendation and runs it in the background. One active run per coaching + type. */
 export async function startRecommendation(input: StartRecommendationInput): Promise<StartedRecommendation> {
   // Two tries: the active run can finish between the duplicate-key refusal and the lookup.
   for (let attempt = 1; ; attempt += 1) {
@@ -64,7 +66,7 @@ export async function startRecommendation(input: StartRecommendationInput): Prom
       return { recommendation: created.toObject() as LeanRecommendation, created: true, run };
     } catch (error) {
       if (!isDuplicateKeyError(error)) throw error;
-      const existing = await AiRecommendation.findOne({ traineeId: input.traineeId, type: input.type, active: true }).lean<LeanRecommendation>();
+      const existing = await AiRecommendation.findOne({ coachingId: input.coachingId, type: input.type, active: true }).lean<LeanRecommendation>();
       if (existing) return { recommendation: existing, created: false, run: null };
       if (attempt >= 2) throw error;
     }
@@ -260,17 +262,18 @@ async function toPublicRecommendation(doc: LeanRecommendation, language: Languag
   } as PublicAiRecommendation;
 }
 
+// Coach reads go through the coaching: another coach's drafts for the same trainee are never found.
 export async function getLatestRecommendation(
-  traineeId: string,
+  coachingId: string,
   type: AiRecommendationType,
   language: Language,
 ): Promise<PublicAiRecommendation | null> {
-  const doc = await AiRecommendation.findOne({ traineeId, type }).sort({ createdAt: -1, _id: -1 }).lean<LeanRecommendation>();
+  const doc = await AiRecommendation.findOne({ coachingId, type }).sort({ createdAt: -1, _id: -1 }).lean<LeanRecommendation>();
   return doc ? toPublicRecommendation(doc, language) : null;
 }
 
-export async function getRecommendation(traineeId: string, id: string, language: Language): Promise<PublicAiRecommendation | null> {
-  const doc = await AiRecommendation.findOne({ _id: id, traineeId }).lean<LeanRecommendation>();
+export async function getRecommendation(coachingId: string, id: string, language: Language): Promise<PublicAiRecommendation | null> {
+  const doc = await AiRecommendation.findOne({ _id: id, coachingId }).lean<LeanRecommendation>();
   return doc ? toPublicRecommendation(doc, language) : null;
 }
 
@@ -278,11 +281,11 @@ export async function presentRecommendation(doc: LeanRecommendation, language: L
   return toPublicRecommendation(doc, language);
 }
 
-/** For the plan saves: a ready recommendation of this trainee (and type) that a plan may point at. */
+/** For the plan saves: a ready recommendation of this coaching (and type) that a plan may point at. */
 export async function isLinkableRecommendation(
-  traineeId: string,
+  coachingId: string,
   id: string,
   type: AiRecommendationType = 'training_plan',
 ): Promise<boolean> {
-  return (await AiRecommendation.exists({ _id: id, traineeId, type, status: 'ready' })) !== null;
+  return (await AiRecommendation.exists({ _id: id, coachingId, type, status: 'ready' })) !== null;
 }

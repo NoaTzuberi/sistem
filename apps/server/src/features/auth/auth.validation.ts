@@ -7,6 +7,7 @@ interface RegisterInput {
   confirmPassword?: unknown;
   timezone?: unknown;
   language?: unknown;
+  inviteCode?: unknown;
 }
 
 interface LoginInput {
@@ -47,6 +48,9 @@ export function validateRegisterInput(input: RegisterInput): ServerMessage | nul
   }
   if (input.language !== undefined && !(LANGUAGE_IDS as readonly unknown[]).includes(input.language)) {
     return msg('language_invalid');
+  }
+  if (input.inviteCode !== undefined && (typeof input.inviteCode !== 'string' || input.inviteCode.length > 300)) {
+    return msg('invite_invalid');
   }
 
   return null;

@@ -1,0 +1,169 @@
+/* The profile photo sheet: grouped source options, then the circular crop. */
+.pf-photo-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pf-photo-options {
+  margin: var(--space-3) 0 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-fill-soft);
+  list-style: none;
+}
+
+.pf-photo-options li + li {
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.pf-photo-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pf-photo-option:active {
+  transform: scale(var(--press-scale));
+}
+
+.pf-photo-option-remove {
+  color: var(--color-primary-deep);
+}
+
+.pf-photo-option-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-profile-icon-tile);
+  height: var(--size-profile-icon-tile);
+  border-radius: var(--radius-profile-icon-tile);
+  background-color: var(--color-card);
+  transition: background-color var(--transition-fast) ease;
+}
+
+/* The crop square: the photo under a dimmed outside and a white ring around the circle. */
+.pf-crop {
+  position: relative;
+  width: var(--size-profile-crop);
+  height: var(--size-profile-crop);
+  margin: var(--space-3) auto 0;
+  overflow: hidden;
+  border-radius: var(--radius-profile-crop);
+  background-color: var(--color-ink);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.pf-crop:active {
+  cursor: grabbing;
+}
+
+.pf-crop:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+
+/* Centered, then moved by the pan (screen pixels, x to the right in both directions). */
+.pf-crop-image {
+  position: absolute;
+  top: 50%;
+  left: 50%; /* physical: the pan's x axis is the screen's, not the reading direction */
+  width: var(--pf-crop-w);
+  height: var(--pf-crop-h);
+  max-width: none;
+  transform: translate(calc(-50% + var(--pf-crop-x)), calc(-50% + var(--pf-crop-y))) scale(var(--pf-crop-zoom));
+  transform-origin: center;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.pf-crop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0 calc(var(--size-profile-crop-circle) / 2),
+    var(--surface-profile-crop-dim) calc(var(--size-profile-crop-circle) / 2 + 1px)
+  );
+  pointer-events: none;
+}
+
+.pf-crop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  width: var(--size-profile-crop-circle);
+  height: var(--size-profile-crop-circle);
+  margin: auto;
+  border-radius: var(--radius-round);
+  box-shadow: var(--ring-profile-crop);
+  pointer-events: none;
+}
+
+.pf-crop-zoom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  margin: var(--space-2) var(--space-1) 0;
+  color: var(--color-text-muted);
+}
+
+.pf-crop-zoom input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--color-primary);
+}
+
+.pf-photo-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+
+.pf-photo-cancel {
+  height: var(--size-cardio-save);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+}
+
+.pf-photo-cancel:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pf-photo-option:hover .pf-photo-option-icon,
+  .pf-photo-cancel:hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}

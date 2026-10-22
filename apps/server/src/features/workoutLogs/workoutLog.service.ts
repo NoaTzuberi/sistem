@@ -18,8 +18,9 @@ export function toPublicWorkoutLog(log: LeanWorkoutLog): PublicWorkoutLog {
   return {
     id: String(log._id),
     traineeId: String(log.traineeId),
-    planId: String(log.planId),
-    workoutId: String(log.workoutId),
+    source: log.source ?? 'plan',
+    planId: log.planId ? String(log.planId) : null,
+    workoutId: log.workoutId ? String(log.workoutId) : null,
     workoutTitle: log.workoutTitle,
     status: log.status,
     startedAt: log.startedAt.toISOString(),
@@ -67,8 +68,25 @@ export async function attachLogDetails(logs: PublicWorkoutLog[]): Promise<void> 
 }
 
 /** Discarded sessions stay in the database but are not part of her history. */
-export async function listWorkoutLogsForTrainee(traineeId: string): Promise<PublicWorkoutLog[]> {
-  const logs = await WorkoutLog.find({ traineeId, status: { $ne: 'abandoned' } }).sort({ startedAt: -1 }).lean<LeanWorkoutLog[]>();
+export async function listWorkoutLogsForTrainee(traineeId: string, coachingId: string | null = null): Promise<PublicWorkoutLog[]> {
+  // A coaching filter keeps her own free workouts too (they belong to no coaching).
+  const filter: Record<string, unknown> = { traineeId, status: { $ne: 'abandoned' } };
+  if (coachingId) filter.$or = [{ coachingId }, { source: 'free' }];
+  const logs = await WorkoutLog.find(filter).sort({ startedAt: -1 }).lean<LeanWorkoutLog[]>();
+  const publicLogs = logs.map(toPublicWorkoutLog);
+  await attachLogDetails(publicLogs);
+  return publicLogs;
+}
+
+/**
+ * Coach side: the logs of HER coaching with this trainee (never another coach's plan logs), plus the
+ * trainee's own free workouts — trainee-owned history, like her body data, seen by every live coach.
+ */
+export async function listWorkoutLogsForCoaching(coachingId: string, traineeId: string): Promise<PublicWorkoutLog[]> {
+  const filter: Record<string, unknown> = { $or: [{ coachingId }, { traineeId, source: 'free' }], status: { $ne: 'abandoned' } };
+  const logs = await WorkoutLog.find(filter)
+    .sort({ startedAt: -1 })
+    .lean<LeanWorkoutLog[]>();
   const publicLogs = logs.map(toPublicWorkoutLog);
   await attachLogDetails(publicLogs);
   return publicLogs;

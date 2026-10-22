@@ -6,6 +6,7 @@ import { migrateLegacyNutritionPreferences } from './features/onboarding/nutriti
 import { migrateCardioSessions } from './features/cardio/cardioSessionMigration';
 import { CardioLog } from './features/cardio/cardio.model';
 import { syncMealLogIndexes } from './features/mealLogs/mealLog.model';
+import { migrateAccounts } from './features/coachings/accountsMigration';
 
 async function startServer(): Promise<void> {
   try {
@@ -13,6 +14,15 @@ async function startServer(): Promise<void> {
   } catch {
     console.error('Failed to connect to MongoDB. Server startup aborted.');
     process.exit(1);
+  }
+
+  // Accounts & relationships: roles[], coach profiles, coachings from User.coachId, coachingId on every
+  // coach-owned record. First, so every later step (and the cardio migration's plans) finds coachings.
+  const accounts = await migrateAccounts();
+  if (accounts.roles + accounts.coaches + accounts.coachings + accounts.records > 0) {
+    console.log(
+      `[accounts] roles ${accounts.roles}, coach profiles ${accounts.coaches}, coachings ${accounts.coachings} (+${accounts.endedCoachings} ended for history), records linked ${accounts.records}.`,
+    );
   }
 
   const interrupted = await failInterruptedRecommendations();

@@ -568,7 +568,7 @@ describe('AI plan recommendations', () => {
     await completeOnboarding();
     await waitForStatus(trainee.id, ['running']);
     // A second start while one is active returns that one.
-    const again = await startRecommendation({ traineeId: trainee.id, coachId: coach.id, type: 'training_plan', trigger: 'coach' });
+    const again = await startRecommendation({ traineeId: trainee.id, coachId: coach.id, coachingId: trainee.coachingId!, type: 'training_plan', trigger: 'coach' });
     expect(again.created).toBe(false);
 
     expect(await failInterruptedRecommendations()).toBe(1);

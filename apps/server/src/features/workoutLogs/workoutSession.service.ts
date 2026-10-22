@@ -20,6 +20,8 @@ import { WorkoutLogNotFoundError, attachLogDetails, attachLogExerciseFacts, toPu
 import type { WorkoutLogDocument, WorkoutLogSetFields } from './workoutLog.types';
 import { LAST_PERFORMANCE_LOG_SCAN, MAX_SETS_PER_EXERCISE } from './workoutLog.constants';
 import { LocalizedError } from '../../i18n';
+import { coachingIdsOf } from '../coachings/coaching.service';
+import { freeSessionWorkout } from './freeWorkoutSession';
 
 // The active workout session (PRD §5.2). The log is created the moment a workout
 // starts and every set change is saved as it happens, so a closed app, a lost
@@ -35,15 +37,16 @@ export class OtherWorkoutActiveError extends Error {
   }
 }
 
-type LeanWorkoutLog = WorkoutLogDocument & { _id: Types.ObjectId };
+export type LeanWorkoutLog = WorkoutLogDocument & { _id: Types.ObjectId };
 
 const DUPLICATE_KEY_ERROR = 11000;
 
-function toActiveRef(log: LeanWorkoutLog): ActiveWorkoutRef {
+export function toActiveRef(log: LeanWorkoutLog): ActiveWorkoutRef {
   return {
     logId: String(log._id),
-    planId: String(log.planId),
-    workoutId: String(log.workoutId),
+    source: log.source ?? 'plan',
+    planId: log.planId ? String(log.planId) : null,
+    workoutId: log.workoutId ? String(log.workoutId) : null,
     workoutTitle: log.workoutTitle,
     startedAt: log.startedAt.toISOString(),
   };
@@ -77,11 +80,14 @@ export async function findLastPerformance(
   traineeId: string,
   exerciseIds: string[],
   excludeLogId?: Types.ObjectId,
+  /** Coach reads: only that coaching's logs. Her own session pre-fill uses her whole history. */
+  coachingId?: string,
 ): Promise<Record<string, LastPerformance>> {
   const result: Record<string, LastPerformance> = {};
   if (exerciseIds.length === 0) return result;
 
   const filter: Record<string, unknown> = { traineeId, status: 'completed', 'sets.exerciseId': { $in: exerciseIds } };
+  if (coachingId) filter.coachingId = coachingId;
   if (excludeLogId) filter._id = { $ne: excludeLogId };
   const logs = await WorkoutLog.find(filter)
     .sort({ finishedAt: -1 })
@@ -106,11 +112,16 @@ export async function findLastPerformance(
   return result;
 }
 
-async function toSession(log: LeanWorkoutLog, now: Date): Promise<WorkoutSession> {
+async function sessionWorkout(log: LeanWorkoutLog): Promise<PlanWorkout> {
+  if (log.source === 'free') return freeSessionWorkout(log);
   const plan = await Plan.findOne({ _id: log.planId, traineeId: log.traineeId }).lean<LeanPlan>();
   const planned = plan ? await loadPlannedWorkout(plan, String(log.workoutId)) : null;
   // A plan with a log can't be deleted (Phase 6), so this fallback is only a safety net.
-  const workout: PlanWorkout = planned ?? { id: String(log.workoutId), title: log.workoutTitle, order: 0, exercises: [] };
+  return planned ?? { id: String(log.workoutId), title: log.workoutTitle, order: 0, exercises: [] };
+}
+
+export async function toSession(log: LeanWorkoutLog, now: Date): Promise<WorkoutSession> {
+  const workout = await sessionWorkout(log);
 
   const publicLog = toPublicWorkoutLog(log);
   const exerciseIds = [...new Set(log.sets.map((set) => String(set.exerciseId)))];
@@ -122,7 +133,7 @@ async function toSession(log: LeanWorkoutLog, now: Date): Promise<WorkoutSession
   return { log: publicLog, workout, lastPerformance, serverTime: now.toISOString() };
 }
 
-async function findOwnLog(logId: string, traineeId: string): Promise<LeanWorkoutLog> {
+export async function findOwnLog(logId: string, traineeId: string): Promise<LeanWorkoutLog> {
   const log = await WorkoutLog.findOne({ _id: logId, traineeId }).lean<LeanWorkoutLog>();
   if (!log) throw new WorkoutLogNotFoundError('workout_log_not_found');
   return log;
@@ -152,14 +163,15 @@ export async function startWorkout(
 ): Promise<{ session: WorkoutSession; resumed: boolean }> {
   const active = await WorkoutLog.findOne({ traineeId, status: 'in_progress' }).lean<LeanWorkoutLog>();
   if (active) {
-    if (String(active.planId) === planId && String(active.workoutId) === workoutId) {
+    if (active.source !== 'free' && String(active.planId) === planId && String(active.workoutId) === workoutId) {
       return { session: await toSession(active, now), resumed: true };
     }
     throw new OtherWorkoutActiveError(toActiveRef(active));
   }
 
+  // Only plans of a LIVE coaching start: an ended coaching's plans are history.
   const [plan, today] = await Promise.all([
-    Plan.findOne({ _id: planId, traineeId, status: 'published' }).lean<LeanPlan>(),
+    Plan.findOne({ _id: planId, traineeId, status: 'published', coachingId: { $in: await coachingIdsOf(traineeId) } }).lean<LeanPlan>(),
     todayFor(traineeId, now),
   ]);
   if (!plan) throw new PlanNotFoundError('plan_not_found');
@@ -194,6 +206,7 @@ export async function startWorkout(
     const created = await WorkoutLog.create({
       traineeId,
       planId,
+      coachingId: plan.coachingId,
       workoutId,
       workoutTitle: workout.title,
       startedAt: now,
@@ -209,7 +222,7 @@ export async function startWorkout(
   }
 }
 
-async function assertActive(logId: string, traineeId: string): Promise<LeanWorkoutLog> {
+export async function assertActive(logId: string, traineeId: string): Promise<LeanWorkoutLog> {
   const log = await findOwnLog(logId, traineeId);
   if (log.status !== 'in_progress') {
     throw new WorkoutLogNotActiveError('workout_not_in_progress');
@@ -340,6 +353,8 @@ export async function updateWorkoutSets(
 
 /** The plan exercises of this log's workout that run as intervals (on the coach's clock). */
 async function intervalPlanExerciseIds(log: LeanWorkoutLog): Promise<Set<string>> {
+  // A free workout has no intervals (they are set by a coach).
+  if (log.source === 'free') return new Set();
   const plan = await Plan.findOne({ _id: log.planId, traineeId: log.traineeId }).select('workouts').lean<LeanPlan>();
   const workout = plan?.workouts.find((candidate) => String(candidate._id) === String(log.workoutId));
   return new Set(workout?.exercises.filter((exercise) => exercise.interval).map((exercise) => String(exercise._id)) ?? []);

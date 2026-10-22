@@ -84,9 +84,12 @@ export const TRAINING_EXPERIENCE_IDS = ['new', 'some', 'experienced'] as const;
 
 export const GENDER_IDS = ['male', 'female', 'other'] as const;
 
-// Coach accounts are never created by public sign-up (PRD §3) — only promoted/seeded.
-export const USER_ROLES = ['trainee', 'coach'] as const;
+// Coach accounts are never created by public sign-up (PRD §3) — the admin creates them.
+// A user may hold several roles (e.g. the platform admin is also a coach).
+export const USER_ROLES = ['trainee', 'coach', 'admin'] as const;
 export const DEFAULT_USER_ROLE = 'trainee';
+/** Which role is "primary" when one is needed (AuthUser.role): the first one she holds. */
+export const ROLE_PRIORITY = ['admin', 'coach', 'trainee'] as const;
 
 export const ONBOARDING_STATUS_IDS = ['not_started', 'in_progress', 'completed'] as const;
 export const DEFAULT_ONBOARDING_STATUS = 'not_started';

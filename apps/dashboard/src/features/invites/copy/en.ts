@@ -1,0 +1,35 @@
+import { plural } from '@sistem/shared';
+import type { CopyShape } from '@sistem/shared';
+import type { he } from './he';
+
+export const en: CopyShape<typeof he> = {
+  button: '+ Invite a trainee',
+  title: 'Invite a trainee',
+  subtitle: 'A trainee who opens the link signs up, fills in the questionnaire and shows up in your "Waiting for a plan" list.',
+  permanentTitle: 'Your permanent link',
+  permanentHint: 'Share it with any trainee, or show the code to scan.',
+  uses: plural({ one: '1 trainee joined through it', other: '{count} trainees joined through it' }),
+  noUses: 'Nobody joined through it yet',
+  copy: 'Copy',
+  share: 'Share',
+  copied: 'Link copied',
+  regenerate: 'Make a new link',
+  regenerateTitle: 'Make a new link?',
+  regenerateText: 'The current link stops working. Trainees who already joined stay with you.',
+  cancel: 'Cancel',
+  qrAlt: 'QR code of the join link',
+  personalTitle: 'Personal link',
+  personalHint: "Single use, valid for 14 days. You can tie it to the trainee's email.",
+  personalEmail: 'Email (optional)',
+  personalCreate: 'Make a link',
+  openLinks: 'Open personal links',
+  forEmail: 'For {email}',
+  anyone: 'For any trainee',
+  expires: 'Valid until {date}',
+  revoke: 'Cancel link',
+  revoked: 'Link cancelled',
+  shareText: 'Join me on Sistem',
+  loadError: "Couldn't load your links.",
+  actionError: "That didn't work. Try again.",
+  done: 'Done',
+};

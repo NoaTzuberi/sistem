@@ -1,0 +1,108 @@
+.coaches-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+}
+
+.coaches-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+}
+
+.coaches-logo-tile {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-block);
+  background: var(--color-primary);
+}
+
+.coaches-role {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.coaches-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-inline-start: auto;
+}
+
+.coaches-bar-link {
+  font-size: var(--text-sm);
+  color: var(--color-primary-deep);
+}
+
+.coaches-bar-link:active {
+  transform: scale(0.97);
+}
+
+.coaches-bar-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.coaches-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-5) var(--space-8);
+}
+
+.coaches-empty,
+.coaches-error {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+}
+
+.coaches-error {
+  color: var(--color-primary-deep);
+}
+
+.coaches-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-block);
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+
+.coaches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.coaches-table th,
+.coaches-table td {
+  padding: var(--space-3) var(--space-4);
+  border-block-end: var(--border-width-thin) solid var(--color-border);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.coaches-table th {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.coaches-table tbody tr:last-child td {
+  border-block-end: none;
+}
+
+.coaches-number {
+  font-variant-numeric: tabular-nums;
+}
+
+.coaches-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .coaches-bar,
+  .coaches-main {
+    padding-inline: var(--space-4);
+  }
+}

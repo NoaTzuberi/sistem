@@ -1,0 +1,119 @@
+Fix — Home: week track + coach card (match docs/design/trainee-home-b.html)
+=========================================================================
+
+Summary
+-------
+- Week track: each lane now has one look, chosen in code (homeDisplay `laneLook`): done = filled with the
+  workout's color · today (not done) = ink · planned = white with a 2px ring in its color · missed = soft column,
+  faint date, a small dot in its color at the bottom · rest = a hairline. Today keeps the pulsing pink dot
+  whether done or not, so today + done = filled + dot. Why it looked wrong before: missed and planned days were
+  both a white column with a thin ring (they read as empty outlines), and "today" was drawn over "done".
+- The lane logic + the selected day live in a new hook `useWeekTrack` (today is selected by default). The day line
+  now reads "מתוכנן · N תרגילים" for planned days. Tapping the day line opens that workout, as before.
+- Coach card: ink avatar with the coach's initials (her name now comes with GET /plans/week as `coach: { name }`;
+  the nutrition plan's coach is the fallback). The pink dot shows only when something is unread. Her name is in
+  Karantina 22px, with the time beside it. The message is 15px / 1.5, cut after 4 whole lines with "עוד" to
+  expand: no "…" and no word cut in half. The section head "COACH · מהמאמנת" sits above the card, like the
+  other Home sections.
+- Quick replies (owner decision in this session): "👍 תודה!" is shown under a real message. It sends her coach an
+  in-app notification (new type `coach_note_thanks`, one per note) and then reads "✓ נשלח". "תשובה" stays hidden
+  until trainee → coach messaging exists. The pink-soft "week ready" chip still shows only for an unread
+  "plan published".
+
+Files changed
+-------------
+Added
+- apps/mobile/src/features/home/hooks/useWeekTrack.ts
+- apps/mobile/src/features/home/hooks/useTextClamp.ts
+- apps/mobile/src/features/home/hooks/useCoachThanks.ts
+- apps/server/src/features/notifications/coachNoteThanks.service.ts
+- apps/server/src/features/notifications/__tests__/coachNoteThanks.test.ts
+- docs/phase-reports/fix-home-week-track-coach-card.txt
+Modified
+- apps/mobile/src/features/home/data/homeDisplay.ts (LaneLook, laneLook, lane color, pulse)
+- apps/mobile/src/features/home/components/WeekTrack/WeekTrack.tsx + .css
+- apps/mobile/src/features/home/components/WeekDayDetail/WeekDayDetail.tsx
+- apps/mobile/src/features/home/components/CoachNote/CoachNote.tsx + .css
+- apps/mobile/src/features/home/components/QuickReplies/QuickReplies.tsx + .css (disabled chip)
+- apps/mobile/src/features/home/components/HomeScreen/HomeScreen.tsx
+- apps/mobile/src/features/home/hooks/useHomeData.ts (note id / key / unread, coachName; days moved to useWeekTrack)
+- apps/mobile/src/features/home/copy/he.ts, en.ts
+- apps/mobile/src/services/notifications/notificationsService.ts (thankCoach)
+- apps/server/src/features/plans/traineePlan.service.ts (+ coach name), __tests__/traineePlans.test.ts
+- apps/server/src/features/notifications/notification.{constants,types,service,validation,controller,routes}.ts
+- apps/server/src/i18n/locales/he.ts, en.ts (coach_note_invalid, coach_note_not_found)
+- packages/types/src/index.ts (TraineeWeek.coach, CoachNoteId, ThankCoachPayload, coach_note_thanks notification)
+- packages/api-client/src/notificationsApi.ts (thankCoach)
+- packages/shared/src/coachNotifications.ts, copy/he.ts, copy/en.ts (coach text for the new notification)
+- apps/dashboard/src/features/notifications/data/notificationItems.ts (shows it in the bell, heart icon)
+- packages/tokens/tokens.css (--text-coach-note 15px, --size-home-coach-avatar 42px)
+Deleted: none
+
+Dependencies
+------------
+None added or removed.
+
+API
+---
+- GET /api/plans/week: new field `coach: { name } | null` (her coach's name only).
+- POST /api/notifications/thanks { note: 'plan' | 'nutrition' } → 204 (trainee only; 400 bad note; 404 no such
+  note / no coach). The server finds the note itself (this week's published plan with notes, or her newest
+  nutrition version with an intro) and her coach; dedupeKey `coach_note_thanks:<noteId>`, so repeat taps never
+  notify twice. No schema change beyond the new notification type id in the enum.
+
+How to test
+-----------
+- npm test (server 620 tests incl. the new coachNoteThanks.test.ts + /plans/week coach name; i18n parity)
+- npm run lint (oxlint + i18n audit + contrast audit — clean)
+- npm run seed:dev, npm run dev:all, sign in as trainee2@sistem.dev:
+  - Home → "השבוע": a done day is filled with its workout's color (white number); today is ink with a pulsing dot;
+    finish today's workout → filled in its color, dot still pulsing; a past undone day is soft with a small
+    colored dot under a faint number; a future workout day is white with a colored ring; rest days are a
+    hairline. Tap a day → it lifts, its letter turns ink, the day line updates; tap the day line → the workout.
+  - Reduced motion (OS setting): the dot stops pulsing, no lift transition.
+  - Coach card (publish the plan with notes from the dashboard): initials avatar, name, time; a long note shows
+    4 lines + "עוד" (expands / "פחות"); "👍 תודה!" → "✓ נשלח", and the coach sees "… אמרה תודה על ההערה שלך" in the
+    dashboard bell and the mobile Inbox (tap → that trainee). Reload Home → still "✓ נשלח".
+  - Switch to English (Settings) and check the same screens; iPhone SE + Pro Max widths.
+
+Known issues / TODOs
+--------------------
+- Workout colors cycle through FIVE identity colors (--color-workout-1…5, the 5th is Cherry), as in the plan
+  builder and Workouts tab — the brief lists four (w1–w4). Kept five so a workout has the same color everywhere;
+  say if Home should use only four.
+- A Hebrew workout name in the day line stays in Karantina (upright): Barlow has no Hebrew letters.
+- Today + done: the pink dot gets a thin white ring so it stays visible on a pink fill (small addition to the design).
+- PLACEHOLDER copy for the owner: "פחות" / "Less", "✓ נשלח" / "✓ Sent", "לא נשלח. נסי שוב", the coach's
+  notification text "{name} אמרה תודה על ההערה שלך" / "{name} said thanks for your note".
+- "Sent" is remembered per device (localStorage). On another device the chip shows "תודה" again, but a tap there
+  doesn't notify the coach twice.
+- "תשובה" (reply) needs trainee → coach messaging — backlog.
+- No visual check in a browser this session (browser tool disconnected) — please run the manual checks above.
+
+Suggested commits
+-----------------
+1. feat(server): coach name on the trainee week + "thanks" for a coach note
+   apps/server/src/features/plans/traineePlan.service.ts, apps/server/src/features/plans/__tests__/traineePlans.test.ts,
+   apps/server/src/features/notifications/ (constants, types, service, validation, controller, routes,
+   coachNoteThanks.service.ts, __tests__/coachNoteThanks.test.ts), apps/server/src/i18n/locales/he.ts, en.ts,
+   packages/types/src/index.ts, packages/api-client/src/notificationsApi.ts
+2. feat(dashboard): show "thanks for your note" notifications
+   packages/shared/src/coachNotifications.ts, packages/shared/src/copy/he.ts, packages/shared/src/copy/en.ts,
+   apps/dashboard/src/features/notifications/data/notificationItems.ts
+3. fix(mobile): Home week track states and coach card per the design
+   apps/mobile/src/features/home/, apps/mobile/src/services/notifications/notificationsService.ts,
+   packages/tokens/tokens.css
+4. docs: Home week track + coach card fix report
+   docs/phase-reports/fix-home-week-track-coach-card.txt
+
+git add -A -- apps/server/src/features/plans/traineePlan.service.ts apps/server/src/features/plans/__tests__/traineePlans.test.ts apps/server/src/features/notifications apps/server/src/i18n/locales/he.ts apps/server/src/i18n/locales/en.ts packages/types/src/index.ts packages/api-client/src/notificationsApi.ts
+git commit -m "feat(server): coach name on the trainee week + thanks for a coach note"
+
+git add -A -- packages/shared/src/coachNotifications.ts packages/shared/src/copy/he.ts packages/shared/src/copy/en.ts apps/dashboard/src/features/notifications/data/notificationItems.ts
+git commit -m "feat(dashboard): show thanks-for-your-note notifications"
+
+git add -A -- apps/mobile/src/features/home apps/mobile/src/services/notifications/notificationsService.ts packages/tokens/tokens.css
+git commit -m "fix(mobile): Home week track states and coach card per the design"
+
+git add -A -- docs/phase-reports/fix-home-week-track-coach-card.txt
+git commit -m "docs: Home week track + coach card fix report"

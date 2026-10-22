@@ -1,12 +1,15 @@
-/* Profile (docs/design/trainee-profile.html): a plain white, full-bleed screen, ink type. */
+/* Profile (docs/design/trainee-profile.html): a full-bleed screen on the soft page surface; content
+   sits on white cards. */
 .pf-screen {
+  /* Locked badges and the filter chips are white on this surface (shared achievements look). */
+  --ach-badge-bg: var(--color-card);
   min-height: 100%;
-  background-color: var(--color-card);
+  background-color: var(--color-profile-surface);
   color: var(--color-ink);
   font-family: var(--font-body);
 }
 
-/* The segmented tabs stick under the status bar on frosted white. */
+/* The segmented tabs stick under the status bar on the frosted page surface. */
 .pf-tabs-bar {
   position: sticky;
   inset-block-start: 0;
@@ -14,7 +17,7 @@
   margin-block-start: var(--space-3);
   padding-block: calc(var(--space-2) + var(--safe-top)) var(--space-2);
   padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
-  background-color: var(--surface-header-frost);
+  background-color: var(--surface-profile-tabs);
   -webkit-backdrop-filter: var(--blur-header);
   backdrop-filter: var(--blur-header);
 }
@@ -24,6 +27,17 @@
   margin-block-start: 0;
   padding: var(--space-1);
   border-radius: var(--radius-profile-segment);
+  background-color: var(--color-profile-segment-track);
+}
+
+.pf-screen .ach-filter-chip:not([aria-pressed='true']) {
+  background-color: var(--color-card);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pf-screen .ach-filter-chip:not([aria-pressed='true']):hover {
+    background-color: var(--color-fill-soft-hover);
+  }
 }
 
 .pf-tabs .segmented-tabs-thumb {

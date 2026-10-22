@@ -1,0 +1,235 @@
+<meta charset="utf-8">
+<title>Sistem First Run</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;1,800&family=Karantina:wght@700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone. Screens: "how do you want to train" choice -> coach code -> coach confirm; plus the meal-photo sheet redesign over the nutrition screen. Light-only by design. */
+:root {
+  --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6; --page: #F6F4F7; --pink: #FF006E; --cherry: #A50047; --blush: #FFE3EF; --purple: #7C4DFF;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1); --sheet: cubic-bezier(.32,.72,0,1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); color: var(--ink); direction: rtl; background: #E9E6EA; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+code.e { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.review { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.review button { height: 32px; padding: 0 12px; border: 0; border-radius: 16px; background: #fff; font-size: 12px; font-weight: 600; }
+.review button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.stage { display: flex; justify-content: center; }
+.phone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 54px; overflow: hidden; background: var(--page); box-shadow: 0 0 0 10px #141116, 0 0 0 11px #3a3540, 0 40px 90px rgba(20,17,22,0.3); }
+.island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 60; }
+.view { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; padding: 58px 20px 30px; transition: opacity 240ms ease, transform 360ms var(--ease-out); }
+.view::-webkit-scrollbar { display: none; }
+.view[data-off] { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+.back { width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; transition: transform 140ms var(--ease-out); }
+.back:active { transform: scale(0.94); }
+.steps { display: flex; gap: 4px; margin-top: 16px; }
+.steps i { flex: 1; height: 4px; border-radius: 2px; background: #E4E0E6; }
+.steps i.on { background: var(--ink); }
+h1.t { margin: 22px 0 0; font-family: var(--he); font-weight: 700; font-size: 56px; line-height: 0.82; }
+p.sub { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink2); }
+
+/* choice */
+.choices { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.ch { position: relative; overflow: hidden; border: 0; border-radius: 28px; padding: 20px; text-align: start; display: flex; flex-direction: column; gap: 10px; min-height: 196px; transition: transform 160ms var(--ease-out), box-shadow 200ms ease; }
+.ch:active { transform: scale(0.98); }
+.ch .ic { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.ch b { font-family: var(--he); font-weight: 700; font-size: 40px; line-height: 0.85; margin-top: auto; }
+.ch span { font-size: 14px; line-height: 1.45; }
+.ch .go { position: absolute; top: 20px; inset-inline-end: 20px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.ch.coach { background: var(--pink); color: #fff; box-shadow: 0 18px 36px rgba(255,0,110,0.3); }
+.ch.coach::before { content: ''; position: absolute; inset: 0; opacity: 0.25; mix-blend-mode: multiply; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.35 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.ch.coach > *:not(.go) { position: relative; }
+.ch.coach .ic { background: rgba(255,255,255,0.2); }
+.ch.coach .go { background: #fff; color: var(--pink); }
+.ch.solo { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(20,17,22,0.04), 0 12px 28px rgba(20,17,22,0.06); }
+.ch.solo .ic { background: var(--soft); color: var(--purple); }
+.ch.solo span { color: var(--muted); }
+.ch.solo .go { background: var(--ink); color: #fff; }
+.note { margin-top: 16px; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* code */
+.codebox { margin-top: 24px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; direction: ltr; }
+.codebox input { width: 100%; height: 62px; border: 0; border-radius: 16px; background: #fff; text-align: center; font-family: var(--num); font-weight: 700; font-size: 30px; text-transform: uppercase; box-shadow: inset 0 0 0 1.5px var(--rule); outline: 0; transition: box-shadow 150ms ease; }
+.codebox input:focus { box-shadow: inset 0 0 0 2px var(--pink); }
+.codebox.err input { box-shadow: inset 0 0 0 2px var(--cherry); animation: shake 320ms; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.errl { margin-top: 10px; font-size: 13px; color: var(--cherry); min-height: 20px; }
+.alt { margin-top: 10px; display: grid; gap: 8px; }
+.alt button { height: 54px; border: 0; border-radius: 18px; background: #fff; display: flex; align-items: center; gap: 12px; padding: 0 16px; font-weight: 600; font-size: 14px; text-align: start; transition: transform 140ms var(--ease-out); }
+.alt button span { flex: 1; } .alt button small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
+.alt button:active { transform: scale(0.98); }
+.alt .ai { width: 34px; height: 34px; border-radius: 11px; background: var(--soft); display: flex; align-items: center; justify-content: center; flex: none; }
+.cta { width: 100%; height: 58px; margin-top: 18px; border: 0; border-radius: 29px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 700; transition: transform 140ms var(--ease-out), opacity 150ms ease; }
+.cta:active { transform: scale(0.97); }
+.cta[disabled] { opacity: 0.35; }
+.lnk { display: block; margin: 14px auto 0; border: 0; background: none; color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* confirm */
+.coachc { margin-top: 26px; border-radius: 30px; background: #fff; overflow: hidden; box-shadow: 0 18px 40px rgba(124,77,255,0.10); text-align: center; }
+.coachc .band { height: 92px; background: linear-gradient(160deg, #FF2E86, #FF006E 55%, #E0005F); }
+.coachc .cav { width: 96px; height: 96px; margin: -52px auto 0; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--he); font-size: 40px; box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--pink); position: relative; }
+.coachc b { display: block; margin-top: 12px; font-family: var(--he); font-weight: 700; font-size: 44px; line-height: 0.85; }
+.coachc .meta { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.coachc .tags { display: flex; justify-content: center; gap: 6px; margin: 12px 0 18px; flex-wrap: wrap; padding: 0 14px; }
+.coachc .tags span { height: 28px; padding: 0 10px; border-radius: 14px; background: var(--blush); color: var(--cherry); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; }
+.coachc .what { border-top: 1px solid var(--rule); padding: 14px 18px; text-align: start; font-size: 13px; line-height: 1.55; color: var(--ink2); display: flex; gap: 10px; }
+.coachc .what svg { flex: none; margin-top: 2px; color: var(--purple); }
+
+/* nutrition backdrop + meal photo sheet */
+.nut { padding-top: 58px; }
+.nut h1 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 56px; line-height: 0.8; }
+.nut .ghost { margin-top: 18px; height: 120px; border-radius: 22px; background: #fff; }
+.scrim { position: absolute; inset: 0; z-index: 40; background: rgba(20,17,22,0.35); transition: opacity 240ms ease; }
+.scrim[data-off] { opacity: 0; pointer-events: none; }
+.sheet { position: absolute; inset-inline: 0; bottom: 0; z-index: 41; max-height: 90%; overflow-y: auto; border-radius: 32px 32px 0 0; background: #fff; padding: 0 20px 26px; box-shadow: 0 -20px 50px rgba(20,17,22,0.25); transition: transform 300ms var(--sheet); }
+.sheet[data-off] { transform: translateY(104%); transition-duration: 200ms; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #D8D3DB; margin: 10px auto 12px; }
+.sheet h3 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 44px; line-height: 0.85; }
+.lock { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.lbl { margin: 18px 0 8px; font-size: 13px; font-weight: 600; color: var(--ink2); display: flex; align-items: baseline; gap: 8px; }
+.meals { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+.meals::-webkit-scrollbar { display: none; }
+.meal { flex: none; height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--soft); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: background-color 150ms ease, color 150ms ease; }
+.meal small { font-family: var(--num); font-weight: 700; font-size: 13px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #fff; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; }
+.meal[aria-checked="true"] { background: var(--ink); color: #fff; } .meal[aria-checked="true"] small { background: var(--pink); color: #fff; }
+.acts { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; margin-top: 14px; }
+.act { height: 132px; border: 0; border-radius: 24px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 16px; text-align: start; transition: transform 140ms var(--ease-out); }
+.act:active { transform: scale(0.97); }
+.act b { font-family: var(--he); font-weight: 700; font-size: 30px; line-height: 0.85; } .act small { display: block; font-size: 12px; margin-top: 4px; opacity: 0.8; }
+.act .ai { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+.act.cam { background: var(--ink); color: #fff; } .act.cam .ai { background: var(--pink); }
+.act.gal { background: var(--soft); } .act.gal .ai { background: #fff; }
+.today { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.th { position: relative; aspect-ratio: 1; border: 0; border-radius: 16px; padding: 0; overflow: hidden; background: var(--g); }
+.th span { position: absolute; bottom: 6px; inset-inline-start: 6px; height: 20px; padding: 0 7px; border-radius: 10px; background: rgba(255,255,255,0.92); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; }
+.th time { position: absolute; top: 6px; inset-inline-end: 6px; height: 18px; padding: 0 6px; border-radius: 9px; background: rgba(20,17,22,0.55); color: #fff; font-family: var(--num); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; direction: ltr; }
+.empty { grid-column: 1 / -1; padding: 18px; border-radius: 18px; background: var(--soft); text-align: center; font-size: 13px; color: var(--muted); }
+.toast { position: absolute; left: 50%; bottom: 40px; z-index: 80; transform: translate(-50%, 20px); opacity: 0; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; white-space: nowrap; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) {
+  .ch.coach:hover { box-shadow: 0 22px 44px rgba(255,0,110,0.38); } .ch.solo:hover { box-shadow: 0 1px 2px rgba(20,17,22,0.04), 0 18px 36px rgba(20,17,22,0.1); }
+  .alt button:hover, .back:hover { background: #FBFAFB; } .cta:not([disabled]):hover { background: var(--ink2); }
+  .meal:not([aria-checked="true"]):hover { background: #ECE8EE; } .act.gal:hover { background: #ECE8EE; } .act.cam:hover { background: var(--ink2); }
+  .review button:not([aria-pressed="true"]):hover { background: #F5F3F6; }
+}
+@media (max-width: 440px) { body { padding: 0; } .review { padding: 10px 16px 0; } .phone { width: 100%; height: calc(100dvh - 60px); border-radius: 0; box-shadow: none; } .island { display: none; } .view { padding-top: max(18px, env(safe-area-inset-top, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .view, .sheet, .scrim, .toast { transition-duration: 1ms !important; } .codebox.err input { animation: none; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="review"><span>לבדיקה:</span><button type="button" data-go="choice" aria-pressed="true">בחירה</button><button type="button" data-go="code" aria-pressed="false">קוד מאמנת</button><button type="button" data-go="confirm" aria-pressed="false">אישור מאמנת</button><button type="button" data-go="meal" aria-pressed="false">תמונת ארוחה</button></div>
+<div class="stage"><div class="phone">
+  <div class="island" aria-hidden="true"></div>
+
+  <section class="view" id="choice" aria-label="איך תרצי להתאמן">
+    <div class="steps" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <h1 class="t">איך תרצי להתאמן?</h1>
+    <p class="sub">אפשר לשנות את זה בכל שלב מהפרופיל.</p>
+    <div class="choices">
+      <button class="ch coach" type="button" data-go="code"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2a5 5 0 0 1 6 4.8"/></svg></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></span><b>עם מאמנת</b><span>קיבלת קוד או קישור מהמאמנת שלך. היא תבנה לך תוכנית אישית.</span></button>
+      <button class="ch solo" type="button" data-solo><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4a2 2 0 1 0 0-.01M8 21l3-6 3 2v4M7 12l3-3 3 1 2 3h3"/></svg></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></span><b>לבד, בקצב שלי</b><span>אימונים, ריצה ותזונה בלי מאמנת. אפשר להצטרף למאמנת בכל שלב.</span></button>
+    </div>
+  </section>
+
+  <section class="view" id="code" aria-label="קוד מאמנת" data-off>
+    <button class="back" type="button" data-go="choice" aria-label="חזרה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button>
+    <div class="steps" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <h1 class="t">הקוד של המאמנת</h1>
+    <p class="sub">6 תווים. אפשר גם להדביק את הקישור שקיבלת.</p>
+    <div class="codebox" id="codebox" role="group" aria-label="קוד מאמנת"></div>
+    <div class="errl" id="errl" role="alert"></div>
+    <div class="alt">
+      <button type="button" data-paste><span class="ai"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span>הדבקת קישור<small>sistem.app/join/…</small></span></button>
+      <button type="button" data-qr><span class="ai"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span><span>סריקת QR<small>מהמסך או מהשלט בסטודיו</small></span></button>
+    </div>
+    <button class="cta" type="button" id="codeGo" disabled>המשך</button>
+    <button class="lnk" type="button" data-solo>אין לי עדיין קוד</button>
+  </section>
+
+  <section class="view" id="confirm" aria-label="אישור מאמנת" data-off>
+    <button class="back" type="button" data-go="code" aria-label="חזרה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button>
+    <div class="steps" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <h1 class="t">זאת המאמנת שלך?</h1>
+    <div class="coachc"><div class="band"></div><span class="cav">שק</span><b>שקד לוי</b><p class="meta">כוח ופונקציונלי · תל אביב</p>
+      <div class="tags"><span>Sistem Strong</span></div>
+      <div class="what"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>שקד תראה את התשובות שלך בשאלון, את המדידות ואת התמונות שתעלי. אף אחד אחר לא.</span></div></div>
+    <button class="cta" type="button" data-joined>כן, זאת היא</button>
+    <button class="lnk" type="button" data-go="code">לא, להכניס קוד אחר</button>
+  </section>
+
+  <section class="view nut" id="meal" aria-label="תזונה" data-off>
+    <h1>תזונה</h1><div class="ghost"></div><div class="ghost"></div>
+  </section>
+  <div class="scrim" id="scrim" data-off></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="תמונת ארוחה" data-off>
+    <div class="grab"></div>
+    <h3>תמונת ארוחה</h3>
+    <div class="lock"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>גלוי רק לך ולמאמנת שלך</div>
+    <div class="lbl">לאיזו ארוחה?</div>
+    <div class="meals" id="meals" role="radiogroup" aria-label="ארוחה"></div>
+    <div class="acts">
+      <button class="act cam" type="button" data-shot><span class="ai"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span><div><b>צילום</b><small>פותח את המצלמה</small></div></button>
+      <button class="act gal" type="button" data-shot><span class="ai"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span><div><b>גלריה</b><small>תמונה קיימת</small></div></button>
+    </div>
+    <div class="lbl"><code class="e" aria-hidden="true">TODAY</code>התמונות של היום</div>
+    <div class="today" id="today"></div>
+  </section>
+  <div class="toast" id="toast" role="status"></div>
+</div></div>
+
+<script>
+(function () {
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var V = ['choice', 'code', 'confirm', 'meal'];
+  var sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim');
+  function show(v) {
+    V.forEach(function (k) { document.getElementById(k).toggleAttribute('data-off', k !== v); });
+    document.querySelectorAll('.review [data-go]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.go === v); });
+    if (v === 'meal') openSheet(); else closeSheet();
+    if (v === 'code') setTimeout(function () { var f = document.querySelector('#codebox input'); if (f) f.focus({ preventScroll: true }); }, 300);
+  }
+  var tt; function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 1700); }
+
+  // code inputs (6 boxes, LTR, auto-advance, paste a code or a link)
+  var box = document.getElementById('codebox'), go = document.getElementById('codeGo'), errl = document.getElementById('errl');
+  box.innerHTML = [0, 1, 2, 3, 4, 5].map(function (i) { return '<input inputmode="text" autocomplete="one-time-code" maxlength="1" aria-label="תו ' + (i + 1) + '">'; }).join('');
+  var ins = box.querySelectorAll('input');
+  function val() { return [].map.call(ins, function (i) { return i.value.toUpperCase(); }).join(''); }
+  function fill(s) { s = s.replace(/^.*\/join\//i, '').replace(/[^a-z0-9]/gi, '').slice(0, 6).toUpperCase(); ins.forEach(function (i, k) { i.value = s[k] || ''; }); check(); var n = Math.min(s.length, 5); ins[n].focus(); }
+  function check() { go.disabled = val().length < 6; box.classList.remove('err'); errl.textContent = ''; }
+  ins.forEach(function (inp, k) {
+    inp.addEventListener('input', function () { inp.value = inp.value.replace(/[^a-z0-9]/gi, '').toUpperCase(); if (inp.value && k < 5) ins[k + 1].focus(); check(); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Backspace' && !inp.value && k > 0) ins[k - 1].focus(); });
+    inp.addEventListener('paste', function (e) { e.preventDefault(); fill((e.clipboardData || window.clipboardData).getData('text')); });
+  });
+  go.addEventListener('click', function () { if (val() === 'SHAKED' || val() === 'SHK123') return show('confirm'); box.classList.remove('err'); void box.offsetWidth; box.classList.add('err'); errl.textContent = 'הקוד לא תקין או שפג תוקפו. בדקי עם המאמנת שלך.'; });
+
+  // meal photo sheet
+  var MEALS = [['בוקר', 1], ['צהריים', 1], ['ביניים', 0], ['ערב', 0]], cur = 2;
+  var PH = [['בוקר', '08:12', 'linear-gradient(160deg,#FFE9D6,#F6B98A)'], ['צהריים', '13:20', 'linear-gradient(160deg,#F1E6FF,#C9A6FF)']];
+  function drawMeals() { document.getElementById('meals').innerHTML = MEALS.map(function (m, i) { return '<button type="button" class="meal" role="radio" aria-checked="' + (i === cur) + '" data-meal="' + i + '">' + m[0] + (m[1] ? '<small>' + m[1] + '</small>' : '') + '</button>'; }).join(''); }
+  function drawToday() { document.getElementById('today').innerHTML = PH.length ? PH.map(function (p) { return '<button type="button" class="th" style="--g:' + p[2] + '" aria-label="תמונת ' + p[0] + ' ' + p[1] + '"><time>' + p[1] + '</time><span>' + p[0] + '</span></button>'; }).join('') : '<div class="empty">עוד אין תמונות היום</div>'; }
+  drawMeals(); drawToday();
+  function openSheet() { sheet.removeAttribute('data-off'); scrim.removeAttribute('data-off'); }
+  function closeSheet() { sheet.setAttribute('data-off', ''); scrim.setAttribute('data-off', ''); }
+
+  document.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-go]'))) return show(t.dataset.go);
+    if (e.target.closest('[data-solo]')) return toast('ממשיכות לשאלון, במסלול העצמאי');
+    if (e.target.closest('[data-joined]')) return toast('הצטרפת לליווי של שקד · ממשיכות לשאלון');
+    if (e.target.closest('[data-paste]')) return fill('https://sistem.app/join/SHAKED');
+    if (e.target.closest('[data-qr]')) return toast('כאן תיפתח סריקת QR');
+    if ((t = e.target.closest('[data-meal]'))) { cur = +t.dataset.meal; return drawMeals(); }
+    if (e.target.closest('[data-shot]')) { var m = MEALS[cur]; m[1]++; var now = new Date(); PH.push([m[0], ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2), 'linear-gradient(160deg,#E1F1FF,#9ED3FF)']); drawMeals(); drawToday(); return toast('התמונה נשמרה לארוחת ' + m[0]); }
+    if (e.target === scrim) { closeSheet(); return; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+})();
+</script>

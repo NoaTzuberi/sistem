@@ -1,16 +1,20 @@
 import type { PlanCardio, WorkoutKind } from './cardio';
+import type { CoachingStatus } from './accounts';
 
 // API contract types shared by the mobile app, the coach dashboard and the server.
 // Types only — no runtime code, so the server (CommonJS) can use `import type`.
 
-export type UserRole = 'trainee' | 'coach';
+/** A person may hold several roles (accounts & relationships): e.g. a coach who is also the platform admin. */
+export type UserRole = 'trainee' | 'coach' | 'admin';
 
 /**
  * Where a signed-in user belongs, decided by the server (PRD §4.2).
  * 'onboarding' → questionnaire, 'waiting' → plan is being built, 'home' → trainee
- * Home, 'coach' → coach mode.
+ * Home, 'coach' → coach mode, 'no_coach' → onboarded but not linked to any coach yet (enter a coach code),
+ * 'admin' → an admin without a coach role (the dashboard only).
  */
-export type AppState = 'onboarding' | 'waiting' | 'home' | 'coach';
+/** 'choose_path' = the first-run "how do you want to train" screen (no coach, no choice yet). */
+export type AppState = 'choose_path' | 'onboarding' | 'waiting' | 'home' | 'coach' | 'admin';
 
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
 
@@ -18,8 +22,13 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  /** Every role she holds. */
+  roles: UserRole[];
+  /** The primary role (admin > coach > trainee) — kept until both clients read `roles`. */
   role: UserRole;
   appState: AppState;
+  /** Her current coaching's status; null = self-guided (no live coaching). Trainees only. */
+  coachingStatus: CoachingStatus | null;
   onboardingStatus: OnboardingStatus;
   /** Computed from onboardingStatus — kept so older screens keep working. */
   onboardingCompleted: boolean;
@@ -31,12 +40,16 @@ export interface AuthUser {
   units: UnitPreferences;
   /** UI language (Phase 15), default 'he'. Server-built texts follow it too. */
   language: Language;
+  /** Her profile photo (signed, expiring link), or null = initials. */
+  avatar: PrivatePhoto | null;
   createdAt: string;
 }
 
 export interface AuthResponse {
   token: string;
   user: AuthUser;
+  /** Sign-up only: the invite code could not be used (the account was still made). */
+  inviteError?: { code: string; message: string };
 }
 
 export interface LoginPayload {
@@ -53,6 +66,8 @@ export interface RegisterPayload {
   timezone?: string;
   /** The language on screen when she signed up (Phase 15); default Hebrew. */
   language?: Language;
+  /** A /join code she arrived with: redeemed together with the sign-up (coaching or community). */
+  inviteCode?: string;
 }
 
 /**
@@ -549,11 +564,16 @@ export interface WorkoutLogStats {
   prCount: number;
 }
 
+/** 'plan' = a workout of a coach's plan; 'free' = one she built herself (no plan, trainee-owned). */
+export type WorkoutLogSource = 'plan' | 'free';
+
 export interface WorkoutLog {
   id: string;
   traineeId: string;
-  planId: string;
-  workoutId: string;
+  source: WorkoutLogSource;
+  /** null for a free workout. */
+  planId: string | null;
+  workoutId: string | null;
   workoutTitle: string;
   status: WorkoutLogStatus;
   startedAt: string;
@@ -611,11 +631,21 @@ export interface WorkoutSummaryPayload {
 /** Enough to point at an open session (Home's "Resume", the start conflict). */
 export interface ActiveWorkoutRef {
   logId: string;
-  planId: string;
-  workoutId: string;
+  source: WorkoutLogSource;
+  planId: string | null;
+  workoutId: string | null;
   workoutTitle: string;
   startedAt: string;
 }
+
+/** POST /workout-logs/free — a workout she builds herself (scratch, a past log again, or by muscles). */
+export type StartFreeWorkoutPayload =
+  | { mode: 'scratch' }
+  | { mode: 'repeat'; fromLogId: string }
+  | { mode: 'muscle'; muscles: string[] };
+
+/** Her muscle-focus ids (the onboarding list) for the free workout's "by muscle" mode. */
+export type FreeWorkoutMuscle = 'chest' | 'back' | 'shoulders' | 'arms' | 'core' | 'glutes' | 'legs' | 'full_body';
 
 /** Her most recent completed performance of one exercise ("Last time: 40 kg × 10"). */
 export interface LastPerformance {
@@ -832,6 +862,8 @@ export interface CoachTraineeSummary {
   id: string;
   name: string;
   email: string;
+  /** Her profile photo (signed, expiring link), or null = initials. */
+  avatar: PrivatePhoto | null;
   onboardingStatus: OnboardingStatus;
   onboardingCompletedAt: string | null;
   timezone: string;
@@ -845,6 +877,11 @@ export interface CoachTraineeSummary {
   lastActivityAt: string | null;
   /** 'YYYY-MM-DD' Sunday of the current week in the trainee's time zone. */
   currentWeekStart: string;
+  /** The coaching (this coach ↔ this trainee) every coach-owned record of hers belongs to. */
+  coachingId: string;
+  coachingStatus: CoachingStatus;
+  /** When she joined this coach (the 48h window starts at the later of this and onboarding). */
+  coachingStartedAt: string;
 }
 
 export interface CoachTraineeDetail extends CoachTraineeSummary {
@@ -855,6 +892,16 @@ export interface CoachTraineeDetail extends CoachTraineeSummary {
 export interface CoachTraineeList {
   items: CoachTraineeSummary[];
   serverTime: string;
+}
+
+/** PUT / DELETE /users/me/avatar answer with her updated account. */
+export interface AvatarResponse {
+  user: AuthUser;
+}
+
+/** GET /users/me/avatar — a fresh link once the old one expired. */
+export interface AvatarLinkResponse {
+  avatar: PrivatePhoto | null;
 }
 
 /** GET /coach/trainees/:traineeId */
@@ -1974,6 +2021,8 @@ export interface ApplyNutritionTemplatePayload {
 // ---------------------------------------------------------------------------
 
 export interface MealPhoto extends PrivatePhoto {
+  /** This photo's own id (a meal can hold several photos a day). */
+  id: string;
   mealId: string;
   /** The meal's name when the photo was added. */
   mealName: string;
@@ -1992,14 +2041,34 @@ export interface MealLogDay {
   editable: boolean;
   /** Anything stored for this day. */
   logged: boolean;
-  /** The meals of that version, for the photo slots (id + name). */
+  /** The meals of that version, for the photo slots (id + name); default meals for portions-only / her own target. */
   meals: { id: string; name: string }[];
+  /** What the day is tracked against: a coach's plan, her own target ("היעד שלי"), or nothing yet. */
+  source: 'plan' | 'own' | null;
+}
+
+/** "היעד שלי": the daily portions a self-guided trainee sets for herself. */
+export interface OwnNutritionTarget {
+  portions: PortionCounts;
+  /** Vegetables are free (shown as a line, never tracked). */
+  freeVegetables: boolean;
+  updatedAt: string;
+}
+
+/** PUT /meal-logs/target */
+export interface SaveOwnNutritionTargetPayload {
+  portions: PortionCounts;
+  freeVegetables: boolean;
 }
 
 /** GET /meal-logs?from=&to= (trainee; at most the editable window). */
 export interface MealLogDaysResponse {
   today: string;
   days: MealLogDay[];
+  /** Her own target, or null (also when a coach's plan is what she tracks against). */
+  ownTarget: OwnNutritionTarget | null;
+  /** True when a coach nutrition plan is live — then her own target is not used. */
+  hasCoachPlan: boolean;
 }
 
 /** PUT /meal-logs/:date — the whole day's marks (last write wins). */
@@ -2033,3 +2102,4 @@ export interface MarkTabSeenPayload {
 
 // Cardio sessions + logs.
 export * from './cardio';
+export * from './accounts';

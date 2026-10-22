@@ -1,0 +1,91 @@
+.fr-code-error {
+  min-height: calc(var(--space-3) + var(--space-1));
+  margin: calc(var(--space-2) + var(--space-1) / 2) 0 0;
+  color: var(--color-fr-cherry);
+  font-size: var(--text-subscreen-label);
+}
+
+.fr-code-options {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: calc(var(--space-2) + var(--space-1) / 2);
+}
+
+.fr-code-solo {
+  text-align: center;
+}
+
+.fr-code-note {
+  margin: var(--space-1) 0 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-xs);
+}
+
+/* The ink call to action (also the confirm screen's). */
+.fr-cta {
+  width: 100%;
+  min-height: var(--size-fr-cta);
+  margin-block-start: calc(var(--space-3) + var(--space-1) / 2);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fr-cta:active:not([disabled]) {
+  transform: scale(var(--scale-fr-press));
+}
+
+/* Disabled: a soft fill with readable ink — never faded white text. */
+.fr-cta[disabled] {
+  background-color: var(--color-fr-step-rest);
+  color: var(--color-fr-muted);
+  cursor: default;
+}
+
+/* A quiet text link under the call to action (a 44px target). */
+.fr-link {
+  display: block;
+  min-height: var(--touch-target-min);
+  margin: var(--space-2) auto 0;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--color-fr-muted);
+  font: inherit;
+  font-size: var(--text-subscreen-label);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.fr-link:active {
+  transform: scale(var(--scale-fr-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fr-cta {
+    transition: transform var(--transition-press) var(--ease-fr-out), background-color var(--transition-hover) ease;
+  }
+
+  .fr-cta:not([disabled]):hover {
+    background-color: var(--color-ink-raised);
+  }
+
+  .fr-link:hover {
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fr-cta {
+    transition: none;
+  }
+}

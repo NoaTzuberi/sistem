@@ -23,6 +23,9 @@ import { Icon } from '../../../../components/common/Icon/Icon';
 import { PageHeader } from '../../../../components/common/PageHeader/PageHeader';
 import { StateLine } from '../../../../components/common/StateLine/StateLine';
 import { Tag } from '../../../../components/common/Tag/Tag';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { InviteSheet } from '../../../invites/components/InviteSheet/InviteSheet';
+import { invitesCopy } from '../../../invites/copy';
 import { useCoachData } from '../../../../services/coach/CoachDataContext';
 import { WeekSquares } from '../../components/WeekSquares/WeekSquares';
 import { traineesCopy } from '../../copy';
@@ -41,6 +44,8 @@ export function TraineesPage() {
   const { openDrawer } = useTraineeDrawer();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
+  const invites = useCopy(invitesCopy);
 
   // The filter lives in the URL: the sidebar's "waiting for a plan" is a link to it.
   const filters: { id: TraineeFilter; label: string }[] = [
@@ -62,7 +67,12 @@ export function TraineesPage() {
       <PageHeader
         title={shared.coach.traineesTitle}
         subtitle={hasTrainees ? fill(copy.listSubtitle, { active: countFor('active'), waiting: countFor('waiting') }) : undefined}
-      />
+      >
+        <PillButton variant="primary" onClick={() => setIsInviting(true)}>
+          {invites.button}
+        </PillButton>
+      </PageHeader>
+      <InviteSheet isOpen={isInviting} onClose={() => setIsInviting(false)} />
 
       <div className="trainees-toolbar">
         <div className="trainees-filters" role="group" aria-label={shared.coach.filterLabel}>

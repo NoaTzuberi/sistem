@@ -1,0 +1,13 @@
+.fr-choices {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + var(--space-1));
+  margin-block-start: var(--space-4);
+}
+
+.fr-choice-error {
+  margin: var(--space-3) 0 0;
+  color: var(--color-fr-cherry);
+  font-size: var(--text-subscreen-label);
+  text-align: center;
+}

@@ -24,7 +24,7 @@ export async function getLatestTraineeRecommendation(req: AuthenticatedRequest, 
   }
   const unavailable = aiUnavailableReason();
   const body: AiRecommendationLatest = {
-    recommendation: await getLatestRecommendation(req.traineeId!, type, requestLanguage(req)),
+    recommendation: await getLatestRecommendation(req.coachingId!, type, requestLanguage(req)),
     unavailableReason: unavailable ? translate(requestLanguage(req), unavailable) : null,
   };
   res.status(200).json(body);
@@ -36,7 +36,7 @@ export async function getTraineeRecommendation(req: AuthenticatedRequest, res: R
     sendError(res, 400, validationError);
     return;
   }
-  const recommendation = await getRecommendation(req.traineeId!, String(req.params.recommendationId), requestLanguage(req));
+  const recommendation = await getRecommendation(req.coachingId!, String(req.params.recommendationId), requestLanguage(req));
   if (!recommendation) {
     sendError(res, 404, 'ai_recommendation_not_found');
     return;
@@ -70,6 +70,7 @@ export async function createTraineeRecommendation(req: AuthenticatedRequest, res
   const started = await startRecommendation({
     traineeId: req.traineeId!,
     coachId: req.userId!,
+    coachingId: req.coachingId!,
     type,
     trigger: 'coach',
     request: splitId ? { splitId } : null,

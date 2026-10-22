@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import { Types } from 'mongoose';
 import type { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { sendError } from '../../i18n';
-import { User } from '../users/user.model';
+import { findLiveCoaching } from '../coachings/coaching.service';
 import {
   FamilyNotFoundError,
   FamilyRequestError,
@@ -28,10 +28,10 @@ async function handle(res: Response, run: () => Promise<unknown>) {
   }
 }
 
-/** A traineeId in a query must be one of this coach's trainees (same 404 as a missing one). */
+/** A traineeId in a query must be one of this coach's trainees — a live coaching (same 404 as a missing one). */
 async function traineeIsHers(coachId: string, traineeId: string | undefined): Promise<boolean> {
   if (!traineeId) return true;
-  return Boolean(await User.exists({ _id: traineeId, role: 'trainee', coachId }));
+  return (await findLiveCoaching(traineeId, coachId)) !== null;
 }
 
 export async function getFamilies(req: AuthenticatedRequest, res: Response) {
@@ -94,5 +94,5 @@ export async function postFamilySplit(req: AuthenticatedRequest, res: Response) 
 export async function getTraineeFamilyHistory(req: AuthenticatedRequest, res: Response) {
   const familyId = typeof req.query.familyId === 'string' ? req.query.familyId : '';
   if (!Types.ObjectId.isValid(familyId)) return sendError(res, 400, 'family_invalid_id');
-  await handle(res, () => getFamilyHistory(req.traineeId!, familyId));
+  await handle(res, () => getFamilyHistory(req.traineeId!, req.coachingId!, familyId));
 }

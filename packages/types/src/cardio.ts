@@ -39,9 +39,12 @@ export interface PlanCardio {
 
 export interface CardioLog {
   id: string;
-  planId: string;
-  /** The PlanWorkout's id. */
-  workoutId: string;
+  /** null for a run of her own cardio workout. */
+  planId: string | null;
+  /** The PlanWorkout's id (null for her own cardio workout). */
+  workoutId: string | null;
+  /** Her own cardio workout's id, or null for a plan workout. */
+  ownWorkoutId: string | null;
   /** Copied when saved, so history survives later edits. */
   workoutTitle: string;
   sport: CardioSport;
@@ -58,9 +61,11 @@ export interface CardioLog {
   createdAt: string;
 }
 
+/** A plan workout (planId + workoutId) OR her own cardio workout (ownWorkoutId). */
 export interface SaveCardioLogPayload {
-  planId: string;
-  workoutId: string;
+  planId?: string;
+  workoutId?: string;
+  ownWorkoutId?: string;
   completedSec: number;
   roundsDone: number;
   highIntensitySec: number;
@@ -71,8 +76,10 @@ export interface SaveCardioLogPayload {
 
 /** GET /api/cardio/plans/:planId/workouts/:workoutId — one cardio workout of her published plan. */
 export interface TraineeCardioWorkoutResponse {
-  planId: string;
-  weekStartDate: string;
+  /** null for her own cardio workout (then ownWorkoutId is set). */
+  planId: string | null;
+  ownWorkoutId: string | null;
+  weekStartDate: string | null;
   workout: PlanWorkout & { kind: 'cardio'; cardio: PlanCardio };
   /** Its day ('YYYY-MM-DD'), or null for a workout without a day. */
   date: string | null;
@@ -87,4 +94,28 @@ export interface TraineeCardioWorkoutResponse {
 export interface CoachCardioLogList {
   /** Newest first. */
   items: CardioLog[];
+}
+
+// ---------------------------------------------------------------------------
+// Her own cardio workouts (self-guided "build a run"): trainee-owned, no plan, no coaching.
+// ---------------------------------------------------------------------------
+
+export interface OwnCardioWorkout {
+  id: string;
+  title: string;
+  cardio: PlanCardio;
+  /** Her runs of it so far. */
+  runs: number;
+  lastRunDate: string | null;
+  updatedAt: string;
+}
+
+/** POST /cardio/own, PUT /cardio/own/:id. */
+export interface SaveOwnCardioWorkoutPayload {
+  title: string;
+  cardio: PlanCardio;
+}
+
+export interface OwnCardioWorkoutList {
+  items: OwnCardioWorkout[];
 }

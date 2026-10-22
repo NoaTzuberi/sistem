@@ -6,6 +6,10 @@ import app from '../app';
 import { config } from '../config/env';
 import { User } from '../features/users/user.model';
 import type { UserDocument } from '../features/users/user.model';
+import type { UserRole } from '@sistem/types';
+import { ensureCoachSetup } from '../features/coachProfiles/coachProfile.service';
+import { Coaching } from '../features/coachings/coaching.model';
+import { getPrimaryCommunityId, joinCommunity } from '../features/communities/community.service';
 
 // Test helper: runs the real Express app (every middleware and route) on a random
 // port and calls it with Node's built-in fetch — no extra test dependency.
@@ -62,8 +66,37 @@ export function tokenFor(userId: Types.ObjectId | string): string {
   return jwt.sign({ sub: String(userId) }, config.jwtSecret, { expiresIn: '1h' });
 }
 
+/**
+ * Test shorthand, kept from before accounts & relationships: `role` = her one role, `coachId` = she
+ * joined that coach (a live Coaching, status `coachingStatus` — default 'waiting' — + the coach's
+ * primary community). A coach gets her profile + primary community, like an admin-created one.
+ */
+type TestUserFields = Omit<Partial<UserDocument>, 'roles'> & {
+  role?: UserRole;
+  roles?: UserRole[];
+  coachId?: Types.ObjectId | string | null;
+  coachingStatus?: 'waiting' | 'active';
+};
+
 /** Creates a user directly (no bcrypt — these tests never log in with a password). */
-export async function createTestUser(email: string, fields: Partial<UserDocument> = {}) {
-  const user = await User.create({ name: email.split('@')[0], email, passwordHash: 'not-a-real-hash', ...fields });
-  return { user, id: String(user._id), token: tokenFor(user._id) };
+export async function createTestUser(email: string, fields: TestUserFields = {}) {
+  const { role, roles, coachId, coachingStatus = 'waiting', ...rest } = fields;
+  const user = await User.create({
+    name: email.split('@')[0],
+    email,
+    passwordHash: 'not-a-real-hash',
+    roles: roles ?? [role ?? 'trainee'],
+    ...rest,
+  });
+  if (user.roles.includes('coach')) await ensureCoachSetup(user._id, user.name);
+  let coachingId: string | null = null;
+  if (coachId) {
+    // Joined before (or as) she onboarded — the usual invite flow — so the 48h window counts from onboarding.
+    const joinedAt = new Date(Math.min(user.createdAt.getTime(), user.onboardingCompletedAt?.getTime() ?? Infinity));
+    const coaching = await Coaching.create({ traineeId: user._id, coachId, status: coachingStatus, startedAt: joinedAt });
+    coachingId = String(coaching._id);
+    const communityId = await getPrimaryCommunityId(coachId);
+    if (communityId) await joinCommunity(user._id, communityId);
+  }
+  return { user, id: String(user._id), token: tokenFor(user._id), coachingId };
 }

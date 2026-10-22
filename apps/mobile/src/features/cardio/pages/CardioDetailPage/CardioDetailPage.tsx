@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IconCheck } from '@tabler/icons-react';
 import { cardioMinutes, cardioTimeline, cardioTotals, formatClock, useCopy, useLoad } from '@sistem/shared';
-import { cardioRunPath } from '../../../../app/config/routes';
+import { cardioRunPath, ownCardioEditPath, ownCardioRunPath } from '../../../../app/config/routes';
 import { SlideToStart } from '../../../../components/common/SlideToStart/SlideToStart';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { appCopy } from '../../../../copy';
-import { getCardioWorkout } from '../../../../services/cardio/cardioService';
+import { getCardioWorkout, getOwnCardioWorkout } from '../../../../services/cardio/cardioService';
 import { BackButton } from '../../../workouts/components/BackButton/BackButton';
 import { CardioCoachNote } from '../../components/CardioCoachNote/CardioCoachNote';
 import { CardioGraph } from '../../components/CardioGraph/CardioGraph';
@@ -24,14 +24,17 @@ import './CardioDetailPage.css';
 /** The slide shows its done state this long before the 3-2-1 starts. */
 const START_DELAY_MS = 500;
 
-/** One cardio workout of her plan (docs/design/trainee-cardio.html): its shape, the coach's note, the steps, start. */
-export function CardioDetailPage() {
+/**
+ * One cardio workout of her plan (docs/design/trainee-cardio.html): its shape, the coach's note, the steps,
+ * start. `own` = one she built herself (self-guided): always startable, with an edit link.
+ */
+export function CardioDetailPage({ own = false }: { own?: boolean }) {
   const copy = useCopy(cardioCopy);
   const weekdays = useCopy(appCopy).eyebrow.weekdays;
   const navigate = useNavigate();
-  const { planId = '', workoutId = '' } = useParams();
+  const { planId = '', workoutId = '', id = '' } = useParams();
   const savedMessage = (useLocation().state as { saved?: string } | null)?.saved;
-  const load = useCallback(() => getCardioWorkout(planId, workoutId), [planId, workoutId]);
+  const load = useCallback(() => (own ? getOwnCardioWorkout(id) : getCardioWorkout(planId, workoutId)), [own, id, planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
   const { prefs, change } = useCardioPrefs();
   const startTimer = useRef<number | undefined>(undefined);
@@ -62,13 +65,18 @@ export function CardioDetailPage() {
 
   function start() {
     window.clearTimeout(startTimer.current);
-    startTimer.current = window.setTimeout(() => navigate(cardioRunPath(planId, workoutId)), START_DELAY_MS);
+    startTimer.current = window.setTimeout(() => navigate(own ? ownCardioRunPath(id) : cardioRunPath(planId, workoutId)), START_DELAY_MS);
   }
 
   return (
     <div className={'cp-detail' + (data.canStart ? ' cp-detail-with-slide' : '')}>
       <div className="cp-detail-top">
         <BackButton />
+        {own && (
+          <button type="button" className="cp-detail-edit" onClick={() => navigate(ownCardioEditPath(id))}>
+            {copy.ownEdit}
+          </button>
+        )}
       </div>
       <code className="cp-detail-eyebrow" aria-hidden="true">
         {detailEyebrow(cardio.sport, data.date, weekdays)}

@@ -1,0 +1,5 @@
+.fr-confirm-loading {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-6);
+}

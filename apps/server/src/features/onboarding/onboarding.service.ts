@@ -23,6 +23,7 @@ import { PLAN_WAIT_MS } from './onboarding.constants';
 import { OnboardingResponse } from './onboardingResponse.model';
 import type { OnboardingAnswersFields, OnboardingResponseDocument, WeightGoalFields } from './onboardingResponse.model';
 import { LocalizedError } from '../../i18n';
+import { getCurrentCoaching, listLiveCoachings, planWindowStart } from '../coachings/coaching.service';
 
 export class OnboardingUserNotFoundError extends LocalizedError {}
 
@@ -204,12 +205,12 @@ export async function getMyOnboarding(userId: string): Promise<MyOnboarding> {
  * app state so the screen can move to Home as soon as a plan is published.
  */
 export async function getWaitingStatus(userId: string): Promise<WaitingStatus> {
-  const user = await findTrainee(userId);
-  const completedAt = user.onboardingCompletedAt;
+  const [user, coaching] = await Promise.all([findTrainee(userId), getCurrentCoaching(userId)]);
+  const windowStart = planWindowStart(user.onboardingCompletedAt ?? null, coaching?.startedAt ?? null);
   return {
-    appState: await getAppState(userId, user),
+    appState: (await getAppState(userId, user)).appState,
     serverTime: new Date().toISOString(),
-    planDueAt: completedAt ? new Date(completedAt.getTime() + PLAN_WAIT_MS).toISOString() : null,
+    planDueAt: windowStart ? new Date(windowStart.getTime() + PLAN_WAIT_MS).toISOString() : null,
   };
 }
 
@@ -249,6 +250,9 @@ export async function completeOnboarding(userId: string, payload: OnboardingAnsw
   response.completedAt ??= now;
   user.onboardingStatus = 'completed';
   user.onboardingCompletedAt ??= now;
+  // Finishing without a coach = self-guided (a normal state; she can join a coach later).
+  const liveCoachings = await listLiveCoachings(user.id);
+  if (liveCoachings.length === 0) user.selfGuidedAt ??= now;
 
   await response.save();
   await user.save();
@@ -260,11 +264,11 @@ export async function completeOnboarding(userId: string, payload: OnboardingAnsw
     if (response.answers.weight !== undefined) {
       await recordOnboardingWeight(user.id, localDateString(now, user.timezone), response.answers.weight);
     }
-    emitAppEvent('trainee.onboarded', {
-      traineeId: user.id,
-      coachId: user.coachId ? String(user.coachId) : null,
-      completedAt: now,
-    });
+    // Each coach she already joined (invite at sign-up) hears about her now; with none, nobody does
+    // until she joins one (the join emits it then).
+    for (const coaching of liveCoachings) {
+      emitAppEvent('trainee.onboarded', { traineeId: user.id, coachId: String(coaching.coachId), coachingId: String(coaching._id), completedAt: now });
+    }
   }
 
   return { user: await toPublicUser(user), onboarding: toMyOnboarding(user, response) };

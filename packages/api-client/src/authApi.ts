@@ -1,5 +1,14 @@
 import type { AxiosInstance } from 'axios';
-import type { AuthResponse, AuthUser, LoginPayload, RegisterPayload, UpdatePreferencesPayload } from '@sistem/types';
+import type {
+  AuthResponse,
+  AuthUser,
+  AvatarLinkResponse,
+  AvatarResponse,
+  LoginPayload,
+  PrivatePhoto,
+  RegisterPayload,
+  UpdatePreferencesPayload,
+} from '@sistem/types';
 import { extractErrorMessage } from './createApiClient';
 
 // Auth calls shared by the mobile app and the coach dashboard. Errors are rethrown
@@ -48,13 +57,53 @@ export function createAuthApi(client: AxiosInstance) {
     }
   }
 
+  /** The admin's one-time link (coach accounts): sets the password and signs her in. */
+  async function setPassword(token: string, password: string): Promise<AuthResponse> {
+    try {
+      const { data } = await client.post<AuthResponse>('/auth/set-password', { token, password });
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, ''));
+    }
+  }
+
   /** Her display units and / or UI language (Settings, both apps); answers the updated user. */
   async function updatePreferences(payload: UpdatePreferencesPayload): Promise<AuthUser> {
     const { data } = await client.patch<{ user: AuthUser }>('/users/preferences', payload);
     return data.user;
   }
 
-  return { register, login, fetchCurrentUser, requestPasswordReset, resetPassword, updatePreferences };
+  /** Her profile photo: a cropped JPEG as the raw body. Answers the updated user (avatar = signed link). */
+  async function uploadAvatar(photo: Blob): Promise<AuthUser> {
+    const { data } = await client.put<AvatarResponse>('/users/me/avatar', photo, {
+      headers: { 'Content-Type': photo.type || 'image/jpeg' },
+    });
+    return data.user;
+  }
+
+  async function removeAvatar(): Promise<AuthUser> {
+    const { data } = await client.delete<AvatarResponse>('/users/me/avatar');
+    return data.user;
+  }
+
+  /** A fresh signed link, once the one she has expired. */
+  async function fetchAvatar(): Promise<PrivatePhoto | null> {
+    const { data } = await client.get<AvatarLinkResponse>('/users/me/avatar');
+    return data.avatar;
+  }
+
+  return {
+    register,
+    login,
+    fetchCurrentUser,
+    requestPasswordReset,
+    setPassword,
+    resetPassword,
+    updatePreferences,
+    uploadAvatar,
+    removeAvatar,
+    fetchAvatar,
+  };
 }
 
 export type AuthApi = ReturnType<typeof createAuthApi>;

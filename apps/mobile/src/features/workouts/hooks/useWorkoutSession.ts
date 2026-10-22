@@ -10,6 +10,7 @@ import {
   updateWorkoutSets,
 } from '../../../services/workoutLogs/workoutLogsService';
 import { clearCachedSession, loadCachedSession, saveCachedSession } from '../data/sessionCache';
+import { addFreeExercise } from '../../../services/workoutLogs/freeWorkoutService';
 import type { CachedSession } from '../data/sessionCache';
 import { MAX_SETS_PER_EXERCISE, SYNC_DEBOUNCE_MS, SYNC_RETRY_MS } from '../data/sessionConfig';
 import {
@@ -395,10 +396,42 @@ export function useWorkoutSession(logId: string) {
     };
   }, []);
 
+  /**
+   * A free workout: one more exercise (online only — the server makes its sets). Values she already
+   * changed stay; the new exercise's sets join with the server's pre-fill. Returns an error line or null.
+   */
+  const addExercise = useCallback(
+    async (exerciseId: string): Promise<string | null> => {
+      try {
+        const fresh = await addFreeExercise(logId, exerciseId);
+        const cached = cacheRef.current;
+        if (cached) {
+          cached.session = withPendingExtraSets(fresh, Object.values(cached.pending));
+          persist();
+        }
+        const merged = { ...initialValues(fresh), ...valuesRef.current };
+        valuesRef.current = merged;
+        setValues(merged);
+        setSession(cached?.session ?? fresh);
+        return null;
+      } catch (error) {
+        if (statusOf(error) === 409) {
+          void handleNotActive();
+          return workoutCopy[getActiveLanguage()].session.notActive;
+        }
+        return isNetworkError(error)
+          ? workoutCopy[getActiveLanguage()].free.addOffline
+          : extractErrorMessage(error, workoutCopy[getActiveLanguage()].free.addError);
+      }
+    },
+    [handleNotActive, logId, persist],
+  );
+
   return {
     session,
     model,
     values,
+    addExercise,
     loadError,
     ended,
     syncState,

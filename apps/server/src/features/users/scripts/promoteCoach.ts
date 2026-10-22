@@ -1,19 +1,19 @@
 /**
- * DEV ONLY: promote an existing user to role=coach, so coach mode and the coach
- * dashboard can be tested with a real account.
+ * DEV ONLY: give an existing user the coach role (+ her coach profile and primary community), so
+ * coach mode and the dashboard can be tested with a real account. In production coaches are created
+ * by the admin (dashboard → Coaches), never promoted.
  *
  *   npm run promote:coach -- <email>                  (local database)
  *   npm run promote:coach -- <email> --allow-remote   (non-local dev database)
  *
- * Refuses to run when NODE_ENV=production. Refuses a non-local database unless
- * --allow-remote is passed, and always prints which database it is about to touch.
- * If the promoted coach is now the default coach (DEFAULT_COACH_EMAIL, or the only
- * coach), trainees without a coach are assigned to her.
+ * Refuses to run when NODE_ENV=production. Refuses a non-local database unless --allow-remote is
+ * passed, and always prints which database it is about to touch. Trainees are never assigned to her:
+ * they join through her invite link.
  */
 import mongoose from 'mongoose';
 import { connectDatabase } from '../../../config/database';
-import { User } from '../user.model';
-import { resolveDefaultCoachId, assignUnassignedTrainees } from '../coachAssignment.service';
+import { User, hasRole } from '../user.model';
+import { ensureCoachSetup } from '../../coachProfiles/coachProfile.service';
 import { assertDevDatabase } from './devDatabaseGuard';
 
 async function main() {
@@ -36,21 +36,14 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    if (user.role === 'coach') {
-      console.log(`${email} is already a coach. Nothing changed.`);
+    if (hasRole(user, 'coach')) {
+      console.log(`${email} is already a coach.`);
     } else {
-      user.role = 'coach';
-      // A coach has no coach of her own.
-      user.coachId = null;
+      user.roles = [...user.roles, 'coach'];
       await user.save();
       console.log(`${email} is now a coach.`);
     }
-
-    const defaultCoachId = await resolveDefaultCoachId();
-    if (defaultCoachId?.equals(user._id)) {
-      const assigned = await assignUnassignedTrainees(user._id);
-      console.log(`Assigned ${assigned} unassigned trainee(s) to ${email}.`);
-    }
+    await ensureCoachSetup(user._id, user.name);
   } finally {
     await mongoose.disconnect();
   }

@@ -12,6 +12,7 @@ import { clearTabUpdate, useTabUpdates } from '../../../features/nutrition/tabUp
 import { appCopy } from '../../../copy';
 import { useDockVisible } from './dockStore';
 import './AppDock.css';
+import { appRole } from '../../../services/auth/appRole';
 
 const ICON_SIZE = 21;
 const ICON_STROKE = 2.2;
@@ -46,9 +47,10 @@ export function AppDock({ busy }: AppDockProps) {
   const copy = useCopy(appCopy);
   const { pathname } = useLocation();
   const visible = useDockVisible();
-  const isTrainee = user?.role === 'trainee';
+  const role = appRole(user);
+  const isTrainee = role === 'trainee';
   const updates = useTabUpdates(isTrainee);
-  const tabs = user ? TABS[user.role] : [];
+  const tabs = role ? TABS[role] : [];
   const currentIndex = tabIndexOf(pathname);
   const current = currentIndex === null ? null : tabs[currentIndex];
   const openUpdateTab = isTrainee && (current?.id === 'workouts' || current?.id === 'nutrition') ? current.id : null;
