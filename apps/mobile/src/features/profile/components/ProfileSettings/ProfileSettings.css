@@ -7,10 +7,22 @@
   outline: none;
 }
 
+/* Two white grouped cards, 10px apart; dividers between rows only. */
 .pf-settings-list {
-  margin: var(--space-1) 0 0;
-  padding: 0;
+  margin: var(--space-2) 0 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-card);
   list-style: none;
+}
+
+.pf-settings-list + .pf-settings-list {
+  margin-block-start: var(--space-profile-group-gap);
+}
+
+.pf-settings-list > li:last-child,
+.pf-settings-list > li:last-child > .pf-row {
+  border-block-end: 0;
 }
 
 .pf-row {
@@ -110,20 +122,20 @@ a.pf-row:active {
 }
 
 .pf-settings-error {
-  padding-block: var(--space-1);
+  margin: 0;
+  padding: var(--space-1) var(--space-3) 0;
   font-size: var(--text-xs);
   color: var(--color-error);
 }
 
-/* Log out: outlined, Cherry text. */
+/* Log out: a white pill, Cherry text. */
 .pf-logout {
   width: 100%;
   min-height: var(--size-profile-logout);
   margin-block-start: var(--space-3);
   border: 0;
   border-radius: var(--radius-round);
-  background: none;
-  box-shadow: inset 0 0 0 var(--border-width-dash) var(--color-hairline);
+  background-color: var(--color-card);
   color: var(--color-primary-deep);
   font-family: var(--font-body);
   font-size: var(--text-base);

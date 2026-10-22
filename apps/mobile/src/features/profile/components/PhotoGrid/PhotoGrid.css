@@ -16,7 +16,7 @@
   padding: 0;
   border: 0;
   border-radius: var(--radius-profile-tile);
-  background-color: var(--color-fill-soft);
+  background-color: var(--color-card);
   cursor: pointer;
   transition:
     transform var(--transition-press) var(--ease-press),

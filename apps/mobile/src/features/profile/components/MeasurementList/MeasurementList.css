@@ -1,7 +1,14 @@
+/* A white grouped card; dividers between rows only. */
 .pf-measure-list {
   margin: 0;
-  padding: 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-card);
   list-style: none;
+}
+
+.pf-measure-list li:last-child .pf-measure {
+  border-block-end: 0;
 }
 
 .pf-measure {

@@ -29,9 +29,9 @@ function LinkRow({ to, icon, title, hint }: { to: string; icon: ReactNode; title
 }
 
 /**
- * Settings on Profile: the language (saved as hers), her questionnaire, units / time zone (the Settings
- * screen), log out with a confirm, the app version. Notification / reminder switches, privacy and
- * personal-details screens don't exist yet (Phase 5b / backlog) — not shown (see the report).
+ * Settings on Profile, in two white groups: (1) the language (saved as hers); (2) her questionnaire and
+ * units / time zone (the Settings screen). Then log out with a confirm, and the app version.
+ * Notification / reminder switches, privacy and personal-details screens don't exist yet (Phase 5b / backlog) — not shown (see the report).
  */
 export const ProfileSettings = forwardRef<HTMLHeadingElement>(function ProfileSettings(_props, ref) {
   const copy = useCopy(profileCopy);
@@ -79,11 +79,14 @@ export const ProfileSettings = forwardRef<HTMLHeadingElement>(function ProfileSe
             ))}
           </span>
         </li>
-        {failed && (
-          <li className="pf-settings-error" role="alert">
-            {copy.languageSaveError}
-          </li>
-        )}
+      </ul>
+      {failed && (
+        <p className="pf-settings-error" role="alert">
+          {copy.languageSaveError}
+        </p>
+      )}
+
+      <ul className="pf-settings-list">
         <LinkRow
           to={ROUTES.PROFILE_QUESTIONNAIRE}
           icon={<IconClipboardList size={18} />}
