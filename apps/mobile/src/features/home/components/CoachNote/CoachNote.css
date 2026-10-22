@@ -1,23 +1,27 @@
 .coach-note {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
+/* Ink circle with her initials; the pink dot = something unread. */
 .coach-note-avatar {
   position: relative;
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: calc(var(--space-5) + var(--space-2));
-  height: calc(var(--space-5) + var(--space-2));
+  width: var(--size-home-coach-avatar);
+  height: var(--size-home-coach-avatar);
   border-radius: var(--radius-round);
   background-color: var(--color-ink);
   color: var(--color-on-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
 }
 
-.coach-note-avatar::after {
+.coach-note-avatar-unread::after {
   content: '';
   position: absolute;
   inset-block-end: 0;
@@ -38,25 +42,69 @@
   display: flex;
   align-items: baseline;
   gap: calc(var(--space-1) * 1.5);
+  min-height: var(--text-display-xs);
   margin: 0;
-  font-size: var(--text-sm);
 }
 
+/* Karantina for a Hebrew name, Barlow italic for a Latin one (.display-name). */
 .coach-note-name {
+  min-width: 0;
+  overflow: hidden;
   font-size: var(--text-display-xs);
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .coach-note-time {
+  flex: none;
   margin-inline-start: auto;
   font-size: var(--text-2xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
 }
 
 .coach-note-text {
   margin: var(--space-1) 0 0;
-  font-size: var(--text-base);
+  font-size: var(--text-coach-note);
   line-height: var(--line-height-base);
   white-space: pre-line;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   text-align: start;
+}
+
+/* Exactly four whole lines: the cut falls between lines — never mid-word, no "…". */
+.coach-note-text-clamped {
+  max-height: calc(1lh * 4);
+  overflow: hidden;
+}
+
+/* "More" / "Less": Cherry Rose (small pink text on white), a 44px hit area around the word. */
+.coach-note-more {
+  min-height: var(--touch-target-min);
+  margin-block: calc((var(--touch-target-min) - 1lh) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.coach-note-more:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+.coach-note-more:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-note-more {
+    transition: none;
+  }
 }

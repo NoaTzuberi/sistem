@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { AppNotification, MealLogDay, TraineeNutritionPlanResponse } from '@sistem/types';
+import type { AppNotification, CoachNoteId, MealLogDay, TraineeNutritionPlanResponse } from '@sistem/types';
 import { useCopy, useLoad } from '@sistem/shared';
 import { useAuth } from '../../../services/auth/AuthContext';
 import { getWeek } from '../../../services/plans/plansService';
@@ -10,7 +10,7 @@ import { useMyAchievements } from '../../achievements/hooks/useMyAchievements';
 import { celebrate } from '../../achievements/celebration';
 import { readSavedFreeTimerSettings } from '../../workouts/data/freeTimerSettings';
 import { useStartingPhotoReminder } from './useStartingPhotoReminder';
-import { buildWeekDays, pickNextAchievements, stageState, weekCount } from '../data/homeDisplay';
+import { pickNextAchievements, stageState, weekCount } from '../data/homeDisplay';
 import { homeCopy } from '../copy';
 
 /** Recent notifications looked at for "the coach's latest update". */
@@ -20,6 +20,12 @@ export interface CoachMessage {
   text: string;
   /** ISO — when it reached her (the publish of the plan / nutrition version it came with). */
   at: string;
+  /** Which note it is (what "👍 Thanks!" names to the server). */
+  note: CoachNoteId;
+  /** One note = one key (its publish): "thanks sent" is remembered per note. */
+  key: string;
+  /** Not read yet: the nutrition intro she hasn't opened (the plan notes: an unread "plan published"). */
+  unread: boolean;
 }
 
 type PlanPublishedNotification = Extract<AppNotification, { type: 'plan_published' }>;
@@ -70,7 +76,6 @@ export function useHomeData() {
 
   const data = week.data;
   const stage = data ? stageState(data) : null;
-  const days = useMemo(() => (data ? buildWeekDays(data) : []), [data]);
 
   const today: MealLogDay | null = useMemo(() => {
     if (!mealLogs) return null;
@@ -85,9 +90,19 @@ export function useHomeData() {
   const coachMessage: CoachMessage | null = useMemo(() => {
     const candidates: CoachMessage[] = [];
     const plan = data?.plan;
-    if (plan?.notes?.trim() && plan.publishedAt) candidates.push({ text: plan.notes.trim(), at: plan.publishedAt });
+    if (plan?.notes?.trim() && plan.publishedAt) {
+      candidates.push({ text: plan.notes.trim(), at: plan.publishedAt, note: 'plan', key: `plan:${plan.id}:${plan.publishedAt}`, unread: false });
+    }
     const view = nutrition?.plan;
-    if (view?.intro?.trim()) candidates.push({ text: view.intro.trim(), at: view.publishedAt });
+    if (view?.intro?.trim()) {
+      candidates.push({
+        text: view.intro.trim(),
+        at: view.publishedAt,
+        note: 'nutrition',
+        key: `nutrition:${view.publishedAt}`,
+        unread: nutrition?.introUnseen ?? false,
+      });
+    }
     return candidates.sort((a, b) => b.at.localeCompare(a.at))[0] ?? null;
   }, [data, nutrition]);
 
@@ -112,7 +127,6 @@ export function useHomeData() {
     user,
     week,
     stage,
-    days,
     weekCount: weekCount(data?.plan ?? null),
     activeLog: data?.activeLog ?? null,
     achievements: achievements ?? null,
@@ -120,6 +134,8 @@ export function useHomeData() {
     startingPhoto,
     fuel: today,
     coachMessage,
+    // Her coach's name for the card (initials + name); the nutrition plan's publisher as a fallback.
+    coachName: data?.coach?.name ?? nutrition?.coach?.name ?? null,
     planUpdate,
     markUpdateSeen,
     lastInterval,

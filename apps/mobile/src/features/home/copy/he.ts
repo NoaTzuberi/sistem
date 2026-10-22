@@ -41,7 +41,7 @@ export const he = {
     days: 'ימי השבוע',
     done: '✓ בוצע',
     today: 'היום · {exercises}',
-    planned: 'מתוכנן',
+    planned: 'מתוכנן · {exercises}',
     rest: 'יום מנוחה · התאוששות',
   },
   score: {
@@ -52,6 +52,12 @@ export const he = {
   coach: {
     title: 'מהמאמנת',
     planReady: 'שבוע {range} מוכן',
+    more: 'עוד',
+    // PLACEHOLDER — the owner sends the final text (less / sent / failed).
+    less: 'פחות',
+    thanks: '👍 תודה!',
+    thanksSent: '✓ נשלח',
+    thanksFailed: 'לא נשלח. נסי שוב',
   },
   achievement: {
     title: 'ההישג הבא',

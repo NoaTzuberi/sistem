@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconCalendarEvent } from '@tabler/icons-react';
 import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
@@ -9,6 +8,8 @@ import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../../workouts/hooks/useStartWorkout';
 import { StartConflictModal } from '../../../workouts/components/StartConflictModal/StartConflictModal';
 import { useHomeData } from '../../hooks/useHomeData';
+import { useWeekTrack } from '../../hooks/useWeekTrack';
+import { useCoachThanks } from '../../hooks/useCoachThanks';
 import { homeCopy } from '../../copy';
 import { HomeStage } from '../HomeStage/HomeStage';
 import { StartingPhotoPrompt } from '../StartingPhotoPrompt/StartingPhotoPrompt';
@@ -34,13 +35,11 @@ export function HomeScreen() {
   const navigate = useNavigate();
   const home = useHomeData();
   const starter = useStartWorkout();
-  const { week, stage, days, activeLog } = home;
+  const { week, stage, activeLog } = home;
   const data = week.data;
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
-
-  // Today is selected until she taps another day.
-  const todayIndex = days.findIndex((day) => day.isToday);
-  const selected = selectedDay ?? (todayIndex === -1 ? 0 : todayIndex);
+  const track = useWeekTrack(data);
+  const coachMessage = home.coachMessage;
+  const thanks = useCoachThanks(coachMessage ? { id: coachMessage.note, key: coachMessage.key } : null);
 
   // One slide (owner decision): resume the open workout, else start today's.
   function handleStart() {
@@ -62,7 +61,16 @@ export function HomeScreen() {
       },
     });
   }
-  const coachAt = home.coachMessage?.at ?? update?.createdAt ?? null;
+  // A real message gets "👍 Thanks!" (her coach is notified). "Reply" waits for messaging (backlog).
+  if (coachMessage) {
+    replies.push({
+      id: 'thanks',
+      label: thanks.state === 'sent' ? copy.coach.thanksSent : thanks.state === 'failed' ? copy.coach.thanksFailed : copy.coach.thanks,
+      disabled: thanks.state === 'sending' || thanks.state === 'sent',
+      onSelect: thanks.send,
+    });
+  }
+  const coachAt = coachMessage?.at ?? update?.createdAt ?? null;
   const nowMs = data ? Date.parse(data.serverTime) : 0;
   const weekStatus =
     week.isLoading && !data ? (
@@ -102,8 +110,8 @@ export function HomeScreen() {
               </button>
             )}
           </div>
-          <WeekTrack days={days} selected={selected} onSelect={setSelectedDay} label={copy.week.days} />
-          {days[selected] && <WeekDayDetail day={days[selected]} planId={data.plan?.id ?? null} />}
+          <WeekTrack days={track.days} selected={track.selected} onSelect={track.select} label={copy.week.days} />
+          {track.selectedDay && <WeekDayDetail day={track.selectedDay} planId={data.plan?.id ?? null} />}
         </section>
       )}
 
@@ -115,9 +123,22 @@ export function HomeScreen() {
 
       <IntervalTimerEntry lastWorkSec={home.lastInterval} onOpen={() => navigate(ROUTES.INTERVAL_TIMER)} />
 
-      {coachAt && (home.coachMessage || replies.length > 0) && (
-        <section className="home-section" aria-label={copy.coach.title}>
-          <CoachNote message={home.coachMessage?.text ?? null} at={coachAt} nowMs={nowMs} replies={replies} />
+      {coachAt && (coachMessage || update) && (
+        <section className="home-section" aria-labelledby="home-coach-title">
+          <div className="home-section-head">
+            <h2 className="home-section-title" id="home-coach-title">
+              <Eyebrow>{eyebrow.coach}</Eyebrow>
+              {copy.coach.title}
+            </h2>
+          </div>
+          <CoachNote
+            coachName={home.coachName}
+            message={coachMessage?.text ?? null}
+            at={coachAt}
+            nowMs={nowMs}
+            unread={Boolean(update) || Boolean(coachMessage?.unread)}
+            replies={replies}
+          />
         </section>
       )}
 

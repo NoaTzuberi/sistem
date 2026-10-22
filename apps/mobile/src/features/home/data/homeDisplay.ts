@@ -39,13 +39,27 @@ export interface PlannedWorkout {
   colorClass: string;
 }
 
+/** The server's status of a day, from its workouts (rest = none planned). */
 export type LaneState = 'done' | 'planned' | 'missed' | 'rest';
+
+/**
+ * How a lane is drawn (docs/design/trainee-home-b.html):
+ * done = filled with the workout's color · today = ink (not done yet — a workout or a rest day) ·
+ * planned = a white column ringed in its color · missed = soft, a small dot in its color · rest = a hairline.
+ * Today keeps the pulsing dot whatever it shows — done included.
+ */
+export type LaneLook = 'done' | 'today' | 'planned' | 'missed' | 'rest';
 
 export interface WeekDay {
   dayOfWeek: number;
   date: string;
   isToday: boolean;
   state: LaneState;
+  look: LaneLook;
+  /** The pulsing "today" dot. */
+  pulse: boolean;
+  /** The color the lane is drawn in: its first done workout when done, else its first workout. */
+  colorClass: string | null;
   workouts: PlannedWorkout[];
 }
 
@@ -56,13 +70,34 @@ function laneState(workouts: PlannedWorkout[]): LaneState {
   return 'planned';
 }
 
+export function laneLook(state: LaneState, isToday: boolean): LaneLook {
+  if (state === 'done') return state;
+  return isToday ? 'today' : state;
+}
+
+function laneColor(state: LaneState, workouts: PlannedWorkout[]): string | null {
+  const lead = state === 'done' ? workouts.find(({ workout }) => workout.status === 'done') : workouts[0];
+  return lead?.colorClass ?? null;
+}
+
 /** Sunday → Saturday. Workouts without a day are not on the track (as before). */
 export function buildWeekDays(week: TraineeWeek): WeekDay[] {
   const planned = (week.plan?.workouts ?? []).map((workout, index) => ({ workout, colorClass: workoutColorClass(index) }));
   return Array.from({ length: DAYS_IN_WEEK }, (_, dayOfWeek) => {
     const workouts = planned.filter(({ workout }) => workout.dayOfWeek === dayOfWeek);
     const date = addDaysToDate(week.weekStartDate, dayOfWeek);
-    return { dayOfWeek, date, isToday: date === week.today, state: laneState(workouts), workouts };
+    const isToday = date === week.today;
+    const state = laneState(workouts);
+    return {
+      dayOfWeek,
+      date,
+      isToday,
+      state,
+      look: laneLook(state, isToday),
+      pulse: isToday,
+      colorClass: laneColor(state, workouts),
+      workouts,
+    };
   });
 }
 

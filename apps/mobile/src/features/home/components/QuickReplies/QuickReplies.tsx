@@ -7,6 +7,8 @@ export interface QuickReply {
   icon?: ReactNode;
   /** The pink-soft chip (an update to open), else neutral. */
   accent?: boolean;
+  /** Sending / already sent: shown, not pressable. */
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -24,10 +26,11 @@ export function QuickReplies({ replies }: QuickRepliesProps) {
           key={reply.id}
           type="button"
           className={'quick-reply' + (reply.accent ? ' quick-reply-accent' : '')}
+          disabled={reply.disabled}
           onClick={reply.onSelect}
         >
           {reply.icon}
-          <bdi>{reply.label}</bdi>
+          <bdi aria-live="polite">{reply.label}</bdi>
         </button>
       ))}
     </div>

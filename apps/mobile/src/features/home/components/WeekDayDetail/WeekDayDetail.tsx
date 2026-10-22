@@ -13,7 +13,7 @@ interface WeekDayDetailProps {
   planId: string | null;
 }
 
-/** The selected lane, read out: color chip + workout name + status — or "rest day · recovery". */
+/** The selected lane, read out: color chip + workout name + status — or "rest day · recovery". Tap → that workout. */
 export function WeekDayDetail({ day, planId }: WeekDayDetailProps) {
   const copy = useCopy(homeCopy);
   const workoutText = useCopy(workoutCopy);
@@ -25,8 +25,8 @@ export function WeekDayDetail({ day, planId }: WeekDayDetailProps) {
     if (workout.status === 'done') return copy.week.done;
     if (workout.inProgress) return workoutText.status.inProgress;
     if (workout.status === 'missed') return workoutText.status.missed;
-    if (workout.isToday) return fill(copy.week.today, { exercises: exerciseCountLabel(workout.exercises.length, workoutText, language) });
-    return copy.week.planned;
+    const exercises = exerciseCountLabel(workout.exercises.length, workoutText, language);
+    return fill(workout.isToday ? copy.week.today : copy.week.planned, { exercises });
   }
 
   return (

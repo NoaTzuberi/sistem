@@ -42,7 +42,7 @@ export const en: CopyShape<typeof he> = {
     days: 'Days of the week',
     done: '✓ Done',
     today: 'Today · {exercises}',
-    planned: 'Planned',
+    planned: 'Planned · {exercises}',
     rest: 'Rest day · Recovery',
   },
   score: {
@@ -53,6 +53,12 @@ export const en: CopyShape<typeof he> = {
   coach: {
     title: 'From your coach',
     planReady: 'Week {range} is ready',
+    more: 'More',
+    // PLACEHOLDER — the owner sends the final text (less / sent / failed).
+    less: 'Less',
+    thanks: '👍 Thanks!',
+    thanksSent: '✓ Sent',
+    thanksFailed: 'Not sent. Try again',
   },
   achievement: {
     title: 'Next achievement',

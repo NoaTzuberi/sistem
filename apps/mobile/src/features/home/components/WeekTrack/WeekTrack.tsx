@@ -11,9 +11,10 @@ interface WeekTrackProps {
 }
 
 /**
- * Sunday → Saturday as seven lanes. done = filled with the workout's identity color · planned = a
- * ring in it · missed = a faint ring · rest = an outline · today = ink with a pulsing dot. Tap a
- * lane to read its day below (WeekDayDetail). The statuses are the server's.
+ * Sunday → Saturday as seven lanes, drawn by `day.look` (homeDisplay): done = filled with the
+ * workout's color · today = ink · planned = ringed in its color · missed = soft with a dot in its
+ * color · rest = a hairline. Today also has the pulsing dot (done or not). Tap a lane to read its
+ * day below (WeekDayDetail). The statuses are the server's.
  */
 export function WeekTrack({ days, selected, onSelect, label }: WeekTrackProps) {
   const language = useLanguage();
@@ -22,16 +23,12 @@ export function WeekTrack({ days, selected, onSelect, label }: WeekTrackProps) {
   return (
     <div className="week-track" role="group" aria-label={label}>
       {days.map((day) => {
-        const first = day.workouts[0];
         const status = day.state === 'rest' ? null : workoutText.status[day.state === 'planned' ? 'upcoming' : day.state];
-        const dayNumber = Number(day.date.slice(8));
         return (
           <button
             key={day.dayOfWeek}
             type="button"
-            className={['week-lane', `week-lane-${day.state}`, day.isToday && 'week-lane-today', first?.colorClass]
-              .filter(Boolean)
-              .join(' ')}
+            className={['week-lane', `week-lane-${day.look}`, day.pulse && 'week-lane-pulse', day.colorClass].filter(Boolean).join(' ')}
             aria-pressed={day.dayOfWeek === selected}
             aria-current={day.isToday ? 'date' : undefined}
             aria-label={[dayName(day.dayOfWeek, language), day.isToday ? workoutText.status.today : null, status].filter(Boolean).join(', ')}
@@ -41,7 +38,7 @@ export function WeekTrack({ days, selected, onSelect, label }: WeekTrackProps) {
               {weekdayName(day.dayOfWeek, language, 'narrow')}
             </span>
             <span className="week-lane-column" aria-hidden="true">
-              <span className="week-lane-date">{dayNumber}</span>
+              <span className="week-lane-date">{Number(day.date.slice(8))}</span>
             </span>
           </button>
         );
