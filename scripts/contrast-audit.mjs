@@ -177,6 +177,12 @@ const lightTokens = Object.keys(vars).filter((name) => {
   return color && color.alpha === 1 && !isWhite(color) && contrast(color.rgb, WHITE) < 3;
 });
 
+// The owner's orange text tone (--ink-orange #c75a00) on light orange tints: chosen over any darker
+// (brown) orange (owner, 2026-10-22). It reads 3.7–4.3:1 — accepted down to 3.5:1, never lower.
+const OWNER_ORANGE_TEXT = [199, 90, 0];
+const OWNER_ORANGE_MIN = 3.5;
+const isOwnerOrange = (color) => color.rgb.every((channel, index) => channel === OWNER_ORANGE_TEXT[index]);
+
 const findings = [];
 const report = (rule, message) =>
   findings.push(`${path.relative(ROOT, rule.file)}:${rule.line}  ${rule.selector.split('\n').pop()}  — ${message}`);
@@ -191,7 +197,7 @@ for (const rule of rules) {
     const bg = resolve(back, vars, locals);
     if (!fg || !bg || bg.alpha < 1) continue;
     const ratio = contrast(flatten(fg, bg.rgb), bg.rgb);
-    const needed = smallText(declarations) ? 4.5 : 3;
+    const needed = isOwnerOrange(fg) ? Math.min(OWNER_ORANGE_MIN, smallText(declarations) ? 4.5 : 3) : smallText(declarations) ? 4.5 : 3;
     if (ratio < needed) {
       const used = Object.values(locals).join(', ');
       report(rule, `${isWhite(fg) ? 'white text' : 'text'} on ${back}${used ? ` (${used})` : ''} is ${ratio.toFixed(2)}:1, needs ${needed}:1`);
