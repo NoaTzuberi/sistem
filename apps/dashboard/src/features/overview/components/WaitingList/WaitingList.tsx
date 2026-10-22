@@ -26,7 +26,7 @@ export function WaitingList({ trainees, nowMs, onOpen }: WaitingListProps) {
     <div className="waiting-list">
       {shown.map((trainee) => (
         <button key={trainee.id} className="waiting-row" type="button" aria-haspopup="dialog" onClick={() => onOpen(trainee.id)}>
-          <Avatar name={trainee.name} seed={trainee.id} size="sm" />
+          <Avatar name={trainee.name} seed={trainee.id} size="sm" photoUrl={trainee.avatar?.url} />
           <b className="waiting-name">
             <bdi>{trainee.name}</bdi>
           </b>

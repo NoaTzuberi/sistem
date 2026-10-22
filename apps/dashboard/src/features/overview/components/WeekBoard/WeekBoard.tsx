@@ -72,7 +72,7 @@ export function WeekBoard({ stats, trainees, onOpen, className }: WeekBoardProps
                 <tr key={trainee.id}>
                   <th scope="row" className="week-board-who">
                     <button className="week-board-name" type="button" aria-haspopup="dialog" onClick={() => onOpen(trainee.id)}>
-                      <Avatar name={trainee.name} seed={trainee.id} size="sm" />
+                      <Avatar name={trainee.name} seed={trainee.id} size="sm" photoUrl={trainee.avatar?.url} />
                       <span className="week-board-name-text" dir="auto">
                         {trainee.name}
                       </span>

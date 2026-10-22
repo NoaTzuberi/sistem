@@ -7,6 +7,7 @@ import { traineesCopy } from '../../copy';
 import { statusTagTone } from '../../data/traineeFacts';
 import { planWindowFraction, traineeHeaderChips } from '../../data/traineeHeader';
 import { PlanWindowPill } from '../PlanWindowPill/PlanWindowPill';
+import { AvatarImage } from '../../../../components/common/AvatarImage/AvatarImage';
 import './TraineeHeader.css';
 
 interface TraineeHeaderProps {
@@ -43,9 +44,10 @@ export function TraineeHeader({ trainee, nowMs, onBuildPlan }: TraineeHeaderProp
 
   return (
     <header className="trainee-header">
-      {/* No trainee photo exists yet: her initials. Decorative — the name is right next to it. */}
+      {/* Her profile photo, else her initials. Decorative — the name is right next to it. */}
       <span className="trainee-avatar" aria-hidden="true">
         {initialsOf(trainee.name)}
+        <AvatarImage url={trainee.avatar?.url} />
       </span>
 
       <div className="trainee-identity">

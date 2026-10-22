@@ -212,6 +212,7 @@ function QuickViewContent({ trainee }: { trainee: CoachTraineeSummary }) {
       <div className="tqv-body">
         <QuickViewHero
           name={trainee.name}
+          photoUrl={trainee.avatar?.url ?? null}
           nameId={NAME_ID}
           status={status}
           statusLabel={shared.traineeStatus.labels[trainee.status]}

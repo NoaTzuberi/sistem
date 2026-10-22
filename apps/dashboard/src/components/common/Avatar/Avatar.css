@@ -1,4 +1,6 @@
 .avatar {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   flex: none;
   align-items: center;

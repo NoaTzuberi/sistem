@@ -48,7 +48,7 @@ export function EndingPlans({ stats, trainees, className }: EndingPlansProps) {
           return (
             <li key={trainee.id} className="ending-card">
               <div className="ending-top">
-                <Avatar name={trainee.name} seed={trainee.id} />
+                <Avatar name={trainee.name} seed={trainee.id} photoUrl={trainee.avatar?.url} />
                 <b className="ending-name">
                   <bdi>{trainee.name}</bdi>
                 </b>

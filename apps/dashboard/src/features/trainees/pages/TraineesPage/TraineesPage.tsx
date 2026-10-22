@@ -139,7 +139,7 @@ export function TraineesPage() {
       >
         <td>
           <span className="trainees-person">
-            <Avatar name={trainee.name} seed={trainee.id} />
+            <Avatar name={trainee.name} seed={trainee.id} photoUrl={trainee.avatar?.url} />
             <span className="trainees-person-text">
               <b className="trainees-name">
                 <bdi>{trainee.name}</bdi>
