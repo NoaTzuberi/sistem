@@ -28,7 +28,7 @@
 }
 
 .pw-consistency-stat[data-stat='average'] { --pw-stat: var(--solid-purple); --pw-stat-soft: var(--color-stat-purple-mist); }
-.pw-consistency-stat[data-stat='full'] { --pw-stat: var(--solid-orange); --pw-stat-soft: var(--color-stat-orange-mist); }
+.pw-consistency-stat[data-stat='full'] { --pw-stat: var(--color-stat-orange-text); --pw-stat-soft: var(--color-stat-orange-mist); }
 .pw-consistency-stat[data-stat='done'] { --pw-stat: var(--solid-blue); --pw-stat-soft: var(--color-stat-blue-mist); }
 
 .pw-consistency-stat dt {

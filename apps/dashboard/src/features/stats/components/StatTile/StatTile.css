@@ -27,6 +27,7 @@
 
 .stat-tile[data-tone='orange'] {
   --stat-color: var(--color-stat-orange);
+  --stat-text: var(--color-stat-orange-text);
   --stat-cloud: var(--color-stat-orange-cloud);
   --stat-mist: var(--color-stat-orange-mist);
 }
@@ -84,7 +85,7 @@
   font-size: var(--text-2xs);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
-  color: var(--stat-color);
+  color: var(--stat-text, var(--stat-color));
   white-space: nowrap;
 }
 

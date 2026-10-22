@@ -33,10 +33,10 @@
 }
 
 .tqv-link[data-tab='logs'] { --tqv-link: var(--color-stat-purple); }
-.tqv-link[data-tab='nutrition'] { --tqv-link: var(--solid-orange); } /* solids: white icon ≥ 3:1 */
+.tqv-link[data-tab='nutrition'] { --tqv-link: var(--color-portion-fat); }
 .tqv-link[data-tab='metrics'] { --tqv-link: var(--color-workout-4); }
 .tqv-link[data-tab='onboarding'] { --tqv-link: var(--color-primary-deep); }
-.tqv-link[data-tab='achievements'] { --tqv-link: var(--solid-amber); }
+.tqv-link[data-tab='achievements'] { --tqv-link: var(--color-qv-achievements); }
 
 /* The hairline between rows starts after the icon, as in a grouped list. */
 li + li .tqv-link::before {
@@ -56,7 +56,7 @@ li + li .tqv-link::before {
   height: 30px;
   border-radius: var(--radius-qv-icon);
   background-color: var(--tqv-link);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: a decorative icon on the exact identity color (owner, 2026-10-22) */
 }
 
 .tqv-link-label {

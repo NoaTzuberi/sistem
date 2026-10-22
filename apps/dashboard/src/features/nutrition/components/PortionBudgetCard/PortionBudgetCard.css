@@ -48,7 +48,7 @@
 }
 
 .nb-budget-value[data-over] {
-  stroke: var(--color-qv-attention-avatar-to);
+  stroke: var(--color-qv-attention-avatar-from);
 }
 
 .nb-budget-pct {

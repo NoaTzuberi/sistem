@@ -63,7 +63,7 @@
   height: 28px;
   border-radius: var(--radius-qv-icon);
   background-color: var(--tqv-fact);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: a decorative icon on the exact identity color (owner, 2026-10-22) */
 }
 
 .tqv-fact-label {

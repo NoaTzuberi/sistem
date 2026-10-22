@@ -21,7 +21,7 @@
 }
 
 .tqv-spotlight[data-tone='attention'] {
-  --tqv-ring: var(--color-qv-attention-avatar-to);
+  --tqv-ring: var(--color-qv-attention-avatar-from);
   background-image: linear-gradient(120deg, var(--color-warning-soft), var(--color-card) 70%);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .tqv-workout[data-tone='1'] { --tqv-workout: var(--color-workout-2); }
-.tqv-workout[data-tone='2'] { --tqv-workout: var(--color-stat-orange); }
+.tqv-workout[data-tone='2'] { --tqv-workout: var(--color-stat-orange-text); }
 .tqv-workout[data-tone='3'] { --tqv-workout: var(--color-stat-blue); }
 .tqv-workout[data-tone='4'] { --tqv-workout: var(--color-workout-5); }
 
