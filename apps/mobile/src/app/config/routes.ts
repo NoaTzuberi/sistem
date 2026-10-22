@@ -14,6 +14,8 @@ export const ROUTES = {
   PROFILE_PHOTOS_COMPARE: '/profile/photos/compare',
   // Under /profile so the Profile tab stays highlighted.
   SETTINGS: '/profile/settings',
+  // Her onboarding answers (what the coach sees) — opened from Profile's settings list.
+  PROFILE_QUESTIONNAIRE: '/profile/questionnaire',
   // Every achievement + the streak (Phase 11) — opened from Home and Profile.
   PROFILE_ACHIEVEMENTS: '/profile/achievements',
   WORKOUTS: '/workouts',

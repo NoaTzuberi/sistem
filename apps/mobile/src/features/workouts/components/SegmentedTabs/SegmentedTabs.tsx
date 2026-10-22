@@ -13,10 +13,12 @@ interface SegmentedTabsProps<T extends string> {
   label: string;
   /** Tab id → the id of the panel it controls. */
   panelId: (id: T) => string;
+  /** A screen's own look on top of the base one (Profile: taller, spring thumb). */
+  className?: string;
 }
 
 /** An iOS-style segmented control: a white thumb slides under the selected tab. Arrow keys move between tabs. */
-export function SegmentedTabs<T extends string>({ tabs, selected, onSelect, label, panelId }: SegmentedTabsProps<T>) {
+export function SegmentedTabs<T extends string>({ tabs, selected, onSelect, label, panelId, className }: SegmentedTabsProps<T>) {
   const index = Math.max(0, tabs.findIndex((tab) => tab.id === selected));
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -31,7 +33,7 @@ export function SegmentedTabs<T extends string>({ tabs, selected, onSelect, labe
 
   return (
     <div
-      className="segmented-tabs"
+      className={'segmented-tabs' + (className ? ` ${className}` : '')}
       role="tablist"
       aria-label={label}
       onKeyDown={handleKeyDown}

@@ -1,0 +1,72 @@
+/* A zero-size point at the medal's center; the pieces fly out from it once and stay gone. */
+.confetti {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background-color: var(--ach-color);
+  opacity: 0;
+  animation: confetti-fly calc(var(--transition-confetti) + var(--confetti-spread) * var(--confetti-lag)) var(--ease-press) var(--confetti-delay) both;
+}
+
+.confetti-piece:nth-child(6n + 2) {
+  background-color: var(--ach-light);
+}
+
+.confetti-piece:nth-child(6n + 3) {
+  background-color: var(--color-primary);
+}
+
+.confetti-piece:nth-child(6n + 4) {
+  background-color: var(--color-ach-streaks-light);
+}
+
+.confetti-piece:nth-child(6n + 5) {
+  background-color: var(--color-ach-perfect-light);
+}
+
+.confetti-piece:nth-child(6n) {
+  background-color: var(--color-card);
+}
+
+.confetti-piece:nth-child(3n) {
+  border-radius: var(--radius-round);
+}
+
+.confetti-piece:nth-child(4n) {
+  width: 5px;
+  height: 5px;
+}
+
+.confetti-piece:nth-child(5n) {
+  width: 9px;
+  height: 9px;
+}
+
+@keyframes confetti-fly {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(var(--confetti-x), var(--confetti-y)) rotate(var(--confetti-turn)) scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}

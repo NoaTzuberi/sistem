@@ -29,6 +29,7 @@ import { ProgressPhotosPage } from '../../features/profile/pages/ProgressPhotosP
 import { ProgressPhotosDayPage } from '../../features/profile/pages/ProgressPhotosDayPage/ProgressPhotosDayPage';
 import { PhotoComparePage } from '../../features/profile/pages/PhotoComparePage/PhotoComparePage';
 import { SettingsPage } from '../../features/profile/pages/SettingsPage/SettingsPage';
+import { QuestionnairePage } from '../../features/profile/pages/QuestionnairePage/QuestionnairePage';
 import { AchievementsPage } from '../../features/achievements/pages/AchievementsPage/AchievementsPage';
 import { AchievementCelebration } from '../../features/achievements/components/AchievementCelebration/AchievementCelebration';
 import { WorkoutsPage } from '../../features/workouts/pages/WorkoutsPage/WorkoutsPage';
@@ -75,6 +76,7 @@ function AppRoutes({ location }: { location: Location }) {
             <Route path={ROUTES.PROFILE_PHOTOS_DAY} element={<ProgressPhotosDayPage />} />
             <Route path={ROUTES.PROFILE_PHOTOS_COMPARE} element={<PhotoComparePage />} />
             <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+            <Route path={ROUTES.PROFILE_QUESTIONNAIRE} element={<QuestionnairePage />} />
             <Route path={ROUTES.PROFILE_ACHIEVEMENTS} element={<AchievementsPage />} />
             <Route path={ROUTES.WORKOUTS} element={<WorkoutsPage />} />
             <Route path={WORKOUT_DETAIL_PATH} element={<WorkoutDetailPage />} />

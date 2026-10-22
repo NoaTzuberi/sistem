@@ -1,0 +1,109 @@
+.pf-measure-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-measure {
+  --pf-measure: var(--color-ink);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-2);
+  border-block-end: var(--border-width-thin) solid var(--color-hairline);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pf-measure:active {
+  transform: scale(var(--press-scale));
+}
+
+/* Identity colors, the same map as the coach's Body tab. */
+.pf-measure-chest { --pf-measure: var(--color-measure-chest); }
+.pf-measure-waist { --pf-measure: var(--color-measure-waist); }
+.pf-measure-hips { --pf-measure: var(--color-measure-hips); }
+.pf-measure-arms { --pf-measure: var(--color-measure-arms); }
+.pf-measure-thighs { --pf-measure: var(--color-measure-thighs); }
+
+.pf-measure-bar {
+  flex: none;
+  width: var(--size-profile-measure-bar-width);
+  height: var(--size-profile-measure-bar);
+  border-radius: var(--radius-round);
+  background-color: var(--pf-measure);
+}
+
+.pf-measure-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pf-measure-name {
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-profile-row-name);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+}
+
+.pf-measure-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.pf-measure-spark {
+  flex: none;
+  width: var(--size-profile-spark-width);
+  height: var(--size-profile-spark-height);
+  overflow: visible;
+}
+
+.pf-measure-spark path {
+  fill: none;
+  stroke: var(--pf-measure);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pf-measure-spark circle {
+  fill: var(--pf-measure);
+}
+
+.pf-measure-value {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: var(--size-profile-spark-width);
+}
+
+.pf-measure-current {
+  font-family: var(--font-num);
+  font-size: var(--text-profile-row-value);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pf-measure-change {
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.pf-measure-change-down {
+  color: var(--color-profile-down);
+}
+
+.pf-measure-change-up {
+  color: var(--color-profile-up);
+}

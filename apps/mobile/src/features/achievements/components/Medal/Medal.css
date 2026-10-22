@@ -1,0 +1,154 @@
+/* Sizes: the box (ring) and the disc inside it.
+   MIRROR of apps/dashboard/src/features/trainees/components/Medal — change both. */
+.medal {
+  --medal-number: var(--text-medal-number);
+  --medal-box: 100px;
+  --medal-disc: 72px;
+  --medal-disc-on: 84px;
+  --medal-icon: 28px;
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--medal-box);
+  height: var(--medal-box);
+}
+
+.medal-small {
+  --medal-number: calc(var(--text-medal-number) * 0.75);
+  --medal-box: 72px;
+  --medal-disc: 52px;
+  --medal-disc-on: 60px;
+  --medal-icon: 22px;
+}
+
+.medal-large {
+  --medal-number: var(--text-medal-number-large);
+  --medal-box: 150px;
+  --medal-disc: 108px;
+  --medal-disc-on: 128px;
+  --medal-icon: 44px;
+}
+
+.medal-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.medal-ring-track,
+.medal-ring-progress {
+  fill: none;
+  stroke-width: 4;
+}
+
+.medal-ring-track {
+  stroke: var(--color-ring-track);
+}
+
+.medal-ring-progress {
+  stroke: var(--ach-color);
+  stroke-linecap: round;
+}
+
+.medal-disc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--medal-disc);
+  height: var(--medal-disc);
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-image: var(--gradient-medal-locked);
+  box-shadow: var(--shadow-medal-locked);
+  color: var(--color-text-faint);
+  transition: color var(--transition-hover) ease;
+}
+
+.medal .medal-icon {
+  width: var(--medal-icon);
+  height: var(--medal-icon);
+}
+
+/* Earned: a glossy disc — a highlight over the light → color gradient (the exact category colors, never
+   darkened), a 3px white ring, a 5px outer ring in 30% color, a colored drop shadow, an inner bottom shade. */
+.medal-unlocked .medal-disc {
+  width: var(--medal-disc-on);
+  height: var(--medal-disc-on);
+  background-image: var(--gradient-medal-gloss), linear-gradient(150deg, var(--ach-light), var(--ach-color));
+  box-shadow:
+    0 0 0 3px var(--color-card),
+    0 0 0 8px color-mix(in srgb, var(--ach-color) 30%, transparent),
+    0 10px 24px color-mix(in srgb, var(--ach-color) 40%, transparent),
+    inset 0 -4px 8px color-mix(in srgb, var(--color-text) 12%, transparent);
+  color: var(--color-on-primary); /* contrast-ignore: a decorative icon / number (aria-hidden) on the exact category color */
+}
+
+/* A count badge's number. */
+.medal-number {
+  font-family: var(--font-num);
+  font-size: var(--medal-number);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The shine: parked off the disc, it sweeps across once when the card is hovered or pressed (the card moves it). */
+.medal-unlocked .medal-disc::after {
+  content: '';
+  position: absolute;
+  inset-block: -50%;
+  /* physical: the sweep travels left → right across the disc in both directions */
+  left: -60%;
+  width: 30%;
+  background-image: var(--gradient-medal-sweep);
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+.medal-lock {
+  position: absolute;
+  inset-block-end: 10%;
+  inset-inline-end: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-medal-lock);
+  color: var(--color-text-muted);
+}
+
+.medal-lock .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.medal-large .medal-lock {
+  width: 32px;
+  height: 32px;
+}
+
+.medal-large .medal-lock .icon {
+  width: 15px;
+  height: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medal-disc {
+    transition: none;
+  }
+}
+
+/* Phone only: the owner's icon file fills the disc. */
+.medal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,157 @@
+/* A badge card in its category's color (--ach-color / --ach-light / --ach-text from the category class).
+   It leans toward the pointer (--tilt-x / --tilt-y, written by useTilt) inside the grid's perspective and
+   springs back when they go. --ach-badge-bg: the locked card's ground (soft grey; the parent may set it).
+   MIRROR of apps/dashboard/src/features/trainees/components/BadgeCard — change both. */
+.ach-badge {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 18px 10px 14px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-ach-badge);
+  background-color: var(--ach-badge-bg, var(--color-fill-soft));
+  color: var(--color-text);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition:
+    transform var(--transition-slide) var(--ease-spring),
+    scale var(--transition-press) var(--ease-press),
+    box-shadow var(--transition-base) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* While it follows the pointer, it tracks it closely (the spring is for letting go). */
+.ach-badge[data-tilting] {
+  transition:
+    transform var(--transition-fast) linear,
+    scale var(--transition-press) var(--ease-press),
+    box-shadow var(--transition-base) ease;
+}
+
+/* Earned: white → the light category color, a soft colored shadow. */
+.ach-badge-unlocked {
+  background-image: linear-gradient(170deg, var(--color-card) 40%, color-mix(in srgb, var(--ach-light) 35%, var(--color-card)));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--ach-color) 18%, transparent);
+}
+
+/* The soft-light sheen under the pointer. */
+.ach-badge::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: radial-gradient(120px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in srgb, var(--color-card) 90%, transparent), transparent 60%);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-hover) ease;
+}
+
+.ach-badge[data-tilting]::after {
+  opacity: 1;
+}
+
+.ach-badge-next {
+  box-shadow:
+    0 0 0 var(--border-width-medium) var(--ach-color),
+    0 12px 30px color-mix(in srgb, var(--ach-color) 25%, transparent);
+}
+
+/* Above the medal (which comes later in the card). */
+.ach-badge-next-label {
+  position: absolute;
+  z-index: var(--z-raised);
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-round);
+  background-color: var(--ach-color);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-primary); /* contrast-ignore: the tag is the exact category color (owner, 2026-10-22) */
+}
+
+.ach-badge-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.ach-badge-status {
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+/* The unlock date in the category's darker tone. */
+.ach-badge-unlocked .ach-badge-status {
+  font-weight: var(--font-weight-semibold);
+  color: var(--ach-text);
+}
+
+.ach-badge:active {
+  scale: 0.97;
+}
+
+/* Pressed: the shine sweeps across an earned disc once. */
+.ach-badge:active .medal-unlocked .medal-disc::after {
+  translate: 640% 0;
+  transition: translate var(--transition-medal-sweep) var(--ease-press);
+}
+
+.ach-badge:focus-visible {
+  outline: var(--border-width-medium) solid var(--ach-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ach-badge:hover {
+    box-shadow: var(--shadow-tile-lift);
+  }
+
+  .ach-badge-next:hover {
+    box-shadow:
+      0 0 0 var(--border-width-medium) var(--ach-color),
+      0 16px 34px color-mix(in srgb, var(--ach-color) 30%, transparent);
+  }
+
+  .ach-badge:hover .medal-locked .medal-disc {
+    color: var(--ach-color);
+  }
+
+  /* The shine sweeps across an earned disc once per hover; it jumps back unseen on leave. */
+  .ach-badge:hover .medal-unlocked .medal-disc::after {
+    translate: 640% 0;
+    transition: translate var(--transition-medal-sweep) var(--ease-press);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ach-badge,
+  .ach-badge[data-tilting],
+  .ach-badge::after {
+    transform: none;
+    transition: none;
+  }
+
+  .ach-badge::after {
+    display: none;
+  }
+
+  .ach-badge:active .medal-unlocked .medal-disc::after,
+  .ach-badge:hover .medal-unlocked .medal-disc::after {
+    translate: none;
+    transition: none;
+  }
+}

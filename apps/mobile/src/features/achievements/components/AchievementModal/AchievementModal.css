@@ -1,0 +1,216 @@
+/* The scrim: a blurred, slightly dark page. Fades in; the card grows in on the drawer curve.
+   MIRROR of apps/dashboard/src/features/trainees/components/AchievementModal — change both. Phone only:
+   the Karantina title, safe-area padding. */
+.ach-modal {
+  position: fixed;
+  z-index: var(--z-modal);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--space-3) + var(--safe-top)) var(--space-3) calc(var(--space-3) + var(--safe-bottom));
+  background-color: var(--color-ach-scrim);
+  -webkit-backdrop-filter: var(--blur-ach-scrim);
+  backdrop-filter: var(--blur-ach-scrim);
+  opacity: 0;
+  transition: opacity var(--transition-drawer-out) ease;
+}
+
+.ach-modal-shown {
+  opacity: 1;
+  transition-duration: var(--transition-drawer-in);
+}
+
+.ach-modal-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(380px, 100%);
+  padding: 32px 24px 24px;
+  overflow: hidden;
+  border-radius: var(--radius-notice-panel);
+  background-color: var(--surface-ach-modal);
+  -webkit-backdrop-filter: var(--blur-glass-card);
+  backdrop-filter: var(--blur-glass-card);
+  box-shadow: var(--shadow-ach-modal);
+  text-align: center;
+  transform: scale(0.94) translateY(8px);
+  transition: transform var(--transition-drawer-out) var(--ease-drawer-out);
+}
+
+.ach-modal-shown .ach-modal-card {
+  transform: none;
+  transition: transform var(--transition-drawer-in) var(--ease-drawer);
+}
+
+/* The category's glow behind the medal (grey while locked). */
+.ach-modal-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -30% -30% 40%;
+  background-image: radial-gradient(40% 50% at 50% 50%, var(--ach-light), transparent 70%);
+  filter: var(--blur-ach-glow);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.ach-modal-card:not(.ach-modal-unlocked)::before {
+  filter: var(--blur-ach-glow) grayscale(1);
+  opacity: 0.4;
+}
+
+.ach-modal-close {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-end: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-round);
+  background-color: var(--surface-qv-close);
+  color: var(--color-text);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+/* 44 × 44 touch target around the 36px button. */
+.ach-modal-close::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+.ach-modal-close:active {
+  transform: scale(var(--press-scale));
+}
+
+.ach-modal-close:focus-visible {
+  outline: var(--border-width-medium) solid var(--ach-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ach-modal-stage {
+  position: relative;
+  margin-block-end: 6px;
+  perspective: 600px;
+}
+
+.ach-modal-medal {
+  display: block;
+}
+
+/* An earned medal flips in to face her as the modal opens. */
+.ach-modal-shown .ach-modal-unlocked .ach-modal-medal {
+  animation: ach-modal-flip var(--transition-medal-flip) var(--ease-press) both;
+}
+
+@keyframes ach-modal-flip {
+  from {
+    transform: rotateY(-180deg) scale(0.6);
+  }
+}
+
+.ach-modal-category {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-round);
+  background-color: color-mix(in srgb, var(--ach-color) 12%, var(--color-card));
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--ach-text); /* 11px on its tint: the category's darker tone */
+}
+
+.ach-modal-title {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--text-ach-modal-title);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+  color: var(--color-ink);
+}
+
+.ach-modal-rule {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.ach-modal-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin: 10px 0 0;
+  padding: 0 16px;
+  border-radius: var(--radius-round);
+  background-color: var(--ach-color);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary); /* contrast-ignore: the pill is the exact category color (owner, 2026-10-22) */
+}
+
+.ach-modal-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-block-start: 12px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ach-modal-bar {
+  flex: 1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.ach-modal-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-round);
+  background-color: var(--ach-color);
+  transform: scaleX(var(--progress));
+  /* physical: transform-origin has no logical keyword — the bar fills from the reading start */
+  transform-origin: right;
+}
+
+[dir='ltr'] .ach-modal-bar-fill {
+  transform-origin: left;
+}
+
+.ach-modal-progress-text {
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ach-modal-close:hover {
+    background-color: var(--color-card);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ach-modal,
+  .ach-modal-card,
+  .ach-modal-shown .ach-modal-card {
+    transform: none;
+    transition: opacity var(--transition-fast) ease;
+  }
+
+  .ach-modal-shown .ach-modal-unlocked .ach-modal-medal {
+    animation: none;
+  }
+}

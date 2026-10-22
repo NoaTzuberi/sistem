@@ -1,0 +1,118 @@
+/* Cherry Rose → Neon Pink → light pink, a faint dot pattern from the reading start. */
+.ach-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-ach-hero);
+  background-image: var(--gradient-ach-hero);
+  box-shadow: var(--shadow-ach-hero-trainee);
+  color: var(--color-on-primary);
+}
+
+.ach-hero::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: radial-gradient(var(--color-ach-hero-dots) 1px, transparent 1.5px);
+  background-size: var(--size-ach-hero-dots) var(--size-ach-hero-dots);
+  opacity: 0.2;
+  /* physical: the pattern fades from the reading start (the right in Hebrew) */
+  -webkit-mask-image: linear-gradient(to left, var(--color-ink), transparent 70%);
+  mask-image: linear-gradient(to left, var(--color-ink), transparent 70%);
+  pointer-events: none;
+}
+
+[dir='ltr'] .ach-hero::after {
+  /* physical: the reading start is the left in English */
+  -webkit-mask-image: linear-gradient(to right, var(--color-ink), transparent 70%);
+  mask-image: linear-gradient(to right, var(--color-ink), transparent 70%);
+}
+
+.ach-hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-on-ach-hero-muted);
+}
+
+.ach-hero-count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-on-ach-hero-muted);
+}
+
+.ach-hero-number {
+  font-family: var(--font-num);
+  font-size: var(--text-ach-hero-count);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-display-num);
+  color: var(--color-on-primary);
+}
+
+.ach-hero-xp {
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--surface-on-hero-track);
+}
+
+/* Full width, scaled to the share unlocked; it grows in from the reading start on open. */
+.ach-hero-xp-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-round);
+  background-image: var(--gradient-xp);
+  box-shadow: var(--shadow-xp);
+  transform: scaleX(var(--xp));
+  /* physical: transform-origin has no logical keyword — the bar grows from the reading start */
+  transform-origin: right;
+  animation: ach-hero-xp-grow var(--intro-xp) var(--ease-press) both;
+}
+
+[dir='ltr'] .ach-hero-xp-fill {
+  /* physical: the reading start is the left in English */
+  transform-origin: left;
+}
+
+@keyframes ach-hero-xp-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.ach-hero-next {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-on-ach-hero-muted);
+}
+
+.ach-hero-next b {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary);
+}
+
+.ach-hero-tiles {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ach-hero-xp-fill {
+    animation: none;
+  }
+}

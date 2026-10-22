@@ -27,4 +27,32 @@ export const he = {
   statPrs: 'שיאים אישיים',
   statAchievements: 'הישגים',
   back: 'חזרה',
+  // Profile → Achievements (the dashboard's achievements look). Wording from the brief / the coach dashboard.
+  board: {
+    unlockedOf: 'מתוך {total} נפתחו',
+    nextLabel: 'הבא בתור:',
+    nextUp: 'הבא בתור',
+    remaining: 'עוד {amount}',
+    unlocksWithFirstWorkout: 'יפתח עם האימון הראשון',
+    weeksInRow: plural({ one: 'שבוע ברצף', two: 'שבועות ברצף', other: 'שבועות ברצף' }),
+    latestUnlock: 'נפתח לאחרונה',
+    filterAll: 'הכול · {count}',
+    filterUnlocked: 'נפתחו · {count}',
+    filterLocked: 'בדרך · {count}',
+    // PLACEHOLDER (screen readers / empty filters — not in the design).
+    filterLabel: 'סינון הישגים',
+    noneUnlocked: 'עדיין לא נפתחו הישגים.',
+    allUnlocked: 'כל ההישגים נפתחו.',
+    notStarted: 'עדיין לא',
+    unlockedShort: 'נפתח · {date}',
+    unlockedOn: 'נפתח ב־{date}',
+    categories: {
+      workouts: 'אימונים',
+      streaks: 'רצפים',
+      perfect: 'שבוע מושלם',
+      records: 'שיאים אישיים',
+      volume: 'נפח',
+      tracking: 'גוף ומדידות',
+    },
+  },
 } as const;

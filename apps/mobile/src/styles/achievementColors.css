@@ -1,0 +1,9 @@
+/* An achievement category's color (achievementCategoryClass in features/achievements/data/achievementCategories.ts):
+   --ach-color the fill (exact — never darkened), --ach-light the lighter shade (medal gradient, confetti, earned
+   card), --ach-text its darker tone for text. Mirrors the dashboard's styles/globals.css. */
+.ach-category-workouts { --ach-color: var(--color-ach-workouts); --ach-light: var(--color-ach-workouts-light); --ach-text: var(--color-ach-workouts-text); }
+.ach-category-streaks { --ach-color: var(--color-ach-streaks); --ach-light: var(--color-ach-streaks-light); --ach-text: var(--color-ach-streaks-text); }
+.ach-category-perfect { --ach-color: var(--color-ach-perfect); --ach-light: var(--color-ach-perfect-light); --ach-text: var(--color-ach-perfect-text); }
+.ach-category-records { --ach-color: var(--color-ach-records); --ach-light: var(--color-ach-records-light); --ach-text: var(--color-ach-records-text); }
+.ach-category-volume { --ach-color: var(--color-ach-volume); --ach-light: var(--color-ach-volume-light); --ach-text: var(--color-ach-volume-text); }
+.ach-category-tracking { --ach-color: var(--color-ach-tracking); --ach-light: var(--color-ach-tracking-light); --ach-text: var(--color-ach-tracking-text); }
