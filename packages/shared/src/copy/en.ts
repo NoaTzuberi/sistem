@@ -137,6 +137,8 @@ export const en: CopyShape<typeof he> = {
   coachNotifications: {
     traineeOnboarded: 'New trainee: {name}',
     workoutCompleted: '{name} finished {workout}',
+    // PLACEHOLDER — the owner sends the final text.
+    noteThanks: '{name} said thanks for your note',
   },
   onboardingSections: {
     basicProfile: 'Basic profile',

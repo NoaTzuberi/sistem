@@ -36,5 +36,13 @@ export function describeCoachNotification(notification: AppNotification, languag
       section: 'logs',
     };
   }
+  if (notification.type === 'coach_note_thanks') {
+    // Her "👍 Thanks!" under a note on Home — opens her (no section of its own).
+    return {
+      text: fill(copy.noteThanks, { name: isolateAuto(notification.data.traineeName) }),
+      traineeId: notification.data.traineeId,
+      section: null,
+    };
+  }
   return null;
 }

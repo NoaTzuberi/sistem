@@ -107,7 +107,9 @@ interface ServerNoticeContext {
 export function buildServerNotice(notification: AppNotification, { nowMs, language, isWaiting, weekOf }: ServerNoticeContext): NoticeItem | null {
   // The sentence and the target are shared with the mobile Inbox.
   const described = describeCoachNotification(notification, language);
-  if (!described || (notification.type !== 'trainee_onboarded' && notification.type !== 'workout_completed')) return null;
+  if (!described || (notification.type !== 'trainee_onboarded' && notification.type !== 'workout_completed' && notification.type !== 'coach_note_thanks')) {
+    return null;
+  }
   const copy = notificationsCopy[language];
   const createdAt = new Date(notification.createdAt);
   const isToday = isSameLocalDay(createdAt, new Date(nowMs));
@@ -124,8 +126,8 @@ export function buildServerNotice(notification: AppNotification, { nowMs, langua
   return {
     id: notification.id,
     serverId: notification.id,
-    type: notification.type === 'trainee_onboarded' ? 'new' : 'done',
-    icon: notification.type === 'trainee_onboarded' ? 'person' : 'check',
+    type: notification.type === 'workout_completed' ? 'done' : 'new',
+    icon: notification.type === 'trainee_onboarded' ? 'person' : notification.type === 'coach_note_thanks' ? 'heart' : 'check',
     title: described.text,
     body,
     time: noticeTime(notification.createdAt, nowMs, language),

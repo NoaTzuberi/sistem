@@ -140,6 +140,8 @@ export const he = {
   coachNotifications: {
     traineeOnboarded: 'מתאמנת חדשה: {name}',
     workoutCompleted: '{name} סיימה את {workout}',
+    // PLACEHOLDER — the owner sends the final text.
+    noteThanks: '{name} אמרה תודה על ההערה שלך',
   },
   onboardingSections: {
     basicProfile: 'פרטים בסיסיים',
