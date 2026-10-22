@@ -1,0 +1,100 @@
+Profile → Achievements tab (dashboard look) + no brown / gold anywhere
+=====================================================================
+
+Summary
+- The trainee's Profile → "הישגים" tab is rebuilt in the coach dashboard's achievements look: the pink hero
+  (count-up, glowing XP bar, next up, streak tile, latest-unlock tile), filter chips, groups by category
+  (dot + name + x/y) with a 3-column badge grid, tilting badge cards, and the achievement modal (flip-in
+  medal, confetti, Esc / scrim / ✕, focus in and back).
+- Sharing (owner's choice): the board logic moved to @sistem/shared (achievementBoard.ts — both apps use
+  it); Medal / BadgeCard / AchievementModal / Confetti / useTilt are copied 1:1 into mobile (no UI package),
+  each file marked "MIRROR … change both". The dashboard's AchievementBadge is renamed BadgeCard.
+- The medal / card spec is applied to both apps: medal gradient light → color (never darkened), 3px white +
+  5px outer ring, count number on count badges, ±8° tilt in a 700px perspective, soft-light sheen, shine
+  sweep per hover / press, finger tilt while pressed, spring back; nothing moves with reduced motion.
+- Colors: 6 categories kept (נפח stays, owner's choice); גוף ומדידות = #C23BC0 / #F0B3EA (was gold #D9952B).
+  No brown, amber, gold or darkened orange token is left. The orange text tone is #C75A00 (--ink-orange).
+
+Color check (scripts/check-colors.mjs — DEV ONLY, `node scripts/check-colors.mjs`)
+- Before: 8 off-palette hex values, 14 brown / gold tokens. After: 4 off-palette (server email only), 0 brown.
+- Brown / gold tokens fixed:
+  --color-ach-tracking #d9952b → #c23bc0 (+ light #ffe3b0 → #f0b3ea) · --color-qv-achievements #d9952b → #c23bc0
+  · --color-pattern-shoulders #d9952b → #c23bc0 (+ soft → #f0b3ea) · --color-warning-text #8a4a00, --color-flag
+  #a85800, --color-avatar-peach-text #a2481c, --color-portion-fat-text, --ink-orange #8a4a00 → --ink-orange
+  #c75a00 · --color-qv-attention-avatar-from/to #d07000 / #a85800 → #ff7a00 / #ff006e · --color-rating-on
+  #ff9f0a → #ff7a00 · --solid-orange #b85300, --solid-amber #946200, --ink-yellow, --tint-yellow → deleted
+  (users moved to the exact fills) · --color-stat-orange #c75a00 (used as a fill) → #ff7a00 + new
+  --color-stat-orange-text · --color-notice-warn split into text (#c75a00) and fill (#ff7a00).
+- Off-palette hex: Google sign-in mark colors (#FFC107 #FF3D00 #4CAF50 #1976D2) kept — Google's brand
+  guidelines; marked `check-colors-ignore`. Server password email (apps/server/.../email.service.ts: #1a1a1a,
+  #ff7a1a, #0b1929, #666) left as is — HTML email can't use CSS variables and it's outside the two apps.
+
+Files changed
+- Added: scripts/check-colors.mjs; packages/shared/src/achievementBoard.ts;
+  apps/mobile/src/styles/achievementColors.css; apps/mobile/src/hooks/useDrawerTransition.ts (copy of the
+  dashboard's); apps/mobile/src/features/achievements/data/achievementCategories.ts;
+  apps/mobile/src/features/achievements/hooks/{useTilt,useCountUp}.ts;
+  apps/mobile/src/features/achievements/components/{Medal,BadgeCard,Confetti,AchievementModal,AchievementsHero,
+  StreakTile,LatestUnlockTile,AchievementGroups,AchievementsTab}/*;
+  apps/dashboard/src/features/trainees/components/BadgeCard/* (renamed from AchievementBadge)
+- Deleted: apps/dashboard/src/features/trainees/components/AchievementBadge/*,
+  apps/dashboard/src/features/trainees/data/achievementBoard.ts (→ @sistem/shared),
+  apps/mobile/src/features/profile/components/{BadgeGrid,NextGoalCard}/* (replaced by the new tab — these were
+  UNTRACKED files, so git can't restore them)
+- Modified: packages/tokens/tokens.css; packages/shared/src/index.ts; scripts/contrast-audit.mjs;
+  apps/mobile/src/main.tsx; apps/mobile/src/features/profile/{pages/ProfilePage/ProfilePage.tsx,copy/he.ts,copy/en.ts};
+  apps/mobile/src/features/achievements/copy/{he,en}.ts; apps/mobile/src/features/auth/components/SocialButtons/SocialButtons.tsx;
+  dashboard: styles/globals.css, trainees/{components/{Medal,AchievementGrid,AchievementModal,AchievementStats,
+  AchievementsHero,LatestUnlockCard,TraineeAchievements,Confetti,ProfileLinksList,ConsistencyCard,QuickFacts,
+  StatusSpotlight}, hooks/{useTilt,useAchievementBoard}.ts, copy/{he,en}.ts}, notifications/components/NotificationItem,
+  stats/components/StatTile, nutrition/components/PortionBudgetCard
+
+Dependencies: none.
+
+How to test
+- npm run lint (oxlint + i18n + contrast: no findings) · npm run test:i18n · npm run build
+- node scripts/check-colors.mjs → only the 4 server-email values
+- Mobile /profile?tab=achievements (360 and 430 wide): count counts up from 0, XP bar grows from the right
+  (Hebrew); "הבא בתור: … · עוד X"; streak + latest tiles (latest opens its modal); chips filter; 3 columns;
+  "10 שקילות" / "מדידות ראשונות" purple-pink; press a badge: it tilts toward the finger, the shine sweeps;
+  modal: earned medal flips in + confetti once, locked shows the progress bar; Esc / scrim / ✕ close and focus
+  returns to the badge. Reduced motion: no count-up, tilt, sweep, flip or confetti.
+- Dashboard trainee → הישגים: same medals / cards; hover tilt + sheen; orange is #FF7A00.
+- Checked in the browser (mobile tab + modal, dashboard tab).
+
+Known issues / decisions
+- #C75A00 text on light orange tints reads 3.7–4.3:1 (AA asks 4.5:1 for small text). It is the owner's
+  orange text tone; the contrast audit accepts that one tone down to 3.5:1 (documented in the script). It now
+  covers warnings, flags, fat portions and streak dates in both apps.
+- White text / icons on the exact fills (#FF7A00, #0094FF …) are under 3:1 in places (the next-up tag, the
+  modal's done pill, icon squares): each is marked `contrast-ignore` with the owner rule.
+- The dashboard doesn't load Barlow / Karantina (mobile-only fonts, no new dependency), so count numbers on
+  its medals use the --font-num fallback; the trainee tab uses the real fonts.
+- Mobile badges use the small medal (72px box) to fit three columns at 360px; the dashboard keeps the regular
+  one. Dashboard locked cards keep the glass ground on its canvas (--ach-badge-bg), mobile uses soft grey.
+- "גוף ומדידות" / "Body & measurements" replaces the old placeholder "גוף" in the dashboard copy too.
+- The "הישגים" standalone page (/profile/achievements, Home links) still uses the older list; not in this brief.
+- Many of these files already had uncommitted changes from earlier work (profile redesign, the orange-fills
+  fix); the commits below include those too — check `git diff` first.
+
+Suggested commits
+- refactor(shared): achievement board logic shared by both apps
+- fix: remove brown, gold and darkened orange tokens; add the color check script
+- feat(dashboard): medal / badge card per the achievements spec (BadgeCard, tilt, count numbers)
+- feat(mobile): Profile achievements tab in the dashboard look
+- docs: profile achievements tab report
+
+git add -A -- packages/shared/src/achievementBoard.ts packages/shared/src/index.ts apps/dashboard/src/features/trainees/data/achievementBoard.ts apps/dashboard/src/features/trainees/hooks/useAchievementBoard.ts
+git commit -m "refactor(shared): achievement board logic shared by both apps"
+
+git add -A -- packages/tokens/tokens.css scripts/check-colors.mjs scripts/contrast-audit.mjs apps/mobile/src/features/auth/components/SocialButtons/SocialButtons.tsx apps/dashboard/src/features/notifications/components/NotificationItem apps/dashboard/src/features/stats/components/StatTile apps/dashboard/src/features/nutrition/components/PortionBudgetCard apps/dashboard/src/features/trainees/components/ProfileLinksList apps/dashboard/src/features/trainees/components/ConsistencyCard apps/dashboard/src/features/trainees/components/QuickFacts apps/dashboard/src/features/trainees/components/StatusSpotlight
+git commit -m "fix: remove brown, gold and darkened orange tokens; add the color check script"
+
+git add -A -- apps/dashboard/src/styles/globals.css apps/dashboard/src/features/trainees/components/Medal apps/dashboard/src/features/trainees/components/AchievementBadge apps/dashboard/src/features/trainees/components/BadgeCard apps/dashboard/src/features/trainees/components/AchievementGrid apps/dashboard/src/features/trainees/components/AchievementModal apps/dashboard/src/features/trainees/components/AchievementStats apps/dashboard/src/features/trainees/components/AchievementsHero apps/dashboard/src/features/trainees/components/LatestUnlockCard apps/dashboard/src/features/trainees/components/TraineeAchievements apps/dashboard/src/features/trainees/components/Confetti apps/dashboard/src/features/trainees/hooks/useTilt.ts apps/dashboard/src/features/trainees/copy
+git commit -m "feat(dashboard): medal and badge card per the achievements spec"
+
+git add -A -- apps/mobile/src/main.tsx apps/mobile/src/styles/achievementColors.css apps/mobile/src/hooks/useDrawerTransition.ts apps/mobile/src/features/achievements apps/mobile/src/features/profile
+git commit -m "feat(mobile): Profile achievements tab in the dashboard look"
+
+git add -A -- docs/phase-reports/profile-achievements-tab.txt
+git commit -m "docs: profile achievements tab report"

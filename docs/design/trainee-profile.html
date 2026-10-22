@@ -1,0 +1,531 @@
+<title>Sistem Trainee Profile</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,700;1,800&family=Karantina:wght@400;700&family=JetBrains+Mono:wght@700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: profile. Identity + scoreboard, segmented tabs (body / photos / achievements), then coach card and settings list. Measurement sheet. Light-only by design. */
+:root {
+  --ink: #141116; --ink2: #2A2530; --muted: #7A7380; --faint: #B7B0BC; --rule: #ECE9EE; --soft: #F5F3F6; --pink: #FF006E; --cherry: #A50047; --blush: #FFE3EF; --purple: #7C4DFF;
+  --m1: #9A77DB; --m2: #FF006E; --m3: #D46A95; --m4: #0070C9; --m5: #E08A5C;
+  --num: 'Barlow Condensed', 'Rubik', sans-serif; --he: 'Karantina', 'Rubik', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace; --font: 'Rubik', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --spring: cubic-bezier(.34,1.56,.64,1); --sheet: cubic-bezier(.32,.72,0,1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); color: var(--ink); direction: rtl; background: #E9E6EA; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.n { font-family: var(--num); font-weight: 700; font-variant-numeric: tabular-nums; }
+code.e { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--faint); }
+.stage { display: flex; justify-content: center; }
+.phone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 54px; overflow: hidden; background: #fff; box-shadow: 0 0 0 10px #141116, 0 0 0 11px #3a3540, 0 40px 90px rgba(20,17,22,0.3); }
+.island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 60; }
+.scr { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; padding: 0 0 130px; }
+.scr::-webkit-scrollbar { display: none; }
+.pad { padding: 0 20px; }
+
+.top { padding: 58px 20px 0; display: flex; align-items: flex-end; justify-content: space-between; }
+.top h1 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 58px; line-height: 0.8; }
+.ib { width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.ib:active { transform: scale(0.94); }
+
+.me { display: flex; align-items: center; gap: 14px; margin-top: 20px; }
+.av { position: relative; width: 76px; height: 76px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--he); font-weight: 700; font-size: 34px; flex: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--pink); }
+.av button { position: absolute; bottom: -2px; inset-inline-start: -2px; width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--pink); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3px #fff; }
+.me b { display: block; font-family: var(--he); font-weight: 700; font-size: 38px; line-height: 0.85; }
+.me .e { display: block; margin-top: 6px; }
+.coachchip { margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 4px; border: 0; border-radius: 14px; background: var(--soft); font-size: 12px; font-weight: 600; }
+[dir="rtl"] .coachchip, .coachchip { padding: 0 4px 0 10px; }
+.coachchip i { width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; font-style: normal; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+.sb { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; padding: 12px 0; border-block: 1px solid var(--rule); }
+.sb div + div { border-inline-start: 1px solid var(--rule); padding-inline-start: 14px; }
+.sb b { display: block; font-size: 40px; line-height: 0.95; }
+.sb span { font-size: 12px; color: var(--muted); }
+
+.tabs { position: sticky; top: 0; z-index: 5; margin: 18px -20px 0; padding: 10px 20px; background: rgba(255,255,255,0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.seg { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px; border-radius: 18px; background: var(--soft); }
+.seg i { position: absolute; top: 4px; bottom: 4px; width: calc((100% - 8px) / 3); right: 4px; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px rgba(20,17,22,0.08); transform: translateX(calc(var(--t, 0) * -100%)); transition: transform 320ms var(--spring); }
+.seg button { position: relative; z-index: 1; height: 40px; border: 0; background: none; font-family: var(--he); font-weight: 700; font-size: 22px; color: var(--muted); transition: color 200ms ease; }
+.seg button[aria-selected="true"] { color: var(--ink); }
+
+
+/* profile hero (vision: soft wash + centered card). Sistem vibe: sharp diagonal speed bands + faint grid, no round blobs */
+.scr { background: #F6F4F7; }
+.bgw { position: absolute; top: 0; inset-inline: 0; height: 200px; pointer-events: none; border-radius: 0 0 40px 40px; overflow: hidden; background: linear-gradient(160deg, #FF2E86 0%, #FF006E 55%, #E0005F 100%); }
+.bgw::after { content: ''; position: absolute; inset: 0; opacity: 0.25; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.35 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.top { position: relative; justify-content: flex-end; padding-top: 54px; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.top h1 { color: #fff; }
+.top .ib { background: none; color: #fff; width: 44px; height: 44px; }
+.pcard { position: relative; margin-top: 56px; border-radius: 30px; background: #fff; box-shadow: 0 1px 2px rgba(20,17,22,0.04), 0 18px 40px rgba(124,77,255,0.10); padding: 22px 18px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.pcard .av img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.pcard .av .camb { width: 32px; height: 32px; bottom: 0; inset-inline-start: 0; z-index: 1; }
+.pcard .av { margin-top: -68px; width: 96px; height: 96px; cursor: pointer; font-size: 40px; box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--pink), 0 12px 26px rgba(255,0,110,0.25); }
+.pname { margin-top: 14px; font-family: var(--he); font-weight: 700; font-size: 42px; line-height: 0.85; }
+.pmeta { margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.pmeta i { width: 3px; height: 3px; border-radius: 50%; background: var(--faint); }
+.lnk { border: 0; background: none; padding: 0; color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--pink); text-underline-offset: 3px; }
+.comms { width: 100%; margin-top: 16px; }
+.ct { display: block; font-size: 11px; font-weight: 600; color: var(--faint); margin-bottom: 8px; }
+.cl { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.cm { height: 32px; padding: 0 12px; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--c) 9%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 22%, transparent); color: var(--ink); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.cm i { width: 7px; height: 7px; border-radius: 2px; background: var(--c); transform: rotate(45deg); }
+.cm.add { background: none; box-shadow: inset 0 0 0 1.5px var(--rule); color: var(--muted); }
+.cm:active { transform: scale(0.96); }
+.edit { margin-top: 18px; height: 46px; padding: 0 22px; border: 0; border-radius: 23px; background: var(--pink); color: #fff; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 10px 22px rgba(255,0,110,0.3); transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.edit:active { transform: scale(0.97); }
+.psb { width: calc(100% + 36px); margin-top: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+.psb div { padding: 12px 0 14px; } .psb div + div { border-inline-start: 1px solid var(--rule); }
+.psb b { display: block; font-size: 32px; line-height: 0.95; } .psb span { font-size: 11px; color: var(--muted); }
+.tabs { background: rgba(246,244,247,0.92) !important; }
+.seg { background: #ECE8EE; }
+.coach { background: #fff; box-shadow: none !important; }
+.set.grp { margin-top: 10px; padding: 0 14px; border-radius: 22px; background: #fff; }
+.set.grp .row:last-child { border-bottom: 0; }
+.out { background: #fff; box-shadow: none; }
+.ms-wrap { padding: 0 14px; border-radius: 22px; background: #fff; }
+.ms-wrap .ms:last-child { border-bottom: 0; }
+.bc:not(.on) { background: #fff; }
+.afil button:not([aria-pressed="true"]) { background: #fff; }
+
+
+/* profile photo sheet: source options -> circular crop (drag to pan, slider to zoom) -> save */
+.popts { margin-top: 14px; border-radius: 22px; background: var(--soft); padding: 0 14px; }
+.popts button { width: 100%; border: 0; background: none; padding: 14px 0; display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--rule); text-align: start; }
+.popts button:last-child { border-bottom: 0; }
+.popts button .ic { width: 36px; height: 36px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; }
+.popts button.del { color: var(--cherry); }
+.crop { position: relative; margin: 14px auto 0; width: 280px; height: 280px; border-radius: 24px; overflow: hidden; background: #141116; touch-action: none; cursor: grab; }
+.crop img { position: absolute; left: 50%; top: 50%; max-width: none; transform: translate(calc(-50% + var(--px, 0px)), calc(-50% + var(--py, 0px))) scale(var(--z, 1)); transform-origin: center; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+.crop::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at center, transparent 0 118px, rgba(20,17,22,0.6) 119px); }
+.crop::before { content: ''; position: absolute; left: 50%; top: 50%; width: 236px; height: 236px; margin: -118px 0 0 -118px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,0.9); z-index: 1; pointer-events: none; }
+.zoom { display: flex; align-items: center; gap: 10px; margin: 14px 4px 0; color: var(--muted); }
+.zoom input { flex: 1; accent-color: var(--pink); }
+.pact { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 16px; }
+.pact button { height: 52px; border: 0; border-radius: 26px; font-weight: 700; font-size: 15px; background: var(--soft); transition: transform 140ms var(--ease-out); }
+.pact button.pri { background: var(--ink); color: #fff; }
+.pact button:active { transform: scale(0.97); }
+
+/* body */
+.wcard { margin-top: 10px; border-radius: 26px; background: var(--ink); color: #fff; padding: 18px 18px 14px; position: relative; overflow: hidden; }
+.wcard::before { content: ''; position: absolute; inset: 0; opacity: 0.1; background: repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 40px); pointer-events: none; }
+.wcard > * { position: relative; }
+.wh { display: flex; align-items: flex-start; justify-content: space-between; }
+.wh .e { color: rgba(255,255,255,0.5); }
+.wh b { display: block; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 58px; line-height: 0.85; margin-top: 6px; }
+.wh b small { font-family: var(--font); font-style: normal; font-size: 14px; font-weight: 600; opacity: 0.7; margin-inline-start: 4px; }
+.delta { height: 26px; padding: 0 10px; border-radius: 13px; background: rgba(255,0,110,0.22); color: #FF8FC0; font-family: var(--num); font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: 4px; }
+.wsub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+.chart { margin-top: 12px; height: 100px; }
+.chart svg { width: 100%; height: 100%; overflow: visible; }
+.chart .ln { fill: none; stroke: #FF006E; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1s var(--ease-out) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.chart .dot { fill: #fff; stroke: #FF006E; stroke-width: 3; }
+.cx { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.range { display: flex; gap: 4px; margin-top: 12px; }
+.range button { height: 30px; padding: 0 12px; border: 0; border-radius: 15px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; }
+.range button[aria-pressed="true"] { background: #fff; color: var(--ink); }
+.upd { width: 100%; margin-top: 12px; height: 52px; border: 0; border-radius: 26px; background: var(--pink); color: #fff; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 24px rgba(255,0,110,0.3); transition: transform 140ms var(--ease-out); }
+.upd:active { transform: scale(0.97); }
+.sh { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 0 6px; }
+.sh h2 { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.sh small { font-size: 12px; color: var(--muted); }
+.ms { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.ms i { width: 6px; height: 34px; border-radius: 3px; background: var(--c); flex: none; }
+.ms div { flex: 1; min-width: 0; }
+.ms b { display: block; font-family: var(--he); font-weight: 700; font-size: 26px; line-height: 0.85; }
+.ms small { font-size: 12px; color: var(--muted); }
+.ms svg { flex: none; }
+.ms .v { text-align: left; min-width: 64px; }
+.ms .v b { font-family: var(--num); font-size: 24px; line-height: 1; }
+.ms .v b small { font-family: var(--font); font-size: 11px; }
+.ms .v span { display: block; font-family: var(--num); font-weight: 700; font-size: 14px; color: var(--cherry); direction: ltr; }
+.ms .v span.up { color: var(--purple); }
+
+/* photos */
+.cmp { position: relative; margin-top: 10px; height: 360px; border-radius: 26px; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.cmp .p { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 14px; }
+.cmp .a { background: linear-gradient(170deg, #F3D9CF, #C9A091); }
+.cmp .b { background: linear-gradient(170deg, #F8E2EA, #E4A3BD); clip-path: inset(0 0 0 var(--cx, 50%)); }
+.cmp .p span { height: 26px; padding: 0 10px; border-radius: 13px; background: rgba(255,255,255,0.92); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.cmp .p span code { color: var(--muted); }
+.cmp .a { justify-content: flex-start; } .cmp .b { justify-content: flex-end; }
+.cmp .sil { position: absolute; left: 50%; top: 40px; transform: translateX(-50%); width: 120px; height: 280px; border-radius: 60px 60px 20px 20px; background: rgba(255,255,255,0.25); }
+.cmp .hd { position: absolute; top: 0; bottom: 0; left: var(--cx, 50%); width: 3px; margin-left: -1.5px; background: #fff; box-shadow: 0 0 12px rgba(0,0,0,0.2); }
+.cmp .hd button { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 0; border-radius: 50%; background: #fff; color: var(--ink); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(20,17,22,0.25); cursor: ew-resize; }
+.lock { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.pg { position: relative; aspect-ratio: 3 / 4; border: 0; border-radius: 16px; background: var(--g); padding: 0; overflow: hidden; }
+.pg span { position: absolute; bottom: 6px; inset-inline-start: 6px; height: 20px; padding: 0 7px; border-radius: 10px; background: rgba(255,255,255,0.92); font-family: var(--mono); font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; }
+.pg.add { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--rule); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.pg.add i { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; }
+.pg[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--pink); }
+
+/* achievements: hero (count + xp + streak + latest), category groups of glossy medals with progress rings, 3D tilt + shine, detail modal with flip + confetti */
+.ah { position: relative; overflow: hidden; isolation: isolate; margin-top: 10px; border-radius: 28px; padding: 18px; color: #fff; background: linear-gradient(125deg, #A50047 0%, #FF006E 58%, #FF7A9F 100%); box-shadow: 0 18px 40px rgba(165,0,71,0.28); }
+.ah::after { content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0.2; background-image: radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.5px); background-size: 16px 16px; -webkit-mask-image: linear-gradient(to left, #000, transparent 75%); mask-image: linear-gradient(to left, #000, transparent 75%); pointer-events: none; }
+.ah .e { color: rgba(255,255,255,0.8); }
+.ah-big { display: flex; align-items: baseline; gap: 10px; margin: 6px 0 12px; }
+.ah-big b { font-family: var(--num); font-style: italic; font-weight: 800; font-size: 64px; line-height: 0.85; }
+.ah-big span { font-size: 14px; opacity: 0.9; }
+.xp { height: 10px; border-radius: 5px; background: rgba(255,255,255,0.25); overflow: hidden; }
+.xp i { display: block; height: 100%; width: var(--v); border-radius: 5px; background: linear-gradient(to left, #fff, #FFD6E6); box-shadow: 0 0 12px rgba(255,255,255,0.7); transform-origin: right; animation: xpIn 900ms var(--ease-out) both; }
+@keyframes xpIn { from { transform: scaleX(0); } }
+.ah-next { margin: 10px 0 0; font-size: 13px; opacity: 0.92; } .ah-next b { font-weight: 700; }
+.ah-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.ah-tile { border: 0; border-radius: 20px; padding: 10px 12px; background: rgba(255,255,255,0.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); color: #fff; display: flex; align-items: center; gap: 10px; text-align: start; }
+.ah-tile .fi { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(160deg, #FFC48A, #FF7A00); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(255,122,0,0.5); flex: none; }
+.ah-tile b { display: block; font-family: var(--num); font-size: 26px; line-height: 1; } .ah-tile small { font-size: 11px; opacity: 0.85; }
+.ah-tile.lt { background: rgba(255,255,255,0.95); color: var(--ink); box-shadow: none; transition: transform 180ms var(--ease-out); }
+.ah-tile.lt b { font-family: var(--font); font-size: 13px; font-weight: 700; line-height: 1.25; } .ah-tile.lt small { color: var(--muted); }
+.ah-tile.lt .medal { --sz: 44px; }
+.ah-tile.lt:active { transform: scale(0.97); }
+.afil { display: flex; gap: 6px; margin: 18px 0 4px; }
+.afil button { height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: var(--soft); font-size: 13px; font-weight: 600; color: var(--ink2); transition: background-color 150ms ease, color 150ms ease; }
+.afil button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.agrp h3 { display: flex; align-items: center; gap: 8px; margin: 18px 0 10px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+.agrp h3 i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); } .agrp h3 span { color: var(--faint); font-weight: 500; font-size: 12px; }
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; perspective: 700px; }
+.bc { --rx: 0deg; --ry: 0deg; position: relative; overflow: hidden; border: 0; border-radius: 22px; padding: 14px 6px 12px; background: var(--soft); display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform 300ms var(--ease-out), box-shadow 250ms ease; }
+.bc.live { transition: transform 60ms linear; }
+.bc.on { background: linear-gradient(170deg, #fff 35%, color-mix(in srgb, var(--c2) 40%, #fff)); box-shadow: 0 1px 2px rgba(20,17,22,0.04), 0 10px 24px color-mix(in srgb, var(--c) 14%, transparent); }
+.bc.on::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,0.9), transparent 60%); mix-blend-mode: soft-light; transition: opacity 200ms ease; }
+.bc.live::after { opacity: 1; }
+.bc b { font-size: 12px; font-weight: 600; line-height: 1.25; }
+.bc small { font-size: 10px; color: var(--muted); }
+.bc.on small { color: color-mix(in srgb, var(--c) 75%, #000); font-weight: 600; }
+.bc.next { box-shadow: 0 0 0 2px var(--c), 0 10px 24px color-mix(in srgb, var(--c) 22%, transparent); background: #fff; }
+.bc .nx { position: absolute; z-index: 2; top: 8px; inset-inline-start: 8px; height: 18px; padding: 0 7px; border-radius: 9px; background: var(--c); color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; }
+.bc:active { transform: scale(0.97); }
+.medal { --sz: 76px; position: relative; width: var(--sz); height: var(--sz); display: flex; align-items: center; justify-content: center; flex: none; }
+.medal .mring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.medal .disc { width: 72%; height: 72%; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #A9A2AC; background: linear-gradient(160deg, #FFFFFF, #ECE8EE); box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(20,17,22,0.06); }
+.medal.on .disc { width: 82%; height: 82%; color: #fff; position: relative; overflow: hidden; background: radial-gradient(80% 80% at 30% 20%, rgba(255,255,255,0.55), transparent 50%), linear-gradient(150deg, var(--c2), var(--c)); box-shadow: 0 0 0 3px #fff, 0 0 0 5px color-mix(in srgb, var(--c) 30%, transparent), 0 8px 20px color-mix(in srgb, var(--c) 40%, transparent), inset 0 -4px 8px rgba(0,0,0,0.12); }
+.medal.on .disc::after { content: ''; position: absolute; top: -50%; bottom: -50%; width: 30%; left: -60%; transform: rotate(25deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent); }
+.bc.on.shine .disc::after, .ah-tile.lt:hover .disc::after { left: 130%; transition: left 700ms var(--ease-out); }
+.medal .disc svg { width: 46%; height: 46%; }
+.medal .disc .t { font-family: var(--num); font-style: italic; font-weight: 800; font-size: calc(var(--sz) * 0.3); line-height: 1; }
+.medal .lock { position: absolute; bottom: 4%; inset-inline-end: 4%; width: 22px; height: 22px; border-radius: 50%; background: #fff; color: var(--muted); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(20,17,22,0.15); }
+.anote { margin: 14px 0 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.achm { position: absolute; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(20,17,22,0.3); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: opacity 200ms ease; }
+.achm[data-off] { opacity: 0; pointer-events: none; }
+.achm-card { position: relative; overflow: hidden; isolation: isolate; width: 100%; border-radius: 32px; padding: 30px 22px 22px; background: #fff; box-shadow: 0 40px 100px rgba(20,17,22,0.3); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 300ms var(--sheet); }
+.achm-card::before { content: ''; position: absolute; inset: 0 0 45%; z-index: -1; background: radial-gradient(60% 70% at 50% 40%, color-mix(in srgb, var(--c2) 70%, #fff), transparent 72%); }
+.achm-card:not(.on)::before { filter: grayscale(1); opacity: 0.5; }
+.achm[data-off] .achm-card { transform: scale(0.94) translateY(8px); }
+.achm-x { position: absolute; top: 14px; inset-inline-end: 14px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--soft); display: flex; align-items: center; justify-content: center; }
+.achm-stage { position: relative; }
+.achm-stage .medal { --sz: 150px; }
+.achm:not([data-off]) .achm-card.on .medal { animation: medalIn 700ms var(--ease-out) both; }
+@keyframes medalIn { from { transform: rotateY(-180deg) scale(0.6); } }
+.confetti { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
+.confetti i { position: absolute; display: block; border-radius: 2px; }
+.achm-cat { height: 24px; padding: 0 10px; border-radius: 12px; background: color-mix(in srgb, var(--c) 12%, #fff); color: color-mix(in srgb, var(--c) 80%, #000); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; }
+.achm-card h2 { margin: 2px 0 0; font-family: var(--he); font-weight: 700; font-size: 40px; line-height: 0.9; }
+.achm-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.achm-done { margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 18px; background: var(--c); color: #fff; font-size: 13px; font-weight: 700; }
+.achm-prog { width: 100%; margin-top: 10px; display: flex; align-items: center; gap: 10px; font-family: var(--num); font-weight: 700; font-size: 16px; }
+.achm-prog .xp { flex: 1; background: var(--soft); } .achm-prog .xp i { background: var(--c); box-shadow: none; }
+
+/* lower */
+.coach { margin-top: 26px; display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 22px; box-shadow: inset 0 0 0 1px var(--rule); }
+.coach .cav { width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.coach div { flex: 1; min-width: 0; } .coach b { font-family: var(--he); font-size: 26px; line-height: 0.85; display: block; } .coach small { font-size: 12px; color: var(--muted); }
+.coach button { height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 700; transition: transform 140ms var(--ease-out); }
+.coach button:active { transform: scale(0.97); }
+.set { margin-top: 6px; }
+.row { width: 100%; border: 0; background: none; padding: 14px 0; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--rule); text-align: start; font-size: 15px; cursor: pointer; }
+.row .ic { width: 36px; height: 36px; border-radius: 12px; background: var(--soft); display: flex; align-items: center; justify-content: center; flex: none; color: var(--ink2); }
+.row span { flex: 1; min-width: 0; } .row span small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.row > svg { color: var(--faint); flex: none; }
+.row .val { font-size: 13px; color: var(--muted); }
+.lang { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 14px; background: var(--soft); flex: none; }
+.lang button { height: 30px; padding: 0 12px; border: 0; border-radius: 11px; background: none; font-size: 12px; font-weight: 700; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(20,17,22,0.08); }
+.sw { position: relative; flex: none; }
+.sw input { position: absolute; opacity: 0; pointer-events: none; }
+.sw i { display: block; width: 46px; height: 28px; border-radius: 14px; background: rgba(118,118,128,0.2); position: relative; transition: background-color 200ms ease; }
+.sw i::after { content: ''; position: absolute; top: 2px; inset-inline-start: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 220ms var(--ease-out); }
+.sw input:checked + i { background: var(--cherry); } .sw input:checked + i::after { transform: translateX(-18px); }
+.sw input:focus-visible + i { box-shadow: 0 0 0 3px rgba(255,0,110,0.3); }
+.out { margin-top: 18px; width: 100%; height: 50px; border: 0; border-radius: 25px; background: none; box-shadow: inset 0 0 0 1.5px var(--rule); color: var(--cherry); font-weight: 700; transition: background-color 150ms ease, transform 140ms var(--ease-out); }
+.out:active { transform: scale(0.97); }
+.ver { text-align: center; margin-top: 14px; }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; z-index: 70; background: rgba(20,17,22,0.35); transition: opacity 240ms ease; }
+.scrim[data-off] { opacity: 0; pointer-events: none; }
+.sheet { position: absolute; inset-inline: 0; bottom: 0; z-index: 71; max-height: 88%; overflow-y: auto; border-radius: 32px 32px 0 0; background: #fff; padding: 0 20px 26px; box-shadow: 0 -20px 50px rgba(20,17,22,0.25); transition: transform 300ms var(--sheet); }
+.sheet[data-off] { transform: translateY(104%); transition-duration: 200ms; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #D8D3DB; margin: 10px auto 12px; }
+.sheet h3 { margin: 0; font-family: var(--he); font-weight: 700; font-size: 42px; line-height: 0.85; }
+.sheet p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.big { margin-top: 16px; display: flex; align-items: center; gap: 8px; height: 76px; padding: 0 10px; border-radius: 38px; background: var(--soft); }
+.big button { width: 54px; height: 54px; border: 0; border-radius: 50%; background: #fff; font-size: 24px; font-weight: 600; transition: transform 120ms var(--ease-out); }
+.big button:active { transform: scale(0.9); }
+.big output { flex: 1; text-align: center; font-family: var(--num); font-style: italic; font-weight: 800; font-size: 48px; line-height: 1; }
+.big output small { font-family: var(--font); font-style: normal; font-size: 14px; font-weight: 600; color: var(--muted); }
+.mrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.mrow i { width: 6px; height: 28px; border-radius: 3px; background: var(--c); }
+.mrow b { flex: 1; font-family: var(--he); font-size: 24px; line-height: 0.9; }
+.mstp { display: flex; align-items: center; gap: 2px; height: 42px; padding: 0 4px; border-radius: 21px; background: var(--soft); }
+.mstp button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: #fff; font-size: 16px; font-weight: 600; }
+.mstp output { min-width: 58px; text-align: center; font-family: var(--num); font-weight: 700; font-size: 20px; }
+.mstp output small { font-family: var(--font); font-size: 10px; color: var(--muted); }
+.save { width: 100%; height: 56px; margin-top: 18px; border: 0; border-radius: 28px; background: var(--ink); color: #fff; font-weight: 700; font-size: 16px; transition: transform 140ms var(--ease-out); }
+.save:active { transform: scale(0.97); }
+.toast { position: absolute; left: 50%; bottom: 110px; z-index: 80; transform: translate(-50%, 20px); opacity: 0; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; white-space: nowrap; transition: opacity 200ms ease, transform 300ms var(--ease-out); pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* dock */
+.dock { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 30; display: flex; gap: 4px; padding: 6px; border-radius: 34px; background: var(--ink); box-shadow: 0 16px 36px rgba(20,17,22,0.35); }
+.dk { height: 54px; min-width: 54px; padding: 0 16px; border: 0; border-radius: 27px; background: transparent; color: rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; gap: 0; }
+.dk .l { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; font-size: 13px; font-weight: 700; }
+.dk[aria-current="page"] { background: var(--pink); color: #fff; padding: 0 18px; gap: 8px; box-shadow: 0 6px 16px rgba(255,0,110,0.45); }
+.dk[aria-current="page"] .l { max-width: 80px; opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .ib:hover { background: #ECE8EE; } .top .ib:hover { background: rgba(255,255,255,0.18); } .edit:hover { background: #E8005F; } .cm:hover { background: color-mix(in srgb, var(--c) 16%, #fff); } .cm.add:hover { background: var(--soft); } .lnk:hover { color: var(--pink); } .seg button:not([aria-selected="true"]):hover { color: var(--ink2); }
+  .row:hover .ic { background: #ECE8EE; } .md:hover { transform: translateY(-3px); } .out:hover { background: var(--blush); }
+  .bc:not(.on):hover .medal .disc { color: var(--c); } .afil button:not([aria-pressed="true"]):hover { background: #ECE8EE; } .ah-tile.lt:hover { transform: translateY(-2px); }
+  .range button:not([aria-pressed="true"]):hover { background: rgba(255,255,255,0.18); } .coach button:hover, .save:hover { background: var(--ink2); }
+}
+@media (max-width: 440px) { body { padding: 0; } .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; } .island { display: none; } .top { padding-top: max(18px, env(safe-area-inset-top, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .xp i, .achm-card .medal { animation: none !important; } .bc { transform: none !important; } .seg i, .sheet, .scrim, .toast, .sw i::after { transition-duration: 1ms !important; } .chart .ln, .ticks i.nx { animation: none !important; } .chart .ln { stroke-dashoffset: 0; } }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+</style>
+
+<div class="stage"><div class="phone">
+  <div class="island" aria-hidden="true"></div>
+  <div class="scr" id="scr">
+    <div class="bgw" aria-hidden="true"></div>
+    <div class="top"><h1 class="sr">פרופיל</h1><button class="ib" type="button" data-jump="set" aria-label="הגדרות"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
+    <div class="pad">
+      <section class="pcard" aria-label="הפרופיל שלי">
+        <span class="av" id="pav"><span id="pavI">מכ</span><button type="button" class="camb" aria-label="הוספת תמונת פרופיל" data-pp><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/></svg></button></span>
+        <b class="pname">מאיה כהן</b>
+        <span class="pmeta"><span>מתאמנת אצל <button type="button" class="lnk" data-jump="coach">שקד</button></span><i aria-hidden="true"></i><code class="e" aria-hidden="true">SINCE 09.2026</code></span>
+        <div class="comms"><span class="ct">הקהילות שלי</span><div class="cl">
+          <button type="button" class="cm" style="--c:#FF006E"><i></i>Sistem Strong</button>
+          <button type="button" class="cm" style="--c:#7C4DFF"><i></i>ריצת בוקר · ת״א</button>
+          <button type="button" class="cm" style="--c:#FF7A00"><i></i>אתגר 30 יום</button>
+          <button type="button" class="cm add" data-comm><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>הצטרפות</button>
+        </div></div>
+        <button type="button" class="edit" data-edit><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>עריכת פרופיל</button>
+        <div class="psb"><div><b class="n">22</b><span>אימונים</span></div><div><b class="n">3</b><span>שבועות ברצף</span></div><div><b class="n">6</b><span>שיאים</span></div></div>
+      </section>
+      <div class="tabs"><div class="seg" role="tablist" aria-label="אזורים" id="seg"><i id="segI"></i><button type="button" role="tab" data-tab="0" aria-selected="true">גוף</button><button type="button" role="tab" data-tab="1" aria-selected="false">תמונות</button><button type="button" role="tab" data-tab="2" aria-selected="false">הישגים</button></div></div>
+      <div id="panel"></div>
+      <div class="coach" id="coach"><span class="cav">שק</span><div><b>שקד</b><small>המאמנת שלך · עונה בדרך כלל תוך יום</small></div><button type="button" data-msg>הודעה</button></div>
+      <div class="sh" id="set"><h2><code class="e" aria-hidden="true">SETTINGS</code>הגדרות</h2></div>
+      <div class="set grp">
+        <div class="row" role="group" aria-label="שפה"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9S9.5 5.5 12 3z"/></svg></span><span>שפה</span><div class="lang"><button type="button" aria-pressed="true">עב</button><button type="button" aria-pressed="false">EN</button></div></div>
+        <label class="row"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><span>התראות<small>הודעות מהמאמנת ותוכניות חדשות</small></span><span class="sw"><input type="checkbox" checked><i></i></span></label>
+        <label class="row"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M22 6l-3-3"/></svg></span><span>תזכורת לאימון<small>ביום אימון, בשעה שתבחרי</small></span><span class="sw"><input type="checkbox"><i></i></span></label>
+      </div>
+      <div class="set grp">
+        <button class="row" type="button"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span><span>השאלון שלי<small>התשובות שהמאמנת רואה</small></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>
+        <button class="row" type="button"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><span>פרטיות<small>התמונות גלויות רק לך ולמאמנת</small></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>
+        <button class="row" type="button"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>פרטים אישיים<small>שם, אימייל, סיסמה</small></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>
+      </div>
+      <button class="out" type="button" data-out>התנתקות</button>
+      <div class="ver"><code class="e" aria-hidden="true">SISTEM · V0.6</code></div>
+    </div>
+  </div>
+  <div class="scrim" id="scrim" data-off></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="עדכון מדידה" data-off><div class="grab"></div><div id="shc"></div></section>
+  <div class="achm" id="achm" data-off></div>
+  <section class="sheet" id="psh" role="dialog" aria-modal="true" aria-label="תמונת פרופיל" data-off><div class="grab"></div><div id="pshc"></div></section>
+  <input type="file" accept="image/*" capture="user" id="fCam" hidden><input type="file" accept="image/*" id="fGal" hidden>
+  <div class="toast" id="toast" role="status"></div>
+  <nav class="dock" aria-label="ניווט">
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="l">בית</span></button>
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg><span class="l">אימונים</span></button>
+    <button class="dk" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8a3 3 0 0 0 6 0V3M10 3v18M17 3c-2 2-2 6 0 8v10"/></svg><span class="l">תזונה</span></button>
+    <button class="dk" type="button" aria-current="page"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="l">פרופיל</span></button>
+  </nav>
+</div></div>
+
+<script>
+(function () {
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = [64.2, 63.9, 63.6, 63.8, 63.1, 62.9, 62.6, 62.4];
+  var M = [['waist', 'מותניים', 'm2', [74, 72.8, 71.5, 70.4]], ['hips', 'אגן', 'm3', [98, 97.6, 96.8, 96]], ['chest', 'חזה', 'm1', [92, 91.5, 91, 90.2]], ['thighs', 'ירכיים', 'm5', [56, 55.4, 55, 54.6]], ['arms', 'זרועות', 'm4', [28, 28.3, 28.6, 29.1]]];
+  var tab = 0, range = 1, cx = 50, newW = 62.4, newM = {};
+  function I(p, s) { return '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  function f1(n) { return (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ''); }
+  function spark(a, c) { var mn = Math.min.apply(0, a), mx = Math.max.apply(0, a), w = 64, h = 26; var pts = a.map(function (v, i) { return [i * w / (a.length - 1), h - 3 - (mx === mn ? h / 2 : (v - mn) / (mx - mn) * (h - 6))]; }); return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true" style="overflow:visible"><polyline points="' + pts.map(function (p) { return p.join(','); }).join(' ') + '" fill="none" stroke="var(--' + c + ')" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + pts[pts.length - 1][0] + '" cy="' + pts[pts.length - 1][1] + '" r="3" fill="var(--' + c + ')"/></svg>'; }
+  function chart() {
+    var a = range === 0 ? W.slice(-4) : W, mn = Math.min.apply(0, a) - 0.3, mx = Math.max.apply(0, a) + 0.3, w = 320, h = 90;
+    var pts = a.map(function (v, i) { return [(a.length - 1 - i) * w / (a.length - 1), h - (v - mn) / (mx - mn) * h]; }); // RTL: oldest on the right
+    var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var last = pts[pts.length - 1];
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-label="גרף משקל"><path d="' + d + ' L' + last[0] + ' ' + h + ' L' + pts[0][0] + ' ' + h + ' Z" fill="rgba(255,0,110,0.12)"/><path class="ln" d="' + d + '" vector-effect="non-scaling-stroke"/><circle class="dot" cx="' + last[0] + '" cy="' + last[1] + '" r="5" vector-effect="non-scaling-stroke"/></svg>';
+  }
+  function body() {
+    var d = W[W.length - 1] - W[0];
+    return '<div class="wcard"><div class="wh"><div><code class="e" aria-hidden="true">WEIGHT · KG</code><b>' + f1(W[W.length - 1]) + '<small>ק״ג</small></b><div class="wsub">עודכן ביום ב׳ · 19.10</div></div><span class="delta"><bdi dir="ltr">' + (d < 0 ? '−' : '+') + f1(Math.abs(d)) + '</bdi> ק״ג</span></div>' +
+      '<div class="chart">' + chart() + '</div><div class="cx" aria-hidden="true"><span>' + (range === 0 ? '4 WEEKS AGO' : 'START · W01') + '</span><span>NOW</span></div>' +
+      '<div class="range"><button type="button" data-range="0" aria-pressed="' + (range === 0) + '">חודש</button><button type="button" data-range="1" aria-pressed="' + (range === 1) + '">מההתחלה</button></div>' +
+      '<button class="upd" type="button" data-upd>' + I('<path d="M12 5v14M5 12h14"/>', 18) + 'עדכון מדידה</button></div>' +
+      '<div class="sh"><h2><code class="e" aria-hidden="true">MEASUREMENTS</code>היקפים</h2><small>ס״מ · מההתחלה</small></div>' +
+      '<div class="ms-wrap">' + M.map(function (m) { var a = m[3], dd = a[a.length - 1] - a[0]; return '<div class="ms" style="--c:var(--' + m[2] + ')"><i></i><div><b>' + m[1] + '</b><small>' + a.length + ' מדידות</small></div>' + spark(a, m[2]) + '<div class="v"><b class="n">' + f1(a[a.length - 1]) + '</b><span class="' + (dd > 0 ? 'up' : '') + '">' + (dd < 0 ? '−' : '+') + f1(Math.abs(dd)) + '</span></div></div>'; }).join('') + '</div>';
+  }
+  var PH = [['W01', 'linear-gradient(170deg,#F3D9CF,#C9A091)'], ['W02', 'linear-gradient(170deg,#F4DCD3,#CDA698)'], ['W04', 'linear-gradient(170deg,#F5E0DA,#D3AC9F)'], ['W06', 'linear-gradient(170deg,#F8E2EA,#E4A3BD)']];
+  function photos() {
+    return '<div class="cmp" id="cmp" style="--cx:' + cx + '%"><div class="p a"><span>התחלה <code>W01</code></span></div><div class="p b"><span>היום <code>W06</code></span></div><span class="sil" aria-hidden="true"></span><div class="hd"><button type="button" id="cmpH" role="slider" aria-label="השוואה בין התחלה להיום" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(cx) + '">' + I('<path d="m9 6-6 6 6 6M15 6l6 6-6 6"/>', 18) + '</button></div></div>' +
+      '<div class="lock">' + I('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>', 13) + 'גלוי רק לך ולמאמנת שלך</div>' +
+      '<div class="sh"><h2><code class="e" aria-hidden="true">PROGRESS</code>כל התמונות</h2><small>' + PH.length + ' תמונות</small></div>' +
+      '<div class="pgrid"><button class="pg add" type="button" data-ph><i>' + I('<path d="M12 5v14M5 12h14"/>', 16) + '</i>תמונה חדשה</button>' + PH.slice().reverse().map(function (p) { return '<button class="pg" type="button" style="--g:' + p[1] + '" aria-label="תמונה ' + p[0] + '"><span>' + p[0] + '</span></button>'; }).join('') + '</div>';
+  }
+  var CAT = { w: ['אימונים', '#FF006E', '#FF8FC0', '<path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/>'], s: ['רצפים', '#FF7A00', '#FFC48A', '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>'],
+    p: ['שבוע מושלם', '#7C4DFF', '#C9A6FF', '<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/>'], r: ['שיאים אישיים', '#0094FF', '#9ED3FF', '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'],
+    b: ['גוף ומדידות', '#C23BC0', '#F0B3EA', '<path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/>'], f: ['תמונות', '#A50047', '#FF8FB8', '<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/>'] };
+  // [cat, title, description, target, progress, unlocked date, big number shown on the disc (optional)]
+  var AC = [
+    ['w', 'אימון ראשון', 'השלימי את האימון הראשון שלך.', 1, 8, '5 באוק׳'], ['w', '5 אימונים', 'השלימי 5 אימונים.', 5, 8, '6 באוק׳', '5'], ['w', '10 אימונים', 'השלימי 10 אימונים.', 10, 8, '', '10'], ['w', '25 אימונים', 'השלימי 25 אימונים.', 25, 8, '', '25'],
+    ['p', 'שבוע מושלם', 'השלימי כל אימון בתוכנית השבועית שלך.', 1, 1, '17 באוק׳'],
+    ['s', 'רצף של 2 שבועות', 'השלימי את התוכנית 2 שבועות ברצף.', 2, 2, '17 באוק׳', '2'], ['s', 'רצף של 4 שבועות', 'השלימי את התוכנית 4 שבועות ברצף.', 4, 2, '', '4'], ['s', 'רצף של 8 שבועות', 'השלימי את התוכנית 8 שבועות ברצף.', 8, 2, '', '8'],
+    ['r', 'שיא חזרות', 'שברי שיא חזרות בתרגיל כלשהו.', 1, 1, '6 באוק׳'], ['r', '5 שיאים אישיים', 'שברי 5 שיאים אישיים.', 5, 1, '', '5'],
+    ['b', 'מדידות ראשונות', 'עדכני מדידות היקפים בפעם הראשונה.', 1, 1, '6 באוק׳'], ['b', '10 שקילות', 'עדכני משקל 10 פעמים.', 10, 10, '6 באוק׳', '10'],
+    ['f', 'Daily Pump ראשון', 'העלי את תמונת ה-Daily Pump הראשונה שלך.', 1, 1, '6 באוק׳']
+  ];
+  var af = 'all';
+  function medal(a, on, p) {
+    var c = CAT[a[0]], C = 2 * Math.PI * 46;
+    return '<span class="medal' + (on ? ' on' : '') + '" style="--c:' + c[1] + ';--c2:' + c[2] + '">' +
+      (on ? '' : '<svg class="mring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="rgba(20,17,22,.08)" stroke-width="4"/>' + (p > 0 ? '<circle cx="50" cy="50" r="46" fill="none" stroke="' + c[1] + '" stroke-width="4" stroke-linecap="round" stroke-dasharray="' + (C * Math.min(1, p)).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 50 50)"/>' : '') + '</svg>') +
+      '<span class="disc">' + (a[6] ? '<span class="t">' + a[6] + '</span>' : I(c[3])) + '</span>' + (on ? '' : '<span class="lock">' + I('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', 11) + '</span>') + '</span>';
+  }
+  function ach() {
+    var data = AC.map(function (a, i) { return { a: a, i: i, on: a[4] >= a[3], p: a[4] / a[3] }; }), un = data.filter(function (x) { return x.on; }).length;
+    var next = data.filter(function (x) { return !x.on; }).sort(function (x, y) { return y.p - x.p; })[0], latest = data[5];
+    var h = '<section class="ah"><code class="e" aria-hidden="true">ACHIEVEMENTS</code><div class="ah-big"><b data-cnt="' + un + '">' + un + '</b><span>מתוך ' + AC.length + ' נפתחו</span></div><div class="xp"><i style="--v:' + (un / AC.length * 100) + '%"></i></div>' +
+      (next ? '<p class="ah-next">הבא בתור: <b>' + next.a[1] + '</b> · עוד ' + (next.a[3] - next.a[4]) + '</p>' : '') +
+      '<div class="ah-row"><div class="ah-tile"><span class="fi">' + I(CAT.s[3], 20) + '</span><div><b>2</b><small>שבועות ברצף</small></div></div>' +
+      '<button class="ah-tile lt" type="button" data-ach="' + latest.i + '">' + medal(latest.a, true, 1) + '<div><small>נפתח לאחרונה</small><b>' + latest.a[1] + '</b></div></button></div></section>';
+    h += '<div class="afil" role="group" aria-label="סינון">' + [['all', 'הכול · ' + AC.length], ['on', 'נפתחו · ' + un], ['off', 'בדרך · ' + (AC.length - un)]].map(function (f) { return '<button type="button" data-af="' + f[0] + '" aria-pressed="' + (af === f[0]) + '">' + f[1] + '</button>'; }).join('') + '</div>';
+    var list = data.filter(function (x) { return af === 'all' || (af === 'on' ? x.on : !x.on); });
+    h += Object.keys(CAT).map(function (k) {
+      var it = list.filter(function (x) { return x.a[0] === k; }); if (!it.length) return '';
+      return '<section class="agrp" style="--c:' + CAT[k][1] + '"><h3><i></i>' + CAT[k][0] + '<span><bdi dir="ltr">' + it.filter(function (x) { return x.on; }).length + '/' + it.length + '</bdi></span></h3><div class="badges">' + it.map(function (x) {
+        var nx = next && x.i === next.i;
+        return '<button type="button" class="bc' + (x.on ? ' on' : '') + (nx ? ' next' : '') + '" data-ach="' + x.i + '" style="--c:' + CAT[k][1] + ';--c2:' + CAT[k][2] + '">' + (nx ? '<span class="nx">הבא בתור</span>' : '') + medal(x.a, x.on, x.p) + '<b>' + x.a[1] + '</b><small>' + (x.on ? x.a[5] : '<bdi dir="ltr">' + x.a[4] + ' / ' + x.a[3] + '</bdi>') + '</small></button>';
+      }).join('') + '</div></section>';
+    }).join('');
+    return h + '<p class="anote">שבוע נספר ברצף כשכל האימונים המתוכננים בו בוצעו.</p>';
+  }
+  function openAch(i) {
+    var a = AC[i], on = a[4] >= a[3], c = CAT[a[0]], m = document.getElementById('achm');
+    m.innerHTML = '<div class="achm-card' + (on ? ' on' : '') + '" role="dialog" aria-modal="true" aria-label="' + a[1] + '" style="--c:' + c[1] + ';--c2:' + c[2] + '"><button type="button" class="achm-x" data-achx aria-label="סגירה">' + I('<path d="M6 6l12 12M18 6 6 18"/>', 15) + '</button>' +
+      '<div class="achm-stage">' + medal(a, on, a[4] / a[3]) + '<div class="confetti" aria-hidden="true"></div></div><span class="achm-cat">' + c[0] + '</span><h2>' + a[1] + '</h2><p>' + a[2] + '</p>' +
+      (on ? '<div class="achm-done">' + I('<path d="m5 12.5 4.5 4.5L19 7.5"/>', 16) + 'נפתח ב-' + a[5] + '</div>' : '<div class="achm-prog"><div class="xp"><i style="--v:' + Math.min(100, a[4] / a[3] * 100) + '%"></i></div><bdi dir="ltr">' + a[4] + ' / ' + a[3] + '</bdi></div>') + '</div>';
+    requestAnimationFrame(function () { m.removeAttribute('data-off'); if (on && !RM) burst(m.querySelector('.confetti'), c); m.querySelector('[data-achx]').focus({ preventScroll: true }); });
+  }
+  function closeAch() { document.getElementById('achm').setAttribute('data-off', ''); }
+  function burst(box, c) {
+    var cols = [c[1], c[2], '#FF006E', '#FFC48A', '#C9A6FF', '#fff'];
+    for (var k = 0; k < 36; k++) { var s = document.createElement('i'), ang = Math.random() * Math.PI * 2, dist = 70 + Math.random() * 90; s.style.background = cols[k % cols.length]; s.style.width = s.style.height = (4 + Math.random() * 5) + 'px'; if (k % 3 === 0) s.style.borderRadius = '50%'; box.appendChild(s);
+      s.animate([{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(' + Math.cos(ang) * dist + 'px,' + (Math.sin(ang) * dist + 40) + 'px) rotate(' + (Math.random() * 540) + 'deg) scale(.6)', opacity: 0 }], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards', delay: 120 }); }
+  }
+  function countUp() { if (RM) return; var b = document.querySelector('[data-cnt]'); if (!b) return; var to = +b.dataset.cnt, t0 = performance.now(); (function f(t) { var k = Math.min(1, (t - t0) / 700); b.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t0); }
+  // badge tilt + shine (pointer); on touch it tilts while pressed
+  document.addEventListener('pointermove', function (e) { var b = e.target.closest && e.target.closest('.bc'); document.querySelectorAll('.bc.live').forEach(function (x) { if (x !== b) { x.classList.remove('live'); x.style.setProperty('--rx', '0deg'); x.style.setProperty('--ry', '0deg'); } }); if (!b || RM) return; var r = b.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height; b.classList.add('live'); b.style.setProperty('--ry', ((x - 0.5) * 16).toFixed(1) + 'deg'); b.style.setProperty('--rx', ((0.5 - y) * 14).toFixed(1) + 'deg'); b.style.setProperty('--mx', (x * 100) + '%'); b.style.setProperty('--my', (y * 100) + '%'); if (b.classList.contains('on') && !b.classList.contains('shine')) b.classList.add('shine'); });
+  document.addEventListener('pointerout', function (e) { var b = e.target.closest && e.target.closest('.bc'); if (b && !b.contains(e.relatedTarget)) { b.classList.remove('live', 'shine'); b.style.setProperty('--rx', '0deg'); b.style.setProperty('--ry', '0deg'); } });
+  function render() { document.getElementById('panel').innerHTML = [body, photos, ach][tab](); document.getElementById('segI').style.setProperty('--t', tab); if (tab === 1) bindCmp(); if (tab === 2) countUp(); }
+  function bindCmp() {
+    var el = document.getElementById('cmp'), drag = false;
+    function set(x) { var r = el.getBoundingClientRect(); cx = Math.max(4, Math.min(96, (x - r.left) / r.width * 100)); el.style.setProperty('--cx', cx + '%'); document.getElementById('cmpH').setAttribute('aria-valuenow', Math.round(cx)); }
+    el.addEventListener('pointerdown', function (e) { drag = true; el.setPointerCapture(e.pointerId); set(e.clientX); });
+    el.addEventListener('pointermove', function (e) { if (drag) set(e.clientX); });
+    el.addEventListener('pointerup', function () { drag = false; });
+    document.getElementById('cmpH').addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); cx = Math.max(4, Math.min(96, cx + (e.key === 'ArrowLeft' ? -5 : 5))); el.style.setProperty('--cx', cx + '%'); } });
+  }
+  render();
+
+  var sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim'), lastF;
+  function sheetHtml() {
+    return '<h3>עדכון מדידה</h3><p>מספיק משקל. את ההיקפים אפשר לעדכן פעם בשבועיים.</p>' +
+      '<div class="big"><button type="button" data-w="1" aria-label="עוד 100 גרם">+</button><output>' + f1(newW) + ' <small>ק״ג</small></output><button type="button" data-w="-1" aria-label="פחות 100 גרם">−</button></div>' +
+      '<div class="sh"><h2>היקפים <small style="font-weight:400;color:var(--muted)">(לא חובה)</small></h2></div>' +
+      M.map(function (m) { var v = newM[m[0]] != null ? newM[m[0]] : m[3][m[3].length - 1]; return '<div class="mrow" style="--c:var(--' + m[2] + ')"><i></i><b>' + m[1] + '</b><div class="mstp"><button type="button" data-m="' + m[0] + ':1" aria-label="עוד">+</button><output>' + f1(v) + ' <small>ס״מ</small></output><button type="button" data-m="' + m[0] + ':-1" aria-label="פחות">−</button></div></div>'; }).join('') +
+      '<button class="save" type="button" data-save>שמירה</button>';
+  }
+  function openSheet() { lastF = document.activeElement; document.getElementById('shc').innerHTML = sheetHtml(); sheet.removeAttribute('data-off'); scrim.removeAttribute('data-off'); }
+  function closeSheet() { sheet.setAttribute('data-off', ''); scrim.setAttribute('data-off', ''); if (lastF) lastF.focus({ preventScroll: true }); }
+  var tt; function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 1700); }
+
+  // ---- profile photo: options -> crop -> save (kept locally in this prototype; the real app uploads it)
+  var psh = document.getElementById('psh'), pshc = document.getElementById('pshc'), photo = null, cropSrc = null, Z = 1, PX = 0, PY = 0, natW = 0, natH = 0;
+  function pOpen(html) { lastF = document.activeElement; pshc.innerHTML = html; psh.removeAttribute('data-off'); scrim.removeAttribute('data-off'); }
+  function pClose() { psh.setAttribute('data-off', ''); scrim.setAttribute('data-off', ''); if (lastF) lastF.focus({ preventScroll: true }); }
+  function optsHtml() {
+    return '<h3>תמונת פרופיל</h3><p>התמונה מוצגת לך, למאמנת ולחברות בקהילות שלך.</p><div class="popts">' +
+      '<button type="button" data-src="cam"><span class="ic">' + I('<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/>', 18) + '</span>צילום תמונה</button>' +
+      '<button type="button" data-src="gal"><span class="ic">' + I('<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>', 18) + '</span>בחירה מהגלריה</button>' +
+      (photo ? '<button type="button" class="del" data-src="del"><span class="ic">' + I('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>', 18) + '</span>הסרת התמונה</button>' : '') + '</div>';
+  }
+  function cropHtml() { return '<h3>התאמה</h3><p>גררי כדי למקם, והגדילי עם הסרגל.</p><div class="crop" id="crop"><img id="cimg" alt="" src="' + cropSrc + '"></div><label class="zoom">' + I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6"/>', 16) + '<input type="range" id="zr" min="1" max="3" step="0.01" value="1" aria-label="הגדלה">' + I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6M11 8v6"/>', 16) + '</label><div class="pact"><button type="button" data-pcx>ביטול</button><button type="button" class="pri" data-psave>שמירה</button></div>'; }
+  function applyCrop() {
+    var c = document.getElementById('crop'); if (!c) return;
+    var base = 236 / Math.min(natW, natH), sw = natW * base * Z, sh = natH * base * Z, mx = Math.max(0, (sw - 236) / 2), my = Math.max(0, (sh - 236) / 2);
+    PX = Math.max(-mx, Math.min(mx, PX)); PY = Math.max(-my, Math.min(my, PY));
+    var img = document.getElementById('cimg'); img.style.width = (natW * base) + 'px'; img.style.height = (natH * base) + 'px';
+    c.style.setProperty('--z', Z); c.style.setProperty('--px', PX + 'px'); c.style.setProperty('--py', PY + 'px');
+  }
+  function startCrop(src) { var im = new Image(); im.onload = function () { natW = im.naturalWidth; natH = im.naturalHeight; cropSrc = src; Z = 1; PX = PY = 0; if (psh.hasAttribute('data-off')) pOpen(''); pshc.innerHTML = cropHtml(); applyCrop(); bindCrop(); }; im.src = src; }
+  function bindCrop() {
+    var c = document.getElementById('crop'), d = null;
+    c.addEventListener('pointerdown', function (e) { d = { x: e.clientX - PX, y: e.clientY - PY }; c.setPointerCapture(e.pointerId); });
+    c.addEventListener('pointermove', function (e) { if (!d) return; PX = e.clientX - d.x; PY = e.clientY - d.y; applyCrop(); });
+    c.addEventListener('pointerup', function () { d = null; });
+    document.getElementById('zr').addEventListener('input', function (e) { Z = +e.target.value; applyCrop(); });
+  }
+  function saveCrop() {
+    var cv = document.createElement('canvas'), S = 400; cv.width = cv.height = S;
+    var ctx = cv.getContext('2d'), img = document.getElementById('cimg'), base = 236 / Math.min(natW, natH), k = S / 236, w = natW * base * Z * k, h = natH * base * Z * k;
+    ctx.drawImage(img, S / 2 - w / 2 + PX * k, S / 2 - h / 2 + PY * k, w, h);
+    photo = cv.toDataURL('image/jpeg', 0.9); // re-encoding through canvas also drops EXIF
+    setAvatar(); pClose(); toast('תמונת הפרופיל עודכנה');
+  }
+  function setAvatar() {
+    var a = document.getElementById('pav'), old = a.querySelector('img'); if (old) old.remove();
+    document.getElementById('pavI').hidden = !!photo;
+    if (photo) { var i = document.createElement('img'); i.src = photo; i.alt = 'תמונת הפרופיל של מאיה'; a.insertBefore(i, a.firstChild); }
+    a.querySelector('.camb').setAttribute('aria-label', photo ? 'החלפת תמונת פרופיל' : 'הוספת תמונת פרופיל');
+  }
+  ['fCam', 'fGal'].forEach(function (id) { document.getElementById(id).addEventListener('change', function (e) { var f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return; var r = new FileReader(); r.onload = function () { startCrop(r.result); }; r.readAsDataURL(f); }); });
+  document.querySelector('.phone').addEventListener('click', function (e) {
+    var t;
+    if (e.target.closest('[data-pp]') || e.target.closest('#pav')) { e.stopPropagation(); return pOpen(optsHtml()); }
+    if ((t = e.target.closest('[data-src]'))) { var v = t.dataset.src; if (v === 'del') { photo = null; setAvatar(); pClose(); toast('התמונה הוסרה'); } else document.getElementById(v === 'cam' ? 'fCam' : 'fGal').click(); return; }
+    if (e.target.closest('[data-pcx]')) return pClose();
+    if (e.target.closest('[data-psave]')) return saveCrop();
+    if (e.target === scrim && !psh.hasAttribute('data-off')) { e.stopPropagation(); return pClose(); }
+  }, true);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !psh.hasAttribute('data-off')) pClose(); });
+  document.querySelector('.phone').addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-tab]'))) { tab = +t.dataset.tab; document.querySelectorAll('[data-tab]').forEach(function (b) { b.setAttribute('aria-selected', b === t); }); return render(); }
+    if ((t = e.target.closest('[data-ach]'))) return openAch(+t.dataset.ach);
+    if (e.target.closest('[data-achx]') || e.target.id === 'achm') return closeAch();
+    if ((t = e.target.closest('[data-af]'))) { af = t.dataset.af; return render(); }
+    if ((t = e.target.closest('[data-range]'))) { range = +t.dataset.range; return render(); }
+    if (e.target.closest('[data-upd]')) return openSheet();
+    if ((t = e.target.closest('[data-w]'))) { newW = Math.round((newW + 0.1 * +t.dataset.w) * 10) / 10; document.getElementById('shc').innerHTML = sheetHtml(); return; }
+    if ((t = e.target.closest('[data-m]'))) { var p = t.dataset.m.split(':'), m = M.filter(function (x) { return x[0] === p[0]; })[0], cur = newM[p[0]] != null ? newM[p[0]] : m[3][m[3].length - 1]; newM[p[0]] = Math.round((cur + 0.5 * +p[1]) * 10) / 10; document.getElementById('shc').innerHTML = sheetHtml(); return; }
+    if (e.target.closest('[data-save]')) { W.push(newW); M.forEach(function (m) { if (newM[m[0]] != null) m[3].push(newM[m[0]]); }); newM = {}; closeSheet(); render(); toast('המדידה נשמרה ונשלחה לשקד'); return; }
+    if (e.target === scrim) return closeSheet();
+    if ((t = e.target.closest('[data-jump]'))) { var el = document.getElementById(t.dataset.jump); if (el) el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' }); return; }
+    if (e.target.closest('[data-ph]')) return toast('כאן תיפתח המצלמה / הגלריה');
+    if (e.target.closest('[data-msg]')) return toast('פותח שיחה עם שקד');
+    if (e.target.closest('[data-edit]')) return toast('כאן נפתח מסך עריכת פרופיל');
+    if (e.target.closest('[data-comm]')) return toast('כאן תופיע רשימת הקהילות');
+    if (e.target.closest('.cm')) return toast('כאן נפתח עמוד הקהילה');
+    if (e.target.closest('[data-out]')) return toast('כאן יופיע אישור התנתקות');
+    if ((t = e.target.closest('.lang button'))) { t.parentNode.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b === t); }); return; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!sheet.hasAttribute('data-off')) closeSheet(); closeAch(); } });
+})();
+</script>
