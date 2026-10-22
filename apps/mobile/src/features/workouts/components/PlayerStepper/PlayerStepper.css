@@ -1,0 +1,105 @@
+/* A white 48px pill with a hairline; its row decides the ground (current / done). */
+.wp-stepper {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 48px;
+  padding: 0 4px;
+  border-radius: 24px;
+  background-color: var(--color-card);
+  box-shadow: var(--ring-hairline);
+}
+
+.wp-stepper-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  color: var(--color-ink);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+/* The round button is 36px; its tap area reaches the pill's full 48px height. */
+.wp-stepper-button::after {
+  content: '';
+  position: absolute;
+  inset: -6px -4px;
+}
+
+.wp-stepper-button:active:not(:disabled) {
+  transform: scale(0.88);
+}
+
+.wp-stepper-button:disabled {
+  opacity: var(--opacity-disabled-strong);
+}
+
+/* Barlow numbers; the "BW" / "–" placeholder smaller and faint. */
+.wp-stepper-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.wp-stepper-input::placeholder {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-faint);
+  opacity: 1;
+}
+
+.wp-stepper:focus-within {
+  box-shadow: var(--ring-field);
+}
+
+/* Done: no pill, no buttons — the logged values stay where they were. */
+.wp-stepper-locked {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.wp-stepper-locked .wp-stepper-button {
+  display: none;
+}
+
+.wp-stepper-locked:focus-within {
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-stepper-button:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-stepper-button {
+    transition: background-color var(--transition-fast) ease;
+  }
+
+  .wp-stepper-button:active:not(:disabled) {
+    transform: none;
+  }
+}

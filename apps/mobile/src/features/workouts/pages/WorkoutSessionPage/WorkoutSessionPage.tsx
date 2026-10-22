@@ -1,40 +1,37 @@
-import { fill, useCopy, useI18n, getActiveLanguage, isolateLtr } from '@sistem/shared';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { fill, getActiveLanguage, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
+import { BottomSheet } from '../../../../components/common/BottomSheet/BottomSheet';
 import { Button } from '../../../../components/common/Button/Button';
-import { Modal } from '../../../../components/common/Modal/Modal';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { Toast } from '../../../../components/common/Toast/Toast';
 import { useWakeLock } from '../../../../hooks/useWakeLock';
+import { useToast } from '../../../../hooks/useToast';
 import { ROUTES, workoutLogPath, workoutSummaryPath } from '../../../../app/config/routes';
-import { REST_LATE_BEEP_MS, REST_OVER_NOTICE_MS, SYNC_RETRY_MS, VIBRATE_SET_DONE_MS } from '../../data/sessionConfig';
-import { countDone, nextOpenSet, nextOpenSetAfter } from '../../data/sessionSets';
-import type { SessionModel } from '../../data/sessionSets';
+import { ALL_DONE_OFFER_DELAY_MS, SYNC_RETRY_MS, VIBRATE_REST_OVER_MS } from '../../data/sessionConfig';
+import { countDone, exerciseOf, firstOpenSetIn, nextOpenSet, nextOpenSetAfter } from '../../data/sessionSets';
+import type { SessionModel, SessionSet, SetValuesByKey } from '../../data/sessionSets';
+import { formatClock } from '../../data/workoutDisplay';
 import { workoutCopy } from '../../copy';
 import { buildBlockPhases } from '../../data/intervalTimeline';
-import { beep, isCountdownBeep, isSoundMuted, unlockAudio } from '../../data/intervalSounds';
+import { unlockAudio } from '../../data/intervalSounds';
 import type { IntervalPhase } from '../../data/intervalTimeline';
 import { useIntervalRun } from '../../hooks/useIntervalRun';
-import { IntervalTimer } from '../../components/IntervalTimer/IntervalTimer';
-import { SoundToggle } from '../../components/SoundToggle/SoundToggle';
-import { useCountdown } from '../../hooks/useCountdown';
+import { useHoldTimer } from '../../hooks/useHoldTimer';
+import { useRestTimer } from '../../hooks/useRestTimer';
 import { useWorkoutSession } from '../../hooks/useWorkoutSession';
-import { RestBar } from '../../components/RestBar/RestBar';
-import { SessionBlock } from '../../components/SessionBlock/SessionBlock';
-import { SessionClock } from '../../components/SessionClock/SessionClock';
-import { FocusTip } from '../../components/FocusTip/FocusTip';
-import { nameScript } from '../../data/weekPlanDisplay';
+import { IntervalTimer } from '../../components/IntervalTimer/IntervalTimer';
+import { PlayerHeader } from '../../components/PlayerHeader/PlayerHeader';
+import { PlayerTip } from '../../components/PlayerTip/PlayerTip';
+import { PlayerExercise } from '../../components/PlayerExercise/PlayerExercise';
+import { PlayerQueue } from '../../components/PlayerQueue/PlayerQueue';
+import { RestSheet } from '../../components/RestSheet/RestSheet';
+import type { RestNext } from '../../components/RestSheet/RestSheet';
 import './WorkoutSessionPage.css';
 
-type Dialog = 'menu' | 'confirmDiscard' | 'confirmFinish' | 'nothingDone';
-
-interface Hold {
-  key: string;
-  startedAt: number;
-  endsAt: number;
-  targetSec: number;
-}
+type Dialog = 'menu' | 'confirmDiscard' | 'confirmFinish' | 'allDone' | 'nothingDone';
 
 /** Best effort: Android vibrates, iOS Safari has no Vibration API. */
 function vibrate(pattern: number[]) {
@@ -45,21 +42,31 @@ function vibrate(pattern: number[]) {
   }
 }
 
-/** "Squat · set 2" — what comes next, for the "Rest over" notice. */
-function describeSet(model: SessionModel, key: string): string {
-  for (const block of model.blocks) {
-    for (const exercise of block.exercises) {
-      const index = exercise.sets.findIndex((set) => set.key === key);
-      if (index !== -1) return `${exercise.plan.exercise?.name ?? 'Exercise'} · set ${index + 1}`;
-    }
-  }
-  return '';
+function scrollToTop() {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+/** What the rest sheet shows as "Next": the set's exercise and "Set 2 · 12 reps". */
+function describeNext(model: SessionModel, values: SetValuesByKey, set: SessionSet): RestNext {
+  const text = workoutCopy[getActiveLanguage()];
+  const exercise = exerciseOf(model, set.planExerciseId);
+  const name = exercise?.plan.exercise?.name ?? sharedCopy[getActiveLanguage()].log.exercise;
+  const number = (exercise?.sets.findIndex((candidate) => candidate.key === set.key) ?? 0) + 1;
+  const setValues = values[set.key];
+  const detail =
+    set.timed && setValues?.durationSec !== undefined
+      ? fill(text.player.nextSeconds, { set: number, seconds: formatClock(setValues.durationSec) })
+      : setValues?.reps !== undefined
+        ? fill(text.player.nextReps, { set: number, reps: setValues.reps })
+        : fill(text.player.nextSet, { set: number });
+  return { name, detail };
 }
 
 /**
- * The active workout (PRD §5.2): full screen, one exercise (or superset) open at a
- * time, per-set logging pre-filled by the server, an optional rest timer, and every
- * change saved on the phone first and on the server right after.
+ * The active workout (PRD §5.2, direction B): full screen, one exercise (or superset) on screen,
+ * per-set logging pre-filled by the server, the rest sheet, the "workout" queue, and every change
+ * saved on the phone first and on the server right after.
  */
 export function WorkoutSessionPage() {
   const { plural } = useI18n();
@@ -67,34 +74,15 @@ export function WorkoutSessionPage() {
   const { logId = '' } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  // Only a fresh start (useStartWorkout) shows the Focus tip; read once, so a reload or
-  // a later visit (resume) doesn't show it again.
-  const [showFocusTip] = useState(() => (location.state as { justStarted?: boolean } | null)?.justStarted === true);
-  const {
-    session,
-    model,
-    values,
-    loadError,
-    ended,
-    syncState,
-    rest,
-    finishQueued,
-    editSet,
-    setCompleted,
-    adjustRest,
-    endRest,
-    finish,
-    discard,
-  } = useWorkoutSession(logId);
+  // Only a fresh start (useStartWorkout) shows the tip; read once, so a reload or a resume doesn't.
+  const [showTip] = useState(() => (location.state as { justStarted?: boolean } | null)?.justStarted === true);
+  const { session, model, values, loadError, ended, syncState, rest, finishQueued, editSet, addSet, setCompleted, adjustRest, endRest, finish, discard } =
+    useWorkoutSession(logId);
+  const { toastMessage, showToast } = useToast();
 
   const [openBlockId, setOpenBlockId] = useState<string | null>(null);
   // The set she is on: follows her (next after the one she ticked), else the first open one.
   const [focusKey, setFocusKey] = useState<string | null>(null);
-  const [scrollKey, setScrollKey] = useState<string | null>(null);
-  const [hold, setHold] = useState<Hold | null>(null);
-  // The seconds of the running hold that already beeped (the countdown ticks 4× a second).
-  const holdBeepedRef = useRef(new Set<number>());
-  const [restOverText, setRestOverText] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -111,24 +99,42 @@ export function WorkoutSessionPage() {
     },
   });
 
-  const holdRemainingMs = useCountdown(hold?.endsAt ?? null);
-  const restRemainingMs = useCountdown(rest?.endsAt ?? null);
+  const hold = useHoldTimer((key, durationSec) => completeSet(key, { durationSec }));
+
+  const restRemainingMs = useRestTimer({
+    rest,
+    onEnd: useCallback(() => {
+      vibrate(VIBRATE_REST_OVER_MS);
+      endRest();
+      // The live toast says it politely; the sheet slides away.
+      showToast(workoutCopy[getActiveLanguage()].player.restDone);
+    }, [endRest, showToast]),
+  });
 
   // Measured once per load; the elapsed clock adds device time to the server's "now".
-  const serverOffsetMs = useMemo(
-    () => (session ? new Date(session.serverTime).getTime() - Date.now() : 0),
-    [session],
-  );
+  const serverOffsetMs = useMemo(() => (session ? new Date(session.serverTime).getTime() - Date.now() : 0), [session]);
 
   const focused = focusKey && model && !values[focusKey]?.completed ? (model.setByKey.get(focusKey) ?? null) : null;
   const currentSet = focused ?? (model ? nextOpenSet(model, values) : null);
   const currentBlockId = currentSet && model ? (model.blockIdByKey.get(currentSet.key) ?? null) : null;
   const openId = openBlockId ?? currentBlockId ?? model?.blocks[0]?.id ?? null;
+  const openIndex = model ? Math.max(0, model.blocks.findIndex((block) => block.id === openId)) : 0;
+  const openBlock = model?.blocks[openIndex] ?? null;
   const totalSets = model?.flow.length ?? 0;
   const doneSets = model ? countDone(model, values) : 0;
 
+  const groups = useMemo(
+    () =>
+      model?.blocks.map((block) => ({
+        id: block.id,
+        name: block.exercises.map((exercise) => exercise.plan.exercise?.name ?? sharedCopy[getActiveLanguage()].log.exercise).join(' + '),
+        sets: block.exercises.flatMap((exercise) => exercise.sets).map((set) => values[set.key]?.completed === true),
+      })) ?? [],
+    [model, values],
+  );
+
   useEffect(() => {
-    if (showFocusTip) navigate(location.pathname, { replace: true, state: null });
+    if (showTip) navigate(location.pathname, { replace: true, state: null });
     // Once, on arrival: clears the history entry's flag.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -139,115 +145,51 @@ export function WorkoutSessionPage() {
     navigate(ended.status === 'completed' ? workoutLogPath(logId) : ROUTES.TRAINEE_HOME, { replace: true });
   }, [ended, logId, navigate]);
 
-  useEffect(() => {
-    if (!scrollKey) return;
-    const frame = window.requestAnimationFrame(() => {
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      document
-        .getElementById(`session-set-${scrollKey}`)
-        ?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-      setScrollKey(null);
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [scrollKey]);
-
-  function focusNextAfter(doneKey: string) {
-    if (!model) return;
-    const next = nextOpenSetAfter(model, values, doneKey);
-    setFocusKey(next?.key ?? null);
-    if (!next) return;
-    const nextBlockId = model.blockIdByKey.get(next.key) ?? null;
-    if (nextBlockId !== openId) setOpenBlockId(nextBlockId);
-    setScrollKey(next.key);
-  }
-
-  function completeSet(key: string, patch: { durationSec?: number } = {}) {
-    setCompleted(key, true, patch);
-    setRestOverText(null);
-    focusNextAfter(key);
-  }
-
-  function toggleSet(key: string) {
-    if (hold?.key === key) setHold(null);
-    if (values[key]?.completed) setCompleted(key, false);
-    else completeSet(key);
-  }
-
-  function startHold(key: string) {
-    const targetSec = values[key]?.durationSec;
-    if (!targetSec) return;
-    // Inside the ▶ tap: lets the browser play the countdown beeps.
-    unlockAudio();
-    holdBeepedRef.current = new Set();
-    const now = Date.now();
-    setHold({ key, startedAt: now, endsAt: now + targetSec * 1000, targetSec });
-  }
-
-  function stopHold() {
-    if (!hold) return;
-    const heldSec = Math.max(1, Math.round((Date.now() - hold.startedAt) / 1000));
-    setHold(null);
-    completeSet(hold.key, { durationSec: Math.min(heldSec, hold.targetSec) });
-  }
-
-  // Same beeps as the interval timer: 10 s left (holds longer than 10 s), then 3-2-1.
-  useEffect(() => {
-    if (!hold || holdRemainingMs === null || holdRemainingMs === 0) return;
-    const left = Math.ceil(holdRemainingMs / 1000);
-    if (isCountdownBeep(left, hold.targetSec) && !holdBeepedRef.current.has(left)) {
-      holdBeepedRef.current.add(left);
-      beep('short', isSoundMuted());
-    }
-  }, [hold, holdRemainingMs]);
-
-  // A hold that runs out: the longer beep (+ vibration), its full time is logged and the set is done.
-  useEffect(() => {
-    if (!hold || holdRemainingMs !== 0) return;
-    beep('long', isSoundMuted());
-    const { key, targetSec } = hold;
-    setHold(null);
-    completeSet(key, { durationSec: targetSec });
-    // completeSet reads the latest render; running once per finished hold is the point.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hold, holdRemainingMs]);
-
-  // Browsers play sound only after a tap: any tap on the session (✓, ±, …) enables it —
-  // also for a rest restored after the app was reopened.
+  // Browsers play sound only after a tap: any tap on the session enables it — also for a rest
+  // restored after the app was reopened.
   useEffect(() => {
     document.addEventListener('pointerdown', unlockAudio);
     return () => document.removeEventListener('pointerdown', unlockAudio);
   }, []);
 
-  // Rest countdown: the same beeps as holds and intervals — 10 s left (rests longer than
-  // 10 s), then 3-2-1. A new rest or ±15s starts the pattern again.
-  const restBeepedRef = useRef(new Set<number>());
-  useEffect(() => {
-    restBeepedRef.current = new Set();
-  }, [rest?.endsAt]);
-  useEffect(() => {
-    if (!rest || restRemainingMs === null || restRemainingMs === 0) return;
-    const left = Math.ceil(restRemainingMs / 1000);
-    if (isCountdownBeep(left, rest.totalSec) && !restBeepedRef.current.has(left)) {
-      restBeepedRef.current.add(left);
-      beep('short', isSoundMuted());
+  // All sets done: offer the finish once the last check has popped.
+  const allDoneTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(allDoneTimer.current), []);
+
+  function focusNextAfter(doneKey: string) {
+    if (!model) return;
+    const next = nextOpenSetAfter(model, values, doneKey);
+    setFocusKey(next?.key ?? null);
+    if (!next) {
+      window.clearTimeout(allDoneTimer.current);
+      allDoneTimer.current = window.setTimeout(() => setDialog('allDone'), ALL_DONE_OFFER_DELAY_MS);
+      return;
     }
-  }, [rest, restRemainingMs]);
+    // The exercise is done: the screen moves on to the next one (the rest sheet already says which).
+    const nextBlockId = model.blockIdByKey.get(next.key) ?? null;
+    if (nextBlockId !== openId) {
+      setOpenBlockId(nextBlockId);
+      scrollToTop();
+    }
+  }
 
-  // Rest over: the longer beep, buzz, say what's next, then hide.
-  useEffect(() => {
-    if (!rest || restRemainingMs !== 0) return;
-    // Ended long ago (the app was in the background): no late beep, just the notice.
-    if (Date.now() - rest.endsAt < REST_LATE_BEEP_MS) beep('long', isSoundMuted());
-    vibrate(VIBRATE_SET_DONE_MS);
-    endRest();
-    setRestOverText(currentSet && model ? fill(workoutCopy[getActiveLanguage()].session.restOverNext, { next: describeSet(model, currentSet.key) }) : workoutCopy[getActiveLanguage()].session.restOver);
-  }, [currentSet, endRest, model, rest, restRemainingMs]);
+  function completeSet(key: string, patch: { durationSec?: number } = {}) {
+    setCompleted(key, true, patch);
+    focusNextAfter(key);
+  }
 
-  useEffect(() => {
-    if (!restOverText) return;
-    const timer = window.setTimeout(() => setRestOverText(null), REST_OVER_NOTICE_MS);
-    return () => window.clearTimeout(timer);
-  }, [restOverText]);
+  function toggleSet(key: string) {
+    if (hold.running?.key === key) hold.cancel();
+    if (values[key]?.completed) setCompleted(key, false);
+    else completeSet(key);
+  }
+
+  function jumpTo(blockId: string) {
+    if (!model) return;
+    setOpenBlockId(blockId);
+    setFocusKey(firstOpenSetIn(model, values, blockId)?.key ?? null);
+    scrollToTop();
+  }
 
   async function doFinish() {
     setDialog(null);
@@ -255,11 +197,8 @@ export function WorkoutSessionPage() {
     setIsFinishing(true);
     const result = await finish();
     setIsFinishing(false);
-    if (result.kind === 'finished') {
-      navigate(workoutSummaryPath(result.log.id), { replace: true });
-    } else if (result.kind === 'error') {
-      setActionError(result.message);
-    }
+    if (result.kind === 'finished') navigate(workoutSummaryPath(result.log.id), { replace: true });
+    else if (result.kind === 'error') setActionError(result.message);
   }
 
   // Finish tapped while offline: retry when the connection is back.
@@ -296,12 +235,8 @@ export function WorkoutSessionPage() {
   if (!session || !model) {
     return (
       <AppShell hideTabBar>
-        <div className="workout-session">
-          {loadError ? (
-            <StateMessage>{loadError}</StateMessage>
-          ) : (
-            <StateMessage>{copy.session.loading}</StateMessage>
-          )}
+        <div className="wp-state">
+          <StateMessage>{loadError ?? copy.session.loading}</StateMessage>
           {loadError && (
             <Button variant="secondary" onClick={() => navigate(ROUTES.TRAINEE_HOME)}>
               {copy.session.leave}
@@ -312,103 +247,83 @@ export function WorkoutSessionPage() {
     );
   }
 
-  const holdForRow = hold && holdRemainingMs !== null ? { key: hold.key, remainingMs: holdRemainingMs } : null;
   const statusLine = finishQueued ? copy.session.finishQueued : syncState === 'offline' ? copy.session.offline : null;
+  const restNext = rest && currentSet ? describeNext(model, values, currentSet) : null;
 
   return (
-    <AppShell hideTabBar>
-      <div className="workout-session">
-        <header className="workout-session-header">
-          <button
-            type="button"
-            className="workout-session-icon-button"
-            aria-label={copy.session.leave}
-            onClick={() => navigate(ROUTES.TRAINEE_HOME)}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-          <div className="workout-session-heading">
-            <h1 className="workout-session-title">
-              <bdi className="display-name" {...nameScript(session.log.workoutTitle)}>
-                {session.log.workoutTitle}
-              </bdi>
-            </h1>
-            <span className="workout-session-meta">
-              <SessionClock startedAt={session.log.startedAt} serverOffsetMs={serverOffsetMs} /> ·{' '}
-              {fill(copy.session.setsProgress, { progress: isolateLtr(`${doneSets} / ${totalSets}`) })}
-            </span>
-          </div>
-          {/* One sound setting for every timer: rest, holds and intervals. */}
-          <SoundToggle />
-          <button
-            type="button"
-            className="workout-session-icon-button"
-            aria-label={copy.session.menu}
-            onClick={() => setDialog('menu')}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="5" cy="12" r="1.5" />
-              <circle cx="12" cy="12" r="1.5" />
-              <circle cx="19" cy="12" r="1.5" />
-            </svg>
-          </button>
-          <progress className="workout-session-progress" max={Math.max(1, totalSets)} value={doneSets} aria-hidden="true" />
-        </header>
+    <AppShell hideTabBar bleed>
+      <div className="wp">
+        <h1 className="wp-visually-hidden">{session.log.workoutTitle}</h1>
+        <PlayerHeader
+          workoutTitle={session.log.workoutTitle}
+          startedAt={session.log.startedAt}
+          serverOffsetMs={serverOffsetMs}
+          groups={groups}
+          currentGroupId={openId}
+          exerciseNumber={openIndex + 1}
+          doneSets={doneSets}
+          totalSets={totalSets}
+          onEnd={handleFinishClick}
+          onMenu={() => setDialog('menu')}
+        />
 
-        {statusLine && <p className="workout-session-status">{statusLine}</p>}
-        {actionError && <p className="workout-session-error">{actionError}</p>}
-        {showFocusTip && <FocusTip />}
+        <div className="wp-body">
+          {statusLine && <p className="wp-status">{statusLine}</p>}
+          {actionError && (
+            <p className="wp-error" role="alert">
+              {actionError}
+            </p>
+          )}
+          {showTip && <PlayerTip />}
+          {session.workout.notes && (
+            <p className="wp-notes" dir="auto">
+              {session.workout.notes}
+            </p>
+          )}
 
-        {session.workout.notes && <p className="workout-session-notes" dir="auto">{session.workout.notes}</p>}
-
-        <div className="workout-session-blocks">
-          {model.blocks.map((block) => (
-            <SessionBlock
-              key={block.id}
-              block={block}
-              isOpen={block.id === openId}
-              isCurrent={block.id === currentBlockId}
+          {openBlock && (
+            <PlayerExercise
+              block={openBlock}
+              isCurrent={openBlock.id === currentBlockId}
               values={values}
               currentKey={currentSet?.key ?? null}
               lastPerformance={session.lastPerformance}
-              hold={holdForRow}
-              onOpen={() => setOpenBlockId(block.id)}
+              hold={hold.running}
+              onAddSet={addSet}
               onStartInterval={() => {
                 endRest();
-                setHold(null);
-                interval.start(buildBlockPhases(block, values));
+                hold.cancel();
+                interval.start(buildBlockPhases(openBlock, values));
               }}
               onEdit={editSet}
               onToggle={toggleSet}
-              onStartHold={startHold}
-              onStopHold={stopHold}
+              onStartHold={(key) => {
+                const targetSec = values[key]?.durationSec;
+                if (targetSec) hold.start(key, targetSec);
+              }}
+              onStopHold={hold.stop}
             />
-          ))}
+          )}
+
+          <PlayerQueue items={groups} currentId={openId} onSelect={jumpTo} />
         </div>
       </div>
 
-      {/* Portaled: the page-enter animation transforms <main>, which would pin a fixed
-          footer to <main> instead of the screen while it runs. */}
+      {/* Portaled: the page-enter animation transforms <main>, which would pin a fixed footer to <main>. */}
       {createPortal(
-        <footer className="workout-session-footer">
-          {rest && restRemainingMs !== null && restRemainingMs > 0 && (
-            <RestBar endsAt={rest.endsAt} remainingMs={restRemainingMs} totalSec={rest.totalSec} onAdjust={adjustRest} onSkip={endRest} />
-          )}
-          {restOverText && !rest && (
-            <p className="workout-session-rest-over" role="status">
-              {restOverText}
-            </p>
-          )}
-          <div className="workout-session-finish">
-            <Button className="workout-session-finish-button" onClick={handleFinishClick} loading={isFinishing}>
-              {copy.session.finish}
-            </Button>
-          </div>
-        </footer>,
+        <div className="wp-footer">
+          <button type="button" className="wp-finish" onClick={handleFinishClick} disabled={isFinishing} aria-busy={isFinishing || undefined}>
+            {copy.session.finish}
+            <small dir="ltr">
+              {doneSets}/{totalSets}
+            </small>
+          </button>
+        </div>,
         document.body,
       )}
+
+      <RestSheet rest={rest && restRemainingMs !== null && restRemainingMs > 0 ? rest : null} remainingMs={restRemainingMs} next={restNext} onAdjust={adjustRest} onSkip={endRest} />
+      <Toast message={toastMessage} />
 
       {interval.run && (
         <IntervalTimer
@@ -424,60 +339,72 @@ export function WorkoutSessionPage() {
         />
       )}
 
-      <Modal isOpen={dialog === 'menu'} onClose={() => setDialog(null)} variant="flat" title={copy.session.menuTitle}>
-        <div className="workout-session-dialog">
-          <Button variant="secondary" onClick={() => navigate(ROUTES.INTERVAL_TIMER)}>
-            {copy.interval.timerTitle}
-          </Button>
-          <Button variant="danger" onClick={() => setDialog('confirmDiscard')}>
-            {copy.session.discard}
-          </Button>
+      <BottomSheet isOpen={dialog === 'menu'} onClose={() => setDialog(null)} labelledBy="wp-menu-title">
+        <div className="wp-sheet">
+          <h2 className="wp-sheet-title display-title" id="wp-menu-title">
+            {copy.session.menuTitle}
+          </h2>
+          <div className="wp-sheet-actions">
+            <button type="button" className="wp-sheet-button" onClick={() => navigate(ROUTES.TRAINEE_HOME)}>
+              {copy.session.leave}
+            </button>
+            <button type="button" className="wp-sheet-button" onClick={() => navigate(ROUTES.INTERVAL_TIMER)}>
+              {copy.interval.timerTitle}
+            </button>
+            <button type="button" className="wp-sheet-button wp-sheet-button-danger" onClick={() => setDialog('confirmDiscard')}>
+              {copy.session.discard}
+            </button>
+          </div>
         </div>
-      </Modal>
+      </BottomSheet>
 
-      <Modal
-        isOpen={dialog === 'confirmDiscard'}
-        onClose={() => setDialog(null)}
-        variant="flat"
-        title={copy.session.confirmDiscardTitle}
-      >
-        <div className="workout-session-dialog">
-          <p className="workout-session-dialog-text">{copy.session.confirmDiscard}</p>
-          <Button variant="danger" onClick={handleDiscard} loading={isDiscarding}>
-            {copy.session.discardConfirm}
-          </Button>
-          <Button variant="ghost" onClick={() => setDialog(null)} disabled={isDiscarding}>
-            {copy.session.cancel}
-          </Button>
+      <BottomSheet isOpen={dialog === 'confirmDiscard'} onClose={() => setDialog(null)} labelledBy="wp-discard-title">
+        <div className="wp-sheet">
+          <h2 className="wp-sheet-title display-title" id="wp-discard-title">
+            {copy.session.confirmDiscardTitle}
+          </h2>
+          <p className="wp-sheet-text">{copy.session.confirmDiscard}</p>
+          <div className="wp-sheet-actions">
+            <button type="button" className="wp-sheet-button wp-sheet-button-danger-solid" onClick={() => void handleDiscard()} disabled={isDiscarding}>
+              {copy.session.discardConfirm}
+            </button>
+            <button type="button" className="wp-sheet-button" onClick={() => setDialog(null)} disabled={isDiscarding}>
+              {copy.session.cancel}
+            </button>
+          </div>
         </div>
-      </Modal>
+      </BottomSheet>
 
-      <Modal
-        isOpen={dialog === 'confirmFinish'}
-        onClose={() => setDialog(null)}
-        variant="flat"
-        title={copy.session.confirmFinishTitle}
-      >
-        <div className="workout-session-dialog">
-          <p className="workout-session-dialog-text">{plural(copy.session.notDoneCount, totalSets - doneSets)}</p>
-          <Button onClick={() => void doFinish()}>{copy.session.finishAnyway}</Button>
-          <Button variant="ghost" onClick={() => setDialog(null)}>
-            {copy.session.keepGoing}
-          </Button>
+      <BottomSheet isOpen={dialog === 'confirmFinish' || dialog === 'allDone'} onClose={() => setDialog(null)} labelledBy="wp-finish-title">
+        <div className="wp-sheet">
+          <h2 className="wp-sheet-title display-title" id="wp-finish-title">
+            {copy.player.confirmTitle}
+          </h2>
+          <p className="wp-sheet-text">{dialog === 'allDone' ? copy.player.allDone : plural(copy.player.confirmLeft, totalSets - doneSets)}</p>
+          <div className="wp-sheet-actions">
+            <button type="button" className="wp-sheet-button wp-sheet-button-primary" onClick={() => void doFinish()}>
+              {copy.player.finishSave}
+            </button>
+            <button type="button" className="wp-sheet-button" onClick={() => setDialog(null)}>
+              {copy.player.backToWorkout}
+            </button>
+          </div>
         </div>
-      </Modal>
+      </BottomSheet>
 
-      <Modal
-        isOpen={dialog === 'nothingDone'}
-        onClose={() => setDialog(null)}
-        variant="flat"
-        title={copy.session.nothingDoneTitle}
-      >
-        <div className="workout-session-dialog">
-          <p className="workout-session-dialog-text">{copy.session.nothingDone}</p>
-          <Button onClick={() => setDialog(null)}>{copy.session.ok}</Button>
+      <BottomSheet isOpen={dialog === 'nothingDone'} onClose={() => setDialog(null)} labelledBy="wp-nothing-title">
+        <div className="wp-sheet">
+          <h2 className="wp-sheet-title display-title" id="wp-nothing-title">
+            {copy.session.nothingDoneTitle}
+          </h2>
+          <p className="wp-sheet-text">{copy.session.nothingDone}</p>
+          <div className="wp-sheet-actions">
+            <button type="button" className="wp-sheet-button wp-sheet-button-primary" onClick={() => setDialog(null)}>
+              {copy.session.ok}
+            </button>
+          </div>
         </div>
-      </Modal>
+      </BottomSheet>
     </AppShell>
   );
 }

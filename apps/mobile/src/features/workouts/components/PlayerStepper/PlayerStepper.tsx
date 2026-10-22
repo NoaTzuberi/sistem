@@ -2,16 +2,20 @@ import { useCopy } from '@sistem/shared';
 import { useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { workoutCopy } from '../../copy';
-import './NumberStepper.css';
+import './PlayerStepper.css';
 
-interface NumberStepperProps {
+interface PlayerStepperProps {
   value: number | undefined;
   step: number;
   max: number;
   /** Decimals allowed (weights); otherwise whole numbers (reps, seconds). */
   decimal?: boolean;
-  /** Accessible name, e.g. "Weight for set 2, kg". */
+  /** Accessible name, e.g. "kg, set 2". */
   label: string;
+  /** Shown when there is no value ("BW" on a bodyweight set, else "–"). */
+  placeholder: string;
+  /** A done set: the value stays, the − / + step away and it can't be typed over. */
+  locked?: boolean;
   onChange: (value: number | undefined) => void;
 }
 
@@ -25,10 +29,10 @@ function clamp(value: number, max: number): number {
 }
 
 /**
- * −  value  + : big buttons for one-handed use at the gym, and the number itself opens
- * the numeric keypad. Empty means "no value" (e.g. no weight on a bodyweight set).
+ * −  value  + in a 48px pill: round 36px buttons for one hand at the gym, and the number itself
+ * opens the numeric keypad. Empty = no value (a bodyweight set); stepping down to 0 clears it.
  */
-export function NumberStepper({ value, step, max, decimal = false, label, onChange }: NumberStepperProps) {
+export function PlayerStepper({ value, step, max, decimal = false, label, placeholder, locked = false, onChange }: PlayerStepperProps) {
   const copy = useCopy(workoutCopy);
   const [draft, setDraft] = useState(format(value));
 
@@ -40,8 +44,7 @@ export function NumberStepper({ value, step, max, decimal = false, label, onChan
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const next = event.target.value;
-    if (!pattern.test(next)) return;
-    setDraft(next);
+    if (pattern.test(next)) setDraft(next);
   }
 
   function commitDraft() {
@@ -59,38 +62,49 @@ export function NumberStepper({ value, step, max, decimal = false, label, onChan
     if (next !== value) onChange(next);
   }
 
+  function stepBy(direction: 1 | -1) {
+    const next = clamp((value ?? 0) + direction * step, max);
+    // A weight stepped down to 0 is "no weight" (bodyweight) again.
+    onChange(decimal && next === 0 ? undefined : next);
+  }
+
   return (
-    <div className="number-stepper" role="group" aria-label={label}>
+    <div className={locked ? 'wp-stepper wp-stepper-locked' : 'wp-stepper'} role="group" aria-label={label}>
       <button
         type="button"
-        className="number-stepper-button"
+        className="wp-stepper-button"
         aria-label={`${copy.session.decrease} ${label}`}
-        disabled={value === undefined || value <= 0}
-        onClick={() => onChange(clamp((value ?? 0) - step, max))}
+        disabled={locked || value === undefined || value <= 0}
+        tabIndex={locked ? -1 : undefined}
+        onClick={() => stepBy(-1)}
       >
         −
       </button>
       <input
-        className="number-stepper-input"
+        className="wp-stepper-input"
         type="text"
         inputMode={decimal ? 'decimal' : 'numeric'}
         enterKeyHint="done"
-        placeholder="–"
+        placeholder={placeholder}
         value={draft}
+        readOnly={locked}
         aria-label={label}
         onChange={handleChange}
         onBlur={commitDraft}
         onKeyDown={(event) => {
           if (event.key === 'Enter') event.currentTarget.blur();
         }}
-        onFocus={(event) => event.currentTarget.select()}
+        onFocus={(event) => {
+          if (!locked) event.currentTarget.select();
+        }}
       />
       <button
         type="button"
-        className="number-stepper-button"
+        className="wp-stepper-button"
         aria-label={`${copy.session.increase} ${label}`}
-        disabled={value !== undefined && value >= max}
-        onClick={() => onChange(clamp((value ?? 0) + step, max))}
+        disabled={locked || (value !== undefined && value >= max)}
+        tabIndex={locked ? -1 : undefined}
+        onClick={() => stepBy(1)}
       >
         +
       </button>

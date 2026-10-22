@@ -47,3 +47,15 @@ export function formatClock(totalSec: number): string {
   const s = String(sec % 60).padStart(2, '0');
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
+
+/** A rest on the player's scoreboard: 45″, 2′, 1:30 (minutes ′ and seconds ″ read the same in both languages). */
+export function formatRest(sec: number): string {
+  if (sec < 60) return `${sec}″`;
+  if (sec % 60 === 0) return `${sec / 60}′`;
+  return formatClock(sec);
+}
+
+/** "8–12", or one number when the range is a single value. */
+export function formatRange(range: { min: number; max: number }, format: (value: number) => string = String): string {
+  return range.min === range.max ? format(range.min) : `${format(range.min)}–${format(range.max)}`;
+}

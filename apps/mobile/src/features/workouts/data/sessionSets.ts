@@ -1,5 +1,5 @@
 import type { PlanExercise, ResolvedPlanSet, SetType, WorkoutLogSetUpdate, WorkoutSession } from '@sistem/types';
-import { weightStepFor } from './sessionConfig';
+import { WEIGHT_STEP_KG } from './sessionConfig';
 
 // The session screen's model of a workout, built from the server's log (pre-filled
 // sets) and the planned workout (targets, notes, supersets). The sets themselves are
@@ -98,7 +98,7 @@ export function buildSessionModel(session: WorkoutSession): SessionModel {
     // Added to the plan after the workout started: not part of this session.
     if (sets.length === 0) continue;
 
-    const exercise: SessionExercise = { plan, sets, weightStep: weightStepFor(plan.exercise?.equipment) };
+    const exercise: SessionExercise = { plan, sets, weightStep: WEIGHT_STEP_KG };
     const group = plan.supersetGroup;
     const existing = group ? blockByGroup.get(group) : undefined;
     if (existing) {
@@ -151,6 +151,33 @@ export function toSetUpdate(set: SessionSet, values: SetValues): WorkoutLogSetUp
   };
 }
 
+/**
+ * Extra sets she added on the phone that the server doesn't have yet (still unsent): put back
+ * into the server's log, so a reload keeps showing them until the update goes through.
+ */
+export function withPendingExtraSets(session: WorkoutSession, updates: WorkoutLogSetUpdate[]): WorkoutSession {
+  const missing = updates
+    .filter((update) => !session.log.sets.some((set) => set.planExerciseId === update.planExerciseId && set.setIndex === update.setIndex))
+    .sort((a, b) => a.setIndex - b.setIndex);
+  if (missing.length === 0) return session;
+  const sets = [...session.log.sets];
+  for (const update of missing) {
+    const sibling = sets.find((set) => set.planExerciseId === update.planExerciseId);
+    if (!sibling) continue;
+    sets.push({
+      exerciseId: sibling.exerciseId,
+      planExerciseId: update.planExerciseId,
+      setIndex: update.setIndex,
+      type: 'working',
+      reps: update.reps ?? undefined,
+      weight: update.weight ?? undefined,
+      durationSec: update.durationSec ?? undefined,
+      completed: update.completed,
+    });
+  }
+  return { ...session, log: { ...session.log, sets } };
+}
+
 /** Local changes not yet confirmed by the server win over what the server sent. */
 export function applyUpdates(values: SetValuesByKey, updates: WorkoutLogSetUpdate[]): SetValuesByKey {
   const next = { ...values };
@@ -201,8 +228,45 @@ export function restAfter(model: SessionModel, values: SetValuesByKey, key: stri
     const last = inRound[inRound.length - 1];
     if (last.plan.id !== set.planExerciseId) return null;
   }
-  const restSec = set.target?.restSec;
+  // An extra set (no planned target) rests like the exercise's last planned set.
+  const restSec = set.target?.restSec ?? exerciseOf(model, set.planExerciseId)?.plan.resolvedSets.at(-1)?.restSec;
   return restSec && restSec > 0 ? restSec : null;
+}
+
+export function exerciseOf(model: SessionModel, planExerciseId: string): SessionExercise | undefined {
+  for (const block of model.blocks) {
+    const found = block.exercises.find((exercise) => exercise.plan.id === planExerciseId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+/** What the coach prescribed, for the scoreboard: set count, reps (or seconds) range, rest range. */
+export interface Prescription {
+  sets: number;
+  /** min–max reps, or seconds when every set is a hold. */
+  amount: { min: number; max: number } | null;
+  timed: boolean;
+  rest: { min: number; max: number } | null;
+}
+
+function range(values: number[]): { min: number; max: number } | null {
+  return values.length > 0 ? { min: Math.min(...values), max: Math.max(...values) } : null;
+}
+
+export function prescriptionOf(exercise: SessionExercise): Prescription {
+  const targets = exercise.plan.resolvedSets;
+  const timed = exercise.sets.every((set) => set.timed);
+  const amounts = timed
+    ? targets.flatMap((target) => (target.durationSec !== undefined ? [target.durationSec] : []))
+    : targets.flatMap((target) => (target.reps !== undefined ? [target.reps, target.repsMax ?? target.reps] : []));
+  const rests = targets.flatMap((target) => (target.restSec ? [target.restSec] : []));
+  return { sets: exercise.sets.length, amount: range(amounts), timed, rest: range(rests) };
+}
+
+/** The first open set of a block, in its flow order (supersets alternate). */
+export function firstOpenSetIn(model: SessionModel, values: SetValuesByKey, blockId: string): SessionSet | null {
+  return model.flow.find((set) => model.blockIdByKey.get(set.key) === blockId && !values[set.key]?.completed) ?? null;
 }
 
 /** Same planned set (a pyramid's steps differ, so they never copy each other). */

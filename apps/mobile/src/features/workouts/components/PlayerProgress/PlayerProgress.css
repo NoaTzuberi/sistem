@@ -1,0 +1,36 @@
+/* Reads in the reading direction: the first exercise sits at the start (right in Hebrew). */
+.wp-progress {
+  display: flex;
+  gap: 3px;
+  margin-top: 12px;
+}
+
+.wp-progress-group {
+  display: flex;
+  flex: var(--wp-sets) 1 0;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wp-progress-set {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background-color: var(--color-fill-soft);
+  transition: background-color var(--transition-base) ease;
+}
+
+.wp-progress-group-current .wp-progress-set {
+  background-color: var(--color-fill-soft-hover);
+}
+
+.wp-progress-set-done,
+.wp-progress-group-current .wp-progress-set-done {
+  background-color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-progress-set {
+    transition: none;
+  }
+}

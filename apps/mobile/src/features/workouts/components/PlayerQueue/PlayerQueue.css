@@ -1,0 +1,116 @@
+.wp-queue {
+  margin-top: 26px;
+}
+
+.wp-queue-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-raised);
+}
+
+.wp-queue-row {
+  display: flex;
+  text-align: start;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-hairline);
+  text-align: start;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.wp-queue-row:active {
+  transform: scale(0.99);
+}
+
+.wp-queue-index {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  font-family: var(--font-num);
+  font-size: 15px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+/* White number on the pink circle: solid pink keeps it readable at 15px. */
+.wp-queue-row-current .wp-queue-index {
+  background-color: var(--solid-pink);
+  color: var(--on-pink);
+}
+
+.wp-queue-row-done .wp-queue-index {
+  background-color: var(--color-primary-deep);
+  color: var(--color-on-primary);
+}
+
+/* A Latin name is left to right but sits at the reading start (match-parent), and its ellipsis
+   falls at its own end. A Hebrew name is set in Karantina by .display-name. */
+.wp-queue-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  text-align: match-parent;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-ink);
+  transition: color var(--transition-fast) ease;
+}
+
+.wp-queue-name[data-script='latin'] {
+  font-weight: var(--font-weight-bold);
+}
+
+.wp-queue-name[data-script='he'] {
+  font-size: 26px;
+}
+
+.wp-queue-row-done .wp-queue-name {
+  color: var(--color-text-muted);
+}
+
+.wp-queue-pips {
+  display: flex;
+  flex: none;
+  gap: 3px;
+}
+
+.wp-queue-pips i {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-hairline);
+}
+
+.wp-queue-pips .wp-queue-pip-done {
+  background-color: var(--color-primary-deep);
+}
+
+.wp-queue-row-current .wp-queue-pip-done {
+  background-color: var(--color-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-queue-row:hover .wp-queue-name {
+    color: var(--color-primary-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-queue-row:active {
+    transform: none;
+  }
+}

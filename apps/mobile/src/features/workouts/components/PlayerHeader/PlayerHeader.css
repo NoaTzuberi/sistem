@@ -1,0 +1,124 @@
+/* Sticky white blur over the scrolling exercise. */
+.wp-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-overlay);
+  padding:
+    calc(var(--safe-top) + var(--space-2))
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    10px
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  background-color: var(--surface-header-frost);
+  -webkit-backdrop-filter: var(--blur-header);
+  backdrop-filter: var(--blur-header);
+}
+
+.wp-header-bar {
+  display: grid;
+  grid-template-columns: var(--touch-target-min) var(--touch-target-min) minmax(0, 1fr) var(--touch-target-min) var(--touch-target-min);
+  align-items: center;
+  gap: 6px;
+}
+
+.wp-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+}
+
+.wp-icon-button:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+/* The shared toggle in the player's round look (two classes: wins over its own CSS in any load order). */
+.wp-sound.sound-toggle {
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+}
+
+.wp-sound.sound-toggle:active {
+  background-color: var(--color-fill-soft-hover);
+}
+
+.wp-sound.sound-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Muted: the speaker steps back. */
+.wp-sound.sound-toggle[aria-pressed='true'] {
+  color: var(--color-text-muted);
+}
+
+.wp-header-title {
+  min-width: 0;
+  text-align: center;
+}
+
+.wp-header-name {
+  display: block;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-text-faint);
+}
+
+.wp-header-clock {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-num);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
+  color: var(--color-ink);
+}
+
+.wp-header-spacer {
+  width: var(--touch-target-min);
+}
+
+.wp-header-counts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.wp-header-counts b {
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-icon-button:hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-icon-button {
+    transition: background-color var(--transition-fast) ease;
+  }
+
+  .wp-icon-button:active {
+    transform: none;
+  }
+}

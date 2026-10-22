@@ -1,0 +1,167 @@
+/* number | kg | reps | ✓ — the same columns as the header row above the sets. */
+.wp-set {
+  padding: 6px 2px;
+  border-radius: 20px;
+  transition: background-color var(--transition-base) ease;
+}
+
+.wp-set + .wp-set {
+  margin-top: 4px;
+}
+
+.wp-set-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wp-set-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.wp-set-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: var(--color-card);
+  box-shadow: inset 0 0 0 1.5px var(--color-hairline);
+  /* The design's faint grey is 2.5:1 on white; the quiet icon grey keeps the 3:1 an icon needs. */
+  color: var(--color-icon-quiet);
+  transition:
+    transform var(--transition-press) var(--ease-spring),
+    background-color var(--transition-base) ease,
+    color var(--transition-base) ease;
+}
+
+.wp-set-check:active {
+  transform: scale(0.9);
+}
+
+/* The set to do now. */
+.wp-set-current {
+  background-color: var(--color-fill-soft);
+}
+
+.wp-set-current .wp-set-number {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.wp-set-current .wp-stepper {
+  box-shadow: none;
+}
+
+.wp-set-current .wp-stepper:focus-within {
+  box-shadow: var(--ring-field);
+}
+
+.wp-set-current .wp-set-check {
+  background-color: var(--color-ink);
+  box-shadow: none;
+  color: var(--color-on-ink);
+}
+
+/* Done: Cherry Rose number with a check, a blush check (no green). */
+.wp-set-done .wp-set-number {
+  background-color: var(--color-primary-deep);
+  color: var(--color-on-primary);
+}
+
+.wp-set-done .wp-set-check {
+  background-color: var(--tint-pink);
+  box-shadow: none;
+  color: var(--color-primary-deep);
+}
+
+.wp-set-pop .wp-set-check {
+  animation: wp-set-pop 420ms var(--ease-spring);
+}
+
+@keyframes wp-set-pop {
+  40% {
+    transform: scale(1.18);
+  }
+}
+
+/* A hold's ▶ countdown under its row. */
+.wp-set-hold {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  margin-top: 6px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: var(--ring-hairline);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.wp-set-hold:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.wp-set-hold:disabled {
+  opacity: var(--opacity-disabled-strong);
+}
+
+.wp-set-hold-running {
+  background-color: var(--color-ink);
+  box-shadow: none;
+  color: var(--color-on-ink);
+}
+
+.wp-set-hold-running span {
+  font-family: var(--font-num);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-set-check:hover {
+    color: var(--color-ink);
+  }
+
+  .wp-set-current .wp-set-check:hover {
+    background-color: var(--color-ink-raised);
+    color: var(--color-on-ink);
+  }
+
+  .wp-set-done .wp-set-check:hover {
+    color: var(--color-primary-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-set,
+  .wp-set-check {
+    transition: none;
+  }
+
+  .wp-set-check:active,
+  .wp-set-hold:active:not(:disabled) {
+    transform: none;
+  }
+
+  .wp-set-pop .wp-set-check {
+    animation: none;
+  }
+}

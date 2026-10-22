@@ -11,14 +11,16 @@ import {
 } from '../../../services/workoutLogs/workoutLogsService';
 import { clearCachedSession, loadCachedSession, saveCachedSession } from '../data/sessionCache';
 import type { CachedSession } from '../data/sessionCache';
-import { SYNC_DEBOUNCE_MS, SYNC_RETRY_MS } from '../data/sessionConfig';
+import { MAX_SETS_PER_EXERCISE, SYNC_DEBOUNCE_MS, SYNC_RETRY_MS } from '../data/sessionConfig';
 import {
   applyUpdates,
   buildSessionModel,
   carryForward,
   initialValues,
   restAfter,
+  setKey,
   toSetUpdate,
+  withPendingExtraSets,
 } from '../data/sessionSets';
 import type { SessionModel, SetValues, SetValuesByKey } from '../data/sessionSets';
 import { workoutCopy } from '../copy';
@@ -153,7 +155,8 @@ export function useWorkoutSession(logId: string) {
     let cancelled = false;
     const cached = loadCachedSession(logId);
 
-    function open(fresh: WorkoutSession, base: CachedSession | null) {
+    function open(server: WorkoutSession, base: CachedSession | null) {
+      const fresh = withPendingExtraSets(server, Object.values(base?.pending ?? {}));
       const next: CachedSession = {
         session: fresh,
         pending: base?.pending ?? {},
@@ -233,6 +236,52 @@ export function useWorkoutSession(logId: string) {
       commit({ [key]: { ...current, ...patch } });
     },
     [commit],
+  );
+
+  /**
+   * "+ Extra set": a working set after the exercise's last one, with that set's numbers.
+   * It joins the phone's copy of the log at once (so the screen and a reload show it); the
+   * server adds it when the update for the next set index arrives.
+   */
+  const addSet = useCallback(
+    (planExerciseId: string) => {
+      const cached = cacheRef.current;
+      if (!cached) return;
+      const logSets = cached.session.log.sets.filter((set) => set.planExerciseId === planExerciseId);
+      const last = logSets.reduce<(typeof logSets)[number] | undefined>(
+        (latest, set) => (!latest || set.setIndex > latest.setIndex ? set : latest),
+        undefined,
+      );
+      if (!last || logSets.length >= MAX_SETS_PER_EXERCISE) return;
+
+      const lastValues = valuesRef.current[setKey(planExerciseId, last.setIndex)];
+      const values: SetValues = {
+        reps: lastValues?.reps ?? last.reps,
+        weight: lastValues?.weight ?? last.weight,
+        durationSec: lastValues?.durationSec ?? last.durationSec,
+        completed: false,
+      };
+      const setIndex = last.setIndex + 1;
+      const key = setKey(planExerciseId, setIndex);
+      const fresh: WorkoutSession = {
+        ...cached.session,
+        log: {
+          ...cached.session.log,
+          sets: [
+            ...cached.session.log.sets,
+            { exerciseId: last.exerciseId, planExerciseId, setIndex, type: 'working', ...values, completed: false },
+          ],
+        },
+      };
+      cached.session = fresh;
+      cached.pending[key] = { planExerciseId, setIndex, reps: values.reps ?? null, weight: values.weight ?? null, durationSec: values.durationSec ?? null, completed: false };
+      valuesRef.current = { ...valuesRef.current, [key]: values };
+      setValues(valuesRef.current);
+      setSession(fresh);
+      persist();
+      scheduleFlush(SYNC_DEBOUNCE_MS);
+    },
+    [persist, scheduleFlush],
   );
 
   const saveRest = useCallback(
@@ -356,6 +405,7 @@ export function useWorkoutSession(logId: string) {
     rest,
     finishQueued,
     editSet,
+    addSet,
     setCompleted,
     adjustRest,
     endRest,

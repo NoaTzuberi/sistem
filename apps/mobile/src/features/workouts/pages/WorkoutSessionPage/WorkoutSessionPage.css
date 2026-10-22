@@ -1,158 +1,171 @@
-/* Room for the fixed footer (rest bar + Finish) under the last exercise. */
-.workout-session {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-bottom: 160px;
+/* The player: white, full bleed; room at the bottom for the pinned Finish over its fade. */
+.wp {
+  min-height: 100dvh;
+  padding-bottom: calc(140px + var(--safe-bottom));
+  background-color: var(--color-card);
 }
 
-/* Stays on top while scrolling: time and progress are always visible. */
-.workout-session-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-raised);
-  display: grid;
-  /* ✕ · title · sound · ⋯ */
-  grid-template-columns: var(--touch-target-min) minmax(0, 1fr) var(--touch-target-min) var(--touch-target-min);
-  align-items: center;
-  gap: var(--space-1);
-  margin: calc(-1 * var(--space-3)) calc(-1 * var(--space-3)) 0;
-  padding: var(--space-2) var(--space-2) 0;
-  background-color: var(--color-bg);
+.wp-body {
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
 }
 
-.workout-session-icon-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  border: none;
-  background: transparent;
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.workout-session-icon-button:active {
-  background-color: var(--color-surface);
-}
-
-.workout-session-icon-button svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
-  stroke: currentColor;
-  stroke-width: 2;
-}
-
-.workout-session-heading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-  text-align: center;
-}
-
-.workout-session-title {
-  max-width: 100%;
-  margin: 0;
-  font-size: var(--text-ticket);
+.wp-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
-.workout-session-meta {
+.wp-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.wp-status,
+.wp-error {
+  margin-top: 12px;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.workout-session-progress {
-  grid-column: 1 / -1;
-  width: 100%;
-  height: 4px;
-  margin-top: var(--space-1);
-  border: none;
-  background: transparent;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.workout-session-progress::-webkit-progress-bar {
-  background-color: var(--color-surface);
-}
-
-.workout-session-progress::-webkit-progress-value {
-  background-color: var(--color-primary);
-}
-
-.workout-session-progress::-moz-progress-bar {
-  background-color: var(--color-primary);
-}
-
-.workout-session-status,
-.workout-session-error {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  background-color: var(--color-surface);
-}
-
-.workout-session-error {
+.wp-error {
   color: var(--color-error);
-  background-color: var(--color-error-soft);
 }
 
-.workout-session-notes {
-  margin: 0;
-  color: var(--color-text-muted);
-  overflow-wrap: anywhere;
+.wp-notes {
+  margin-top: 12px;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-ink-raised);
+  white-space: pre-line;
 }
 
-.workout-session-blocks {
-  display: flex;
-  flex-direction: column;
-}
-
-.workout-session-footer {
+/* Pinned ink Finish over a white fade, inside the app column. */
+.wp-footer {
   position: fixed;
-  inset-inline-start: 0;
-  inset-inline-end: 0;
-  bottom: 0;
+  inset-block-end: 0;
+  inset-inline: 0;
   z-index: var(--z-tab-bar);
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-bg);
-  border-top: var(--border-width-thin) solid var(--color-border);
-}
-
-.workout-session-rest-over {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  font-weight: var(--font-weight-bold);
-}
-
-.workout-session-finish {
-  display: flex;
+  width: 100%;
+  max-width: var(--app-column-max);
+  margin-inline: auto;
   padding:
-    var(--space-2)
-    calc(var(--space-3) + var(--safe-right))
-    calc(var(--space-2) + var(--safe-bottom))
-    calc(var(--space-3) + var(--safe-left));
+    var(--space-6)
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    calc(26px + var(--safe-bottom))
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  background: linear-gradient(to top, var(--color-card) 45%, color-mix(in srgb, var(--color-card) 0%, transparent));
+  pointer-events: none;
 }
 
-.workout-session-finish-button {
-  flex: 1;
-}
-
-.workout-session-dialog {
+.wp-finish {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--size-cardio-save);
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--color-ink) 30%, transparent);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-ink);
+  pointer-events: auto;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
 }
 
-.workout-session-dialog-text {
-  margin: 0 0 var(--space-2);
+.wp-finish small {
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  color: var(--color-on-ink-faint);
+}
+
+.wp-finish:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.wp-finish:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+/* The bottom sheets' content (menu, finish, discard). */
+.wp-sheet {
+  padding: 0 var(--home-gutter) calc(var(--space-4) + var(--safe-bottom));
+}
+
+.wp-sheet-title {
+  font-size: 40px;
+  color: var(--color-ink);
+}
+
+.wp-sheet-text {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink-raised);
+}
+
+.wp-sheet-actions {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: 18px;
+}
+
+.wp-sheet-button {
+  min-height: var(--cta-height);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  font-size: 15px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease;
+}
+
+.wp-sheet-button-primary {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.wp-sheet-button-danger {
+  color: var(--color-error);
+}
+
+.wp-sheet-button-danger-solid {
+  background-color: var(--color-error);
+  color: var(--color-on-primary);
+}
+
+.wp-sheet-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.wp-sheet-button:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-finish:hover:not(:disabled),
+  .wp-sheet-button-primary:hover:not(:disabled) {
+    background-color: var(--color-ink-raised);
+  }
+
+  .wp-sheet-button:not(.wp-sheet-button-primary, .wp-sheet-button-danger-solid):hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-finish:active:not(:disabled),
+  .wp-sheet-button:active:not(:disabled) {
+    transform: none;
+  }
 }
