@@ -185,6 +185,8 @@ export const en: Record<keyof typeof he, string> = {
   notification_limit_invalid: 'limit must be a whole number between 1 and {max}.',
   notification_before_invalid: 'Invalid before cursor.',
   notification_unread_invalid: 'unread must be true or false.',
+  coach_note_invalid: 'note must be plan or nutrition.',
+  coach_note_not_found: 'Coach note not found.',
   tab_invalid: 'Tab must be workouts or nutrition.',
   exercise_query_invalid: 'Invalid query parameters.',
   exercise_page_invalid: 'page must be an integer of at least {min}.',

@@ -21,6 +21,9 @@ function dedupeKeyFor(payload: NotificationPayload): string {
     case 'nutrition_plan_published':
       // Per version: every publish (first or update) is its own notification.
       return `nutrition_plan_published:${payload.data.planId}:${payload.data.version}`;
+    case 'coach_note_thanks':
+      // Per note: a second tap (or another device) never thanks twice.
+      return `coach_note_thanks:${payload.data.noteId}`;
   }
 }
 

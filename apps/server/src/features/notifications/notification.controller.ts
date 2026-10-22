@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { parseNotificationListQuery, validateNotificationIdParam } from './notification.validation';
+import { parseNotificationListQuery, parseThanksBody, validateNotificationIdParam } from './notification.validation';
+import { CoachNoteNotFoundError, thankCoachForNote } from './coachNoteThanks.service';
 import {
   listNotifications,
   countUnreadNotifications,
@@ -48,4 +49,24 @@ export async function markMyNotificationRead(req: AuthenticatedRequest, res: Res
 export async function markAllMyNotificationsRead(req: AuthenticatedRequest, res: Response) {
   await markAllNotificationsRead(req.userId!);
   res.status(200).json({ unreadCount: 0 });
+}
+
+/** 204 — also when she already thanked for this note (one notification per note). */
+export async function thankMyCoach(req: AuthenticatedRequest, res: Response) {
+  const parsed = parseThanksBody(req.body);
+  if ('error' in parsed) {
+    sendError(res, 400, parsed.error);
+    return;
+  }
+
+  try {
+    await thankCoachForNote(req.userId!, parsed.value);
+    res.status(204).end();
+  } catch (error) {
+    if (error instanceof CoachNoteNotFoundError) {
+      sendError(res, 404, error.serverMessage);
+      return;
+    }
+    throw error;
+  }
 }

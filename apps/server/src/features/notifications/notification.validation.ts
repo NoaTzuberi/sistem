@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { DEFAULT_NOTIFICATION_PAGE_SIZE, MAX_NOTIFICATION_PAGE_SIZE } from './notification.constants';
+import type { CoachNoteId } from '@sistem/types';
+import { COACH_NOTE_IDS, DEFAULT_NOTIFICATION_PAGE_SIZE, MAX_NOTIFICATION_PAGE_SIZE } from './notification.constants';
 import { type ServerMessage, msg } from '../../i18n';
 
 export function validateNotificationIdParam(id: unknown): ServerMessage | null {
@@ -39,4 +40,13 @@ export function parseNotificationListQuery(
   }
 
   return { value: { limit, before, unreadOnly: query.unread === 'true' } };
+}
+
+/** POST /notifications/thanks { note }: which of her coach's notes she thanks for. */
+export function parseThanksBody(body: unknown): { value: CoachNoteId } | { error: ServerMessage } {
+  const note = (body as { note?: unknown } | null)?.note;
+  if (typeof note !== 'string' || !(COACH_NOTE_IDS as readonly string[]).includes(note)) {
+    return { error: msg('coach_note_invalid') };
+  }
+  return { value: note as CoachNoteId };
 }

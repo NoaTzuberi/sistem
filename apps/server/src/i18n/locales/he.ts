@@ -184,6 +184,8 @@ export const he = {
   notification_limit_invalid: 'limit חייב להיות מספר שלם בין 1 ל־{max}.',
   notification_before_invalid: 'סמן before לא תקין.',
   notification_unread_invalid: 'unread חייב להיות true או false.',
+  coach_note_invalid: 'קוד הערה לא תקין.',
+  coach_note_not_found: 'לא נמצאה הערה של המאמנת.',
   tab_invalid: 'הלשונית חייבת להיות אימונים או תזונה.',
   exercise_query_invalid: 'פרמטרי החיפוש אינם תקינים.',
   exercise_page_invalid: 'page חייב להיות מספר שלם של {min} לפחות.',

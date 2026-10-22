@@ -91,6 +91,13 @@ describe('trainee plans', () => {
       expect(res.body.serverTime).toEqual(expect.any(String));
     });
 
+    it('sends her coach’s name only (Home’s coach card), null without a coach', async () => {
+      const res = await api.request('GET', '/plans/week', { token: trainee.token });
+      expect(res.body.coach).toEqual({ name: coach.user.name });
+      const solo = await createTestUser('solo@example.com', { timezone: TIMEZONE });
+      expect((await api.request('GET', '/plans/week', { token: solo.token })).body.coach).toBeNull();
+    });
+
     it('returns exercise names (facts only), resolved sets and statuses', async () => {
       const plan = await createPlan(trainee, THIS_WEEK);
       const log = await completeWorkout(plan, 0);

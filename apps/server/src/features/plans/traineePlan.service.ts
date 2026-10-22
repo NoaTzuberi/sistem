@@ -71,11 +71,14 @@ export async function getTraineePlan(planId: string, traineeId: string, now: Dat
 
 /** This week's published plan (if any) and the workout to start next. */
 export async function getTraineeWeek(traineeId: string, now: Date = new Date()): Promise<TraineeWeek> {
-  const today = await todayFor(traineeId, now);
+  const user = await User.findById(traineeId).select('timezone coachId').lean();
+  const today = localDateString(now, user?.timezone ?? DEFAULT_TIMEZONE);
   const weekStartDate = weekStartOf(today);
-  const [plan, active] = await Promise.all([
+  const [plan, active, coach] = await Promise.all([
     Plan.findOne({ traineeId, weekStartDate, status: 'published' }).lean<LeanPlan>(),
     WorkoutLog.findOne({ traineeId, status: 'in_progress' }).select('planId workoutId workoutTitle startedAt').lean(),
+    // Her coach's name only (Home's coach card: name + initials) — nothing else about the coach.
+    user?.coachId ? User.findById(user.coachId).select('name').lean() : null,
   ]);
   const [traineePlan = null] = plan ? await toTraineePlans(traineeId, [plan], today) : [];
 
@@ -85,6 +88,7 @@ export async function getTraineeWeek(traineeId: string, now: Date = new Date()):
     serverTime: now.toISOString(),
     plan: traineePlan,
     nextWorkoutId: traineePlan ? pickNextWorkoutId(traineePlan) : null,
+    coach: coach ? { name: coach.name } : null,
     activeLog: active
       ? {
           logId: String(active._id),

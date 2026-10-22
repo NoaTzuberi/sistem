@@ -384,6 +384,8 @@ export interface TraineeWeek {
    * one, else the earliest missed one (still doable until the week ends), else null.
    */
   nextWorkoutId: string | null;
+  /** Her coach's name (Home's coach card: name + initials); null when she has no coach. */
+  coach: { name: string } | null;
   /** Her open workout session, if any — also one left open in an earlier week. */
   activeLog: ActiveWorkoutRef | null;
 }
@@ -999,7 +1001,16 @@ export type NotificationType =
   | 'trainee_onboarded'
   | 'plan_published'
   | 'workout_completed'
-  | 'nutrition_plan_published';
+  | 'nutrition_plan_published'
+  | 'coach_note_thanks';
+
+/** A coach note the trainee can thank for on Home: this week's plan notes / her nutrition intro. */
+export type CoachNoteId = 'plan' | 'nutrition';
+
+/** POST /notifications/thanks (trainee) → 204. One notification to her coach per note. */
+export interface ThankCoachPayload {
+  note: CoachNoteId;
+}
 
 interface NotificationBase {
   id: string;
@@ -1022,6 +1033,11 @@ export type AppNotification =
   | (NotificationBase & {
       type: 'nutrition_plan_published';
       data: { planId: string; version: number; isUpdate: boolean };
+    })
+  /** To the coach: the trainee tapped "👍 Thanks!" under one of her notes (noteId = plan / nutrition version id). */
+  | (NotificationBase & {
+      type: 'coach_note_thanks';
+      data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string };
     });
 
 /** GET /notifications — newest first. */
