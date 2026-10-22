@@ -18,14 +18,16 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string, langu
     from: config.emailFrom,
     to,
     subject: t('email_reset_subject'),
+    // Email clients can't read CSS variables: these are the exact token values (tokens.css —
+    // --color-text, --color-primary, --color-on-primary, --color-text-muted).
     html: `
-      <div dir="${dir}" lang="${language}" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a; text-align: start;">
+      <div dir="${dir}" lang="${language}" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #26222a; text-align: start;">
         <h2 style="margin-bottom: 8px;">${t('email_reset_title')}</h2>
         <p>${t('email_reset_body')}</p>
         <p style="margin: 24px 0;">
-          <a href="${resetUrl}" style="background-color: #ff7a1a; color: #0b1929; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">${t('email_reset_button')}</a>
+          <a href="${resetUrl}" style="background-color: #ff006e; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">${t('email_reset_button')}</a>
         </p>
-        <p style="color: #666;">${t('email_reset_ignore')}</p>
+        <p style="color: #6b6b6b;">${t('email_reset_ignore')}</p>
       </div>
     `,
   });
