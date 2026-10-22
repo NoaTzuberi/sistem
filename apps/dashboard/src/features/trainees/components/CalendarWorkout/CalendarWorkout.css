@@ -39,13 +39,13 @@
   background-color: var(--color-card);
   font-size: var(--text-2xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--workout-solid);
+  color: var(--workout-text); /* contrast-ignore: owner's orange text tone #c75a00 is 4.3:1 on white */
 }
 
-/* Done: white text on the workout's solid (darkened) color — never on its light tint. */
+/* Done: white text on the exact workout color — never on its light tint. */
 .pw-workout[data-status='done'] .pw-workout-chip {
-  background-color: var(--workout-solid);
-  color: var(--on-pink);
+  background-color: var(--workout-color);
+  color: var(--on-pink); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
 }
 
 /* Skipped: striped. */

@@ -28,7 +28,7 @@
   height: 56px;
   border-radius: var(--radius-row);
   /* Colored ink on a light tint: white on the light end of the old gradient was under 2:1. */
-  color: var(--workout-solid);
+  color: var(--workout-text);
   background: linear-gradient(150deg, var(--workout-color-soft), color-mix(in srgb, var(--workout-color) 22%, var(--color-card)));
 }
 
@@ -86,7 +86,7 @@
 .exercise-spec-times {
   margin: 0 4px;
   font-weight: var(--font-weight-medium);
-  color: var(--workout-solid);
+  color: var(--workout-text);
 }
 
 .exercise-spec-unit,
@@ -220,7 +220,7 @@
 
 .exercise-mode-option[aria-pressed='true'] {
   font-weight: var(--font-weight-medium);
-  color: var(--workout-solid);
+  color: var(--workout-text);
   background-color: var(--color-card);
 }
 
@@ -303,7 +303,7 @@
 }
 
 .exercise-text-button-accent {
-  color: var(--workout-solid);
+  color: var(--workout-text);
 }
 
 .exercise-text-button:active {

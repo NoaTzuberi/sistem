@@ -73,10 +73,10 @@
   color: var(--group-fill);
 }
 
-/* Selected: the group's dark ink under white (the bright fills are too light for white text). */
+/* Selected: filled with the exact group color. */
 .tn-food-sheet-tab[aria-pressed='true'] {
-  background-color: var(--group-text);
-  color: var(--color-on-primary);
+  background-color: var(--group-fill);
+  color: var(--color-on-primary); /* contrast-ignore: owner — fills are the exact group color (2026-10-21) */
 }
 
 .tn-food-sheet-tab[aria-pressed='true'] svg {
@@ -175,8 +175,8 @@
 }
 
 .tn-food-add-on {
-  background-color: var(--group-text);
-  color: var(--color-on-primary);
+  background-color: var(--group-fill);
+  color: var(--color-on-primary); /* contrast-ignore: owner — fills are the exact group color (2026-10-21) */
   cursor: default;
 }
 

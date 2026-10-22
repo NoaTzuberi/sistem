@@ -19,21 +19,21 @@
   border-inline-start: var(--border-width-medium) solid var(--color-card);
 }
 
-/* The groups' readable fills: white numbers need the --solid-* form of orange and sky blue. */
+/* The groups' exact fill colors (owner, 2026-10-21). */
 .portion-split-protein {
-  background-color: var(--solid-pink);
+  background-color: var(--color-portion-protein);
 }
 
 .portion-split-carb {
-  background-color: var(--solid-purple);
+  background-color: var(--color-portion-carb);
 }
 
 .portion-split-fat {
-  background-color: var(--solid-orange);
+  background-color: var(--color-portion-fat);
 }
 
 .portion-split-snack {
-  background-color: var(--solid-blue);
+  background-color: var(--color-portion-snack);
 }
 
 .portion-split-gap {
@@ -45,6 +45,6 @@
   font-size: var(--text-xs);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
-  color: var(--on-pink);
+  color: var(--on-pink); /* contrast-ignore: owner — fills are the exact group color (2026-10-21) */
   white-space: nowrap;
 }

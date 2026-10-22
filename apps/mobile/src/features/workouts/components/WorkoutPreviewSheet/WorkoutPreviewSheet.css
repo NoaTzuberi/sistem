@@ -1,10 +1,10 @@
-/* The header block in the workout's solid color (white text only on a solid fill). */
+/* The header block in the workout's exact color. */
 .preview-sheet-head {
   margin-block-end: 14px;
   padding: var(--space-3);
   border-radius: var(--radius-entry);
-  background-color: var(--workout-color-solid);
-  color: var(--on-pink);
+  background-color: var(--workout-color);
+  color: var(--on-pink); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
 }
 
 .preview-sheet-title {
@@ -48,7 +48,7 @@
   font-family: var(--font-num);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-extrabold);
-  color: color-mix(in srgb, var(--workout-color-solid) 75%, var(--color-ink));
+  color: var(--workout-color-text);
 }
 
 .preview-sheet-text {

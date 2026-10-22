@@ -81,8 +81,8 @@
 
 /* Selected: filled with the workout's color (an identity color, not a status). */
 .workout-tab[aria-selected='true'] {
-  color: var(--color-on-primary);
-  background-color: var(--workout-solid);
+  color: var(--color-on-primary); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
+  background-color: var(--workout-color);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--workout-color) 35%, transparent);
 }
 

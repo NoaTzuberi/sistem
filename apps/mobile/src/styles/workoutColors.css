@@ -1,8 +1,8 @@
 /* Workout identity colors, by the workout's place in the plan (as in the plan builder). Home and
    Workouts set one of these classes; components read --workout-color (tints, rings) and
-   --workout-color-solid (fills under white text), --workout-color-soft (a planned ticket). */
-.workout-color-1 { --workout-color: var(--color-workout-1); --workout-color-solid: var(--color-workout-1-solid); --workout-color-soft: var(--color-workout-1-soft); }
-.workout-color-2 { --workout-color: var(--color-workout-2); --workout-color-solid: var(--color-workout-2-solid); --workout-color-soft: var(--color-workout-2-soft); }
-.workout-color-3 { --workout-color: var(--color-workout-3); --workout-color-solid: var(--color-workout-3-solid); --workout-color-soft: var(--color-workout-3-soft); }
-.workout-color-4 { --workout-color: var(--color-workout-4); --workout-color-solid: var(--color-workout-4-solid); --workout-color-soft: var(--color-workout-4-soft); }
-.workout-color-5 { --workout-color: var(--color-workout-5); --workout-color-solid: var(--color-workout-5-solid); --workout-color-soft: var(--color-workout-5-soft); }
+   --workout-color-text (text on its tint or on white), --workout-color-soft (a planned ticket). */
+.workout-color-1 { --workout-color: var(--color-workout-1); --workout-color-text: var(--color-workout-1-text); --workout-color-soft: var(--color-workout-1-soft); }
+.workout-color-2 { --workout-color: var(--color-workout-2); --workout-color-text: var(--color-workout-2-text); --workout-color-soft: var(--color-workout-2-soft); }
+.workout-color-3 { --workout-color: var(--color-workout-3); --workout-color-text: var(--color-workout-3-text); --workout-color-soft: var(--color-workout-3-soft); }
+.workout-color-4 { --workout-color: var(--color-workout-4); --workout-color-text: var(--color-workout-4-text); --workout-color-soft: var(--color-workout-4-soft); }
+.workout-color-5 { --workout-color: var(--color-workout-5); --workout-color-text: var(--color-workout-5-text); --workout-color-soft: var(--color-workout-5-soft); }

@@ -142,7 +142,7 @@
 /* A workout: its tint, its readable color for the text (never white on the tint). */
 .publish-chip-workout {
   background-color: var(--workout-color-soft);
-  color: var(--workout-solid);
+  color: var(--workout-text);
 }
 
 .publish-chip-dot {

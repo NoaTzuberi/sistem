@@ -98,15 +98,14 @@ button.month-calendar-day {
   opacity: var(--opacity-faint);
 }
 
-/* A workout day: its workout's solid color (white digits only on a solid fill). */
+/* A workout day: filled with its workout's exact color. */
 .month-calendar-day-has {
-  background-color: var(--workout-color-solid);
-  color: var(--on-pink);
+  background-color: var(--workout-color);
+  color: var(--on-pink); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
 }
 
 /* A workout no longer in her plans: plain ink. */
 .month-calendar-day-unplanned {
-  --workout-color-solid: var(--color-ink);
   --workout-color: var(--color-ink);
 }
 

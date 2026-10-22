@@ -4,11 +4,11 @@
   gap: 6px;
 }
 
-/* Zone colors: the tint and its ink at rest; the chosen chip takes a solid fill white text can sit on. */
-.ws-feel-chip[data-zone='1'] { --ws-soft: var(--color-zone-1-soft); --ws-ink: var(--color-zone-1-text); --ws-solid: var(--solid-blue); --ws-glow: var(--color-zone-1); }
-.ws-feel-chip[data-zone='2'] { --ws-soft: var(--color-zone-2-soft); --ws-ink: var(--color-zone-2-text); --ws-solid: var(--solid-purple); --ws-glow: var(--color-zone-2); }
-.ws-feel-chip[data-zone='3'] { --ws-soft: var(--color-zone-3-soft); --ws-ink: var(--color-zone-3-text); --ws-solid: var(--solid-orange); --ws-glow: var(--color-zone-3); }
-.ws-feel-chip[data-zone='4'] { --ws-soft: var(--color-zone-4-soft); --ws-ink: var(--color-zone-4-text); --ws-solid: var(--solid-pink); --ws-glow: var(--color-zone-4); }
+/* Zone colors: the tint and its ink at rest; the chosen chip is filled with the exact zone color. */
+.ws-feel-chip[data-zone='1'] { --ws-soft: var(--color-zone-1-soft); --ws-ink: var(--color-zone-1-text); --ws-solid: var(--color-zone-1); --ws-glow: var(--color-zone-1); }
+.ws-feel-chip[data-zone='2'] { --ws-soft: var(--color-zone-2-soft); --ws-ink: var(--color-zone-2-text); --ws-solid: var(--color-zone-2); --ws-glow: var(--color-zone-2); }
+.ws-feel-chip[data-zone='3'] { --ws-soft: var(--color-zone-3-soft); --ws-ink: var(--color-zone-3-text); --ws-solid: var(--color-zone-3); --ws-glow: var(--color-zone-3); }
+.ws-feel-chip[data-zone='4'] { --ws-soft: var(--color-zone-4-soft); --ws-ink: var(--color-zone-4-text); --ws-solid: var(--color-zone-4); --ws-glow: var(--color-zone-4); }
 .ws-feel-chip[data-zone='5'] { --ws-soft: var(--color-zone-5-soft); --ws-ink: var(--color-zone-5-text); --ws-solid: var(--color-zone-5); --ws-glow: var(--color-zone-5); }
 
 .ws-feel-chip {
@@ -47,7 +47,7 @@
 .ws-feel-chip[aria-checked='true'] {
   background-color: var(--ws-solid);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--ws-glow) 40%, transparent);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: owner — the fill is the exact zone color (2026-10-21) */
   transform: translateY(-4px);
 }
 

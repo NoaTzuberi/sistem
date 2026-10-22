@@ -111,7 +111,7 @@
 
 .cp-rpe-chip[aria-checked='true'] {
   background-color: var(--cp-stage);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: owner — the ground is the exact zone color (2026-10-21) */
   box-shadow: 0 8px 18px color-mix(in srgb, var(--cp-c) 40%, transparent);
   transform: translateY(-3px);
 }

@@ -38,13 +38,13 @@
   pointer-events: none;
 }
 
-/* On its tint the name takes the darker solid shade of the color (contrast). */
+/* On its tint the name takes the color's text tone (contrast). */
 .workout-ticket-name {
   display: -webkit-box;
   overflow: hidden;
   font-size: var(--text-ticket);
   line-height: 0.95;
-  color: color-mix(in srgb, var(--workout-color-solid) 75%, var(--color-ink));
+  color: var(--workout-color-text);
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -71,15 +71,15 @@
   color: var(--color-ink);
 }
 
-/* Done: the solid color (white text only on a solid fill). */
+/* Done: filled with the exact workout color. */
 .workout-ticket-done {
-  background-color: var(--workout-color-solid);
+  background-color: var(--workout-color);
   box-shadow: none;
-  color: var(--on-pink);
+  color: var(--on-pink); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
 }
 
 .workout-ticket-done .workout-ticket-name {
-  color: var(--on-pink);
+  color: var(--on-pink); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
 }
 
 .workout-ticket-done .workout-ticket-meta {

@@ -14,7 +14,7 @@
     calc(var(--home-gutter) + var(--safe-inline-start));
   overflow: hidden;
   background-color: var(--cp-stage);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: owner — the ground is the exact zone color (2026-10-21) */
   transition: background-color var(--transition-zone) ease;
 }
 
