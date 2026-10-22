@@ -1,5 +1,7 @@
-/* Sizes: the box (ring) and the disc inside it. */
+/* Sizes: the box (ring) and the disc inside it.
+   MIRRORED in apps/mobile/src/features/achievements/components/Medal — change both. */
 .medal {
+  --medal-number: var(--text-medal-number);
   --medal-box: 100px;
   --medal-disc: 72px;
   --medal-disc-on: 84px;
@@ -14,6 +16,7 @@
 }
 
 .medal-small {
+  --medal-number: calc(var(--text-medal-number) * 0.75);
   --medal-box: 72px;
   --medal-disc: 52px;
   --medal-disc-on: 60px;
@@ -21,6 +24,7 @@
 }
 
 .medal-large {
+  --medal-number: var(--text-medal-number-large);
   --medal-box: 150px;
   --medal-disc: 108px;
   --medal-disc-on: 128px;
@@ -69,20 +73,31 @@
   height: var(--medal-icon);
 }
 
-/* Unlocked: a glossy disc — a highlight over the category gradient, a white ring and a colored glow. */
+/* Earned: a glossy disc — a highlight over the light → color gradient (the exact category colors, never
+   darkened), a 3px white ring, a 5px outer ring in 30% color, a colored drop shadow, an inner bottom shade. */
 .medal-unlocked .medal-disc {
   width: var(--medal-disc-on);
   height: var(--medal-disc-on);
-  background-image: var(--gradient-medal-gloss), linear-gradient(150deg, var(--ach-color), var(--ach-solid)); /* ≥ 3:1 under the white icon */
+  background-image: var(--gradient-medal-gloss), linear-gradient(150deg, var(--ach-light), var(--ach-color));
   box-shadow:
-    0 0 0 4px var(--color-card),
-    0 0 0 6px color-mix(in srgb, var(--ach-color) 30%, transparent),
+    0 0 0 3px var(--color-card),
+    0 0 0 8px color-mix(in srgb, var(--ach-color) 30%, transparent),
     0 10px 24px color-mix(in srgb, var(--ach-color) 40%, transparent),
     inset 0 -4px 8px color-mix(in srgb, var(--color-text) 12%, transparent);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: a decorative icon / number (aria-hidden) on the exact category color */
 }
 
-/* The light sweep: parked off the disc, it crosses when the card is hovered (the card moves it). */
+/* A count badge's number. */
+.medal-number {
+  font-family: var(--font-num);
+  font-size: var(--medal-number);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The shine: parked off the disc, it sweeps across once when the card is hovered or pressed (the card moves it). */
 .medal-unlocked .medal-disc::after {
   content: '';
   position: absolute;

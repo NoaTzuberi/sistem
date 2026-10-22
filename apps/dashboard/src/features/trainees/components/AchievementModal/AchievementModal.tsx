@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { describeAchievement, describeAchievementProgress, fill, formatUnlockedDate, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { achievementBadgeNumber, describeAchievement, describeAchievementProgress, fill, formatUnlockedDate, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { useDrawerTransition } from '../../../../hooks/useDrawerTransition';
 import { achievementCategoryClass } from '../../data/achievementCategories';
-import type { BadgeEntry } from '../../data/achievementBoard';
+import type { BadgeEntry } from '@sistem/shared';
 import { Confetti } from '../Confetti/Confetti';
 import { Medal } from '../Medal/Medal';
 import { traineesCopy } from '../../copy';
@@ -78,7 +78,7 @@ export function AchievementModal({ badge, isOpen, onClose }: AchievementModalPro
         </button>
         <div className="ach-modal-stage">
           <span className="ach-modal-medal">
-            <Medal category={badge.category} unlocked={badge.unlocked} fraction={badge.fraction} size="large" />
+            <Medal category={badge.category} unlocked={badge.unlocked} fraction={badge.fraction} number={achievementBadgeNumber(badge.type)} size="large" />
           </span>
           {badge.unlocked && isShown && <Confetti />}
         </div>

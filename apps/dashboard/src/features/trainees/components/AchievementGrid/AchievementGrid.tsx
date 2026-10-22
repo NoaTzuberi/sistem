@@ -2,9 +2,9 @@ import type { AchievementType } from '@sistem/types';
 import { fill, isolateLtr, useCopy } from '@sistem/shared';
 import { RangeSegmented } from '../../../stats/components/RangeSegmented/RangeSegmented';
 import { achievementCategoryClass } from '../../data/achievementCategories';
-import { filterBadges, groupBadges } from '../../data/achievementBoard';
-import type { AchievementBoard, AchievementFilter } from '../../data/achievementBoard';
-import { AchievementBadge } from '../AchievementBadge/AchievementBadge';
+import { filterBadges, groupBadges } from '@sistem/shared';
+import type { AchievementBoard, AchievementFilter } from '@sistem/shared';
+import { BadgeCard } from '../BadgeCard/BadgeCard';
 import { traineesCopy } from '../../copy';
 import './AchievementGrid.css';
 
@@ -49,7 +49,7 @@ export function AchievementGrid({ board, filter, onFilter, onOpen }: Achievement
           </h4>
           <div className="ach-grid-badges">
             {group.badges.map((badge) => (
-              <AchievementBadge key={badge.type} badge={badge} isNext={board.next?.type === badge.type} onOpen={() => onOpen(badge.type)} />
+              <BadgeCard key={badge.type} badge={badge} isNext={board.next?.type === badge.type} onOpen={() => onOpen(badge.type)} />
             ))}
           </div>
         </section>

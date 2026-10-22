@@ -192,8 +192,7 @@ export const he = {
       perfect: 'שבוע מושלם',
       records: 'שיאים אישיים',
       volume: 'נפח',
-      // PLACEHOLDER: the design has no body-tracking category; the Body tab's name for now.
-      tracking: 'גוף',
+      tracking: 'גוף ומדידות', // owner, 2026-10-22
     },
   },
   // The Plans tab, v3: week rail, week calendar, consistency. Wording from the approved design;

@@ -184,7 +184,7 @@ export const en: CopyShape<typeof he> = {
       perfect: 'Perfect week',
       records: 'Personal records',
       volume: 'Volume',
-      tracking: 'Body',
+      tracking: 'Body & measurements',
     },
   },
   weeks: {

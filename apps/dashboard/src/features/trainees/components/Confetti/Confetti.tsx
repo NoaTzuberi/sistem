@@ -28,6 +28,7 @@ const PIECE_PATHS: Piece[] = Array.from({ length: PIECES }, (_, index) => {
 /**
  * One burst of confetti from the medal, in the category's colors (--ach-color, --ach-light) and
  * the brand's. Mounted once per opening of an unlocked badge; never with reduced motion (CSS).
+ * MIRRORED in apps/mobile/src/features/achievements/components/Confetti — change both.
  */
 export function Confetti() {
   return (

@@ -1,4 +1,6 @@
 .ach-grid {
+  /* On the dashboard canvas a locked card keeps the glass ground (the phone uses the soft grey). */
+  --ach-badge-bg: var(--surface-glass-card);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -54,7 +56,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
-  perspective: 800px;
+  perspective: var(--perspective-ach-grid);
 }
 
 @media (max-width: 760px) {

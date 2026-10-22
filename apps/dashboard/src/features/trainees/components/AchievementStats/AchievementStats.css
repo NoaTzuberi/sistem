@@ -27,8 +27,8 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-qv-icon);
-  background-color: var(--ach-solid);
-  color: var(--color-on-primary);
+  background-color: var(--ach-color);
+  color: var(--color-on-primary); /* contrast-ignore: a decorative icon on the exact category color (owner, 2026-10-22) */
 }
 
 .ach-stat-label {

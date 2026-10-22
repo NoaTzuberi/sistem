@@ -75,45 +75,44 @@ button {
 /*
  * A workout's identity color, by its place in the plan (workoutColorClass). Used by the
  * plan builder and by the AI draft card on a trainee's profile. Visual only: which
- * workout this is — never a status. --workout-solid is its readable form: the fill under white
- * text and its text on white (orange and sky blue are too light for either).
+ * workout this is — never a status. Fills use the exact --workout-color (owner, 2026-10-21);
+ * --workout-text is its readable form as text on white or on its tint.
  */
 .workout-color-1 {
   --workout-color: var(--color-workout-1);
   --workout-color-soft: var(--color-workout-1-soft);
-  --workout-solid: var(--solid-pink);
-}
+  --workout-text: var(--color-workout-1-text);
+  }
 
 .workout-color-2 {
   --workout-color: var(--color-workout-2);
   --workout-color-soft: var(--color-workout-2-soft);
-  --workout-solid: var(--color-workout-2);
-}
+  --workout-text: var(--color-workout-2-text);
+  }
 
 .workout-color-3 {
   --workout-color: var(--color-workout-3);
   --workout-color-soft: var(--color-workout-3-soft);
-  --workout-solid: var(--solid-orange);
-}
+  --workout-text: var(--color-workout-3-text);
+  }
 
 .workout-color-4 {
   --workout-color: var(--color-workout-4);
   --workout-color-soft: var(--color-workout-4-soft);
-  --workout-solid: var(--solid-blue);
-}
+  --workout-text: var(--color-workout-4-text);
+  }
 
 .workout-color-5 {
   --workout-color: var(--color-workout-5);
   --workout-color-soft: var(--color-workout-5-soft);
-  --workout-solid: var(--color-workout-5);
-}
+  --workout-text: var(--color-workout-5-text);
+  }
 
 /* A cardio workout, whatever its place: the cardio purple (its solid keeps white text at 6.2:1). */
 .workout-kind-cardio {
   --workout-color: var(--color-zone-2);
   --workout-color-soft: var(--tint-purple);
-  --workout-solid: var(--ink-purple);
-}
+  }
 
 /*
  * A movement pattern's color, by its group (patternGroupClass in exerciseLibrary/data/patternGroups.ts).
@@ -199,43 +198,43 @@ button {
 
 /*
  * An achievement category's color (achievementCategoryClass in trainees/data/achievementCategories.ts):
- * --ach-color the ink, --ach-light the lighter shade (medal gradient, confetti, unlocked card),
- * --ach-solid the fill under white text / small text on a light ground (≥ 4.5:1).
+ * --ach-color the fill (exact — never darkened), --ach-light the lighter shade (medal gradient, confetti,
+ * unlocked card), --ach-text its darker tone for text. Mirrored in apps/mobile/src/styles/achievementColors.css.
  */
 .ach-category-workouts {
   --ach-color: var(--color-ach-workouts);
   --ach-light: var(--color-ach-workouts-light);
-  --ach-solid: var(--solid-pink);
+  --ach-text: var(--color-ach-workouts-text);
 }
 
 .ach-category-streaks {
   --ach-color: var(--color-ach-streaks);
   --ach-light: var(--color-ach-streaks-light);
-  --ach-solid: var(--solid-orange);
+  --ach-text: var(--color-ach-streaks-text);
 }
 
 .ach-category-perfect {
   --ach-color: var(--color-ach-perfect);
   --ach-light: var(--color-ach-perfect-light);
-  --ach-solid: var(--color-ach-perfect);
+  --ach-text: var(--color-ach-perfect-text);
 }
 
 .ach-category-records {
   --ach-color: var(--color-ach-records);
   --ach-light: var(--color-ach-records-light);
-  --ach-solid: var(--solid-blue);
+  --ach-text: var(--color-ach-records-text);
 }
 
 .ach-category-volume {
   --ach-color: var(--color-ach-volume);
   --ach-light: var(--color-ach-volume-light);
-  --ach-solid: var(--color-ach-volume);
+  --ach-text: var(--color-ach-volume-text);
 }
 
 .ach-category-tracking {
   --ach-color: var(--color-ach-tracking);
   --ach-light: var(--color-ach-tracking-light);
-  --ach-solid: var(--solid-amber);
+  --ach-text: var(--color-ach-tracking-text);
 }
 
 /* A portion group's color on a trainee's Nutrition tab (donut, bars): --group-color. Identity, not status. */

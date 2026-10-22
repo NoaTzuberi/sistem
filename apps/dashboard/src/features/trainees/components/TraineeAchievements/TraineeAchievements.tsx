@@ -2,7 +2,7 @@ import type { AchievementOverview } from '@sistem/types';
 import { fill, sharedCopy, useCopy } from '@sistem/shared';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { useStatsIntro } from '../../../stats/hooks/useStatsIntro';
-import type { AchievementBoard } from '../../data/achievementBoard';
+import type { AchievementBoard } from '@sistem/shared';
 import { useAchievementBoard } from '../../hooks/useAchievementBoard';
 import { AchievementGrid } from '../AchievementGrid/AchievementGrid';
 import { AchievementModal } from '../AchievementModal/AchievementModal';

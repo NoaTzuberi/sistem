@@ -1,4 +1,5 @@
-/* The scrim: a blurred, slightly dark page. Fades in; the card grows in on the drawer curve. */
+/* The scrim: a blurred, slightly dark page. Fades in; the card grows in on the drawer curve.
+   MIRRORED in apps/mobile/src/features/achievements/components/AchievementModal — change both. */
 .ach-modal {
   position: fixed;
   z-index: var(--z-modal);
@@ -104,14 +105,14 @@
   display: block;
 }
 
-/* The medal turns to face her as the modal opens. */
-.ach-modal-shown .ach-modal-medal {
+/* An earned medal flips in to face her as the modal opens. */
+.ach-modal-shown .ach-modal-unlocked .ach-modal-medal {
   animation: ach-modal-flip var(--transition-medal-flip) var(--ease-press) both;
 }
 
 @keyframes ach-modal-flip {
   from {
-    transform: rotateY(180deg) scale(0.6);
+    transform: rotateY(-180deg) scale(0.6);
   }
 }
 
@@ -124,7 +125,7 @@
   background-color: color-mix(in srgb, var(--ach-color) 12%, var(--color-card));
   font-size: var(--text-2xs);
   font-weight: var(--font-weight-bold);
-  color: color-mix(in srgb, var(--ach-solid) 80%, var(--color-text)); /* 11px on its tint needs 4.5:1 */
+  color: var(--ach-text); /* 11px on its tint: the category's darker tone */
 }
 
 .ach-modal-title {
@@ -148,10 +149,10 @@
   margin: 10px 0 0;
   padding: 0 16px;
   border-radius: var(--radius-round);
-  background-color: var(--ach-solid);
+  background-color: var(--ach-color);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-on-primary);
+  color: var(--color-on-primary); /* contrast-ignore: the pill is the exact category color (owner, 2026-10-22) */
 }
 
 .ach-modal-progress {
@@ -204,7 +205,7 @@
     transition: opacity var(--transition-fast) ease;
   }
 
-  .ach-modal-shown .ach-modal-medal {
+  .ach-modal-shown .ach-modal-unlocked .ach-modal-medal {
     animation: none;
   }
 }

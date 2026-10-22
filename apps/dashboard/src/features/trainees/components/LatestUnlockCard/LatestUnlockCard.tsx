@@ -1,6 +1,6 @@
-import { describeAchievement, formatUnlockedDate, useCopy, useLanguage } from '@sistem/shared';
+import { achievementBadgeNumber, describeAchievement, formatUnlockedDate, useCopy, useLanguage } from '@sistem/shared';
 import { achievementCategoryClass } from '../../data/achievementCategories';
-import type { BadgeEntry } from '../../data/achievementBoard';
+import type { BadgeEntry } from '@sistem/shared';
 import { Medal } from '../Medal/Medal';
 import { traineesCopy } from '../../copy';
 import './LatestUnlockCard.css';
@@ -11,7 +11,7 @@ export function LatestUnlockCard({ badge, onOpen }: { badge: BadgeEntry; onOpen:
   const copy = useCopy(traineesCopy).achievementsTab;
   return (
     <button type="button" className={`latest-unlock ${achievementCategoryClass(badge.category)}`} onClick={onOpen}>
-      <Medal category={badge.category} unlocked fraction={1} size="small" />
+      <Medal category={badge.category} unlocked fraction={1} number={achievementBadgeNumber(badge.type)} size="small" />
       <span className="latest-unlock-text">
         <small className="latest-unlock-eyebrow">{copy.latestUnlock}</small>
         <b className="latest-unlock-title">{describeAchievement(badge.type, language).name}</b>

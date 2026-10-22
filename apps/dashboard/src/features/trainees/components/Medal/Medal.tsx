@@ -8,15 +8,19 @@ interface MedalProps {
   unlocked: boolean;
   /** 0–1: the locked medal's progress ring (no ring stroke at 0). */
   fraction: number;
+  /** A count badge (5 / 10 / 25 …): the earned disc shows this number instead of the icon. */
+  number?: number | null;
   size?: 'small' | 'regular' | 'large';
 }
 
 /**
  * An achievement's medal, in its category's color (--ach-color / --ach-light from the parent).
- * Unlocked: a glossy disc with a white ring and a glow. Locked: a grey embossed disc, a lock and
- * the progress ring. Decorative — the card around it says what it is.
+ * Earned: a glossy disc (highlight over light → color), a white ring, an outer ring in the color and
+ * a colored glow; the icon or the count. Locked: a grey disc, the progress ring from 12 o'clock and a
+ * lock. Decorative — the card around it says what it is.
+ * MIRRORED 1:1 in apps/mobile/src/features/achievements/components/Medal — change both.
  */
-export function Medal({ category, unlocked, fraction, size = 'regular' }: MedalProps) {
+export function Medal({ category, unlocked, fraction, number = null, size = 'regular' }: MedalProps) {
   return (
     <span className={`medal medal-${size} ${unlocked ? 'medal-unlocked' : 'medal-locked'}`} aria-hidden="true">
       {!unlocked && (
@@ -28,7 +32,7 @@ export function Medal({ category, unlocked, fraction, size = 'regular' }: MedalP
         </svg>
       )}
       <span className="medal-disc">
-        <Icon name={CATEGORY_ICON[category]} className="medal-icon" />
+        {unlocked && number !== null ? <b className="medal-number">{number}</b> : <Icon name={CATEGORY_ICON[category]} className="medal-icon" />}
       </span>
       {!unlocked && (
         <span className="medal-lock">
