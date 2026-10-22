@@ -799,5 +799,5 @@ Implement PRD §15.2 "Community branding". Propose the schema, the theme model a
 
 - **Password reset** — not in the MVP. The ATLAS forgot/reset-password flow (server routes + Resend email + client pages) exists; before enabling it in the app it needs a deep link / universal link or a small web reset page, and a Sistem email sender.
 - **Write original exercise descriptions** — AI draft reviewed and approved by the coach. Until then, the coach's per-exercise notes in the plan builder are the instructions trainees see.
-- **Multiple coaches** — the model supports it (coachId per trainee); UI, assignment and coach sign-up are not planned yet.
+- **Multiple coaches at once** — the model, API and authorization support it since accounts & relationships (Coaching per coach, `MULTI_COACH_ENABLED`); the trainee UI that groups workouts by coach / discipline is not planned yet (see docs/phase-reports/accounts-relationships.md).
 - **Community follow-ups** — everything in PRD §15.4 (open questions) that is left out of Phase 16: trainee reactions / comments / posts, moderation, new-post notifications.

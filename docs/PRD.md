@@ -36,8 +36,9 @@ To avoid confusion in code and docs, use these names consistently:
 | Trainee | Sign up / log in, complete onboarding, view own plans & workouts, log workouts, upload photos, track body metrics, view achievements. |
 | Coach | Uses the web dashboard (full) and coach mode in the mobile app (on the go) to: view all trainees and their onboarding data, receive new-trainee notifications, build workouts and weekly plans, assign/publish plans per trainee, view trainee logs, photos and body metrics. |
 
-- Authentication: **JWT, reused from ATLAS** as-is. Add a `role` field (`trainee` | `coach`) to the user model.
-- Coach accounts are never created via public sign-up. They are seeded or promoted manually.
+- Authentication: **JWT, reused from ATLAS** as-is. `User.roles` = `admin` | `coach` | `trainee` (an array — one person may hold several; accounts & relationships, 2026-10-22).
+- Coach accounts are never created via public sign-up. The platform **admin** creates them in the dashboard (name + email → a one-time "set password" link), and can suspend / reactivate them.
+- **Accounts & relationships (owner, 2026-10-22).** A trainee joins a coach through the coach's invite link (`/join/<code>`: permanent link + QR, or a personal single-use link) → sign-up → onboarding → waiting. Sign-up without a link is allowed: after onboarding she enters a coach code ("no coach yet"). The trainee ↔ coach relationship is a **Coaching** (waiting / active / ended); coach-owned data (plans, workouts incl. cardio, nutrition, logs, coach notes, AI drafts) belongs to one coaching, trainee-owned data (questionnaire, body, photos, profile) to the trainee and is visible to every coach with a live coaching. One live coaching per trainee for now (`MULTI_COACH_ENABLED`, off); the model supports several (e.g. pilates + gym). Each coach has a primary **community**; membership never grants private access. Details: docs/phase-reports/accounts-relationships.md.
 - All API routes enforce role-based authorization server-side. A trainee can only ever read/write their own data.
 
 ### Social sign-in — Google + Apple (later — Phase 5c, after Phase 5b)
@@ -292,7 +293,8 @@ Store device push tokens per user. Fail gracefully when push permission is denie
 
 ## 10. Data Model (initial sketch)
 
-- **User**: name, email, passwordHash, role, onboardingStatus, onboardingCompletedAt, pushTokens[], coachId (for trainees)
+- **User**: name, email, passwordHash (empty until an admin-created coach sets it), roles[], onboardingStatus, onboardingCompletedAt, pushTokens[]
+- **CoachProfile**: userId, displayName, slug, status (active / suspended), createdBy · **Coaching**: traineeId, coachId, status (waiting / active / ended), discipline?, startedAt, endedAt · **Community**: coachId, name, slug, visibility, isPrimary · **Membership**: communityId, userId, role, status · **Invite**: code, coachId, type (coaching / community), communityId?, targetEmail?, maxUses?, uses, expiresAt?, revokedAt. Coach-owned records carry `coachingId`.
 - **OnboardingResponse**: userId, answers (reuse ATLAS schema; Phase 13a adds nutrition preferences), completedAt
 - **Exercise**: reused from ATLAS exercise library
 - **Plan**: traineeId, coachId, weekStartDate, status (draft/published), workouts[]
