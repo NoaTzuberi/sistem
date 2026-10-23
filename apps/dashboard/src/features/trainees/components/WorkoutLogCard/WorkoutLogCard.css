@@ -183,3 +183,16 @@
     transition: none;
   }
 }
+
+/* Her own free workout (not from a plan). */
+.log-card-free {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-fr-tag);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--tint-purple);
+  color: var(--ink-purple);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}

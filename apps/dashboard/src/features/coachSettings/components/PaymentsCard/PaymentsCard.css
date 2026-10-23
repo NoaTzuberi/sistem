@@ -1,0 +1,73 @@
+.pay-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .pay-card-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pay-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pay-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pay-field-label {
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.pay-field-hint {
+  color: var(--color-fr-muted);
+  font-size: var(--text-xs);
+}
+
+.pay-input {
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--radius-field);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-base);
+}
+
+.pay-textarea {
+  padding-block: var(--space-2);
+  resize: vertical;
+}
+
+.pay-input:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.pay-error {
+  margin: 0;
+  color: var(--color-fr-cherry);
+  font-size: var(--text-sm);
+}
+
+.pay-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pay-future {
+  margin: 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-xs);
+}

@@ -21,7 +21,7 @@ import { LocalizedError } from '../../i18n';
 import type { ServerMessage } from '../../i18n';
 import { extractInviteCode, redeemInvite } from '../invites/invite.service';
 
-const SALT_ROUNDS = 12;
+export const SALT_ROUNDS = 12;
 const TOKEN_EXPIRY = '7d';
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 

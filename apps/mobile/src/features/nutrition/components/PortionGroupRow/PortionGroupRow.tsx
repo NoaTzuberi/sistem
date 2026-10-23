@@ -14,7 +14,8 @@ interface PortionGroupRowProps {
   eaten: number;
   editable: boolean;
   onChange: (value: number) => void;
-  onOpenFoods: () => void;
+  /** "What can I have?" (the food sheet); none without a food list (her own target). */
+  onOpenFoods?: () => void;
   /** Bumped when she completes the group: the badge pops once per bump (0 = never). */
   popKey: number;
 }
@@ -61,10 +62,12 @@ export function PortionGroupRow({ group, planned, eaten, editable, onChange, onO
             <TextWithNumber text={copy.overGoal} number={<PortionNumber value={over} sign="+" />} />
           </span>
         )}
-        <button type="button" className="tn-group-row-foods" onClick={onOpenFoods} aria-label={fill(copy.openSwaps, { label })}>
-          {copy.whatCanI}
-          <IconChevronRight className="flip-rtl" size={14} stroke={2.2} aria-hidden="true" />
-        </button>
+        {onOpenFoods && (
+          <button type="button" className="tn-group-row-foods" onClick={onOpenFoods} aria-label={fill(copy.openSwaps, { label })}>
+            {copy.whatCanI}
+            <IconChevronRight className="flip-rtl" size={14} stroke={2.2} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </li>
   );

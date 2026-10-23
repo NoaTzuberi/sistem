@@ -92,4 +92,38 @@ export const he = {
   trackingLoadError: 'לא הצלחנו לטעון את המעקב.',
   trackingPreviousWeek: 'השבוע הקודם',
   trackingNextWeek: 'השבוע הבא',
+  // "היעד שלי" (self-guided) — PLACEHOLDER drafts, except the action (the task's wording).
+  ownTarget: {
+    title: 'היעד שלי',
+    sub: 'כמה מנות מכל קבוצה ביום. אפשר לשנות מתי שרוצים.',
+    trackingLabel: 'מסמנות לפי היעד שלך',
+    edit: 'עריכת היעד',
+    emptyTitle: 'יעד מנות משלך',
+    emptyText: 'בוחרים כמה מנות חלבון, פחמימה ושומן ביום, ומסמנים מה אכלת.',
+    action: 'הגדרת יעד מנות',
+    freeVegetables: 'ירקות חופשי',
+    freeVegetablesHint: 'ירקות לא נספרים במנות',
+    save: 'שמירת היעד',
+    saving: 'שומרת…',
+    empty: 'צריך לפחות מנה אחת ביום.',
+    saveError: 'לא הצלחנו לשמור את היעד. אפשר לנסות שוב.',
+  },
+  // The meal photo sheet (docs/design/trainee-first-run.html, "תמונת ארוחה"). The design's wording; DRAFT = not in it.
+  mp: {
+    privacySelf: 'גלוי רק לך',
+    whichMeal: 'לאיזו ארוחה?',
+    camera: 'צילום',
+    cameraHint: 'פותח את המצלמה',
+    gallery: 'גלריה',
+    galleryHint: 'תמונה קיימת',
+    today: 'התמונות של היום',
+    todayEmpty: 'עוד אין תמונות היום',
+    saved: 'התמונה נשמרה לארוחת {meal}',
+    photosOfMeal: plural({ one: 'תמונה אחת', two: '2 תמונות', other: '{count} תמונות' }), // DRAFT (the badge, for screen readers)
+    openPhoto: 'תמונה של {meal}, {time}', // DRAFT
+    delete: 'מחיקה', // DRAFT
+    deleted: 'התמונה נמחקה', // DRAFT
+    previous: 'התמונה הקודמת', // DRAFT
+    next: 'התמונה הבאה', // DRAFT
+  },
 } as const;

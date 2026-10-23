@@ -15,6 +15,8 @@ export const ROUTES = {
   TRAINEE_NUTRITION: '/trainees/:traineeId/nutrition',
   // Phase 12b: the exercise library by family — review patterns, families, primaries.
   EXERCISES: '/exercises',
+  // Her settings: what her trainees see about her (payment links).
+  SETTINGS: '/settings',
   // Accounts: the admin's coach list, and the one-time "set password" link a new coach opens.
   ADMIN_COACHES: '/admin/coaches',
   SET_PASSWORD: '/set-password',

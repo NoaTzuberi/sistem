@@ -4,6 +4,7 @@ import { fill, formatPortionCount, getActiveLanguage, PORTION_GROUPS, sharedCopy
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
+import { useAuth } from '../../../../services/auth/AuthContext';
 import { getNutritionPlan, markNutritionIntroSeen } from '../../../../services/nutrition/nutritionService';
 import { loadNutritionCache, saveNutritionCache } from '../../data/nutritionCache';
 import { hasFreeVegetables, planMode, sumPortions } from '../../data/nutritionDay';
@@ -19,6 +20,9 @@ import { MenuSection } from '../MenuSection/MenuSection';
 import { MenuMealCard } from '../MenuMealCard/MenuMealCard';
 import { MealPhotoStrip } from '../MealPhotoStrip/MealPhotoStrip';
 import { MealPhotoSheet } from '../MealPhotoSheet/MealPhotoSheet';
+import { OwnTargetSheet } from '../OwnTargetSheet/OwnTargetSheet';
+import { SgEmptyState } from '../../../../components/common/SgEmptyState/SgEmptyState';
+import { IconTarget } from '@tabler/icons-react';
 import { FoodSheet } from '../FoodSheet/FoodSheet';
 import { nutritionCopy } from '../../copy';
 import './NutritionScreen.css';
@@ -42,6 +46,11 @@ export function NutritionScreen({ userId }: { userId: string }) {
   const nutritionDay = useNutritionDay(userId);
   const sheet = useNutritionSheet();
   const [isPhotoSheetOpen, setIsPhotoSheetOpen] = useState(false);
+  // "היעד שלי": without a coach's nutrition plan she tracks against her own daily portions.
+  const [isTargetOpen, setIsTargetOpen] = useState(false);
+  const authUser = useAuth().user;
+  const hasCoach = authUser?.coachingStatus != null;
+  const timezone = authUser?.timezone ?? 'Asia/Jerusalem';
   const { toastMessage, showToast } = useToast();
   const [pops, setPops] = useState(NO_POPS);
 
@@ -90,7 +99,10 @@ export function NutritionScreen({ userId }: { userId: string }) {
   }
 
   const { day, date } = nutritionDay;
-  const dayHasPlan = day !== null && day.planVersion !== null && sumPortions(day.planned) > 0;
+  const ownTarget = nutritionDay.ownTarget;
+  // A day tracked against her own target (no coach plan) works like a plan day, without foods.
+  const isOwnDay = !plan && day !== null && day.source === 'own';
+  const dayHasPlan = day !== null && (day.planVersion !== null || isOwnDay) && sumPortions(day.planned) > 0;
   // Before the days arrive (first open offline): the plan's portions, nothing marked, read-only.
   const planned = day && dayHasPlan ? day.planned : (plan?.dayPortions ?? ZERO);
   const eaten = day && dayHasPlan ? day.eaten : ZERO;
@@ -123,8 +135,8 @@ export function NutritionScreen({ userId }: { userId: string }) {
 
   return (
     <div className="tn-screen">
-      <NutritionHeader date={date} onAddPhoto={plan && addPhoto ? addPhoto : undefined}>
-        {plan && date && nutritionDay.week.length > 0 && <WeekStrip week={nutritionDay.week} selected={date} onSelect={nutritionDay.selectDate} />}
+      <NutritionHeader date={date} onAddPhoto={(plan || isOwnDay) && addPhoto ? addPhoto : undefined}>
+        {(plan || ownTarget) && date && nutritionDay.week.length > 0 && <WeekStrip week={nutritionDay.week} selected={date} onSelect={nutritionDay.selectDate} />}
       </NutritionHeader>
 
       <div className="tn-body">
@@ -132,8 +144,52 @@ export function NutritionScreen({ userId }: { userId: string }) {
           <StateMessage>{copy.loading}</StateMessage>
         ) : !data ? (
           <StateMessage onRetry={() => void load()}>{error}</StateMessage>
+        ) : !plan && ownTarget ? (
+          <>
+            <div className="sg-own-head">
+              <p className="sg-own-label">{copy.ownTarget.trackingLabel}</p>
+              <button type="button" className="sg-own-edit" onClick={() => setIsTargetOpen(true)}>
+                {copy.ownTarget.edit}
+              </button>
+            </div>
+            {dayHasPlan && day ? (
+              <>
+                <PortionSummary planned={day.planned} eaten={day.eaten} mode="portions" />
+                <ul className="tn-groups">
+                  {PORTION_GROUPS.filter((group) => day.planned[group] > 0).map((group) => (
+                    <PortionGroupRow
+                      key={group}
+                      group={group}
+                      planned={day.planned[group]}
+                      eaten={day.eaten[group]}
+                      editable={canEdit}
+                      onChange={(value) => celebrate(nutritionDay.setGroup(group, value))}
+                      popKey={pops[group]}
+                    />
+                  ))}
+                </ul>
+                {ownTarget.freeVegetables && <FreeVegetables />}
+              </>
+            ) : (
+              <p className="tn-note">{copy.trackerNoPlan}</p>
+            )}
+            <p className="tn-note" role="status">
+              {syncNote}
+            </p>
+            {day && <MealPhotoStrip photos={day.photos} onAdd={addPhoto} onLinkExpired={() => void nutritionDay.reload()} />}
+          </>
         ) : !plan ? (
-          <StateMessage>{copy.empty}</StateMessage>
+          <>
+            {/* Self-guided: no "waiting for your coach" line — one action. With a coach: her line, then the same action. */}
+            {hasCoach && <StateMessage>{copy.empty}</StateMessage>}
+            <SgEmptyState
+              icon={<IconTarget size={24} />}
+              title={copy.ownTarget.emptyTitle}
+              text={copy.ownTarget.emptyText}
+              actionLabel={copy.ownTarget.action}
+              onAction={() => setIsTargetOpen(true)}
+            />
+          </>
         ) : (
           <>
             {/* Keyed by version: a new note opens again. */}
@@ -223,10 +279,14 @@ export function NutritionScreen({ userId }: { userId: string }) {
           isOpen={isPhotoSheetOpen}
           onClose={() => setIsPhotoSheetOpen(false)}
           day={day}
+          timezone={timezone}
+          selfGuided={!hasCoach}
           onDayChange={nutritionDay.replaceDay}
           onLinkExpired={() => void nutritionDay.reload()}
+          onToast={showToast}
         />
       )}
+      <OwnTargetSheet isOpen={isTargetOpen} onClose={() => setIsTargetOpen(false)} current={ownTarget} onSaved={() => void nutritionDay.reload()} />
       <Toast message={toastMessage} />
     </div>
   );

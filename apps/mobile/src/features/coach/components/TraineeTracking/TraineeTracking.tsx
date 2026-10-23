@@ -74,7 +74,7 @@ export function TraineeTracking({ traineeId }: { traineeId: string }) {
               {day.photos.length > 0 && (
                 <div className="coach-tracking-photos">
                   {day.photos.map((photo) => (
-                    <div key={photo.mealId} className="coach-tracking-photo">
+                    <div key={photo.id} className="coach-tracking-photo">
                       <PrivatePhoto
                         photo={photo}
                         alt={fill(copy.photoAlt, { meal: photo.mealName })}

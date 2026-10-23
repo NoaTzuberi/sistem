@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { MealLogDay, PortionCounts } from '@sistem/types';
+import type { MealLogDay, OwnNutritionTarget, PortionCounts } from '@sistem/types';
 import { getMealLogs, saveMealLog } from '../../../services/nutrition/nutritionService';
 import { loadNutritionCache, saveNutritionCache } from '../data/nutritionCache';
 
@@ -21,6 +21,7 @@ export function useMealTracker(userId: string) {
     return withPending(cache.days, cache.pending);
   });
   const [today, setToday] = useState<string | null>(() => loadNutritionCache(userId).today);
+  const [ownTarget, setOwnTarget] = useState<OwnNutritionTarget | null>(() => loadNutritionCache(userId).ownTarget);
   const [loadFailed, setLoadFailed] = useState(false);
   const [sync, setSync] = useState<TrackerSync>(() =>
     Object.keys(loadNutritionCache(userId).pending).length > 0 ? 'pending' : 'synced',
@@ -82,9 +83,10 @@ export function useMealTracker(userId: string) {
     try {
       const response = await getMealLogs();
       const { pending } = loadNutritionCache(userId);
-      saveNutritionCache(userId, { days: response.days, today: response.today });
+      saveNutritionCache(userId, { days: response.days, today: response.today, ownTarget: response.ownTarget });
       setDays(withPending(response.days, pending));
       setToday(response.today);
+      setOwnTarget(response.ownTarget);
       setLoadFailed(false);
       if (Object.keys(pending).length > 0) scheduleFlush(0);
     } catch {
@@ -140,5 +142,5 @@ export function useMealTracker(userId: string) {
     [userId],
   );
 
-  return { days, today, loadFailed, sync, setEaten, replaceDay, reload };
+  return { days, today, ownTarget, loadFailed, sync, setEaten, replaceDay, reload };
 }

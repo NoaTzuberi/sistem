@@ -31,4 +31,5 @@ export const he = {
   loadError: 'לא הצלחנו לטעון את הקישורים.',
   actionError: 'הפעולה לא הצליחה. אפשר לנסות שוב.',
   done: 'סיום',
+  shortCode: 'או הקוד:', // PLACEHOLDER — trainees type it in the app
 };

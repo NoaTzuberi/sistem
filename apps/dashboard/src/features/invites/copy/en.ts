@@ -32,4 +32,5 @@ export const en: CopyShape<typeof he> = {
   loadError: "Couldn't load your links.",
   actionError: "That didn't work. Try again.",
   done: 'Done',
+  shortCode: 'Or the code:',
 };

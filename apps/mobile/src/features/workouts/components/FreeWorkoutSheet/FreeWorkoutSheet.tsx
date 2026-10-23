@@ -6,6 +6,7 @@ import type { FreeWorkoutMode } from '../../data/freeWorkout';
 import { nameScript } from '../../data/weekPlanDisplay';
 import type { useFreeWorkout } from '../../hooks/useFreeWorkout';
 import { MusclePicker } from '../MusclePicker/MusclePicker';
+import { useAuth } from '../../../../services/auth/AuthContext';
 import { workoutCopy } from '../../copy';
 import './FreeWorkoutSheet.css';
 
@@ -15,13 +16,11 @@ interface FreeWorkoutSheetProps {
   free: ReturnType<typeof useFreeWorkout>;
 }
 
-/**
- * "Free workout": from scratch, repeat a past workout, or by muscle, then Start. Built ahead of the
- * server: Start calls the PROPOSED endpoint (see data/freeWorkout.ts).
- */
+/** "Free workout": from scratch, repeat a past workout, or by muscle, then Start (POST /workout-logs/free). */
 export function FreeWorkoutSheet({ isOpen, onClose, free }: FreeWorkoutSheetProps) {
   const copy = useCopy(workoutCopy);
   const language = useLanguage();
+  const selfGuided = useAuth().user?.coachingStatus == null;
 
   const options: { mode: FreeWorkoutMode; title: string; text: string; icon: ReactNode; colorClass: string }[] = [
     { mode: 'scratch', title: copy.free.scratch, text: copy.free.scratchText, icon: <IconPlus size={22} stroke={2} />, colorClass: 'workout-color-1' },
@@ -54,7 +53,8 @@ export function FreeWorkoutSheet({ isOpen, onClose, free }: FreeWorkoutSheetProp
       <h2 className="free-sheet-title display-title" id="free-sheet-title">
         {copy.screen.freeWorkout}
       </h2>
-      <p className="free-sheet-intro">{copy.free.intro}</p>
+      {/* Self-guided: nobody else sees it, so the line says so. */}
+      <p className="free-sheet-intro">{selfGuided ? copy.free.introSelf : copy.free.intro}</p>
 
       <div className="free-sheet-options" role="radiogroup" aria-labelledby="free-sheet-title">
         {options.map((option) => (

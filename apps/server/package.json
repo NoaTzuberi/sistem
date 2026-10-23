@@ -15,6 +15,7 @@
     "group:exercises": "tsx src/features/exerciseFamilies/scripts/groupExercises.ts",
     "seed:knowledge": "tsx src/features/knowledge/scripts/seedKnowledge.ts",
     "promote:coach": "tsx src/features/users/scripts/promoteCoach.ts",
+    "create:admin": "tsx src/features/admin/scripts/createAdmin.ts",
     "seed:dev": "tsx src/features/users/scripts/seedDev.ts",
     "backfill:achievements": "tsx src/features/achievements/scripts/backfillAchievements.ts",
     "media:compress": "tsx src/features/onboardingMedia/scripts/compressOnboardingVideos.ts",

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes';
+import { CoachSettingsPage } from '../../features/coachSettings/pages/CoachSettingsPage/CoachSettingsPage';
 import { Login } from '../../features/auth/pages/Login/Login';
 import { RequireRole } from '../../features/auth/components/RequireRole/RequireRole';
 import { SetPasswordPage } from '../../features/auth/pages/SetPasswordPage/SetPasswordPage';
@@ -31,6 +32,7 @@ export function AppRouter() {
           <Route path={ROUTES.TRAINEE} element={<TraineeDetailPage />} />
           <Route path={ROUTES.PLAN} element={<PlanBuilderPage />} />
           <Route path={ROUTES.EXERCISES} element={<ExerciseLibraryPage />} />
+          <Route path={ROUTES.SETTINGS} element={<CoachSettingsPage />} />
           <Route path={ROUTES.TRAINEE_NUTRITION} element={<NutritionBuilderPage />} />
           {/* The nutrition library: one page, its tab in the path. */}
           <Route path={ROUTES.NUTRITION} element={<Navigate to={ROUTES.NUTRITION_FOODS} replace />} />

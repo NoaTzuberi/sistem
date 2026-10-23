@@ -11,6 +11,7 @@ export const {
   saveMealLog,
   uploadMealPhoto,
   removeMealPhoto,
+  saveOwnNutritionTarget,
   getTabUpdates,
   markTabSeen,
 } = createTraineeApi(apiClient);

@@ -45,7 +45,7 @@ export function MealPhotoStrip({ photos, onAdd, onLinkExpired }: MealPhotoStripP
           </li>
         )}
         {photos.map((photo) => (
-          <li key={photo.mealId} className="tn-photos-tile">
+          <li key={photo.id} className="tn-photos-tile">
             <PrivatePhoto
               photo={photo}
               alt={fill(copy.photoAlt, { meal: photo.mealName })}

@@ -10,10 +10,6 @@ import { workoutSessionPath } from '../../../app/config/routes';
 import type { FreeWorkoutMode, FreeWorkoutMuscle, StartFreeWorkoutPayload } from '../data/freeWorkout';
 import { workoutCopy } from '../copy';
 
-/**
- * The free-workout sheet's choices and its Start. Start calls the PROPOSED endpoint
- * (freeWorkoutService) and opens the existing session screen — the server side waits for approval.
- */
 /** Past workouts offered for "repeat": the newest completed log of each workout. */
 const RECENT_LOGS = 8;
 
@@ -30,6 +26,7 @@ function recentDistinct(logs: WorkoutLog[]): WorkoutLog[] {
   return picked;
 }
 
+/** The free-workout sheet's choices and its Start: the server builds the session, the usual session screen runs it. */
 export function useFreeWorkout(isOpen: boolean) {
   const copy = useCopy(workoutCopy);
   const navigate = useNavigate();

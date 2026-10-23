@@ -10,6 +10,7 @@ import { useCoachData } from '../services/coach/CoachDataContext';
 import { useAuth } from '../services/auth/AuthContext';
 import { hasRole } from '../features/auth/data/roles';
 import { adminCopy } from '../features/admin/copy';
+import { coachSettingsCopy } from '../features/coachSettings/copy';
 
 export interface NavItem {
   id: string;
@@ -41,6 +42,7 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
   const { pathname, search } = useLocation();
   const { trainees } = useCoachData();
   const admin = useCopy(adminCopy);
+  const settings = useCopy(coachSettingsCopy);
   const { user } = useAuth();
   const isAdmin = hasRole(user, 'admin');
 
@@ -105,6 +107,11 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
           },
         ],
       },
+      {
+        id: 'account',
+        label: settings.navGroup,
+        items: [{ id: 'settings', to: ROUTES.SETTINGS, label: settings.navLabel, icon: 'settings', isCurrent: under(ROUTES.SETTINGS) }],
+      },
     ];
     // The platform admin also manages coach accounts (a page of its own).
     if (isAdmin) {
@@ -116,5 +123,5 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
     }
 
     return { groups, current: groups.flatMap((group) => group.items).find((item) => item.isCurrent) };
-  }, [copy, nutrition, exercises, admin, isAdmin, pathname, search, trainees]);
+  }, [copy, nutrition, exercises, admin, settings, isAdmin, pathname, search, trainees]);
 }

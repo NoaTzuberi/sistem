@@ -1,8 +1,16 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { IconCalendarEvent } from '@tabler/icons-react';
 import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
 import { ROUTES, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { useToast } from '../../../../hooks/useToast';
+import { useFreeWorkout } from '../../../workouts/hooks/useFreeWorkout';
+import { FreeWorkoutSheet } from '../../../workouts/components/FreeWorkoutSheet/FreeWorkoutSheet';
+import { SgStageAction } from '../SgStageAction/SgStageAction';
+import { JoinCoachCard } from '../JoinCoachCard/JoinCoachCard';
+import { useJoinCardDismissal } from '../../hooks/useJoinCardDismissal';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../../workouts/hooks/useStartWorkout';
@@ -40,6 +48,41 @@ export function HomeScreen() {
   const track = useWeekTrack(data);
   const coachMessage = home.coachMessage;
   const thanks = useCoachThanks(coachMessage ? { id: coachMessage.note, key: coachMessage.key } : null);
+  // Self-guided (no live coaching) or a coach she joined later still building the plan: her own tools.
+  const coachingStatus = home.user?.coachingStatus ?? null;
+  const [isFreeOpen, setIsFreeOpen] = useState(false);
+  const free = useFreeWorkout(isFreeOpen);
+  const joinCard = useJoinCardDismissal(home.user?.id);
+  const { toastMessage, showToast } = useToast();
+  const location = useLocation();
+  const joinedCoach = (location.state as { joinedCoach?: string } | null)?.joinedCoach;
+
+  // Back from joining a coach (Profile / this card): say so once, then forget it.
+  useEffect(() => {
+    if (!joinedCoach) return;
+    showToast(fill(copy.selfGuided.joined, { coach: joinedCoach }));
+    navigate(location.pathname, { replace: true, state: null });
+  }, [copy.selfGuided.joined, joinedCoach, location.pathname, navigate, showToast]);
+
+  function openFree() {
+    free.reset();
+    setIsFreeOpen(true);
+  }
+
+  const noPlanContent =
+    coachingStatus === 'active' ? undefined : (
+      <SgStageAction
+        line={
+          coachingStatus === 'waiting'
+            ? home.coachName
+              ? fill(copy.selfGuided.waitingLine, { coach: home.coachName })
+              : copy.selfGuided.waitingNoName
+            : copy.selfGuided.line
+        }
+        actionLabel={copy.selfGuided.action}
+        onAction={openFree}
+      />
+    );
 
   // One slide (owner decision): resume the open workout, else start today's.
   function handleStart() {
@@ -91,7 +134,12 @@ export function HomeScreen() {
         isStarting={starter.isStarting}
         startError={starter.error}
         status={weekStatus}
+        noPlanContent={noPlanContent}
       />
+
+      {coachingStatus === null && !joinCard.isDismissed && (
+        <JoinCoachCard onOpen={() => navigate(ROUTES.JOIN_COACH_CODE)} onDismiss={joinCard.dismiss} />
+      )}
 
       {home.startingPhoto.isVisible && (
         <StartingPhotoPrompt onTake={() => navigate(ROUTES.PROFILE_PHOTOS)} onDismiss={home.startingPhoto.dismiss} />
@@ -176,6 +224,9 @@ export function HomeScreen() {
           <FuelToday day={home.fuel} />
         </section>
       )}
+
+      <FreeWorkoutSheet isOpen={isFreeOpen} onClose={() => setIsFreeOpen(false)} free={free} />
+      <Toast message={toastMessage} />
 
       <StartConflictModal
         active={starter.conflict}

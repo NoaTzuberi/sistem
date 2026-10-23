@@ -1,0 +1,103 @@
+.pp-start {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + var(--space-1));
+  padding: calc(var(--space-3) + var(--space-1));
+  border-radius: var(--radius-fr-panel);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-fr-solo);
+}
+
+.pp-start-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-icon-tile);
+  height: var(--size-fr-icon-tile);
+  border-radius: var(--radius-fr-icon-tile);
+  background-color: var(--color-ink);
+  color: var(--color-pink-on-ink);
+}
+
+.pp-start-title,
+.pp-start-set-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-profile-sheet-title);
+  line-height: 0.85;
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.pp-start-text {
+  margin: 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* Set: a compact row. */
+.pp-start-set {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-2) + var(--space-1));
+  padding: calc(var(--space-2) + var(--space-1));
+  border-radius: var(--radius-fr-panel);
+  background-color: var(--color-card);
+}
+
+.pp-start-thumb {
+  flex: none;
+  width: calc(var(--size-fr-icon-tile) + var(--space-2));
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-fr-thumb);
+  background-color: var(--color-fr-soft);
+  cursor: pointer;
+}
+
+.pp-start-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pp-start-set-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pp-start-set-title {
+  font-size: var(--text-profile-row-name);
+}
+
+.pp-start-set-date {
+  margin: var(--space-1) 0 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-xs);
+}
+
+/* A quiet text button (44px target). */
+.pp-text-button {
+  flex: none;
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-subscreen-label);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.pp-text-button:active {
+  transform: scale(var(--scale-fr-press));
+}

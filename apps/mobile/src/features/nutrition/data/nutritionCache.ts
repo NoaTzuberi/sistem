@@ -1,4 +1,4 @@
-import type { MealLogDay, PortionCounts, TraineeNutritionPlanResponse } from '@sistem/types';
+import type { MealLogDay, OwnNutritionTarget, PortionCounts, TraineeNutritionPlanResponse } from '@sistem/types';
 
 // The Nutrition tab kept on the phone (Phase 13a+): the last plan and days the server
 // sent, so the tab opens without a connection, and the marks the server hasn't confirmed
@@ -16,10 +16,12 @@ export interface NutritionCache {
    * takes back exactly those). Phone only: the server keeps counts per group, never which meal (PRD 13a+).
    */
   mealMarks: Record<string, Record<string, PortionCounts>>;
+  /** Her own target ("היעד שלי") as the server last sent it. */
+  ownTarget: OwnNutritionTarget | null;
 }
 
 const KEY_PREFIX = 'sistem.nutrition.';
-const EMPTY: NutritionCache = { plan: null, today: null, days: [], pending: {}, mealMarks: {} };
+const EMPTY: NutritionCache = { plan: null, today: null, days: [], pending: {}, mealMarks: {}, ownTarget: null };
 
 export function loadNutritionCache(userId: string): NutritionCache {
   try {

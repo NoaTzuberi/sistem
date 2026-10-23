@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { directionOf, getActiveLanguage, poseLabel, useCopy, useI18n } from '@sistem/shared';
 import { IconLock } from '@tabler/icons-react';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
@@ -20,6 +20,9 @@ import { PhotoCompareFrame } from '../../components/PhotoCompareFrame/PhotoCompa
 import { PhotoGrid } from '../../components/PhotoGrid/PhotoGrid';
 import { AchievementsTab } from '../../../achievements/components/AchievementsTab/AchievementsTab';
 import { CoachCard } from '../../components/CoachCard/CoachCard';
+import { JoinCoachRow } from '../../components/JoinCoachRow/JoinCoachRow';
+import { useActiveCoachings } from '../../../../hooks/useActiveCoachings';
+import { initialsOf } from '../../data/profileDisplay';
 import { ProfileSettings } from '../../components/ProfileSettings/ProfileSettings';
 import { ProfilePhotoSheet } from '../../components/ProfilePhotoSheet/ProfilePhotoSheet';
 import { useAvatarUpload } from '../../hooks/useAvatarUpload';
@@ -53,6 +56,7 @@ function jumpTo(element: HTMLElement | null) {
  * filter, every badge by category + its modal) — her coach and the settings. The tab lives in the URL (?tab=).
  */
 export function ProfilePage() {
+  const navigate = useNavigate();
   const copy = useCopy(profileCopy);
   const achievementText = useCopy(achievementCopy);
   const bodyText = useCopy(bodyCopy);
@@ -70,6 +74,9 @@ export function ProfilePage() {
   const [photoSheetOpen, setPhotoSheetOpen] = useState(false);
   const avatar = useAvatarUpload();
   const { toastMessage, showToast } = useToast();
+  // Her current coaching's card (photo, status, payment links) — the server sends only her own.
+  const { coachings } = useActiveCoachings(profile.user?.coachingStatus != null);
+  const coaching = coachings[0] ?? null;
   const coachRef = useRef<HTMLElement>(null);
   const settingsRef = useRef<HTMLHeadingElement>(null);
 
@@ -194,7 +201,21 @@ export function ProfilePage() {
               ))}
           </section>
 
-          {profile.coach && <CoachCard ref={coachRef} coach={profile.coach} />}
+          {/* Self-guided: "Join a coach" in place of the coach card. */}
+          {profile.user?.coachingStatus == null ? (
+            <JoinCoachRow onOpen={() => navigate(ROUTES.JOIN_COACH_CODE)} />
+          ) : (
+            (coaching || profile.coach) && (
+              <CoachCard
+                ref={coachRef}
+                coach={coaching ? { name: coaching.coachName, initials: initialsOf(coaching.coachName) } : profile.coach!}
+                avatar={coaching?.coachAvatar ?? null}
+                status={coaching?.status ?? null}
+                payment={coaching?.payment ?? null}
+                onToast={showToast}
+              />
+            )
+          )}
           <ProfileSettings ref={settingsRef} />
         </div>
 

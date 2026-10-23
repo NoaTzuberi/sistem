@@ -9,8 +9,12 @@ import './WorkoutLogCard.css';
 const MAX_RATING = 5;
 const WORKOUT_TONES = 5;
 
-/** The same workout keeps the same identity color across her logs (the log does not know its place in the plan). */
-function toneOf(workoutId: string): number {
+/**
+ * The same workout keeps the same identity color across her logs (the log does not know its place in the plan).
+ * A free workout has no plan workout to match, so it gets no tone and keeps the card's default color.
+ */
+function toneOf(workoutId: string | null): number | undefined {
+  if (workoutId === null) return undefined;
   let hash = 0;
   for (const char of workoutId) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   return hash % WORKOUT_TONES;
@@ -53,6 +57,8 @@ export function WorkoutLogCard({ log, timezone, isOpen, onToggle }: WorkoutLogCa
           </span>
         </span>
         <span className="log-card-badges">
+          {/* Her own workout (outside your plans) — trainee-owned history. */}
+          {log.source === 'free' && <span className="log-card-free">{shared.coach.freeWorkout}</span>}
           <span className="log-card-status" data-state={state}>
             {state === 'partial' ? copy.logs.partial : shared.coach.logStatus[log.status]}
           </span>

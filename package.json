@@ -23,6 +23,7 @@
     "group:exercises": "npm run group:exercises -w @sistem/server",
     "seed:knowledge": "npm run seed:knowledge -w @sistem/server",
     "promote:coach": "npm run promote:coach -w @sistem/server --",
+    "create:admin": "npm run create:admin -w @sistem/server --",
     "seed:dev": "npm run seed:dev -w @sistem/server --",
     "seed:nutrition": "npm run seed:nutrition -w @sistem/server --",
     "reset:nutrition": "npm run reset:nutrition -w @sistem/server --",

@@ -32,6 +32,8 @@ interface HomeStageProps {
   startError: string | null;
   /** The week's loading / error line, shown on the stage until the week is there. */
   status?: ReactNode;
+  /** No plan this week: what the stage shows instead of the plain line (self-guided / coach still building). */
+  noPlanContent?: ReactNode;
 }
 
 function todayLabel(today: string, language: Language): string {
@@ -50,7 +52,7 @@ function todayEyebrow(today: string, weekdays: readonly string[]): string {
 
 /** The full-bleed pink stage: greeting, the live object of the day, today's workout and slide-to-start. */
 export function HomeStage(props: HomeStageProps) {
-  const { name, today, stage, weekCount, activeLog, onStart, isStarting, startError, status } = props;
+  const { name, today, stage, weekCount, activeLog, onStart, isStarting, startError, status, noPlanContent } = props;
   const copy = useCopy(homeCopy);
   const eyebrow = useCopy(appCopy).eyebrow;
   const workoutText = useCopy(workoutCopy);
@@ -107,8 +109,10 @@ export function HomeStage(props: HomeStageProps) {
 
       {status}
       {kicker && <TodayWorkoutHeadline kicker={kicker} eyebrow={stage ? eyebrow.today : undefined} title={title} />}
-      {!kicker && message && (
-        <p className="home-stage-message display-title">{message}</p>
+      {!kicker && stage?.kind === 'noPlan' && noPlanContent ? (
+        noPlanContent
+      ) : (
+        !kicker && message && <p className="home-stage-message display-title">{message}</p>
       )}
 
       {stage?.kind === 'rest' && next && (

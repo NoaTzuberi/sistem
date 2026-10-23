@@ -1,4 +1,5 @@
 import { fill, getActiveLanguage, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { IconPlus } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';

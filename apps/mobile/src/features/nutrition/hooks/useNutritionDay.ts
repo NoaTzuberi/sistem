@@ -92,5 +92,6 @@ export function useNutritionDay(userId: string) {
     offline: tracker.loadFailed,
     replaceDay: tracker.replaceDay,
     reload: tracker.reload,
+    ownTarget: tracker.ownTarget,
   };
 }

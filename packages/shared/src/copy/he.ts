@@ -80,6 +80,7 @@ export const he = {
     all: 'הכול',
   },
   coach: {
+    freeWorkout: 'אימון חופשי', // PLACEHOLDER — her own workout, outside the coach's plans
     tabs: {
       onboarding: 'שאלון',
       plan: 'תוכנית',

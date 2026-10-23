@@ -38,10 +38,10 @@ import { BodyMetric } from '../../bodyMetrics/bodyMetric.model';
 import type { PlanSetTargetFields } from '../../plans/plan.types';
 import { Exercise } from '../../exercises/exercise.model';
 import { assertDevDatabase } from './devDatabaseGuard';
+import { DEV_SEED_PASSWORD } from './devSeed.constants';
 import { existsSync } from 'node:fs';
 import { NUTRITION_SEED_FILES, applyNutritionSeed, readNutritionSeedFile } from '../../nutrition/nutritionSeed';
 
-const DEV_SEED_PASSWORD = 'sistem-dev-1234';
 const MIN_OWN_PASSWORD_LENGTH = 12;
 const OWN_SEED_PASSWORD = process.env.SEED_PASSWORD ?? '';
 const SEED_PASSWORD = OWN_SEED_PASSWORD || DEV_SEED_PASSWORD;

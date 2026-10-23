@@ -1,8 +1,8 @@
 /* The white coach card. */
 .pf-coach {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
+  gap: var(--space-3);
   margin-block-start: var(--space-5);
   padding: var(--space-3);
   border-radius: var(--radius-profile-group);
@@ -11,11 +11,19 @@
   outline: none;
 }
 
+.pf-coach-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .pf-coach:focus-visible {
   box-shadow: var(--ring-field);
 }
 
 .pf-coach-avatar {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex: none;
   align-items: center;

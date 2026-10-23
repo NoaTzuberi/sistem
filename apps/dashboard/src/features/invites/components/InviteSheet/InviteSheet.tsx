@@ -56,6 +56,14 @@ export function InviteSheet({ isOpen, onClose }: InviteSheetProps) {
                 <QrCode url={invites.permanent.url} label={copy.qrAlt} />
                 <div className="invite-permanent-side">
                   <LinkRow url={invites.permanent.url} />
+                  {invites.permanent.shortCode && (
+                    <p className="invite-code">
+                      <span>{copy.shortCode}</span>
+                      <b className="invite-code-value" dir="ltr">
+                        {invites.permanent.shortCode}
+                      </b>
+                    </p>
+                  )}
                   <p className="invite-hint">
                     {invites.permanent.uses > 0 ? plural(copy.uses, invites.permanent.uses) : copy.noUses}
                   </p>

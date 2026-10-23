@@ -1,0 +1,108 @@
+.photo-tiles {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: var(--space-2);
+}
+
+.photo-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: var(--size-fr-action-tile);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-fr-tile);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-tile:active:not([disabled]) {
+  transform: scale(var(--scale-fr-press));
+}
+
+.photo-tile[disabled] {
+  cursor: default;
+}
+
+.photo-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fr-action-icon);
+  height: var(--size-fr-action-icon);
+  border-radius: var(--radius-fr-icon-tile);
+}
+
+.photo-tile-title {
+  display: block;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-fr-tile);
+  line-height: 0.85;
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.photo-tile-hint {
+  display: block;
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+}
+
+/* Camera: ink, a pink icon tile. */
+.photo-tile[data-tone='camera'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.photo-tile[data-tone='camera'] .photo-tile-icon {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.photo-tile[data-tone='camera'] .photo-tile-hint {
+  color: var(--color-on-ink-muted);
+}
+
+/* Gallery: soft, a white icon tile. */
+.photo-tile[data-tone='gallery'] {
+  background-color: var(--color-fr-soft);
+  color: var(--color-ink);
+}
+
+.photo-tile[data-tone='gallery'] .photo-tile-icon {
+  background-color: var(--color-card);
+}
+
+.photo-tile[data-tone='gallery'] .photo-tile-hint {
+  color: var(--color-fr-muted);
+}
+
+.photo-tiles-input {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-tile {
+    transition: transform var(--transition-press) var(--ease-fr-out), background-color var(--transition-hover) ease;
+  }
+
+  .photo-tile[data-tone='camera']:not([disabled]):hover {
+    background-color: var(--color-ink-raised);
+  }
+
+  .photo-tile[data-tone='gallery']:not([disabled]):hover {
+    background-color: var(--color-fr-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-tile {
+    transition: none;
+  }
+}

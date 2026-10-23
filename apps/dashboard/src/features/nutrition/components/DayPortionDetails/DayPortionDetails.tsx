@@ -16,9 +16,10 @@ export function DayPortionDetails({ day, title, onClose }: DayPortionDetailsProp
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
-  const photoOf = new Map(day.photos.map((photo) => [photo.mealId, photo]));
-  // Photos of meals the plan no longer has still show (by the name stored with them).
-  const extraPhotos = day.photos.filter((photo) => !day.meals.some((meal) => meal.id === photo.mealId));
+  // A meal can hold several photos a day.
+  const photosOf = (mealId: string) => day.photos.filter((photo) => photo.mealId === mealId);
+  // Photos of meals the plan no longer has still show (by the name stored with them), one row per meal.
+  const extraMeals = [...new Map(day.photos.filter((photo) => !day.meals.some((meal) => meal.id === photo.mealId)).map((photo) => [photo.mealId, photo.mealName])).entries()];
 
   return (
     <section className="nb-day-details" aria-label={title}>
@@ -38,21 +39,21 @@ export function DayPortionDetails({ day, title, onClose }: DayPortionDetailsProp
           </li>
         ))}
       </ul>
-      {day.meals.length + extraPhotos.length > 0 && (
+      {day.meals.length + extraMeals.length > 0 && (
         <>
           <h4 className="nb-day-details-subtitle">{copy.tracking.dayMeals}</h4>
           <ul className="nb-day-details-meals">
-            {[...day.meals.map((meal) => ({ id: meal.id, name: meal.name, photo: photoOf.get(meal.id) })), ...extraPhotos.map((photo) => ({ id: photo.mealId, name: photo.mealName, photo }))].map((meal) => (
+            {[...day.meals.map((meal) => ({ id: meal.id, name: meal.name })), ...extraMeals.map(([id, name]) => ({ id, name }))].map((meal) => (
               <li key={meal.id} className="nb-day-details-meal">
                 <span className="nb-day-details-meal-name" dir="auto">
                   {meal.name}
                 </span>
-                {meal.photo && (
+                {photosOf(meal.id).map((photo) => (
                   // A short-lived signed link made for this coach only; a click opens it full size.
-                  <a className="nb-day-details-photo" href={meal.photo.url} target="_blank" rel="noreferrer">
-                    <img src={meal.photo.url} alt={meal.name} loading="lazy" />
+                  <a key={photo.id} className="nb-day-details-photo" href={photo.url} target="_blank" rel="noreferrer">
+                    <img src={photo.url} alt={meal.name} loading="lazy" />
                   </a>
-                )}
+                ))}
               </li>
             ))}
           </ul>

@@ -1,0 +1,136 @@
+.gallery-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font-family: var(--font-body);
+}
+
+.gallery-viewer-stage {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: calc(var(--space-6) + var(--safe-top)) var(--safe-inline-end) var(--space-2) var(--safe-inline-start);
+  touch-action: pan-y;
+}
+
+.gallery-viewer-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.gallery-viewer-close,
+.gallery-viewer-nav {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-ink-rule);
+  color: var(--color-on-ink);
+  cursor: pointer;
+}
+
+.gallery-viewer-close {
+  inset-block-start: calc(var(--space-2) + var(--safe-top));
+  inset-inline-end: calc(var(--space-2) + var(--safe-inline-end));
+}
+
+.gallery-viewer-nav {
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+.gallery-viewer-previous {
+  inset-inline-start: calc(var(--space-2) + var(--safe-inline-start));
+}
+
+.gallery-viewer-next {
+  inset-inline-end: calc(var(--space-2) + var(--safe-inline-end));
+}
+
+.gallery-viewer-nav[disabled] {
+  visibility: hidden;
+}
+
+.gallery-viewer-close:active,
+.gallery-viewer-nav:active {
+  background-color: var(--color-on-ink-rule-hover);
+}
+
+.gallery-viewer-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) calc(var(--space-3) + var(--safe-bottom));
+}
+
+.gallery-viewer-caption {
+  margin: 0;
+  color: var(--color-on-ink-muted);
+  font-size: var(--text-subscreen-label);
+  text-align: center;
+}
+
+.gallery-viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.gallery-viewer :focus-visible {
+  outline: var(--border-width-medium) solid var(--color-pink-on-ink);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gallery-viewer-close:hover,
+  .gallery-viewer-nav:hover {
+    background-color: var(--color-on-ink-rule-hover);
+  }
+}
+
+/* A viewer action on ink: a quiet pill; a destructive one in the pink that reads on ink. */
+.gallery-viewer-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-on-ink-rule);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+}
+
+.gallery-viewer-action:active:not([disabled]) {
+  transform: scale(var(--scale-fr-press));
+}
+
+.gallery-viewer-action[data-tone='danger'] {
+  color: var(--color-pink-on-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-viewer-action {
+    transition: none;
+  }
+}

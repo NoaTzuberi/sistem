@@ -169,3 +169,61 @@
     transform: none;
   }
 }
+
+/* A free workout: the empty start and "Add exercise" under the queue. */
+.wp-free-empty {
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-fr-panel);
+  background-color: var(--color-card);
+  text-align: center;
+}
+
+.wp-free-empty-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-qn-section);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+}
+
+.wp-free-empty-text {
+  margin: var(--space-1) 0 0;
+  color: var(--color-fr-muted);
+  font-size: var(--text-sm);
+}
+
+.wp-free-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--size-fr-option-row);
+  margin-block-start: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-fr-option);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+}
+
+.wp-free-add:active {
+  transform: scale(var(--scale-fr-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-free-add:hover {
+    background-color: var(--color-ink-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-free-add {
+    transition: none;
+  }
+}

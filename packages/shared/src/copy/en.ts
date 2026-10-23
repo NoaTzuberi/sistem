@@ -77,6 +77,7 @@ export const en: CopyShape<typeof he> = {
     all: 'All',
   },
   coach: {
+    freeWorkout: 'Free workout',
     tabs: {
       onboarding: 'Onboarding',
       plan: 'Plan',

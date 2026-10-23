@@ -95,7 +95,13 @@ npm run group:exercises           # movement patterns + equipment-variant famili
 npm run seed:knowledge            # knowledge base embeddings (needs VOYAGE_API_KEY)
 npm run seed:dev                  # DEV ONLY: 1 coach + 2 onboarded trainees (one with a plan)
 npm run promote:coach -- <email>  # DEV ONLY: make an existing user a coach
+npm run create:admin              # create the ADMIN_EMAIL account (or add the admin role)
 ```
+
+`create:admin` reads `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters, needed only to create an
+account or with `-- --reset-password`; never the seed password, never printed) and optional `ADMIN_NAME`.
+A new account gets only the admin role; an existing one keeps her roles and password. It prints the
+target database and refuses a non-local one unless `-- --allow-remote` is added.
 
 `seed:dev` and `promote:coach` refuse to run with `NODE_ENV=production` and refuse a
 non-local database unless `--allow-remote` is added (they print which database they

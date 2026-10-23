@@ -10,6 +10,14 @@
   backdrop-filter: var(--blur-header);
 }
 
+/* The back button, and an optional action at the row's end. */
+.ssh-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 /* 44px hit area around a 40px white disc. */
 .ssh-back {
   display: flex;

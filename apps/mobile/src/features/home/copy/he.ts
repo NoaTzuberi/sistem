@@ -68,4 +68,17 @@ export const he = {
     title: 'תזונה היום',
     logMeal: 'סימון ארוחה',
   },
+  // Self-guided / joined later — PLACEHOLDER drafts.
+  selfGuided: {
+    line: 'היום הוא יום טוב להתאמן.',
+    waitingLine: '{coach} בונה לך תוכנית. בינתיים אפשר להתאמן לבד.',
+    waitingNoName: 'המאמנת שלך בונה לך תוכנית. בינתיים אפשר להתאמן לבד.',
+    action: 'אימון חופשי',
+    joined: 'הצטרפת לליווי של {coach}',
+  },
+  joinCoach: {
+    label: 'הצטרפות למאמנת',
+    text: 'יש לך מאמנת? הכניסי קוד',
+    dismiss: 'הסתרה',
+  },
 } as const;

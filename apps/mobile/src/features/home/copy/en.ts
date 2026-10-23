@@ -69,4 +69,16 @@ export const en: CopyShape<typeof he> = {
     title: 'Nutrition today',
     logMeal: 'Log a meal',
   },
+  selfGuided: {
+    line: 'Today is a good day to train.',
+    waitingLine: '{coach} is building your plan. Meanwhile, you can train on your own.',
+    waitingNoName: 'Your coach is building your plan. Meanwhile, you can train on your own.',
+    action: 'Free workout',
+    joined: "You joined {coach}'s coaching",
+  },
+  joinCoach: {
+    label: 'Join a coach',
+    text: 'Have a coach? Enter a code',
+    dismiss: 'Hide',
+  },
 };
