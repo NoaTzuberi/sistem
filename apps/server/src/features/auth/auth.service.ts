@@ -11,6 +11,7 @@ interface AuthResponse {
 }
 import { User, UserDocument, isOnboardingCompleted, primaryRole } from '../users/user.model';
 import { config } from '../../config/env';
+import { publicLink } from '../../config/publicUrls';
 import { sendPasswordResetEmail } from './email.service';
 import { getAppState } from '../users/appState.service';
 import { isValidTimezone } from '../users/timezone';
@@ -139,7 +140,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
   user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
   await user.save();
 
-  const resetUrl = `${config.clientUrl}/reset-password?token=${rawToken}`;
+  const resetUrl = publicLink(config.clientUrl, `/reset-password?token=${rawToken}`);
   try {
     await sendPasswordResetEmail(user.email, resetUrl, resolveLanguage(user.preferences));
   } catch (error) {
@@ -172,7 +173,7 @@ export async function issueSetPasswordLink(userId: string, ttlMs: number, now: D
   const rawToken = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(now.getTime() + ttlMs);
   await User.updateOne({ _id: userId }, { $set: { passwordResetTokenHash: hashResetToken(rawToken), passwordResetExpires: expiresAt } });
-  return { url: `${config.dashboardUrl.replace(/\/+$/, '')}/set-password?token=${rawToken}`, expiresAt };
+  return { url: publicLink(config.dashboardUrl, `/set-password?token=${rawToken}`), expiresAt };
 }
 
 /** Uses the link: sets the password, burns the token, and signs her in. */

@@ -34,7 +34,6 @@ Type these in Render's dashboard (the service → **Environment**). Never paste 
 | `DATABASE_URL` | yes | The Atlas connection string of the **production** database. |
 | `JWT_SECRET` | yes | A long random value. Make one with `openssl rand -base64 48`. The server refuses to start in production without it. |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | for photos | Cloudinary → Settings → API Keys. Without them the server runs, but Daily Pump / progress / meal photos fail. |
-| `CLIENT_URL` | optional | `https://noatzuberi.github.io/sistem/mobile` — only used in password-reset emails (backlog). |
 | `RESEND_API_KEY`, `EMAIL_FROM` | optional | Password-reset email (backlog). Empty = no email is sent. |
 | `DEFAULT_COACH_EMAIL` | optional | The coach new sign-ups are assigned to. Empty = the only coach, when there is exactly one. |
 | `GEMINI_API_KEY`, `VOYAGE_API_KEY` | not now | The AI drafts are **off** in production (see below), so these are not read. |
@@ -45,6 +44,17 @@ the server treats a missing key as empty.
 Already set by `render.yaml` (nothing to type):
 
 - `NODE_ENV=production`, `NODE_VERSION=22`
+- `CLIENT_URL=https://noatzuberi.github.io/sistem/mobile/#` — the trainee app: invite `/join` links and
+  password-reset links start with it.
+- `DASHBOARD_URL=https://noatzuberi.github.io/sistem/#` — the coach dashboard: the admin's one-time
+  "set password" links start with it.
+
+  Both are **required**: in production the server refuses to start when one is missing, is not
+  `https`, or points at `localhost` (no fallback — a wrong link would reach real people). The value
+  is everything before the route. GitHub Pages uses hash routing, so both end with `/#`
+  (a link becomes `…/sistem/mobile/#/join/ABC123`); without the `#` the links open a 404. If the
+  service was created by hand rather than from the Blueprint, type these two in **Environment**.
+  If the sites move (for example a custom domain), change both here.
 - `CLIENT_ORIGINS=https://noatzuberi.github.io` — the only website allowed to call the API. It is
   the origin only (no `/sistem/`). If the site ever moves, change it here; several origins are
   separated by commas.

@@ -1,22 +1,26 @@
 import dotenv from 'dotenv';
 import { parseClientOrigins } from './clientOrigins';
+import { parsePublicUrl } from './publicUrls';
 
 dotenv.config();
 
 const DEFAULT_PORT = 5002;
 const DEFAULT_JWT_SECRET = 'JWT_SECRET';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const config = {
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv: NODE_ENV,
   port: Number(process.env.PORT) || DEFAULT_PORT,
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || DEFAULT_JWT_SECRET,
   voyageApiKey: process.env.VOYAGE_API_KEY || '',
   // CORS allow-list (comma-separated in CLIENT_ORIGINS). Never '*'.
-  clientOrigins: parseClientOrigins(process.env.CLIENT_ORIGINS, process.env.NODE_ENV || 'development'),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
-  // The coach dashboard (the admin's "set password" links open there).
-  dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:5174',
+  clientOrigins: parseClientOrigins(process.env.CLIENT_ORIGINS, NODE_ENV),
+  // Bases of every link the server hands out (publicUrls.ts). Required in production — the
+  // server refuses to start without them. The trainee app: invite /join links, password reset.
+  clientUrl: parsePublicUrl('CLIENT_URL', process.env.CLIENT_URL, NODE_ENV),
+  // The coach dashboard: the admin's "set password" links.
+  dashboardUrl: parsePublicUrl('DASHBOARD_URL', process.env.DASHBOARD_URL, NODE_ENV),
   // Accounts with this email get the admin role at server start (idempotent; empty = none).
   adminEmail: (process.env.ADMIN_EMAIL || '').trim().toLowerCase(),
   resendApiKey: process.env.RESEND_API_KEY || '',

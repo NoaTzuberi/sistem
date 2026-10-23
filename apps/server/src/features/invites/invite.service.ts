@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import type { Types } from 'mongoose';
 import type { CoachInvite, CoachInvitesResponse, InviteProblem, InviteType, JoinPreview, JoinResult } from '@sistem/types';
 import { config } from '../../config/env';
+import { publicLink } from '../../config/publicUrls';
 import { LocalizedError } from '../../i18n';
 import type { MessageCode } from '../../i18n';
 import { emitAppEvent } from '../../events/appEvents';
@@ -61,7 +62,7 @@ export function newShortCode(): string {
 }
 
 export function joinUrl(code: string): string {
-  return `${config.clientUrl.replace(/\/+$/, '')}/join/${code}`;
+  return publicLink(config.clientUrl, `/join/${encodeURIComponent(code)}`);
 }
 
 function toCoachInvite(invite: LeanInvite): CoachInvite {

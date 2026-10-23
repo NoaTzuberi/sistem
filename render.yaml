@@ -41,8 +41,13 @@ services:
         sync: false
       - key: AI_PAID_TIER
         value: "false"
+      # Public, not secrets: the bases of the links the server hands out (invite /join → trainee app,
+      # set-password → dashboard). Required — the server refuses to start without them. Pages uses
+      # hash routing, so both end with '/#'.
       - key: CLIENT_URL
-        sync: false
+        value: "https://noatzuberi.github.io/sistem/mobile/#"
+      - key: DASHBOARD_URL
+        value: "https://noatzuberi.github.io/sistem/#"
       - key: EMAIL_FROM
         sync: false
       - key: DEFAULT_COACH_EMAIL
