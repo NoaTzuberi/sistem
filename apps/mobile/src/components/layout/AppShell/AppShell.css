@@ -22,6 +22,24 @@
   padding-bottom: calc(var(--dock-height) + max(var(--dock-offset), var(--safe-bottom)) + var(--space-3));
 }
 
+/* Content scrolling under the floating dock fades out first: a dark card or tile must never peek out beside
+   the ink pill and read as part of it. The band covers the dock, its offset and the safe area. */
+.app-shell-with-tabs {
+  --dock-scrim-color: var(--color-bg);
+}
+
+.app-shell-with-tabs::after {
+  content: '';
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: calc(var(--z-tab-bar) - 1);
+  height: calc(var(--dock-height) + max(var(--dock-offset), var(--safe-bottom)) + var(--space-5));
+  /* Solid up to the dock's top edge, then a short fade. */
+  background-image: linear-gradient(to top, var(--dock-scrim-color) calc(100% - var(--space-5)), transparent);
+  pointer-events: none;
+}
+
 /* Full-bleed screens (Trainee Home) draw their own safe areas; the app column is centered on
    wider screens (designed for 360–430px). */
 .app-shell-bleed .app-shell-main {
@@ -33,5 +51,6 @@
 }
 
 .app-shell-bleed {
+  --dock-scrim-color: var(--color-card);
   background-color: var(--color-card);
 }
