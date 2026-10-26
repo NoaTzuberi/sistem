@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { OnboardingStatus, UserRole } from '@sistem/types';
+import type { AppMode, OnboardingStatus, UserRole } from '@sistem/types';
 import {
   USER_ROLES,
   DEFAULT_USER_ROLE,
@@ -11,6 +11,7 @@ import {
 } from './users.constants';
 import { isValidTimezone } from './timezone';
 import { LANGUAGE_IDS } from './units';
+import { APP_MODE_IDS } from './appMode';
 
 interface UserPreferences {
   units?: {
@@ -21,6 +22,8 @@ interface UserPreferences {
   };
   /** UI language (Phase 15). Unset = Hebrew. */
   language?: 'he' | 'en';
+  /** Which side of the app a coach who is also a trainee uses (users/appMode.ts). Unset = coach. */
+  appMode?: AppMode;
 }
 
 export interface PushToken {
@@ -65,6 +68,7 @@ const preferencesSchema = new Schema<UserPreferences>(
       length: { type: String, enum: ['cm', 'in'] },
     },
     language: { type: String, enum: LANGUAGE_IDS },
+    appMode: { type: String, enum: APP_MODE_IDS },
   },
   { _id: false },
 );

@@ -14,6 +14,7 @@ import { config } from '../../config/env';
 import { publicLink } from '../../config/publicUrls';
 import { sendDashboardResetEmail, sendPasswordResetEmail } from './email.service';
 import { getAppState } from '../users/appState.service';
+import { hasAppModeChoice, resolveAppMode } from '../users/appMode';
 import { isValidTimezone } from '../users/timezone';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
 import { toPublicAvatar } from '../users/avatar';
@@ -67,6 +68,8 @@ export async function toPublicUser(user: UserDocument & { _id: unknown }): Promi
     units: resolveUnits(user.preferences),
     language: resolveLanguage(user.preferences),
     avatar: toPublicAvatar(user.avatar),
+    appMode: resolveAppMode(user.roles, user.preferences?.appMode),
+    canSwitchAppMode: hasAppModeChoice(user.roles),
     createdAt: user.createdAt.toISOString(),
   };
 }

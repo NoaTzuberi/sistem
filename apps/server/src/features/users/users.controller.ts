@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { chooseSelfGuided, getUserProfileById, updateUserPreferences, UserNotFoundError } from './users.service';
+import { AppModeNotAllowedError, chooseSelfGuided, getUserProfileById, updateUserPreferences, UserNotFoundError } from './users.service';
 import { parsePreferencesPayload } from './users.validation';
 import { sendError } from '../../i18n';
 import { InvalidAvatarError, getAvatar, removeAvatar, setAvatar } from './avatar.service';
@@ -30,6 +30,10 @@ export async function patchPreferences(req: AuthenticatedRequest, res: Response)
   } catch (error) {
     if (error instanceof UserNotFoundError) {
       sendError(res, 401, error.serverMessage);
+      return;
+    }
+    if (error instanceof AppModeNotAllowedError) {
+      sendError(res, 403, error.serverMessage);
       return;
     }
     throw error;

@@ -2,6 +2,7 @@ import { ensureCoachSetup } from '../../coachProfiles/coachProfile.service';
 import { CoachProfile } from '../../coachProfiles/coachProfile.model';
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
+import type { UserRole } from '@sistem/types';
 import { connectTestDatabase, disconnectTestDatabase, clearTestDatabase } from '../../exercises/__tests__/testDb';
 import { User } from '../../users/user.model';
 import { register } from '../auth.controller';
@@ -117,6 +118,12 @@ describe('roles and app state', () => {
     expect(resolveAppState({ roles: ['coach'], onboardingStatus: 'not_started' }, none)).toBe('coach');
     expect(resolveAppState({ roles: ['admin', 'coach'], onboardingStatus: 'not_started' }, none)).toBe('coach');
     expect(resolveAppState({ roles: ['admin'], onboardingStatus: 'not_started' }, none)).toBe('admin');
+    // Coach + trainee: coach by default, the trainee side once she switched; a side her roles lack is ignored.
+    const both = { roles: ['admin', 'coach', 'trainee'] as UserRole[], onboardingStatus: 'completed' as const };
+    expect(resolveAppState(both, none)).toBe('coach');
+    expect(resolveAppState({ ...both, preferences: { appMode: 'trainee' } }, none)).toBe('home');
+    expect(resolveAppState({ roles: ['trainee'], onboardingStatus: 'completed', preferences: { appMode: 'coach' } }, none)).toBe('home');
+    expect(resolveAppState({ roles: ['coach'], onboardingStatus: 'completed', preferences: { appMode: 'trainee' } }, none)).toBe('coach');
   });
 
   describe('requireRole', () => {
