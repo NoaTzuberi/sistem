@@ -26,7 +26,11 @@ export const en: Record<keyof typeof he, string> = {
   reset_link_sent: 'If an account exists for that email, a reset link has been sent.',
   password_reset_done: 'Password reset successfully.',
   // Preferences (units + language)
-  preferences_empty: 'Send a weight unit, a length unit or a language.',
+  preferences_empty: 'Send a weight unit, a length unit, a language or an app mode.',
+  activity_before_invalid: 'before must be an ISO date-time.',
+  activity_limit_invalid: 'limit must be a whole number from 1 to {max}.',
+  app_mode_invalid: "App mode must be 'coach' or 'trainee'.",
+  app_mode_not_allowed: 'This account cannot use that mode.',
   preferences_units_not_object: 'units must be an object.',
   preferences_unknown_unit: 'Only the weight and length units can be changed here.',
   preferences_unknown_field: 'Only units and language can be changed here.',

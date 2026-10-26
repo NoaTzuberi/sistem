@@ -16,6 +16,9 @@ export type UserRole = 'trainee' | 'coach' | 'admin';
 /** 'choose_path' = the first-run "how do you want to train" screen (no coach, no choice yet). */
 export type AppState = 'choose_path' | 'onboarding' | 'waiting' | 'home' | 'coach' | 'admin';
 
+/** The side of the mobile app she uses. Someone with both the coach and the trainee role picks it in Profile. */
+export type AppMode = 'coach' | 'trainee';
+
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
 
 export interface AuthUser {
@@ -42,6 +45,10 @@ export interface AuthUser {
   language: Language;
   /** Her profile photo (signed, expiring link), or null = initials. */
   avatar: PrivatePhoto | null;
+  /** The side of the app she uses now (server-decided from her roles + stored choice); null = neither (admin only). */
+  appMode: AppMode | null;
+  /** She holds both the coach and the trainee role: the Profile shows the mode switch. */
+  canSwitchAppMode: boolean;
   createdAt: string;
 }
 
@@ -116,6 +123,8 @@ export interface UnitPreferences {
 export interface UpdatePreferencesPayload {
   units?: Partial<UnitPreferences>;
   language?: Language;
+  /** Only for someone with both roles; the server refuses a side her roles don't allow. */
+  appMode?: AppMode;
 }
 
 /** The questionnaire answers — the same shape ATLAS stored in User.profile. */
@@ -882,6 +891,135 @@ export interface CoachTraineeSummary {
   coachingStatus: CoachingStatus;
   /** When she joined this coach (the 48h window starts at the later of this and onboarding). */
   coachingStartedAt: string;
+  /** This week's published plan of this coaching (her zone), or null. Statuses are the server's. */
+  thisWeek: CoachTraineeThisWeek | null;
+  /** "Week N" of her coaching, counted from the week of her first published plan; null before one. */
+  coachingWeek: number | null;
+  /** Her newest completed workout (strength, free or cardio) this coach can see. */
+  lastCompletedAt: string | null;
+  /** Why she needs the coach's attention now (coach/coachAttention.ts), or null. Active coachings only. */
+  attention: CoachAttention | null;
+}
+
+/** One workout of her week, in the plan's order (the order gives its identity color, as in her app). */
+export interface CoachWeekWorkout {
+  id: string;
+  title: string;
+  kind: 'strength' | 'cardio';
+  /** 0 = Sunday … 6, or null for a workout without a set day. */
+  dayOfWeek: number | null;
+  status: WorkoutStatus;
+}
+
+export interface CoachTraineeThisWeek {
+  planId: string;
+  /** Coach-only split id (Phase 12b), when the plan follows one — its label is the plan's only "name". */
+  splitId: string | null;
+  workouts: CoachWeekWorkout[];
+  planned: number;
+  completed: number;
+  missed: number;
+}
+
+/**
+ * The attention rule (coach/coachAttention.ts): an active trainee with no completed workout for N days
+ * (counted from the later of her last workout and her first published plan), or with M missed workouts
+ * this week. no_workout wins when both apply.
+ */
+export type CoachAttention = { reason: 'no_workout'; days: number } | { reason: 'missed_workouts'; count: number };
+
+/** GET /coach/today — the coach mode Today stage. */
+export interface CoachTodayResponse {
+  serverTime: string;
+  /** Today in the coach's zone ('YYYY-MM-DD'). */
+  today: string;
+  /** Calendar week of the year (weeks start on Sunday; week 1 holds 1 January), in the coach's zone. */
+  weekOfYear: number;
+  scoreboard: {
+    /** Active coachings with at least one completed workout this week (her zone). */
+    trainedThisWeek: number;
+    activeTrainees: number;
+    /** Coachings in 'waiting' (no published plan yet). */
+    waiting: number;
+    attention: number;
+  };
+  /** Waiting coachings, longest wait first. */
+  waiting: CoachTraineeSummary[];
+  /** Trainees who need attention (the amber feed cards). */
+  attention: CoachTraineeSummary[];
+}
+
+export interface CoachActivityTrainee {
+  id: string;
+  name: string;
+  avatar: PrivatePhoto | null;
+}
+
+/** The best record of a finished workout, for the feed's PR chip. */
+export interface CoachActivityRecord {
+  exerciseName: string;
+  type: 'weight' | 'reps' | 'duration';
+  /** kg, reps or seconds by type. */
+  value: number;
+}
+
+export type CoachActivityEvent =
+  | {
+      type: 'workout_completed';
+      logId: string;
+      workoutTitle: string;
+      /** A free workout she built herself. */
+      free: boolean;
+      setsCompleted: number;
+      durationSec: number;
+      rating: number | null;
+      prCount: number;
+      record: CoachActivityRecord | null;
+    }
+  | {
+      type: 'cardio_completed';
+      logId: string;
+      workoutTitle: string;
+      completedSec: number;
+      roundsDone: number;
+      roundsTotal: number;
+      distanceKm: number | null;
+    }
+  | {
+      type: 'photos_uploaded';
+      source: 'meal' | 'progress' | 'pump';
+      /** Her day ('YYYY-MM-DD'); for 'pump' the workout log. */
+      date: string | null;
+      logId: string | null;
+      count: number;
+      /** Signed, expiring links (the feed blurs them). Empty when photo storage is off. */
+      photos: PrivatePhoto[];
+    }
+  | {
+      type: 'measurements_updated';
+      date: string;
+      weightKg: number | null;
+      /** The one notable change against her previous entry: the biggest move of weight or a measurement. */
+      change: { id: string; delta: number } | null;
+    }
+  | {
+      type: 'trainee_joined';
+      onboardingStatus: OnboardingStatus;
+    };
+
+export type CoachActivityItem = CoachActivityEvent & {
+  /** Stable across pages: '<type>:<record id>'. */
+  id: string;
+  /** When it happened (ISO). The feed is ordered by this, newest first. */
+  at: string;
+  trainee: CoachActivityTrainee;
+};
+
+/** GET /coach/activity?before=<ISO>&limit=<n> — newest first; nextBefore is the next page's `before`. */
+export interface CoachActivityPage {
+  items: CoachActivityItem[];
+  nextBefore: string | null;
+  serverTime: string;
 }
 
 export interface CoachTraineeDetail extends CoachTraineeSummary {

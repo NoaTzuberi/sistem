@@ -13,6 +13,8 @@ import type {
   CoachNutritionPlanResponse,
   CoachPlan,
   CoachStats,
+  CoachTodayResponse,
+  CoachActivityPage,
   CoachStatsRange,
   CoachTraineeList,
   CoachTraineeResponse,
@@ -101,6 +103,19 @@ export function createCoachApi(client: AxiosInstance) {
   /** Read-only numbers over her own trainees: the Statistics page and the Overview widgets. */
   async function getCoachStats(range?: CoachStatsRange): Promise<CoachStats> {
     const { data } = await client.get<CoachStats>('/coach/stats', { params: range ? { range } : undefined });
+    return data;
+  }
+
+  /** Coach mode Today: the stage's scoreboard, the waiting carousel and the attention cards. */
+  async function getCoachToday(): Promise<CoachTodayResponse> {
+    const { data } = await client.get<CoachTodayResponse>('/coach/today');
+    return data;
+  }
+
+  /** One page of the coach mode feed, newest first; pass the previous page's nextBefore for the next. */
+  async function getCoachActivity(before?: string | null, limit?: number): Promise<CoachActivityPage> {
+    const params = { ...(before ? { before } : {}), ...(limit ? { limit } : {}) };
+    const { data } = await client.get<CoachActivityPage>('/coach/activity', { params });
     return data;
   }
 
@@ -389,6 +404,8 @@ export function createCoachApi(client: AxiosInstance) {
   return {
     listTrainees,
     getCoachStats,
+    getCoachToday,
+    getCoachActivity,
     getTrainee,
     listTraineeWorkoutLogs,
     listTraineeBodyMetrics,

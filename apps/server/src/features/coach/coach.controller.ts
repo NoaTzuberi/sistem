@@ -3,6 +3,9 @@ import type { PlanIssuesBody } from '@sistem/types';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { listCoachTrainees, getCoachTraineeDetail } from './coach.service';
 import { getCoachStats } from './coachStats.service';
+import { getCoachToday } from './coachToday.service';
+import { getCoachActivity } from './coachActivity.service';
+import { parseActivityQuery } from './coach.validation';
 import { parseStatsRange } from './coachStats';
 import { PlanNotFoundError } from '../plans/plan.service';
 import {
@@ -36,6 +39,22 @@ export async function getTrainees(req: AuthenticatedRequest, res: Response) {
 /** Read-only numbers for the dashboard's Statistics and Overview pages — her own trainees only. */
 export async function getStats(req: AuthenticatedRequest, res: Response) {
   res.status(200).json(await getCoachStats(req.userId!, parseStatsRange(req.query.range)));
+}
+
+/** Coach mode Today: scoreboard, waiting trainees and the attention cards. */
+export async function getToday(req: AuthenticatedRequest, res: Response) {
+  res.status(200).json(await getCoachToday(req.userId!));
+}
+
+/** Coach mode feed: one page of her trainees' activity, newest first (?before=<ISO>&limit=<n>). */
+export async function getActivity(req: AuthenticatedRequest, res: Response) {
+  const parsed = parseActivityQuery(req.query);
+  if (parsed.error) {
+    sendError(res, 400, parsed.error);
+    return;
+  }
+  const now = new Date();
+  res.status(200).json(await getCoachActivity(req.userId!, parsed.value.before ?? now, parsed.value.limit, now));
 }
 
 /** The plan builder's library: every imported exercise that was not rejected, facts only. */

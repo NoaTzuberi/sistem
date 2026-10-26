@@ -4,6 +4,8 @@ import { loadCoachTrainee } from '../../middleware/coachTrainee.middleware';
 import {
   getTrainees,
   getStats,
+  getToday,
+  getActivity,
   getExercises,
   getTrainee,
   getTraineePlans,
@@ -85,6 +87,10 @@ coachRouter.post('/exercise-families/:familyId/split', postFamilySplit);
 
 // Read-only aggregates over her own trainees (the dashboard's Statistics and Overview pages).
 coachRouter.get('/stats', getStats);
+
+// Coach mode (mobile): the Today stage and the activity feed, over her live coachings only.
+coachRouter.get('/today', getToday);
+coachRouter.get('/activity', getActivity);
 
 // Invites: her permanent coaching link (+ QR in the dashboard), personal single-use links, and her
 // community-only link. Every query is scoped to the calling coach.

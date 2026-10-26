@@ -25,7 +25,11 @@ export const he = {
   reset_link_sent: 'אם קיים חשבון עם האימייל הזה, נשלח אליו קישור לאיפוס.',
   password_reset_done: 'הסיסמה אופסה בהצלחה.',
   // Preferences (units + language)
-  preferences_empty: 'יש לשלוח יחידת משקל, יחידת אורך או שפה.',
+  preferences_empty: 'יש לשלוח יחידת משקל, יחידת אורך, שפה או מצב אפליקציה.',
+  activity_before_invalid: 'before חייב להיות תאריך ושעה (ISO).',
+  activity_limit_invalid: 'limit חייב להיות מספר שלם בין 1 ל-{max}.',
+  app_mode_invalid: "מצב האפליקציה חייב להיות 'coach' או 'trainee'.",
+  app_mode_not_allowed: 'אין לחשבון הזה גישה למצב הזה.',
   preferences_units_not_object: 'היחידות חייבות להיות אובייקט.',
   preferences_unknown_unit: 'כאן אפשר לשנות רק את יחידות המשקל והאורך.',
   preferences_unknown_field: 'כאן אפשר לשנות רק יחידות ושפה.',
