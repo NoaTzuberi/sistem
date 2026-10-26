@@ -5,15 +5,20 @@ import { ROUTES } from '../../../../app/config/routes';
 import { FlowBackground } from '../../../../components/common/FlowBackground/FlowBackground';
 import { LanguageToggle } from '../../../../components/common/LanguageToggle/LanguageToggle';
 import { Logo } from '../../../../components/common/Logo/Logo';
-import { LoginField } from '../../components/LoginField/LoginField';
-import { LockIcon } from '../../components/LoginIcons/LoginIcons';
+import { PasswordField } from '../../components/PasswordField/PasswordField';
 import { useSetPassword } from '../../hooks/useSetPassword';
+import { usePasswordVisibility } from '../../hooks/usePasswordVisibility';
 import './SetPasswordPage.css';
 
 /** A new coach's one-time link (made by the admin): choose a password → signed in. */
 export function SetPasswordPage() {
   const copy = useCopy(appCopy).setPassword;
-  const form = useSetPassword();
+  const passwordVisibility = usePasswordVisibility();
+  const confirmVisibility = usePasswordVisibility();
+  const form = useSetPassword(() => {
+    passwordVisibility.hide();
+    confirmVisibility.hide();
+  });
 
   return (
     <main className="set-password-page">
@@ -27,21 +32,17 @@ export function SetPasswordPage() {
         {form.hasToken ? (
           <>
             <p className="set-password-subtitle">{copy.subtitle}</p>
-            <LoginField
+            <PasswordField
               label={copy.password}
-              icon={<LockIcon />}
-              type="password"
-              dir="ltr"
+              visibility={passwordVisibility}
               autoComplete="new-password"
               value={form.password}
               onChange={(event) => form.setPassword(event.target.value)}
               required
             />
-            <LoginField
+            <PasswordField
               label={copy.confirm}
-              icon={<LockIcon />}
-              type="password"
-              dir="ltr"
+              visibility={confirmVisibility}
               autoComplete="new-password"
               value={form.confirm}
               onChange={(event) => form.setConfirm(event.target.value)}

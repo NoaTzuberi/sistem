@@ -11,8 +11,8 @@ import { dashboardHome } from '../data/roles';
 // Same minimum as the server (auth.validation MIN_PASSWORD_LENGTH); the server checks it again.
 const MIN_PASSWORD_LENGTH = 8;
 
-/** The one-time link: the token from the URL, two password fields, then she is signed in. */
-export function useSetPassword() {
+/** The one-time link: the token from the URL, two password fields, then she is signed in. `onSaved` hides shown passwords. */
+export function useSetPassword(onSaved?: () => void) {
   const copy = useCopy(appCopy).setPassword;
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';
@@ -31,6 +31,7 @@ export function useSetPassword() {
     setIsSaving(true);
     try {
       const { token: session, user } = await setPassword(token, password);
+      onSaved?.();
       signInWithToken(session, user);
       navigate(dashboardHome(user, { home: ROUTES.HOME, admin: ROUTES.ADMIN_COACHES }) ?? ROUTES.LOGIN, { replace: true });
     } catch (saveError) {

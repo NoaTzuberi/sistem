@@ -100,6 +100,11 @@ export function CoachesPage() {
                           <PillButton size="sm" disabled={isBusy} onClick={() => admin.newLink(coach)}>
                             {copy.newLink}
                           </PillButton>
+                          {coach.passwordSet && (
+                            <PillButton size="sm" disabled={isBusy} onClick={() => admin.resetLink(coach)}>
+                              {copy.resetLink}
+                            </PillButton>
+                          )}
                           {coach.status === 'active' ? (
                             <PillButton size="sm" variant="danger" disabled={isBusy} onClick={() => admin.askSuspend(coach)}>
                               {copy.suspend}

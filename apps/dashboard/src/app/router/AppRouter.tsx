@@ -4,6 +4,8 @@ import { CoachSettingsPage } from '../../features/coachSettings/pages/CoachSetti
 import { Login } from '../../features/auth/pages/Login/Login';
 import { RequireRole } from '../../features/auth/components/RequireRole/RequireRole';
 import { SetPasswordPage } from '../../features/auth/pages/SetPasswordPage/SetPasswordPage';
+import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage/ForgotPasswordPage';
+import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage/ResetPasswordPage';
 import { CoachesPage } from '../../features/admin/pages/CoachesPage/CoachesPage';
 import { AppShell } from '../../components/layout/AppShell/AppShell';
 import { OverviewPage } from '../../features/overview/pages/OverviewPage/OverviewPage';
@@ -20,6 +22,8 @@ export function AppRouter() {
     <Routes>
       <Route path={ROUTES.LOGIN} element={<Login />} />
       <Route path={ROUTES.SET_PASSWORD} element={<SetPasswordPage />} />
+      <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+      <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
       {/* Client-side gates only; every /api/admin and /api/coach route checks the role itself. */}
       <Route element={<RequireRole role="admin" />}>
         <Route path={ROUTES.ADMIN_COACHES} element={<CoachesPage />} />

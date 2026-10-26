@@ -20,6 +20,9 @@ export const ROUTES = {
   // Accounts: the admin's coach list, and the one-time "set password" link a new coach opens.
   ADMIN_COACHES: '/admin/coaches',
   SET_PASSWORD: '/set-password',
+  // Forgot password (coach / admin): ask for a link → the emailed link opens the reset screen.
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 } as const;
 
 export const TRAINEE_TABS = ['onboarding', 'plans', 'nutrition', 'logs', 'metrics', 'achievements'] as const;

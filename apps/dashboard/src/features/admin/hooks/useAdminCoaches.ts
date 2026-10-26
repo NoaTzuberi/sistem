@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import type { AdminCoach, CoachPasswordLinkResponse } from '@sistem/types';
 import { useCopy, useLoad } from '@sistem/shared';
-import { createCoach, listCoaches, resendPasswordLink, setCoachStatus } from '../../../services/admin/adminService';
+import { createCoach, createResetLink, listCoaches, resendPasswordLink, setCoachStatus } from '../../../services/admin/adminService';
 import { adminCopy } from '../copy';
 
-/** The admin's coach list and its actions (create, new password link, pause / reactivate). */
+/** The admin's coach list and its actions (create, new password link, reset link, pause / reactivate). */
 export function useAdminCoaches() {
   const copy = useCopy(adminCopy);
   const load = useCallback(() => listCoaches(), []);
@@ -34,6 +34,8 @@ export function useAdminCoaches() {
   }
 
   const newLink = (coach: AdminCoach) => run(coach.id, async () => setLink(await resendPasswordLink(coach.id)));
+  // The fallback while email can't reach her: a 60-minute reset link to copy.
+  const resetLink = (coach: AdminCoach) => run(coach.id, async () => setLink(await createResetLink(coach.id)));
   const reactivate = (coach: AdminCoach) => run(coach.id, async () => void (await setCoachStatus(coach.id, 'active')));
   const confirmSuspend = () => {
     if (!toSuspend) return;
@@ -53,6 +55,7 @@ export function useAdminCoaches() {
     closeLink: () => setLink(null),
     create,
     newLink,
+    resetLink,
     reactivate,
     toSuspend,
     askSuspend: setToSuspend,

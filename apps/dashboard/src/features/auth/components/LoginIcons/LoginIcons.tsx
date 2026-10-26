@@ -48,3 +48,24 @@ export function ArrowIcon() {
     </LineIcon>
   );
 }
+
+/** The show / hide password toggle: an open eye = "show"; never mirrored. */
+export function EyeIcon() {
+  return (
+    <LineIcon>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </LineIcon>
+  );
+}
+
+export function EyeOffIcon() {
+  return (
+    <LineIcon>
+      <path d="M10.6 5.1A9.9 9.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-2.4 3.4" />
+      <path d="M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+      <path d="m2 2 20 20" />
+    </LineIcon>
+  );
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { TRAINEE_APP_URL } from '../../../../app/config/env';
 import { ROUTES } from '../../../../app/config/routes';
@@ -11,8 +11,10 @@ import { Switch } from '../../../../components/common/Switch/Switch';
 import { useCopy } from '@sistem/shared';
 import { appCopy } from '../../../../copy';
 import { LoginField } from '../../components/LoginField/LoginField';
-import { ArrowIcon, LockIcon, MailIcon } from '../../components/LoginIcons/LoginIcons';
-import { FORGOT_PASSWORD_ENABLED, REMEMBER_ME_ENABLED } from '../../data/authConfig';
+import { ArrowIcon, MailIcon } from '../../components/LoginIcons/LoginIcons';
+import { PasswordField } from '../../components/PasswordField/PasswordField';
+import { REMEMBER_ME_ENABLED } from '../../data/authConfig';
+import { usePasswordVisibility } from '../../hooks/usePasswordVisibility';
 import { useLoginEntrance } from '../../hooks/useLoginEntrance';
 import { dashboardHome } from '../../data/roles';
 import './Login.css';
@@ -27,6 +29,7 @@ export function Login() {
   const { brandRef, cardRef, intro } = useLoginEntrance<HTMLElement, HTMLDivElement>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const passwordVisibility = usePasswordVisibility();
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Shown only behind REMEMBER_ME_ENABLED; the auth doesn't read it yet.
@@ -51,6 +54,7 @@ export function Login() {
         setError(copy.coachOnly);
         return;
       }
+      passwordVisibility.hide();
       navigate(home, { replace: true });
     } catch (loginError) {
       setError((loginError instanceof Error && loginError.message) || copy.loginFailed);
@@ -114,30 +118,25 @@ export function Login() {
               icon={<MailIcon />}
               type="email"
               dir="ltr"
-              autoComplete="email"
+              autoComplete="username"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
             />
 
-            <LoginField
+            <PasswordField
               label={copy.password}
-              icon={<LockIcon />}
-              type="password"
-              dir="ltr"
+              visibility={passwordVisibility}
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              trailing={
-                FORGOT_PASSWORD_ENABLED && (
-                  // TODO: becomes a link to the forgot-password screen when the dashboard has one.
-                  <button type="button" className="login-forgot">
-                    {copy.login.forgot}
-                  </button>
-                )
-              }
             />
+
+            {/* The email typed so far goes along, so the next screen starts with it. */}
+            <Link className="login-forgot" to={ROUTES.FORGOT_PASSWORD} state={{ email: email.trim() }}>
+              {copy.login.forgot}
+            </Link>
 
             {REMEMBER_ME_ENABLED && (
               // TODO: not wired — the auth has no remember-me yet (data/authConfig.ts).
