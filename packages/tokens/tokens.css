@@ -39,13 +39,9 @@
      sign-up background; TrackBackground paints the same two colors on its canvas. */
   --gradient-brand: linear-gradient(to bottom left, var(--color-primary), var(--color-primary-deep));
 
-  /* Glass surfaces on the brand gradient (login / sign-up): white at an alpha, no new colors. */
-  --glass-bg: color-mix(in srgb, var(--color-on-primary) 55%, transparent);
-  --glass-bg-strong: color-mix(in srgb, var(--color-on-primary) 78%, transparent); /* fields on the glass card */
-  --glass-border: color-mix(in srgb, var(--color-on-primary) 80%, transparent);
+  /* Glass on a colored surface (the dashboard's auth cards, the social buttons' divider). */
   --glass-blur: blur(22px) saturate(140%);
   --glass-divider: color-mix(in srgb, var(--color-text) 15%, transparent);
-  --glass-outline: color-mix(in srgb, var(--color-text) 25%, transparent);     /* outlined pill on glass */
 
   /* The running track drawn on the gradient (TrackBackground): white (--color-on-primary) at these alphas. */
   --track-lane-alpha: 0.32;        /* inner lane lines */
@@ -1234,6 +1230,108 @@
   --shift-fr-shake: 4px;
   --size-fr-tag: 28px;
   --size-fr-cta: 58px;
+
+  /* ═══ 16. Auth screens (join / login / sign-up / password), direction B: the running-track background
+     (unchanged) full-bleed, one solid white card, pink + soft pills. White text only on the pink. ═══ */
+  --color-auth-stage: var(--color-primary-deep);            /* html / body behind the track: the gradient's bottom edge (iOS bars) */
+  --color-auth-card: var(--color-card);
+  --radius-auth-card: var(--radius-fr-card);                /* 30px */
+  --shadow-auth-card: 0 24px 50px color-mix(in srgb, #780032 25%, transparent);
+  --color-auth-ink-2: var(--color-fr-ink-2);                /* body lines in the card */
+  --color-auth-muted: var(--color-fr-muted);
+  --color-auth-soft: var(--color-fr-soft);                  /* #f5f3f6 — the soft pill, the input fill */
+  --color-auth-soft-hover: var(--color-fr-soft-hover);
+  --size-auth-button: 56px;
+  --radius-auth-button: 28px;
+  --shadow-auth-primary: 0 10px 24px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --size-auth-input: 52px;
+  --radius-auth-input: 16px;
+  --size-auth-avatar: 64px;
+  --ring-auth-avatar: 0 0 0 3px var(--color-card), 0 0 0 5px var(--color-primary);
+  --text-auth-name: 34px;                                   /* the coach's name (Karantina) */
+  --text-auth-title: 40px;                                  /* a card title (Karantina) */
+  --size-auth-icon-tile: 56px;
+  --size-auth-step-icon: 36px;
+  --surface-auth-switch-track: color-mix(in srgb, var(--color-on-primary) 20%, transparent);
+  --size-auth-column: 420px;
+  --size-auth-logo: 210px;
+  --space-auth-card: 22px;
+
+  /* ═══ 17. Coach mode (mobile, docs/design/coach-app.html): a work tool — an INK stage with faint vertical
+     grid lines and a pink → purple accent bar instead of the trainee pink; the page surface under white
+     cards; pink stays the action color. Light only by design. ═════════════════════════════════════ */
+  --color-coach-page: var(--color-subscreen-page);           /* #f6f4f7 */
+  --color-coach-card: var(--color-card);
+  --color-coach-stage: var(--color-ink);                     /* #141116 */
+  --color-coach-stage-grid: color-mix(in srgb, var(--color-on-primary) 7%, transparent);
+  --size-coach-stage-grid: 44px;
+  --gradient-coach-accent: linear-gradient(to left, var(--color-primary), var(--color-stat-purple));  /* the 3px bar under the stage */
+  --size-coach-accent: 3px;
+  --radius-coach-stage: 36px;                                /* the stage's bottom corners */
+  --color-coach-on-stage: var(--color-on-ink);
+  --color-coach-on-stage-muted: color-mix(in srgb, var(--color-on-primary) 65%, transparent);  /* captions on ink */
+  --color-coach-on-stage-faint: color-mix(in srgb, var(--color-on-primary) 50%, transparent);  /* the mono eyebrow */
+  --color-coach-stage-rule: color-mix(in srgb, var(--color-on-primary) 14%, transparent);      /* hairlines on ink */
+  --surface-coach-on-stage: color-mix(in srgb, var(--color-on-primary) 10%, transparent);       /* round buttons, quick actions */
+  --surface-coach-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  --color-coach-pink-on-ink: #ff5c9e;                        /* "waiting" number on the stage */
+  --color-coach-amber-on-ink: #ffb066;                       /* "attention" number on the stage */
+  --color-coach-primary-hover: #e8005f;                      /* the pink pill / action under a fine pointer */
+  /* Amber = waiting / attention. Text uses THE orange ink (no brown — the spec's #8a4a00 swapped for it). */
+  --color-coach-amber-soft: var(--color-warning-soft);       /* #fff4e5 */
+  --color-coach-amber-ink: var(--ink-orange);                /* #c75a00 */
+  --color-coach-blush: var(--color-workout-1-soft);          /* #ffe3ef — the PR chip, an attention tag */
+  --color-coach-cherry: var(--color-primary-deep);           /* #a50047 — its text; a decrease */
+  --color-coach-ink-2: var(--color-ink-raised);              /* #2a2530 — section labels */
+  --color-coach-muted: var(--color-fr-muted);                /* #7a7380 */
+  --color-coach-faint: #9a929f;                              /* times under a feed item (3:1 on white — secondary only) */
+  --color-coach-rule: var(--color-subscreen-rule);           /* #ece9ee */
+  --color-coach-soft: var(--color-fr-soft);                  /* #f5f3f6 — chips, the empty lane, soft tiles */
+  --color-coach-soft-hover: var(--color-fill-soft-hover);    /* #ece8ee */
+  --color-coach-segment-track: var(--color-segment-track);
+  --surface-coach-tabs: color-mix(in srgb, var(--color-coach-page) 92%, transparent);  /* the sticky segmented tabs */
+  --shadow-coach-card: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  --shadow-coach-thumb: 0 2px 8px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --radius-coach-card: 22px;
+  --radius-coach-pill: 20px;
+  --radius-coach-chip: 12px;
+  --radius-coach-lane: 12px;
+  --radius-coach-tile: 18px;
+  --size-coach-round: 40px;                                  /* avatar / bell / back on the stage (44px hit area) */
+  --size-coach-avatar: 40px;
+  --size-coach-avatar-lg: 46px;                              /* a list row */
+  --size-coach-avatar-xl: 64px;                              /* the trainee detail header */
+  --size-coach-type-badge: 20px;                             /* a feed item's type badge */
+  --size-coach-wait-card: 150px;
+  --size-coach-chip: 24px;
+  --size-coach-action: 32px;                                 /* a feed item's message button (its hit area stays 44px) */
+  --size-coach-quick-action: 64px;
+  --size-coach-lane: 64px;
+  --size-coach-pip-width: 14px;
+  --size-coach-pip-height: 6px;
+  --size-coach-thumb-width: 64px;                            /* a blurred feed photo */
+  --size-coach-thumb-height: 80px;
+  --size-coach-bar: 10px;                                    /* a portion bar */
+  --blur-coach-thumb: blur(6px);                             /* feed photos stay blurred; the trainee screen shows them */
+  --text-coach-greeting: 50px;                               /* "בוקר טוב, …" (Karantina) */
+  --text-coach-title: 54px;                                  /* "מתאמנות" */
+  --text-coach-score: 36px;                                  /* a stage scoreboard number (Barlow) */
+  --text-coach-score-sup: 18px;
+  --text-coach-name-lg: 42px;                                /* the trainee's name on her stage */
+  --text-coach-name: 26px;                                   /* a list row / waiting card name */
+  --text-coach-tab: 20px;                                    /* a segmented tab */
+  --text-coach-log: 19px;                                    /* a workout name in "last workouts" (Barlow italic) */
+  --text-coach-metric: 28px;                                 /* a body scoreboard number */
+  --text-coach-body: 14px;
+  --text-coach-label: 13px;
+  --text-coach-caption: 11px;
+  --opacity-coach-score-sup: 0.5;
+  /* A feed item's type badge (icon on its color). */
+  --color-coach-type-workout: var(--color-workout-2);
+  --color-coach-type-cardio: var(--color-workout-4);
+  --color-coach-type-photo: var(--color-primary-deep);
+  --color-coach-type-measurements: #c23bc0;
+  --color-coach-type-joined: var(--color-primary);
 }
 
 /* English: the Latin font pair; a display heading is Barlow Condensed italic 800, uppercase. */
@@ -1264,6 +1362,11 @@
   --text-fr-coach-name: 36px;
   --text-fr-sheet-title: 36px;
   --text-fr-tile: 24px;
+  --text-coach-greeting: 40px;
+  --text-coach-title: 42px;
+  --text-coach-name-lg: 34px;
+  --text-coach-name: 20px;
+  --text-coach-tab: 16px;
 }
 
 /* Right-to-left: the same shapes, mirrored (polygons have no logical form). */

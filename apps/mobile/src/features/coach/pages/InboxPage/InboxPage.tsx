@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { AppNotification } from '@sistem/types';
 import { describeCoachNotification, formatDateTime, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
-import { IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Button } from '../../../../components/common/Button/Button';
 import { listNotifications, markAllRead, markRead } from '../../../../services/notifications/notificationsService';
 import { refreshUnreadCount, setUnreadCount, useUnreadCount } from '../../../notifications/unreadCount';
-import { coachTraineePath } from '../../../../app/config/routes';
-import { TRAINEE_TAB_PARAM } from '../../data/traineeTabs';
+import { ROUTES, coachTraineePath } from '../../../../app/config/routes';
+import { traineeTabOf } from '../../data/traineeTabs';
+import { coachCopy } from '../../copy';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import './InboxPage.css';
 
@@ -19,6 +20,7 @@ const PAGE_SIZE = 20;
 export function InboxPage() {
   const shared = useCopy(sharedCopy);
   const copy = shared.coach.inbox;
+  const coachText = useCopy(coachCopy);
   const language = useLanguage();
   const navigate = useNavigate();
   const unreadCount = useUnreadCount();
@@ -63,8 +65,7 @@ export function InboxPage() {
   }
 
   function handleOpen(notification: AppNotification, traineeId: string, section: 'logs' | null) {
-    const path = coachTraineePath(traineeId);
-    navigate(section ? `${path}?${TRAINEE_TAB_PARAM}=${section}` : path);
+    navigate(coachTraineePath(traineeId, section ? traineeTabOf(section) : null));
     if (notification.readAt) return;
     markRead(notification.id)
       .catch(() => undefined)
@@ -90,6 +91,9 @@ export function InboxPage() {
     <AppShell>
       <div className="coach-inbox">
         <header className="coach-inbox-header">
+          <Link className="coach-inbox-back" to={ROUTES.COACH_TODAY} aria-label={coachText.detail.back}>
+            <IconChevronLeft className="flip-rtl" size={24} aria-hidden="true" />
+          </Link>
           <h1 className="coach-inbox-title">{copy.title}</h1>
           <button className="coach-inbox-read-all" type="button" disabled={unreadCount === 0} onClick={handleMarkAllRead}>
             {copy.markAllRead}

@@ -1,0 +1,77 @@
+.waiting-carousel {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--home-gutter));
+  padding: 0 var(--home-gutter) var(--space-1);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  scroll-padding-inline: var(--home-gutter);
+  scroll-snap-type: x proximity;
+}
+
+.waiting-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.waiting-carousel > li {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.waiting-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: var(--size-coach-wait-card);
+  height: 100%;
+  padding: var(--space-3) calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  box-shadow: var(--shadow-coach-card);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: transform var(--transition-press) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.waiting-card:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .waiting-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.waiting-card-name {
+  max-width: 100%;
+  margin-block-start: calc(var(--space-2) + 2px);
+  overflow: hidden;
+  font-size: var(--text-coach-name);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.waiting-card-line {
+  margin-block: var(--space-1) var(--space-2);
+  font-size: var(--text-coach-caption);
+  line-height: var(--line-height-snug);
+  color: var(--color-coach-muted);
+}
+
+.waiting-card-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-block-start: auto;
+  padding-inline: var(--space-2);
+  /* The tag sits at the bottom of every card; the line above keeps a gap to it. */
+  padding-block: 2px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-amber-soft);
+  color: var(--color-coach-amber-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+}

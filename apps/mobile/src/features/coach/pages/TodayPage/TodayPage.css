@@ -1,0 +1,42 @@
+.coach-today-greeting {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-coach-greeting);
+  line-height: 0.82;
+  overflow-wrap: anywhere;
+}
+
+/* Karantina's descenders need the room the tight line height takes away. */
+:root:lang(en) .coach-today-greeting {
+  line-height: var(--line-height-display);
+}
+
+.coach-today-line {
+  margin: var(--space-2) 0 0;
+  line-height: 1;
+}
+
+.coach-today-stage-error {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-coach-label);
+  color: var(--color-coach-on-stage-muted);
+}
+
+/* A new coach: one card and the invite button. */
+.coach-today-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+  padding: var(--space-4) calc(var(--space-3) + var(--space-1));
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  box-shadow: var(--shadow-coach-card);
+}
+
+.coach-today-empty-text {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--line-height-base);
+  color: var(--color-coach-ink-2);
+}

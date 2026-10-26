@@ -1,0 +1,46 @@
+.portion-bars {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.portion-bar {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: calc(var(--space-2) + 2px);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.portion-bar dd {
+  margin: 0;
+}
+
+.portion-bar-protein { --portion-color: var(--color-portion-protein); --portion-soft: var(--color-portion-protein-soft); }
+.portion-bar-carb { --portion-color: var(--color-portion-carb); --portion-soft: var(--color-portion-carb-soft); }
+.portion-bar-fat { --portion-color: var(--color-portion-fat); --portion-soft: var(--color-portion-fat-soft); }
+.portion-bar-snack { --portion-color: var(--color-portion-snack); --portion-soft: var(--color-portion-snack-soft); }
+
+.portion-bar-track {
+  height: var(--size-coach-bar);
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: var(--portion-soft);
+}
+
+.portion-bar-fill {
+  display: block;
+  width: var(--portion-share);
+  height: 100%;
+  border-radius: var(--radius-round);
+  background-color: var(--portion-color);
+}
+
+.portion-bar-count {
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}

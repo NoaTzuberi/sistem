@@ -5,7 +5,7 @@ import { CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, ROUTES, WORKOUT_SESSION_PATH, WORK
 // without a coach role has no dock), in dock order — the order decides
 // the direction of the screen transition (a higher index = forward).
 
-export type TabId = 'home' | 'workouts' | 'nutrition' | 'profile' | 'inbox' | 'trainees';
+export type TabId = 'home' | 'workouts' | 'nutrition' | 'profile' | 'today' | 'trainees';
 
 export interface TabRoute {
   id: TabId;
@@ -20,7 +20,8 @@ export const TABS: Record<'trainee' | 'coach', TabRoute[]> = {
     { id: 'profile', to: ROUTES.PROFILE },
   ],
   coach: [
-    { id: 'inbox', to: ROUTES.COACH_INBOX },
+    // Messages (with its unread badge) joins in Phase B, with the message model.
+    { id: 'today', to: ROUTES.COACH_TODAY },
     { id: 'trainees', to: ROUTES.COACH_TRAINEES },
     { id: 'profile', to: ROUTES.COACH_PROFILE },
   ],

@@ -1,0 +1,48 @@
+.desk-note {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--space-2) + 2px);
+  margin-block-start: calc(var(--space-2) + 2px);
+  padding: var(--space-2) calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-tile);
+  background-color: var(--color-coach-soft);
+  color: var(--color-coach-ink-2);
+}
+
+.desk-note-icon {
+  flex: none;
+  margin-block-start: calc(var(--space-1) + 2px);
+  color: var(--color-stat-purple);
+}
+
+.desk-note-text {
+  margin: 0;
+  padding-block: var(--space-1);
+  font-size: var(--text-xs);
+  line-height: var(--line-height-base);
+}
+
+.desk-note-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  margin-block-end: calc(-1 * var(--space-2));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.desk-note-link:active {
+  opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .desk-note-link:hover {
+    text-decoration: underline;
+  }
+}

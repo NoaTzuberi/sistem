@@ -29,7 +29,9 @@ export const ROUTES = {
   TRAINEE_HOME: '/home',
   // The free interval timer (Phase 8): logs nothing.
   INTERVAL_TIMER: '/timer',
-  COACH_INBOX: '/coach/inbox',
+  // Coach mode: Today (feed + stage) is her landing tab; the notifications inbox sits behind its bell.
+  COACH_TODAY: '/coach/today',
+  COACH_INBOX: '/coach/today/inbox',
   COACH_TRAINEES: '/coach/trainees',
   COACH_PROFILE: '/coach/profile',
   // First run (no invite, no choice yet): "how do you want to train" → the coach code.
@@ -92,8 +94,14 @@ export function exercisePath(slug: string): string {
 // Coach mode: one trainee (PRD §6). A "new trainee" notification opens this screen.
 export const COACH_TRAINEE_PATH = '/coach/trainees/:traineeId';
 
-export function coachTraineePath(traineeId: string): string {
-  return `/coach/trainees/${traineeId}`;
+export function coachTraineePath(traineeId: string, tab?: string | null): string {
+  const path = `/coach/trainees/${traineeId}`;
+  return tab ? `${path}?tab=${tab}` : path;
+}
+
+/** The trainees list, optionally preset to a filter (?filter=) — Today's scoreboard opens these. */
+export function coachTraineesPath(filter?: string | null): string {
+  return filter ? `${ROUTES.COACH_TRAINEES}?filter=${filter}` : ROUTES.COACH_TRAINEES;
 }
 
 // Trainee Workouts (PRD §5.4): one planned workout, one workout log, and the active

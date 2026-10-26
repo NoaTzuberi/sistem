@@ -1,0 +1,18 @@
+.activity-feed-day-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: calc(var(--space-3) + 2px) 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-coach-muted);
+}
+
+.activity-feed-day-title .eyebrow {
+  color: var(--color-coach-faint);
+}
+
+.activity-feed-more {
+  width: 100%;
+  margin-block-start: var(--space-2);
+}

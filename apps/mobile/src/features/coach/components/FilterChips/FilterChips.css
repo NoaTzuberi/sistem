@@ -1,0 +1,59 @@
+.filter-chips {
+  display: flex;
+  gap: calc(var(--space-1) + 2px);
+  margin: calc(var(--space-2) + 2px) calc(-1 * var(--home-gutter)) 0;
+  padding-inline: var(--home-gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: calc(var(--space-1) + 2px);
+  min-height: var(--touch-target-min);
+  padding-inline: calc(var(--space-2) + var(--space-1));
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-card);
+  color: var(--color-coach-ink-2);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-out),
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filter-chip:active {
+  transform: scale(var(--press-scale));
+}
+
+.filter-chip[aria-pressed='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.filter-chip-count {
+  font-family: var(--font-num);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-coach-muted);
+}
+
+.filter-chip[aria-pressed='true'] .filter-chip-count {
+  color: var(--color-on-ink-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filter-chip:not([aria-pressed='true']):hover {
+    background-color: var(--color-coach-soft);
+  }
+}

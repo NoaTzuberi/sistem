@@ -1,0 +1,92 @@
+.nutrition-day-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+}
+
+.nutrition-day-days {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.nutrition-day-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--touch-target-min) + var(--space-1));
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-calendar-day);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-out), background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nutrition-day-day:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.nutrition-day-day[aria-pressed='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.nutrition-day-day:disabled {
+  color: var(--color-coach-faint);
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nutrition-day-day:not([aria-pressed='true']):not(:disabled):hover {
+    background-color: var(--color-coach-soft-hover);
+  }
+}
+
+.nutrition-day-weekday {
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nutrition-day-date {
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.nutrition-day-arrow {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  margin-inline: calc(-1 * var(--space-2));
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--color-coach-ink-2);
+  cursor: pointer;
+}
+
+.nutrition-day-arrow:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.nutrition-day-arrow:disabled {
+  color: var(--color-coach-faint);
+  cursor: default;
+}
+
+.nutrition-day-photos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(var(--space-1) + 2px);
+}

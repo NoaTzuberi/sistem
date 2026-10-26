@@ -1,0 +1,5 @@
+.mode-switch-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-error);
+}

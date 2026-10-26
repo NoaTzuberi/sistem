@@ -1,0 +1,78 @@
+/* Coach mode (docs/design/coach-app.html): the page surface under white cards, ink type. */
+.coach-screen {
+  min-height: 100dvh;
+  background-color: var(--color-coach-page);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.coach-screen-body {
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+}
+
+/* A large title instead of the stage (Trainees, Profile). */
+.coach-screen-top {
+  padding-block-start: calc(var(--space-4) + var(--safe-top));
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+}
+
+.coach-screen-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.coach-screen-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-coach-title);
+}
+
+/* A section label above a card or a list: mono eyebrow + Hebrew label + an optional link. */
+.coach-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-block: var(--space-4) var(--space-2);
+  color: var(--color-coach-ink-2);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.coach-section-head .eyebrow {
+  color: var(--color-coach-faint);
+}
+
+.coach-section-title {
+  margin: 0;
+  font: inherit;
+}
+
+.coach-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  margin-block: calc((var(--touch-target-min) - var(--text-coach-label) * 1.5) / -2);
+  margin-inline-start: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast) ease;
+}
+
+.coach-link:active {
+  opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .coach-link:hover {
+    text-decoration: underline;
+  }
+}

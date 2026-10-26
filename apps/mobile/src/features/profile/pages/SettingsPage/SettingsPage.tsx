@@ -9,6 +9,8 @@ import { ROUTES } from '../../../../app/config/routes';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { SubScreenHeader } from '../../components/SubScreenHeader/SubScreenHeader';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
+import { ModeSwitch } from '../../../coach/components/ModeSwitch/ModeSwitch';
+import { coachCopy } from '../../../coach/copy';
 import { LogoutSheet } from '../../components/LogoutSheet/LogoutSheet';
 import { useLanguagePreference } from '../../hooks/useLanguagePreference';
 import { useUnitPreferences } from '../../hooks/useUnitPreferences';
@@ -48,6 +50,7 @@ function SectionTitle({ eyebrow, id, children }: { eyebrow: string; id: string; 
 export function SettingsPage() {
   const copy = useCopy(profileCopy);
   const shared = useCopy(sharedCopy);
+  const coachText = useCopy(coachCopy);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const units = useUnitPreferences();
@@ -119,6 +122,18 @@ export function SettingsPage() {
               </p>
             )}
           </section>
+
+          {/* Someone who is also a coach switches back to coach mode here (the coach Profile has the same switch). */}
+          {user?.canSwitchAppMode && (
+            <section className="st-section" aria-labelledby="st-mode">
+              <SectionTitle eyebrow={copy.eyebrow.account} id="st-mode">
+                {coachText.profile.modeTitle}
+              </SectionTitle>
+              <div className="st-card st-card-padded">
+                <ModeSwitch />
+              </div>
+            </section>
+          )}
 
           <section className="st-section" aria-labelledby="st-account">
             <SectionTitle eyebrow={copy.eyebrow.account} id="st-account">

@@ -1,12 +1,11 @@
 import { type MouseEvent, type ReactNode, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { IconBarbell, IconHome, IconInbox, IconSalad, IconUser, IconUsers } from '@tabler/icons-react';
+import { IconActivityHeartbeat, IconBarbell, IconHome, IconSalad, IconUser, IconUsers } from '@tabler/icons-react';
 import type { TabUpdates } from '@sistem/types';
 import { useCopy } from '@sistem/shared';
 import { useAuth } from '../../../services/auth/AuthContext';
 import { hapticSelection } from '../../../services/haptics/haptics';
 import { TABS, type TabId, tabIndexOf } from '../../../app/config/tabs';
-import { UnreadBadge } from '../../../features/notifications/components/UnreadBadge/UnreadBadge';
 import { TabUpdateDot } from '../../../features/nutrition/components/TabUpdateDot/TabUpdateDot';
 import { clearTabUpdate, useTabUpdates } from '../../../features/nutrition/tabUpdates';
 import { appCopy } from '../../../copy';
@@ -22,12 +21,11 @@ const ICONS: Record<TabId, ReactNode> = {
   workouts: <IconBarbell size={ICON_SIZE} stroke={ICON_STROKE} />,
   nutrition: <IconSalad size={ICON_SIZE} stroke={ICON_STROKE} />,
   profile: <IconUser size={ICON_SIZE} stroke={ICON_STROKE} />,
-  inbox: <IconInbox size={ICON_SIZE} stroke={ICON_STROKE} />,
+  today: <IconActivityHeartbeat size={ICON_SIZE} stroke={ICON_STROKE} />,
   trainees: <IconUsers size={ICON_SIZE} stroke={ICON_STROKE} />,
 };
 
 function badgeOf(id: TabId, updates: TabUpdates): ReactNode {
-  if (id === 'inbox') return <UnreadBadge />;
   if (id === 'workouts') return <TabUpdateDot visible={updates.workouts} />;
   if (id === 'nutrition') return <TabUpdateDot visible={updates.nutrition} />;
   return null;

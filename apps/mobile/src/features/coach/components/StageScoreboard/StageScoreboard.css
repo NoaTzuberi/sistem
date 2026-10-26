@@ -1,0 +1,61 @@
+.stage-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-block-start: var(--space-3);
+  padding-block-start: calc(var(--space-2) + var(--space-1));
+  border-block-start: 1px solid var(--color-coach-stage-rule);
+}
+
+.stage-scoreboard-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: var(--touch-target-min);
+  color: var(--color-coach-on-stage);
+  text-align: start;
+  text-decoration: none;
+  transition: opacity var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stage-scoreboard-cell + .stage-scoreboard-cell {
+  padding-inline-start: calc(var(--space-2) + var(--space-1));
+  border-inline-start: 1px solid var(--color-coach-stage-rule);
+}
+
+.stage-scoreboard-cell:active {
+  opacity: 0.7;
+}
+
+.stage-scoreboard-value {
+  align-self: flex-start;
+  font-family: var(--font-num);
+  font-size: var(--text-coach-score);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+}
+
+.stage-scoreboard-sup {
+  font-size: var(--text-coach-score-sup);
+  opacity: var(--opacity-coach-score-sup);
+}
+
+.stage-scoreboard-value-pink {
+  color: var(--color-coach-pink-on-ink);
+}
+
+.stage-scoreboard-value-amber {
+  color: var(--color-coach-amber-on-ink);
+}
+
+.stage-scoreboard-label {
+  font-size: var(--text-coach-caption);
+  color: var(--color-coach-on-stage-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stage-scoreboard-cell:hover .stage-scoreboard-label {
+    color: var(--color-coach-on-stage);
+  }
+}

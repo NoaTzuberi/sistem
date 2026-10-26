@@ -1,0 +1,45 @@
+.body-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.body-scoreboard-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.body-scoreboard-cell + .body-scoreboard-cell {
+  padding-inline-start: calc(var(--space-2) + var(--space-1));
+  border-inline-start: 1px solid var(--color-coach-rule);
+}
+
+.body-scoreboard dd {
+  margin: 0;
+}
+
+.body-scoreboard-value {
+  font-family: var(--font-num);
+  font-size: var(--text-coach-metric);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.body-scoreboard-label {
+  order: 1;
+  font-size: var(--text-coach-caption);
+  color: var(--color-coach-muted);
+}
+
+.body-scoreboard-delta {
+  order: 2;
+  font-family: var(--font-num);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-profile-up);
+}
+
+.body-scoreboard-delta-down {
+  color: var(--color-coach-cherry);
+}

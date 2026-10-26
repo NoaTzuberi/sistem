@@ -1,0 +1,16 @@
+.week-pips {
+  display: flex;
+  gap: 3px;
+  margin-block-start: var(--space-1);
+}
+
+.week-pip {
+  width: var(--size-coach-pip-width);
+  height: var(--size-coach-pip-height);
+  border-radius: var(--radius-pip);
+  background-color: var(--color-coach-soft);
+}
+
+.week-pip-done {
+  background-color: var(--trainee-color);
+}

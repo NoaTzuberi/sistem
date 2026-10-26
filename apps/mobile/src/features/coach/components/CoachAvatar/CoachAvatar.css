@@ -1,0 +1,41 @@
+.coach-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: var(--size-coach-avatar);
+  height: var(--size-coach-avatar);
+  border-radius: var(--radius-round);
+  background-color: var(--trainee-color, var(--color-ink));
+  color: var(--color-on-primary);
+  font-family: var(--font-display-he);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.coach-avatar-plain {
+  background-color: var(--color-on-ink);
+  color: var(--color-ink);
+}
+
+.coach-avatar-lg {
+  width: var(--size-coach-avatar-lg);
+  height: var(--size-coach-avatar-lg);
+  font-size: var(--text-xl);
+}
+
+.coach-avatar-xl {
+  width: var(--size-coach-avatar-xl);
+  height: var(--size-coach-avatar-xl);
+  font-size: var(--text-2xl);
+}
+
+/* A trainee's own color (data/coachMode traineeColorClass): the workout colors without orange, which is too
+   light under white initials; Cherry takes its place. */
+.trainee-color-1 { --trainee-color: var(--color-workout-1); }
+.trainee-color-2 { --trainee-color: var(--color-workout-2); }
+.trainee-color-3 { --trainee-color: var(--color-workout-4); }
+.trainee-color-4 { --trainee-color: var(--color-workout-5); }

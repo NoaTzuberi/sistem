@@ -1,0 +1,105 @@
+.coach-stage {
+  --eyebrow-color: var(--color-coach-on-stage-faint);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding:
+    calc(var(--space-4) + var(--safe-top))
+    calc(var(--home-gutter) + var(--safe-inline-end))
+    calc(var(--space-4) - var(--space-1))
+    calc(var(--home-gutter) + var(--safe-inline-start));
+  border-end-start-radius: var(--radius-coach-stage);
+  border-end-end-radius: var(--radius-coach-stage);
+  background-color: var(--color-coach-stage);
+  color: var(--color-coach-on-stage);
+}
+
+/* Screen-space decoration: the grid and the accent bar read the same in both directions. */
+.coach-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--color-coach-stage-grid) 0 1px, transparent 1px var(--size-coach-stage-grid));
+}
+
+.coach-stage::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: var(--size-coach-accent);
+  background: var(--gradient-coach-accent);
+}
+
+/* Headings and lines on the stage are white (the global heading color is ink). */
+.coach-stage :where(h1, h2, p) {
+  color: inherit;
+}
+
+.coach-stage .eyebrow {
+  color: var(--color-coach-on-stage-faint);
+}
+
+/* The row at the top: avatar / back, a spacer, round buttons, the invite pill. */
+.coach-stage-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.coach-stage-spacer {
+  flex: 1;
+}
+
+/* A round icon button on ink (bell, back): drawn 40px, 44px of hit area. */
+.coach-stage-round {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-coach-round);
+  height: var(--size-coach-round);
+  margin: calc((var(--touch-target-min) - var(--size-coach-round)) / 2);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--surface-coach-on-stage);
+  color: var(--color-coach-on-stage);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-out),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.coach-stage-round::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-coach-round) - var(--touch-target-min)) / 2);
+}
+
+.coach-stage-round:active {
+  transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .coach-stage-round:hover {
+    background-color: var(--surface-coach-on-stage-hover);
+  }
+}
+
+/* The bell's unread dot. */
+.coach-stage-dot {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: calc(var(--space-2) + 1px);
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-coach-stage);
+}

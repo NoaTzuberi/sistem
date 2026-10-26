@@ -11,7 +11,24 @@
   margin-bottom: var(--space-2);
 }
 
+.coach-inbox-back {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  margin-inline-start: calc(-1 * var(--space-2));
+  border-radius: var(--radius-round);
+  color: var(--color-ink);
+}
+
+.coach-inbox-back:active {
+  opacity: 0.6;
+}
+
 .coach-inbox-title {
+  flex: 1;
   margin: 0;
   font-family: var(--font-family-display);
   font-size: var(--text-2xl);

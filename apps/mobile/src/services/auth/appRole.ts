@@ -1,11 +1,13 @@
 import type { AuthUser } from '@sistem/types';
 
 /**
- * Which side of the app she uses: coach mode when she holds the coach role, else the trainee app.
- * (AuthUser.role is the primary role — an admin who coaches is 'admin' there — so the app reads roles.)
+ * Which side of the app she uses: the server's appMode (coach mode for a coach, unless she also trains and
+ * switched to the trainee side in Profile). A cached account from before appMode existed falls back to
+ * the roles: coach wins.
  */
-export function appRole(user: Pick<AuthUser, 'roles'> | null | undefined): 'coach' | 'trainee' | null {
+export function appRole(user: Pick<AuthUser, 'roles' | 'appMode'> | null | undefined): 'coach' | 'trainee' | null {
   if (!user) return null;
+  if (user.appMode !== undefined) return user.appMode;
   if (user.roles.includes('coach')) return 'coach';
   return user.roles.includes('trainee') ? 'trainee' : null;
 }

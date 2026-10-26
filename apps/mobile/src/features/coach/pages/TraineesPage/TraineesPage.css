@@ -1,135 +1,35 @@
-.coach-trainees {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.coach-trainees-title {
-  margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--text-2xl);
-  line-height: var(--line-height-tight);
-}
-
-/* 16px text: no page zoom on focus. */
-.coach-trainees-search {
-  width: 100%;
-  min-height: var(--touch-target-min);
-  padding: 0 var(--space-3);
-  font-size: var(--text-base);
-  background-color: var(--color-bg);
-  border: var(--border-width-thin) solid var(--color-border);
-  border-radius: var(--radius-none);
-  appearance: none;
-}
-
-.coach-trainees-search:focus-visible {
-  outline: var(--border-width-medium) solid var(--color-primary);
-  outline-offset: 0;
-}
-
-/* One row that scrolls sideways, bleeding to the screen edges. */
-.coach-trainees-filters {
-  display: flex;
-  gap: var(--space-2);
-  margin: 0 calc(-1 * var(--space-3));
-  padding: 0 var(--space-3);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.coach-trainees-filters::-webkit-scrollbar {
-  display: none;
-}
-
-.coach-trainees-filter {
-  flex-shrink: 0;
-  min-height: var(--touch-target-min);
-  padding: 0 var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
-  border: var(--border-width-thin) solid var(--color-border);
-}
-
-.coach-trainees-filter[aria-pressed='true'] {
-  color: var(--color-primary-deep);
-  background-color: var(--color-primary-soft);
-  border-color: var(--color-primary);
-}
-
-.coach-trainees-filter:active {
-  background-color: var(--color-surface);
-}
-
-.coach-trainees-filter-count {
-  color: var(--color-text-muted);
-}
-
-/* The one filter the coach works from every week — kept apart and louder. */
-.coach-trainees-needs-plan {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  min-height: var(--touch-target-min);
-  padding: 0 var(--space-3);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-deep);
-  background-color: var(--color-primary-soft);
-  border: var(--border-width-medium) solid var(--color-primary);
-  clip-path: var(--cut-corner);
-}
-
-.coach-trainees-needs-plan[aria-pressed='true'] {
-  color: var(--color-on-primary);
-  background-color: var(--color-primary-deep);
-  border-color: var(--color-primary-deep);
-}
-
-.coach-trainees-needs-plan:active {
-  background-color: var(--color-primary-deep);
-  border-color: var(--color-primary-deep);
-  color: var(--color-on-primary);
-}
-
-.coach-trainees-list {
-  border-top: var(--border-width-thin) solid var(--color-border);
-}
-
-.coach-trainee-row {
+.coach-search {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: var(--touch-target-min);
-  padding: var(--space-3) 0;
-  border-bottom: var(--border-width-thin) solid var(--color-border);
+  min-height: calc(var(--touch-target-min) + 2px);
+  margin-block-start: calc(var(--space-3) - 2px);
+  padding-inline: calc(var(--space-3) - 2px);
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-card);
+  color: var(--color-coach-muted);
 }
 
-.coach-trainee-row:active {
-  background-color: var(--color-surface);
+.coach-search:focus-within {
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
-.coach-trainee-row-main {
-  display: flex;
+.coach-search input {
   flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
   min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  /* 16px: no zoom on focus (iOS). */
+  font-size: var(--text-base);
 }
 
-.coach-trainee-row-name {
-  font-weight: var(--font-weight-bold);
-  overflow-wrap: anywhere;
-}
-
-.coach-trainee-row-activity {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.coach-trainee-row-chevron {
-  flex-shrink: 0;
-  color: var(--color-text-muted);
+.coach-trainee-list {
+  margin: calc(var(--space-2) + var(--space-1)) 0 0;
+  padding: 0 calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  list-style: none;
 }

@@ -1,0 +1,29 @@
+.invite-pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  padding-inline: calc(var(--space-3) - 2px);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  /* 14px bold: white on Neon Pink reads as large text (3.8:1). */
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  transition:
+    transform var(--transition-press) var(--ease-out),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.invite-pill:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .invite-pill:hover {
+    background-color: var(--color-coach-primary-hover);
+  }
+}

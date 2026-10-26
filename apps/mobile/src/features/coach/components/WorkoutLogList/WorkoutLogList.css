@@ -135,3 +135,8 @@
 .workout-log-set {
   font-size: var(--text-sm);
 }
+
+.workout-logs-more {
+  width: 100%;
+  margin-block-start: var(--space-2);
+}

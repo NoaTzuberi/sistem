@@ -10,10 +10,12 @@ import './TraineeAchievements.css';
 
 interface TraineeAchievementsProps {
   traineeId: string;
+  /** The streak and the numbers only (the trainee overview) — no full achievement list. */
+  compact?: boolean;
 }
 
 /** The Achievements tab (coach mode): her streak, numbers and achievements — her own views, read-only. */
-export function TraineeAchievements({ traineeId }: TraineeAchievementsProps) {
+export function TraineeAchievements({ traineeId, compact = false }: TraineeAchievementsProps) {
   const copy = useCopy(achievementCopy);
   const load = useCallback(() => getTraineeAchievements(traineeId), [traineeId]);
   const { data, error, reload } = useLoad(load, copy.loadError);
@@ -24,7 +26,7 @@ export function TraineeAchievements({ traineeId }: TraineeAchievementsProps) {
     <div className="trainee-achievements">
       <StreakSummary streak={data.streak} />
       <ProgressStats overview={data} />
-      <AchievementList progress={data.progress} />
+      {!compact && <AchievementList progress={data.progress} />}
     </div>
   );
 }

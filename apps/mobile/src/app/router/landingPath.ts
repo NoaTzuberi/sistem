@@ -7,7 +7,7 @@ const LANDING_PATHS: Record<AppState, string> = {
   onboarding: ROUTES.ONBOARDING,
   waiting: ROUTES.WAITING,
   home: ROUTES.TRAINEE_HOME,
-  coach: ROUTES.COACH_INBOX,
+  coach: ROUTES.COACH_TODAY,
   admin: ROUTES.ADMIN_ONLY,
 };
 

@@ -1,0 +1,65 @@
+.last-workouts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.last-workout {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-2) + 2px);
+  padding-block: calc(var(--space-2) + 2px);
+  border-block-start: 1px solid var(--color-coach-rule);
+}
+
+.last-workout:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.last-workout-bar {
+  flex: none;
+  width: 6px;
+  height: 34px;
+  border-radius: var(--radius-pip);
+  background-color: var(--workout-color);
+}
+
+.last-workout-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.last-workout-name {
+  overflow: hidden;
+  font-size: var(--text-coach-log);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: start;
+}
+
+.last-workout-facts {
+  font-size: var(--text-xs);
+  color: var(--color-coach-muted);
+}
+
+.last-workout-rating {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+}
+
+.last-workout-rating-value {
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.last-workout-rating-label {
+  font-size: var(--text-2xs);
+  color: var(--color-coach-muted);
+}

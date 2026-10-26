@@ -1,0 +1,34 @@
+.coach-card {
+  margin-block-start: calc(var(--space-2) + 2px);
+  padding: calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  box-shadow: var(--shadow-coach-card);
+}
+
+.coach-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-block-end: calc(var(--space-2) + 2px);
+  color: var(--color-coach-ink-2);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.coach-card-head .eyebrow {
+  color: var(--color-coach-faint);
+}
+
+.coach-card-title {
+  margin: 0;
+  font: inherit;
+}
+
+/* A plain text line inside a card (empty states, a summary). */
+.coach-card-text {
+  margin: 0;
+  font-size: var(--text-coach-label);
+  line-height: var(--line-height-base);
+  color: var(--color-coach-muted);
+}
