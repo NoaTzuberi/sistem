@@ -71,6 +71,40 @@
   color: var(--color-ink);
 }
 
+/* Cardio: the same ticket — a cardio badge on top (opposite the name's start), "minutes · blocks", and the
+   intensity strip above the chip. */
+.workout-ticket-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-end;
+  height: 22px;
+  margin-block-end: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--workout-color-text);
+}
+
+.workout-ticket-cardio .workout-ticket-name {
+  -webkit-line-clamp: 2;
+}
+
+.workout-ticket-num {
+  font-family: var(--font-num);
+  font-weight: var(--font-weight-bold);
+}
+
+.workout-ticket-cardio .cardio-strip {
+  margin-block-start: auto;
+}
+
+.workout-ticket-cardio .workout-ticket-chip {
+  margin-block-start: var(--space-2);
+}
+
 /* Done: filled with the exact workout color. */
 .workout-ticket-done {
   background-color: var(--workout-color);
@@ -91,7 +125,8 @@
   opacity: 0.18;
 }
 
-.workout-ticket-done .workout-ticket-chip {
+.workout-ticket-done .workout-ticket-chip,
+.workout-ticket-done .workout-ticket-badge {
   background-color: color-mix(in srgb, var(--on-pink) 22%, transparent);
   color: var(--on-pink);
 }
@@ -124,5 +159,12 @@
 
   .workout-ticket:active {
     transform: scale(var(--press-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-ticket,
+  .workout-ticket:hover {
+    transform: none;
   }
 }

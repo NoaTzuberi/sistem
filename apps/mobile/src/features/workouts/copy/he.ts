@@ -186,6 +186,8 @@ export const he = {
     allExercises: 'כל התרגילים',
     allDone: 'כל האימונים של השבוע בוצעו 🎉',
     allWorkouts: 'כל האימונים השבוע',
+    cardioBlocks: plural({ one: 'בלוק אחד', two: '2 בלוקים', other: '{count} בלוקים' }),
+    cardioStripLabel: plural({ one: 'בלוק אחד, עצימות עד {max}', two: '2 בלוקים, עצימות עד {max}', other: '{count} בלוקים, עצימות עד {max}' }),
     nextWeekLocked: 'המאמנת שלך מכינה אותו. הוא ייפתח כשתפרסם',
     moreToMove: 'רוצה לזוז עוד?',
     freeEntryText: 'מאפס, חזרה על אימון קודם או לפי שריר. נשמר בהיסטוריה שלך',

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IconBarbell, IconPlus, IconRun } from '@tabler/icons-react';
-import { sharedCopy, useCopy } from '@sistem/shared';
-import { OWN_CARDIO_NEW, workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
+import { useCopy } from '@sistem/shared';
+import { cardioDetailPath, OWN_CARDIO_NEW, workoutLogPath, workoutSessionPath } from '../../../../app/config/routes';
 import { SgEmptyState } from '../../../../components/common/SgEmptyState/SgEmptyState';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { OwnCardioList } from '../../../cardio/components/OwnCardioList/OwnCardioList';
@@ -12,11 +12,10 @@ import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
 import { useStartWorkout } from '../../hooks/useStartWorkout';
 import { useWeekPlan } from '../../hooks/useWeekPlan';
-import { CardioWeekList } from '../../../cardio/components/CardioWeekList/CardioWeekList';
 import { cardioCopy } from '../../../cardio/copy';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFreeWorkout } from '../../hooks/useFreeWorkout';
-import { toPlannedWorkouts, type PlannedWorkout, type WeekPlan } from '../../data/weekPlanDisplay';
+import { toPlannedWorkouts, type PlannedWorkout } from '../../data/weekPlanDisplay';
 import { addMonths, HISTORY_FILTERS, weekStartOf, type HistoryFilter, type MonthKey } from '../../data/historyDisplay';
 import { StartConflictModal } from '../StartConflictModal/StartConflictModal';
 import { LargeTitleHeader } from '../LargeTitleHeader/LargeTitleHeader';
@@ -49,11 +48,6 @@ const FILTERS: HistoryFilter[] = HISTORY_FILTERS;
  * month calendar and by week). The tab lives in the URL (?tab=history). Nothing is made up: a part
  * without data is not drawn.
  */
-/** The week's cardio workouts (they have their own section; the tickets are strength). */
-function cardioOf(weekPlan: WeekPlan) {
-  return weekPlan.workouts.filter(({ workout }) => workout.kind === 'cardio').map(({ workout }) => workout);
-}
-
 export function WorkoutsScreen() {
   const copy = useCopy(workoutCopy);
   const eyebrow = useCopy(appCopy).eyebrow;
@@ -63,7 +57,6 @@ export function WorkoutsScreen() {
 
   const { weekPlan, activeLog, error, isLoading, reload } = useWeekPlan();
   const cardioText = useCopy(cardioCopy);
-  const sharedText = useCopy(sharedCopy);
   const starter = useStartWorkout();
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
   const [isFreeOpen, setIsFreeOpen] = useState(false);
@@ -108,6 +101,16 @@ export function WorkoutsScreen() {
     // Her open session (maybe of another week) is resumed in one tap, as on Home.
     if (activeLog && activeLog.workoutId === planned.workout.id) navigate(workoutSessionPath(activeLog.logId));
     else void starter.start(plan.id, planned.workout.id);
+  }
+
+  /** A ticket: strength opens its preview sheet, cardio its own workout screen. */
+  function openTicket(planned: PlannedWorkout) {
+    const planId = weekPlan?.plan?.id;
+    if (planned.workout.kind === 'cardio') {
+      if (planId) navigate(cardioDetailPath(planId, planned.workout.id));
+    } else {
+      setPreview({ planned, isNextWeek: false });
+    }
   }
 
   function openFree() {
@@ -179,22 +182,10 @@ export function WorkoutsScreen() {
                 </h2>
               </div>
               <WorkoutTicketCarousel
-                workouts={weekPlan.workouts.filter(({ workout }) => workout.kind !== 'cardio')}
+                workouts={weekPlan.workouts}
                 label={copy.plan.allWorkouts}
-                onOpen={(planned) => setPreview({ planned, isNextWeek: false })}
+                onOpen={openTicket}
               />
-            </>
-          )}
-
-          {weekPlan.plan && cardioOf(weekPlan).length > 0 && (
-            <>
-              <div className="workouts-section-head">
-                <h2 className="workouts-section-title">
-                  <Eyebrow>{cardioText.eyebrowCardio}</Eyebrow>
-                  {sharedText.cardio.cardioTag}
-                </h2>
-              </div>
-              <CardioWeekList planId={weekPlan.plan.id} workouts={cardioOf(weekPlan)} />
             </>
           )}
 

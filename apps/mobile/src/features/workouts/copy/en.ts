@@ -182,6 +182,8 @@ export const en: CopyShape<typeof he> = {
     allExercises: 'All exercises',
     allDone: 'Every workout this week is done 🎉',
     allWorkouts: "This week's workouts",
+    cardioBlocks: plural({ one: '{count} block', other: '{count} blocks' }),
+    cardioStripLabel: plural({ one: '{count} block, intensity up to {max}', other: '{count} blocks, intensity up to {max}' }),
     nextWeekLocked: 'Your coach is preparing it. It opens when she publishes it',
     moreToMove: 'Want to move more?',
     freeEntryText: 'From scratch, repeat a past workout or by muscle. Saved to your history',

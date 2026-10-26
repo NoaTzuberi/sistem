@@ -1,0 +1,16 @@
+/* 8px tall, 2px gaps; each segment's width is its block's share of the session (--strip-grow = seconds). */
+.cardio-strip {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  height: 8px;
+  /* physical: the session runs in time, left → right, as the cardio charts do */
+  direction: ltr;
+}
+
+.cardio-strip-segment {
+  flex: var(--strip-grow) 1 0;
+  min-width: 2px;
+  border-radius: var(--radius-bar);
+  background-color: var(--cp-c);
+}
