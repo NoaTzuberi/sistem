@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { Request, Response } from 'express';
 import { config } from '../config/env';
 import { sendError } from '../i18n';
@@ -14,10 +14,11 @@ export function setRateLimitForTests(enabled: boolean): void {
   enabledInTests = enabled;
 }
 
-function limiter(limit: number, windowMinutes: number) {
+function limiter(limit: number, windowMinutes: number, keyGenerator?: (req: Request) => string) {
   return rateLimit({
     windowMs: windowMinutes * 60 * 1000,
     limit,
+    ...(keyGenerator ? { keyGenerator } : {}),
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     skip: () => config.nodeEnv === 'test' && !enabledInTests,
@@ -29,3 +30,11 @@ function limiter(limit: number, windowMinutes: number) {
 export const authRateLimit = limiter(20, 15);
 /** Looking up and accepting /join codes. */
 export const joinRateLimit = limiter(60, 15);
+/**
+ * Reset-link requests per email address (on top of the per-IP limit). The same answer for every
+ * address, so it reveals nothing; without an email it falls back to the IP.
+ */
+export const resetEmailRateLimit = limiter(5, 60, (req) => {
+  const email: unknown = req.body?.email;
+  return typeof email === 'string' && email.trim() ? `email:${email.trim().toLowerCase()}` : ipKeyGenerator(req.ip ?? '');
+});

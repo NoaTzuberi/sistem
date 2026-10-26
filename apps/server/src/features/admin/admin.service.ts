@@ -6,7 +6,7 @@ import { CoachProfile } from '../coachProfiles/coachProfile.model';
 import type { CoachProfileDocument } from '../coachProfiles/coachProfile.model';
 import { ensureCoachSetup } from '../coachProfiles/coachProfile.service';
 import { Coaching } from '../coachings/coaching.model';
-import { issueSetPasswordLink } from '../auth/auth.service';
+import { issuePasswordResetLink, issueSetPasswordLink } from '../auth/auth.service';
 import { sendSetPasswordEmail } from '../auth/email.service';
 import { resolveLanguage } from '../users/units';
 import { SET_PASSWORD_LINK_HOURS } from './admin.constants';
@@ -69,7 +69,19 @@ async function passwordLink(profile: LeanProfile): Promise<CoachPasswordLinkResp
     console.error('Failed to send the set-password email:', error);
   }
   const [coach] = await toAdminCoaches([profile]);
-  return { coach, setPasswordUrl: url, expiresAt: expiresAt.toISOString(), emailSent };
+  return { coach, kind: 'set_password', setPasswordUrl: url, expiresAt: expiresAt.toISOString(), emailSent };
+}
+
+/**
+ * The fallback when email can't reach her (no provider in production yet): a dashboard reset link
+ * for the admin to copy and pass on. Same rules as the emailed one (60 min, single use, cancels
+ * older links, signs her other sessions out when used). Never emailed, never logged.
+ */
+export async function createResetLink(profileId: string): Promise<CoachPasswordLinkResponse> {
+  const profile = await findProfile(profileId);
+  const { url, expiresAt } = await issuePasswordResetLink(String(profile.userId));
+  const [coach] = await toAdminCoaches([profile]);
+  return { coach, kind: 'reset_password', setPasswordUrl: url, expiresAt: expiresAt.toISOString(), emailSent: false };
 }
 
 /**

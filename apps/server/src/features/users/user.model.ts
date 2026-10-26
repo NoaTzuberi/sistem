@@ -38,6 +38,8 @@ export interface UserDocument {
   roles: UserRole[];
   passwordResetTokenHash?: string;
   passwordResetExpires?: Date;
+  /** In every JWT (`sv`); raised when a coach / admin resets her password, which signs out every older session. */
+  sessionVersion?: number;
   preferences?: UserPreferences;
   onboardingStatus: OnboardingStatus;
   onboardingCompletedAt?: Date | null;
@@ -88,6 +90,7 @@ const userSchema = new Schema<UserDocument>(
     },
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
+    sessionVersion: { type: Number, default: 0 },
     preferences: { type: preferencesSchema },
     onboardingStatus: {
       type: String,

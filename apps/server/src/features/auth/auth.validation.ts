@@ -77,6 +77,11 @@ export function validateForgotPasswordInput(input: ForgotPasswordInput): ServerM
   return null;
 }
 
+/** 'dashboard' from the coach dashboard; anything else = the trainee app (unchanged behavior). */
+export function parsePasswordResetApp(value: unknown): 'dashboard' | undefined {
+  return value === 'dashboard' ? 'dashboard' : undefined;
+}
+
 export function validateResetPasswordInput(input: ResetPasswordInput): ServerMessage | null {
   if (typeof input.token !== 'string' || input.token.trim().length === 0) {
     return msg('reset_token_required');

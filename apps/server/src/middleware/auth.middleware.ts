@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import type { UserRole } from '@sistem/types';
 import { config } from '../config/env';
 import { User, hasRole } from '../features/users/user.model';
@@ -15,7 +16,7 @@ export interface AuthenticatedRequest extends Request {
   coachingId?: string;
 }
 
-export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -25,13 +26,24 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
 
   const token = authHeader.slice('Bearer '.length);
 
+  let payload: { sub?: string; sv?: number };
   try {
-    const payload = jwt.verify(token, config.jwtSecret) as { sub: string };
-    req.userId = payload.sub;
-    next();
+    payload = jwt.verify(token, config.jwtSecret) as { sub?: string; sv?: number };
   } catch {
     sendError(res, 401, 'invalid_token');
+    return;
   }
+
+  // A coach / admin password reset raises the account's session version: tokens signed before it
+  // stop here. Tokens from before this check have no `sv` = version 0.
+  const user = mongoose.isValidObjectId(payload.sub) ? await User.findById(payload.sub).select('sessionVersion').lean() : null;
+  if (!user || (user.sessionVersion ?? 0) !== (payload.sv ?? 0)) {
+    sendError(res, 401, 'invalid_token');
+    return;
+  }
+
+  req.userId = payload.sub;
+  next();
 }
 
 /**

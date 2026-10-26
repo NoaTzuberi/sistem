@@ -170,7 +170,9 @@ export interface CreateCoachPayload {
 /** POST /admin/coaches and POST /admin/coaches/:id/password-link. */
 export interface CoachPasswordLinkResponse {
   coach: AdminCoach;
-  /** One-time "set password" link (single use) — shown once to copy. */
+  /** set_password = the new-coach link (48 h); reset_password = the dashboard reset link (60 min, signs her out elsewhere). */
+  kind: 'set_password' | 'reset_password';
+  /** One-time link (single use) — shown once to copy. */
   setPasswordUrl: string;
   expiresAt: string;
   /** True when the email went out (Resend configured). */

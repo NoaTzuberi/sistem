@@ -417,6 +417,13 @@ export const he = {
   email_set_password_title: "ברוכה הבאה ל-Sistem",
   email_set_password_body: "נפתח לך חשבון מאמנת. לחצי על הכפתור כדי לבחור סיסמה. הקישור תקף ל-{hours} שעות ולשימוש אחד.",
   email_set_password_button: "יצירת סיסמה",
+  // Coach dashboard password reset email — PLACEHOLDER drafts
+  email_dashboard_reset_subject: "איפוס סיסמה ל-Sistem",
+  email_dashboard_reset_title: "איפוס סיסמה",
+  email_dashboard_reset_body: "קיבלנו בקשה לאפס את הסיסמה שלך ללוח הבקרה של Sistem.",
+  email_dashboard_reset_button: "בחירת סיסמה חדשה",
+  email_dashboard_reset_expiry: "הקישור תקף לשעה ולשימוש אחד.",
+  email_dashboard_reset_ignore: "אם לא ביקשת, אפשר להתעלם. הסיסמה שלך לא תשתנה.",
   // First run, self-guided, payments — DRAFT copy (PLACEHOLDER)
   payment_url_invalid: "הקישור ל-PayBox צריך להתחיל ב-https://. אפשר להעתיק אותו שוב מהאפליקציה.",
   payment_phone_invalid: "המספר לא נראה כמו נייד ישראלי. אפשר להקליד אותו כך: 050-1234567.",

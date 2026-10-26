@@ -141,12 +141,18 @@ export function createAdminApi(client: AxiosInstance) {
     return data;
   }
 
+  /** The fallback when email can't reach her: a 60-minute dashboard reset link to copy. */
+  async function createResetLink(coachId: string): Promise<CoachPasswordLinkResponse> {
+    const { data } = await client.post<CoachPasswordLinkResponse>(`/admin/coaches/${coachId}/reset-link`);
+    return data;
+  }
+
   async function setCoachStatus(coachId: string, status: CoachProfileStatus): Promise<AdminCoach> {
     const { data } = await client.patch<{ coach: AdminCoach }>(`/admin/coaches/${coachId}`, { status });
     return data.coach;
   }
 
-  return { listCoaches, createCoach, resendPasswordLink, setCoachStatus };
+  return { listCoaches, createCoach, resendPasswordLink, createResetLink, setCoachStatus };
 }
 
 export type JoinApi = ReturnType<typeof createJoinApi>;

@@ -9,7 +9,23 @@ import type {
   RegisterPayload,
   UpdatePreferencesPayload,
 } from '@sistem/types';
+import axios from 'axios';
 import { extractErrorMessage } from './createApiClient';
+
+/** An auth call's error with the server's code (e.g. 'reset_token_invalid'), when it sent one. */
+export class AuthApiError extends Error {
+  readonly code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
+function toAuthApiError(error: unknown): AuthApiError {
+  const code = axios.isAxiosError(error) ? error.response?.data?.code : undefined;
+  return new AuthApiError(extractErrorMessage(error, ''), typeof code === 'string' ? code : undefined);
+}
 
 // Auth calls shared by the mobile app and the coach dashboard. Errors are rethrown
 // as plain Error with the server's message (in the language on screen), so pages can show
@@ -39,9 +55,10 @@ export function createAuthApi(client: AxiosInstance) {
     return data.user;
   }
 
-  async function requestPasswordReset(email: string): Promise<string> {
+  /** `app: 'dashboard'` = the coach dashboard's flow (coach / admin accounts get a dashboard link). */
+  async function requestPasswordReset(email: string, app?: 'dashboard'): Promise<string> {
     try {
-      const { data } = await client.post<{ message: string }>('/auth/forgot-password', { email });
+      const { data } = await client.post<{ message: string }>('/auth/forgot-password', app ? { email, app } : { email });
       return data.message;
     } catch (error) {
       throw new Error(extractErrorMessage(error, ''));
@@ -53,8 +70,14 @@ export function createAuthApi(client: AxiosInstance) {
       const { data } = await client.post<{ message: string }>('/auth/reset-password', { token, password, confirmPassword });
       return data.message;
     } catch (error) {
-      throw new Error(extractErrorMessage(error, ''));
+      throw toAuthApiError(error);
     }
+  }
+
+  /** Whether a reset link still works (unused, not expired) — before she types a new password. */
+  async function checkResetToken(token: string): Promise<boolean> {
+    const { data } = await client.post<{ valid: boolean }>('/auth/reset-password/check', { token });
+    return data.valid;
   }
 
   /** The admin's one-time link (coach accounts): sets the password and signs her in. */
@@ -99,6 +122,7 @@ export function createAuthApi(client: AxiosInstance) {
     requestPasswordReset,
     setPassword,
     resetPassword,
+    checkResetToken,
     updatePreferences,
     uploadAvatar,
     removeAvatar,

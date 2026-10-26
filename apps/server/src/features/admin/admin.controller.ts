@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import mongoose from 'mongoose';
 import type { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { sendError } from '../../i18n';
-import { CoachEmailTakenError, CoachNotFoundError, createCoach, listCoaches, resendPasswordLink, setCoachStatus } from './admin.service';
+import { CoachEmailTakenError, CoachNotFoundError, createCoach, createResetLink, listCoaches, resendPasswordLink, setCoachStatus } from './admin.service';
 import { parseCoachStatus, parseCreateCoachPayload } from './admin.validation';
 
 function sendAdminError(res: Response, error: unknown): void {
@@ -31,6 +31,16 @@ export async function postCoach(req: AuthenticatedRequest, res: Response) {
     res.status(201).json(await createCoach(req.userId!, value.name, value.email));
   } catch (createError) {
     sendAdminError(res, createError);
+  }
+}
+
+export async function postResetLink(req: AuthenticatedRequest, res: Response) {
+  const id = readCoachId(req, res);
+  if (!id) return;
+  try {
+    res.status(200).json(await createResetLink(id));
+  } catch (error) {
+    sendAdminError(res, error);
   }
 }
 

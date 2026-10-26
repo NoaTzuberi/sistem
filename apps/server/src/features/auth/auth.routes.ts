@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { register, login, me, forgotPassword, resetPassword, setPassword } from './auth.controller';
+import { register, login, me, forgotPassword, resetPassword, setPassword, checkResetToken } from './auth.controller';
 import { requireAuth } from '../../middleware/auth.middleware';
-import { authRateLimit } from '../../middleware/rateLimit.middleware';
+import { authRateLimit, resetEmailRateLimit } from '../../middleware/rateLimit.middleware';
 
 export const authRouter = Router();
 
@@ -9,6 +9,8 @@ export const authRouter = Router();
 authRouter.post('/register', authRateLimit, register);
 authRouter.post('/login', authRateLimit, login);
 authRouter.get('/me', requireAuth, me);
-authRouter.post('/forgot-password', authRateLimit, forgotPassword);
+// Reset links: per IP, and the request also per email (one inbox can't be flooded from many IPs).
+authRouter.post('/forgot-password', authRateLimit, resetEmailRateLimit, forgotPassword);
+authRouter.post('/reset-password/check', authRateLimit, checkResetToken);
 authRouter.post('/reset-password', authRateLimit, resetPassword);
 authRouter.post('/set-password', authRateLimit, setPassword);

@@ -33,6 +33,39 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string, langu
   });
 }
 
+/**
+ * The coach dashboard's reset link (coach / admin accounts). Returns false when it did not go out
+ * (no Resend key, or Resend refused it) — the caller never logs the link outside development.
+ */
+export async function sendDashboardResetEmail(to: string, url: string, language: Language): Promise<boolean> {
+  if (!resend) return false;
+  const t = (code: Parameters<typeof translate>[1]) => translate(language, code);
+  const dir = language === 'he' ? 'rtl' : 'ltr';
+  // Resend reports failures in the result (it does not throw). Exact token values (email clients
+  // can't read CSS variables) — same as the reset email above.
+  const { error } = await resend.emails.send({
+    from: config.emailFrom,
+    to,
+    subject: t('email_dashboard_reset_subject'),
+    html: `
+      <div dir="${dir}" lang="${language}" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #26222a; text-align: start;">
+        <h2 style="margin-bottom: 8px;">${t('email_dashboard_reset_title')}</h2>
+        <p>${t('email_dashboard_reset_body')}</p>
+        <p style="margin: 24px 0;">
+          <a href="${url}" style="background-color: #ff006e; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">${t('email_dashboard_reset_button')}</a>
+        </p>
+        <p>${t('email_dashboard_reset_expiry')}</p>
+        <p style="color: #6b6b6b;">${t('email_dashboard_reset_ignore')}</p>
+      </div>
+    `,
+  });
+  if (error) {
+    console.error('Resend refused the dashboard reset email:', error.name);
+    return false;
+  }
+  return true;
+}
+
 /** The admin's one-time link to a new coach. Returns false when email is not configured (the admin copies the link). */
 export async function sendSetPasswordEmail(to: string, url: string, hours: number, language: Language): Promise<boolean> {
   if (!resend) {

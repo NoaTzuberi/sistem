@@ -4,12 +4,14 @@ import {
   validateLoginInput,
   validateForgotPasswordInput,
   validateResetPasswordInput,
+  parsePasswordResetApp,
 } from './auth.validation';
 import {
   registerUser,
   loginUser,
   getCurrentUser,
   requestPasswordReset,
+  isResetTokenLive,
   resetPassword as resetPasswordService,
   EmailAlreadyInUseError,
   InvalidCredentialsError,
@@ -71,8 +73,14 @@ export async function forgotPassword(req: Request, res: Response) {
     return;
   }
 
-  await requestPasswordReset(req.body.email);
+  await requestPasswordReset(req.body.email, parsePasswordResetApp(req.body.app));
   sendError(res, 200, 'reset_link_sent');
+}
+
+/** { valid } — the dashboard reset screen asks before showing the password fields. */
+export async function checkResetToken(req: Request, res: Response) {
+  const token = req.body?.token;
+  res.status(200).json({ valid: typeof token === 'string' && token.length > 0 && (await isResetTokenLive(token)) });
 }
 
 export async function resetPassword(req: Request, res: Response) {

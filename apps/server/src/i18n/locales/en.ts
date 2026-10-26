@@ -420,6 +420,13 @@ export const en: Record<keyof typeof he, string> = {
   email_set_password_title: "Welcome to Sistem",
   email_set_password_body: "A coach account was opened for you. Tap the button to choose your password. The link works once and for {hours} hours.",
   email_set_password_button: "Set password",
+  // Coach dashboard password reset email — PLACEHOLDER drafts
+  email_dashboard_reset_subject: "Reset your Sistem password",
+  email_dashboard_reset_title: "Reset your password",
+  email_dashboard_reset_body: "We got a request to reset your Sistem dashboard password.",
+  email_dashboard_reset_button: "Choose a new password",
+  email_dashboard_reset_expiry: "The link works for one hour, once.",
+  email_dashboard_reset_ignore: "If you didn't ask for this, you can ignore it. Your password won't change.",
   // First run, self-guided, payments — DRAFT copy (PLACEHOLDER)
   payment_url_invalid: "The PayBox link must start with https://. Copy it again from the app.",
   payment_phone_invalid: "That doesn't look like an Israeli mobile number. Type it like 050-1234567.",

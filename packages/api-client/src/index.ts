@@ -1,6 +1,6 @@
 export { createApiClient, extractErrorMessage } from './createApiClient';
 export type { ApiClientOptions } from './createApiClient';
-export { createAuthApi } from './authApi';
+export { createAuthApi, AuthApiError } from './authApi';
 export type { AuthApi } from './authApi';
 export { createNotificationsApi } from './notificationsApi';
 export type { NotificationsApi } from './notificationsApi';

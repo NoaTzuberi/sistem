@@ -9,10 +9,10 @@ interface AuthResponse {
   /** Set when the sign-up's invite code could not be used (the account is made anyway). */
   inviteError?: ServerMessage;
 }
-import { User, UserDocument, isOnboardingCompleted, primaryRole } from '../users/user.model';
+import { User, UserDocument, hasRole, isOnboardingCompleted, primaryRole } from '../users/user.model';
 import { config } from '../../config/env';
 import { publicLink } from '../../config/publicUrls';
-import { sendPasswordResetEmail } from './email.service';
+import { sendDashboardResetEmail, sendPasswordResetEmail } from './email.service';
 import { getAppState } from '../users/appState.service';
 import { isValidTimezone } from '../users/timezone';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
@@ -32,8 +32,17 @@ export class UserNotFoundError extends LocalizedError {}
 export class InvalidResetTokenError extends LocalizedError {}
 export class SetPasswordTokenError extends LocalizedError {}
 
-function signToken(userId: string): string {
-  return jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: TOKEN_EXPIRY });
+/** Which front end asked for the reset link. Only the coach dashboard sends one; none = the trainee app. */
+export type PasswordResetApp = 'dashboard';
+
+/** `sv` = the account's session version: requireAuth refuses a token whose version is older. */
+function signToken(userId: string, sessionVersion = 0): string {
+  return jwt.sign({ sub: userId, sv: sessionVersion }, config.jwtSecret, { expiresIn: TOKEN_EXPIRY });
+}
+
+/** Coach and admin accounts get the dashboard reset flow (dashboard link, older sessions signed out). */
+export function isStaffAccount(user: Pick<UserDocument, 'roles'>): boolean {
+  return hasRole(user, 'coach') || hasRole(user, 'admin');
 }
 
 function hashResetToken(token: string): string {
@@ -125,13 +134,20 @@ export async function loginUser(email: string, password: string) {
     throw new InvalidCredentialsError('invalid_credentials');
   }
 
-  return { token: signToken(String(user._id)), user: await toPublicUser(user) };
+  return { token: signToken(String(user._id), user.sessionVersion ?? 0), user: await toPublicUser(user) };
 }
 
-export async function requestPasswordReset(email: string): Promise<void> {
+export async function requestPasswordReset(email: string, app?: PasswordResetApp): Promise<void> {
   const user = await User.findOne({ email });
   if (!user) {
     // Never reveal whether an email is registered — resolve silently either way.
+    return;
+  }
+
+  if (app === 'dashboard' && isStaffAccount(user)) {
+    const { url } = await issuePasswordResetLink(String(user._id));
+    // Not awaited: the answer takes the same time whether or not the account exists.
+    void deliverDashboardResetLink(user.email, url, resolveLanguage(user.preferences));
     return;
   }
 
@@ -148,20 +164,59 @@ export async function requestPasswordReset(email: string): Promise<void> {
   }
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  const user = await User.findOne({
-    passwordResetTokenHash: hashResetToken(token),
-    passwordResetExpires: { $gt: new Date() },
-  });
+/** The email, or — DEV ONLY, when no email went out — the local console. Never logs in production / tests. */
+async function deliverDashboardResetLink(to: string, url: string, language: Language): Promise<void> {
+  let sent = false;
+  try {
+    sent = await sendDashboardResetEmail(to, url, language);
+  } catch {
+    console.error('Failed to send the dashboard password reset email.');
+  }
+  if (!sent && config.nodeEnv === 'development') {
+    console.info(`[dev only] Dashboard password reset link for ${to}: ${url}`);
+  }
+}
 
-  if (!user) {
+/**
+ * A dashboard reset link (coach / admin): 60 minutes, single use, only the token's hash is stored.
+ * Shares the token fields with the set-password link, so a new link of either kind cancels the older one.
+ */
+export async function issuePasswordResetLink(userId: string, now: Date = new Date()): Promise<{ url: string; expiresAt: Date }> {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_MS);
+  await User.updateOne({ _id: userId }, { $set: { passwordResetTokenHash: hashResetToken(rawToken), passwordResetExpires: expiresAt } });
+  return { url: publicLink(config.dashboardUrl, `/reset-password?token=${rawToken}`), expiresAt };
+}
+
+/** Lets the reset screen say "this link no longer works" before she types a password. */
+export async function isResetTokenLive(token: string): Promise<boolean> {
+  return Boolean(await User.exists({ passwordResetTokenHash: hashResetToken(token), passwordResetExpires: { $gt: new Date() } }));
+}
+
+/**
+ * Uses a reset / set-password token: sets the password and burns the token in ONE conditional update,
+ * so the same link can never work twice. Coach / admin accounts also get a new session version, which
+ * signs out every older session (trainee accounts keep their sessions, as before).
+ */
+async function consumeResetToken(token: string, password: string) {
+  const live = { passwordResetTokenHash: hashResetToken(token), passwordResetExpires: { $gt: new Date() } };
+  const holder = await User.findOne(live).select('roles');
+  if (!holder) return null;
+  return User.findOneAndUpdate(
+    { _id: holder._id, ...live },
+    {
+      $set: { passwordHash: await bcrypt.hash(password, SALT_ROUNDS) },
+      $unset: { passwordResetTokenHash: 1, passwordResetExpires: 1 },
+      ...(isStaffAccount(holder) ? { $inc: { sessionVersion: 1 } } : {}),
+    },
+    { returnDocument: 'after' },
+  );
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  if (!(await consumeResetToken(token, newPassword))) {
     throw new InvalidResetTokenError('reset_token_invalid');
   }
-
-  user.passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-  user.passwordResetTokenHash = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
 }
 
 /**
@@ -178,11 +233,7 @@ export async function issueSetPasswordLink(userId: string, ttlMs: number, now: D
 
 /** Uses the link: sets the password, burns the token, and signs her in. */
 export async function setPasswordWithToken(token: string, password: string): Promise<AuthResponse> {
-  const user = await User.findOneAndUpdate(
-    { passwordResetTokenHash: hashResetToken(token), passwordResetExpires: { $gt: new Date() } },
-    { $set: { passwordHash: await bcrypt.hash(password, SALT_ROUNDS) }, $unset: { passwordResetTokenHash: 1, passwordResetExpires: 1 } },
-    { returnDocument: 'after' },
-  );
+  const user = await consumeResetToken(token, password);
   if (!user) throw new SetPasswordTokenError('set_password_token_invalid');
-  return { token: signToken(String(user._id)), user: await toPublicUser(user) };
+  return { token: signToken(String(user._id), user.sessionVersion ?? 0), user: await toPublicUser(user) };
 }
