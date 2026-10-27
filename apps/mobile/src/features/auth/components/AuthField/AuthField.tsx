@@ -3,8 +3,9 @@ import { useId } from 'react';
 import './AuthField.css';
 
 interface AuthFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Shown above the field. */
+  /** Read by screen readers only — the placeholder is what she sees. */
   label: string;
+  icon: ReactNode;
   error?: string;
   statusText?: string;
   helperText?: string;
@@ -15,8 +16,8 @@ interface AuthFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 // Same wait as common/Input: the keyboard opens after focus and shrinks the screen.
 const KEYBOARD_OPEN_DELAY_MS = 300;
 
-/** A field of the signed-out screens' white card: label above, soft fill, optional trailing control (the eye). */
-export function AuthField({ label, error, statusText, helperText, trailing, id, onFocus, ...rest }: AuthFieldProps) {
+/** The pill input of the login / sign-up card: round icon chip, input, optional trailing control. */
+export function AuthField({ label, icon, error, statusText, helperText, trailing, id, onFocus, ...rest }: AuthFieldProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const noteId = `${inputId}-note`;
@@ -34,10 +35,13 @@ export function AuthField({ label, error, statusText, helperText, trailing, id, 
 
   return (
     <div className="auth-field-group">
-      <label className="auth-field-label" htmlFor={inputId}>
-        {label}
-      </label>
       <div className={'auth-field' + (error ? ' auth-field-invalid' : '')}>
+        <span className="auth-field-icon" aria-hidden="true">
+          {icon}
+        </span>
+        <label className="auth-field-label" htmlFor={inputId}>
+          {label}
+        </label>
         <input
           id={inputId}
           className="auth-field-input"

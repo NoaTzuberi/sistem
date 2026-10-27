@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
-import { AuthField } from '../../components/AuthField/AuthField';
-import { AuthButton } from '../../components/AuthButton/AuthButton';
+import { PageLayout } from '../../../../components/layout/PageLayout/PageLayout';
+import { Container } from '../../../../components/layout/Container/Container';
+import { Section } from '../../../../components/layout/Section/Section';
+import { Input } from '../../../../components/common/Input/Input';
+import { Button } from '../../../../components/common/Button/Button';
+import { AuthCard } from '../../components/AuthCard/AuthCard';
 import { resetPassword } from '../../../../services/auth/authService';
 import { authErrorText, validatePassword, validateConfirmPassword, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
 import { PasswordVisibilityToggle } from '../../components/PasswordVisibilityToggle/PasswordVisibilityToggle';
 import { ROUTES } from '../../../../app/config/routes';
+import './ResetPassword.css';
 
 export function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -65,81 +69,95 @@ export function ResetPassword() {
 
   if (!token) {
     return (
-      <AuthScreen title={copy.resetTitle}>
-        <p className="auth-form-text">{copy.resetLinkInvalid}</p>
-        <div className="auth-link-row">
-          <Link className="auth-link" to={ROUTES.FORGOT_PASSWORD}>
-            {copy.requestNewLink}
-          </Link>
-        </div>
-      </AuthScreen>
+      <PageLayout>
+        <Section className="auth-page">
+          <Container>
+            <AuthCard title={copy.resetTitle}>
+              <p className="reset-password-message">{copy.resetLinkInvalid}</p>
+              <p className="auth-switch">
+                <Link to={ROUTES.FORGOT_PASSWORD}>{copy.requestNewLink}</Link>
+              </p>
+            </AuthCard>
+          </Container>
+        </Section>
+      </PageLayout>
     );
   }
 
   if (isDone) {
     return (
-      <AuthScreen title={copy.resetTitle}>
-        <p className="auth-form-text" role="status">
-          {copy.resetDone}
-        </p>
-        <AuthButton onClick={() => navigate(ROUTES.LOGIN)}>{copy.loginButton}</AuthButton>
-      </AuthScreen>
+      <PageLayout>
+        <Section className="auth-page">
+          <Container>
+            <AuthCard title={copy.resetTitle}>
+              <p className="reset-password-message">{copy.resetDone}</p>
+              <Button variant="primary" onClick={() => navigate(ROUTES.LOGIN)}>
+                {copy.loginButton}
+              </Button>
+            </AuthCard>
+          </Container>
+        </Section>
+      </PageLayout>
     );
   }
 
   return (
-    <AuthScreen title={copy.resetTitle}>
-      <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <AuthField
-          type={passwordVisible ? 'text' : 'password'}
-          label={copy.newPassword}
-          placeholder={copy.newPasswordInputPlaceholder}
-          value={password}
-          onChange={(event) => updatePassword(event.target.value)}
-          onBlur={() => setPasswordError(validatePassword(password))}
-          error={authErrorText(copy, passwordError)}
-          autoComplete="new-password"
-          trailing={
-            <PasswordVisibilityToggle
-              visible={passwordVisible}
-              showLabel={copy.passwordHidden}
-              hideLabel={copy.passwordVisible}
-              onToggle={() => setPasswordVisible((visible) => !visible)}
-            />
-          }
-        />
-        <AuthField
-          type={confirmPasswordVisible ? 'text' : 'password'}
-          label={copy.confirmPassword}
-          placeholder={copy.confirmPasswordPlaceholder}
-          value={confirmPassword}
-          onChange={(event) => updateConfirmPassword(event.target.value)}
-          onBlur={() => {
-            setConfirmTouched(true);
-            setConfirmPasswordError(validateConfirmPassword(password, confirmPassword));
-          }}
-          error={confirmPasswordError ? copy.passwordsMismatch : undefined}
-          statusText={confirmTouched && confirmPassword && passwordsMatch ? copy.passwordsMatch : undefined}
-          autoComplete="new-password"
-          trailing={
-            <PasswordVisibilityToggle
-              visible={confirmPasswordVisible}
-              showLabel={copy.passwordHidden}
-              hideLabel={copy.passwordVisible}
-              onToggle={() => setConfirmPasswordVisible((visible) => !visible)}
-            />
-          }
-        />
-        {formError && <p className="auth-form-error">{formError}</p>}
-        <AuthButton type="submit" loading={isSubmitting} disabled={isFormInvalid}>
-          {copy.resetButton}
-        </AuthButton>
-      </form>
-      <div className="auth-link-row">
-        <Link className="auth-link" to={ROUTES.LOGIN}>
-          {copy.backToLogin}
-        </Link>
-      </div>
-    </AuthScreen>
+    <PageLayout>
+      <Section className="auth-page">
+        <Container>
+          <AuthCard title={copy.resetTitle}>
+            <form className="auth-form" onSubmit={handleSubmit} noValidate>
+              <Input
+                type={passwordVisible ? 'text' : 'password'}
+                label={copy.newPassword}
+                placeholder={copy.newPasswordInputPlaceholder}
+                value={password}
+                onChange={(event) => updatePassword(event.target.value)}
+                onBlur={() => setPasswordError(validatePassword(password))}
+                error={authErrorText(copy, passwordError)}
+                autoComplete="new-password"
+                trailing={
+                  <PasswordVisibilityToggle
+                    visible={passwordVisible}
+                    showLabel={copy.passwordHidden}
+                    hideLabel={copy.passwordVisible}
+                    onToggle={() => setPasswordVisible((visible) => !visible)}
+                  />
+                }
+              />
+              <Input
+                type={confirmPasswordVisible ? 'text' : 'password'}
+                label={copy.confirmPassword}
+                placeholder={copy.confirmPasswordPlaceholder}
+                value={confirmPassword}
+                onChange={(event) => updateConfirmPassword(event.target.value)}
+                onBlur={() => {
+                  setConfirmTouched(true);
+                  setConfirmPasswordError(validateConfirmPassword(password, confirmPassword));
+                }}
+                error={confirmPasswordError ? copy.passwordsMismatch : undefined}
+                statusText={confirmTouched && confirmPassword && passwordsMatch ? copy.passwordsMatch : undefined}
+                autoComplete="new-password"
+                trailing={
+                  <PasswordVisibilityToggle
+                    visible={confirmPasswordVisible}
+                    showLabel={copy.passwordHidden}
+                    hideLabel={copy.passwordVisible}
+                    onToggle={() => setConfirmPasswordVisible((visible) => !visible)}
+                  />
+                }
+              />
+              {formError && <p className="auth-form-error">{formError}</p>}
+              <Button type="submit" variant="primary" loading={isSubmitting} disabled={isFormInvalid}>
+                {copy.resetButton}
+              </Button>
+            </form>
+            <p className="auth-switch">
+              <Link to={ROUTES.LOGIN}>{copy.backToLogin}</Link>
+            </p>
+          </AuthCard>
+        </Container>
+      </Section>
+    </PageLayout>
   );
 }

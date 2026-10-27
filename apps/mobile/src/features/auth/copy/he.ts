@@ -20,6 +20,7 @@ export const he = {
   passwordsMatch: 'הסיסמאות תואמות ✓',
   passwordsMismatch: 'הסיסמאות לא תואמות',
   forgotLink: 'שכחת סיסמה?',
+  forgotShort: 'שכחתי',
   loginButton: 'התחברות',
   registerButton: 'יצירת חשבון',
   noAccount: 'אין לך חשבון?',

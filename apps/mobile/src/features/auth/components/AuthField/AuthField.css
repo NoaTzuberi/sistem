@@ -4,20 +4,14 @@
   gap: var(--space-1);
 }
 
-.auth-field-label {
-  color: var(--color-ink);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
 .auth-field {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  min-height: var(--size-auth-input);
-  padding-inline: var(--space-3) var(--space-1);
-  border-radius: var(--radius-auth-input);
-  background: var(--color-auth-soft);
+  gap: var(--space-2);
+  height: var(--auth-control-height);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-round);
+  background: var(--glass-bg-strong);
   transition: box-shadow var(--transition-fast) var(--ease-standard);
 }
 
@@ -30,24 +24,46 @@
   box-shadow: 0 0 0 var(--border-width-medium) var(--color-error);
 }
 
+.auth-field-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--auth-chip-size);
+  height: var(--auth-chip-size);
+  border-radius: var(--radius-round);
+  background: var(--color-on-primary);
+  color: var(--color-text);
+}
+
+/* Screen readers only. */
+.auth-field-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* 16px minimum font size: iOS zooms the page on focus below that. */
 .auth-field-input {
   flex: 1;
   min-width: 0;
-  height: var(--size-auth-input);
+  height: 100%;
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--color-ink);
+  color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--text-base);
 }
 
 .auth-field-input::placeholder {
-  color: var(--color-auth-muted);
+  color: var(--color-text-muted);
 }
 
-/* The field shows the focus (box-shadow above). */
+/* The pill shows the focus (box-shadow above). */
 .auth-field-input:focus,
 .auth-field-input:focus-visible {
   outline: none;
@@ -56,11 +72,12 @@
 .auth-field-helper,
 .auth-field-error,
 .auth-field-status {
+  padding-inline: var(--space-3);
   font-size: var(--text-sm);
 }
 
 .auth-field-helper {
-  color: var(--color-auth-muted);
+  color: var(--color-text-muted);
 }
 
 .auth-field-error {
@@ -71,18 +88,10 @@
   color: var(--color-primary-deep);
 }
 
-/* The eye: 44px of hit area inside the field. */
-.auth-field .password-visibility-toggle {
-  position: static;
-  flex: none;
-  width: var(--touch-target-min);
-  height: var(--touch-target-min);
-}
-
-/* Browser autofill paints its own background over the field. It can't be turned off, only
-   delayed — so the field keeps its fill and the text keeps its color. */
+/* Browser autofill paints its own square background over the pill. It can't be turned off, only
+   delayed — so the pill keeps its shape and the text keeps its color. */
 .auth-field-input:-webkit-autofill,
 .auth-field-input:autofill {
-  -webkit-text-fill-color: var(--color-ink);
+  -webkit-text-fill-color: var(--color-text);
   transition: background-color 100000s;
 }

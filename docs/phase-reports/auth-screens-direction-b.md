@@ -1,5 +1,7 @@
 # Auth screens — direction B card + full-bleed track background
 
+> SUPERSEDED (2026-10-27): the owner reverted this design. See docs/phase-reports/auth-screens-restore.md.
+
 ## Summary
 Every signed-out screen (/join, login, sign-up, forgot / reset password) and the admin-only screen share one
 `AuthScreen`. The background art is UNCHANGED (owner correction): the same TrackBackground (gradient, running-track

@@ -3,7 +3,6 @@
 export const he = {
   invitesYou: 'מזמינה אותך להתאמן איתה ב-Sistem', // owner
   invitedHint: 'אחרי ההרשמה ממלאות שאלון קצר, ו{coach} בונה לך תוכנית אישית', // owner
-  steps: { signUp: 'הרשמה', questionnaire: 'שאלון', plan: 'תוכנית ממנה' }, // owner
   signUp: 'הרשמה',
   haveAccount: 'יש לי כבר חשבון',
   confirmJoin: 'להצטרף לליווי של {coach}?', // owner

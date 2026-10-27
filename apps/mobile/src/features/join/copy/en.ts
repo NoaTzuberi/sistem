@@ -4,7 +4,6 @@ import type { he } from './he';
 export const en: CopyShape<typeof he> = {
   invitesYou: 'invites you to train with her on Sistem',
   invitedHint: 'After signing up you fill in a short questionnaire, and {coach} builds you a personal plan',
-  steps: { signUp: 'Sign up', questionnaire: 'Questionnaire', plan: 'Her plan' },
   signUp: 'Sign up',
   haveAccount: 'I already have an account',
   confirmJoin: "Join {coach}'s coaching?",

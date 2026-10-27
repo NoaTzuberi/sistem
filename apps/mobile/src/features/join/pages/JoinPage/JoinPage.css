@@ -1,50 +1,36 @@
 .join-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  text-align: center;
+  gap: var(--space-3);
 }
 
 .join-loading {
   display: flex;
   justify-content: center;
-  padding-block: var(--space-5);
+  padding-block: var(--space-4);
 }
 
+/* A sentence as the card title (community, a refusal); the dead link uses the login title itself. */
 .join-title {
   margin: 0;
-  color: var(--color-ink);
-  font-size: var(--text-auth-name);
+  font-size: var(--text-display-lg);
 }
 
+.join-lead {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+/* The login card's text color: muted grey is too faint on the translucent card. */
 .join-text {
   margin: 0;
-  color: var(--color-auth-ink-2);
+  color: var(--color-text);
   font-size: var(--text-base);
-}
-
-/* The dead-link tile: soft pink, Cherry icon. */
-.join-icon-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  width: var(--size-auth-icon-tile);
-  height: var(--size-auth-icon-tile);
-  border-radius: var(--radius-fr-icon-tile);
-  background: var(--tint-pink);
-  color: var(--ink-pink);
 }
 
 .join-actions {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.join-question {
-  margin: 0;
-  color: var(--color-ink);
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
 }

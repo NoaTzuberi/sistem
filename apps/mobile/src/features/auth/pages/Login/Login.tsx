@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { IconAt, IconKey } from '@tabler/icons-react';
 import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
 import { AuthField } from '../../components/AuthField/AuthField';
-import { AuthButton } from '../../components/AuthButton/AuthButton';
+import { AuthSubmitButton } from '../../components/AuthSubmitButton/AuthSubmitButton';
 import { PasswordVisibilityToggle } from '../../components/PasswordVisibilityToggle/PasswordVisibilityToggle';
 import { SocialButtons } from '../../components/SocialButtons/SocialButtons';
 import { CoachDashboardLink } from '../../components/CoachDashboardLink/CoachDashboardLink';
@@ -56,16 +57,17 @@ export function Login() {
 
   return (
     <AuthScreen title={copy.loginTitle} switchLabel={copy.registerLink} switchTo={ROUTES.REGISTER} footer={<CoachDashboardLink />}>
-      <form className="auth-form" onSubmit={handleSubmit} noValidate>
+      <form className="auth-glass-form" onSubmit={handleSubmit} noValidate>
         <AuthField
           type="email"
           label={copy.email}
+          icon={<IconAt size={20} />}
           inputMode="email"
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="next"
-          placeholder={copy.emailPlaceholder}
+          placeholder={copy.email}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           error={authErrorText(copy, emailError)}
@@ -74,27 +76,30 @@ export function Login() {
         <AuthField
           type={passwordVisible ? 'text' : 'password'}
           label={copy.password}
+          icon={<IconKey size={20} />}
+          placeholder={copy.password}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           error={authErrorText(copy, passwordError)}
           autoComplete="current-password"
           enterKeyHint="go"
           trailing={
-            <PasswordVisibilityToggle
-              visible={passwordVisible}
-              showLabel={copy.passwordHidden}
-              hideLabel={copy.passwordVisible}
-              onToggle={() => setPasswordVisible((visible) => !visible)}
-            />
+            <>
+              <PasswordVisibilityToggle
+                visible={passwordVisible}
+                showLabel={copy.passwordHidden}
+                hideLabel={copy.passwordVisible}
+                onToggle={() => setPasswordVisible((visible) => !visible)}
+              />
+              {/* The email she typed goes along, so the reset form starts filled in. */}
+              <Link to={ROUTES.FORGOT_PASSWORD} state={{ email }} className="login-forgot-pill" aria-label={copy.forgotLink}>
+                {copy.forgotShort}
+              </Link>
+            </>
           }
         />
-        <Link to={ROUTES.FORGOT_PASSWORD} state={{ email }} className="auth-link login-forgot">
-          {copy.forgotLink}
-        </Link>
-        {formError && <p className="auth-form-error">{formError}</p>}
-        <AuthButton type="submit" loading={isSubmitting}>
-          {copy.loginButton}
-        </AuthButton>
+        {formError && <p className="auth-glass-error">{formError}</p>}
+        <AuthSubmitButton loading={isSubmitting}>{copy.loginButton}</AuthSubmitButton>
         <SocialButtons />
       </form>
     </AuthScreen>

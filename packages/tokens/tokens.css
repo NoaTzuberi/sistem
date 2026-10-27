@@ -39,9 +39,13 @@
      sign-up background; TrackBackground paints the same two colors on its canvas. */
   --gradient-brand: linear-gradient(to bottom left, var(--color-primary), var(--color-primary-deep));
 
-  /* Glass on a colored surface (the dashboard's auth cards, the social buttons' divider). */
+  /* Glass surfaces on the brand gradient (login / sign-up / join): white at an alpha, no new colors. */
+  --glass-bg: color-mix(in srgb, var(--color-on-primary) 55%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--color-on-primary) 78%, transparent); /* fields on the glass card */
+  --glass-border: color-mix(in srgb, var(--color-on-primary) 80%, transparent);
   --glass-blur: blur(22px) saturate(140%);
   --glass-divider: color-mix(in srgb, var(--color-text) 15%, transparent);
+  --glass-outline: color-mix(in srgb, var(--color-text) 25%, transparent);     /* outlined pill on glass */
 
   /* The running track drawn on the gradient (TrackBackground): white (--color-on-primary) at these alphas. */
   --track-lane-alpha: 0.32;        /* inner lane lines */
@@ -1231,31 +1235,12 @@
   --size-fr-tag: 28px;
   --size-fr-cta: 58px;
 
-  /* ═══ 16. Auth screens (join / login / sign-up / password), direction B: the running-track background
-     (unchanged) full-bleed, one solid white card, pink + soft pills. White text only on the pink. ═══ */
-  --color-auth-stage: var(--color-primary-deep);            /* html / body behind the track: the gradient's bottom edge (iOS bars) */
-  --color-auth-card: var(--color-card);
-  --radius-auth-card: var(--radius-fr-card);                /* 30px */
-  --shadow-auth-card: 0 24px 50px color-mix(in srgb, #780032 25%, transparent);
-  --color-auth-ink-2: var(--color-fr-ink-2);                /* body lines in the card */
-  --color-auth-muted: var(--color-fr-muted);
-  --color-auth-soft: var(--color-fr-soft);                  /* #f5f3f6 — the soft pill, the input fill */
-  --color-auth-soft-hover: var(--color-fr-soft-hover);
-  --size-auth-button: 56px;
-  --radius-auth-button: 28px;
-  --shadow-auth-primary: 0 10px 24px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  --size-auth-input: 52px;
-  --radius-auth-input: 16px;
-  --size-auth-avatar: 64px;
-  --ring-auth-avatar: 0 0 0 3px var(--color-card), 0 0 0 5px var(--color-primary);
-  --text-auth-name: 34px;                                   /* the coach's name (Karantina) */
-  --text-auth-title: 40px;                                  /* a card title (Karantina) */
-  --size-auth-icon-tile: 56px;
-  --size-auth-step-icon: 36px;
-  --surface-auth-switch-track: color-mix(in srgb, var(--color-on-primary) 20%, transparent);
-  --size-auth-column: 420px;
-  --size-auth-logo: 210px;
-  --space-auth-card: 22px;
+  /* ═══ 16. Auth screens (join / login / sign-up / password): the glass card design stays as it was; these
+     only paint the browser edges pink (iOS Safari's bars, overscroll) and size the join screen's coach block. ═══ */
+  --color-auth-stage-top: var(--color-primary);             /* theme-color: the gradient's top */
+  --color-auth-stage: var(--color-primary-deep);            /* html / body behind the track: the gradient's bottom edge */
+  --size-join-avatar: 56px;
+  --ring-join-avatar: 0 0 0 3px var(--color-on-primary);    /* white ring on the glass card */
 
   /* ═══ 17. Coach mode (mobile, docs/design/coach-app.html): a work tool — an INK stage with faint vertical
      grid lines and a pink → purple accent bar instead of the trainee pink; the page surface under white

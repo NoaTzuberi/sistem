@@ -1,5 +1,19 @@
-/* "Forgot password?" under the password field, at the end of the line. */
-.login-forgot {
-  align-self: flex-end;
-  margin-block-start: calc(-1 * var(--space-2));
+/* "Forgot" lives inside the password pill. */
+.login-forgot-pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  /* The chip's height in the design is 42px; the tap target still gets its 44. */
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-round);
+  background: var(--color-on-primary);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+
+.login-forgot-pill:active {
+  color: var(--color-primary-deep);
 }

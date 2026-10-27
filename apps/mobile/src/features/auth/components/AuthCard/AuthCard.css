@@ -1,0 +1,71 @@
+/* Full-width phone layout: no floating card, content centered vertically and
+   scrollable when the keyboard shrinks the screen. */
+.auth-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: var(--space-5);
+  padding-block: var(--space-5);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+}
+
+.auth-card-logo {
+  margin: 0 auto var(--space-4);
+}
+
+.auth-card-title {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-display-lg);
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.auth-form .btn {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.auth-form-error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+}
+
+.auth-switch {
+  margin-top: var(--space-4);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Inline links still get a 44px tap area. */
+.auth-switch a,
+.auth-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-1);
+  color: var(--color-primary-deep);
+  font-weight: var(--font-weight-semibold);
+}
+
+.auth-switch a:active,
+.auth-link:active {
+  color: var(--color-primary);
+}
+
+.auth-card-language {
+  display: flex;
+  justify-content: center;
+  margin-block-start: var(--space-4);
+}

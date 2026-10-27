@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IconAt, IconKey, IconUser } from '@tabler/icons-react';
 import { landingPath } from '../../../../app/router/landingPath';
 import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
 import { JoinBanner } from '../../../firstRun/components/JoinBanner/JoinBanner';
 import { useJoiningCoach } from '../../../firstRun/hooks/useJoiningCoach';
 import { AuthField } from '../../components/AuthField/AuthField';
-import { AuthButton } from '../../components/AuthButton/AuthButton';
+import { AuthSubmitButton } from '../../components/AuthSubmitButton/AuthSubmitButton';
 import { SocialButtons } from '../../components/SocialButtons/SocialButtons';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { authErrorText, validateName, validateEmail, validatePassword, type AuthErrorKey } from '../../validation';
@@ -98,10 +99,11 @@ export function Register() {
       switchTo={ROUTES.LOGIN}
       banner={joiningCoach ? <JoinBanner coachName={joiningCoach} /> : undefined}
     >
-      <form className="auth-form" onSubmit={handleSubmit} noValidate>
+      <form className="auth-glass-form" onSubmit={handleSubmit} noValidate>
         <AuthField
           type="text"
           label={copy.name}
+          icon={<IconUser size={20} />}
           placeholder={copy.namePlaceholder}
           value={name}
           onChange={(event) => updateName(event.target.value)}
@@ -114,12 +116,13 @@ export function Register() {
         <AuthField
           type="email"
           label={copy.email}
+          icon={<IconAt size={20} />}
           inputMode="email"
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="next"
-          placeholder={copy.emailPlaceholder}
+          placeholder={copy.email}
           value={email}
           onChange={(event) => updateEmail(event.target.value)}
           onBlur={() => setEmailError(validateEmail(email))}
@@ -129,6 +132,8 @@ export function Register() {
         <AuthField
           type={passwordVisible ? 'text' : 'password'}
           label={copy.password}
+          icon={<IconKey size={20} />}
+          placeholder={copy.password}
           helperText={copy.newPasswordPlaceholder}
           value={password}
           onChange={(event) => updatePassword(event.target.value)}
@@ -148,6 +153,7 @@ export function Register() {
         <AuthField
           type={confirmPasswordVisible ? 'text' : 'password'}
           label={copy.confirmPassword}
+          icon={<IconKey size={20} />}
           placeholder={copy.confirmPasswordPlaceholder}
           value={confirmPassword}
           onChange={(event) => updateConfirmPassword(event.target.value)}
@@ -165,10 +171,8 @@ export function Register() {
             />
           }
         />
-        {formError && <p className="auth-form-error">{formError}</p>}
-        <AuthButton type="submit" loading={isSubmitting} disabled={isFormInvalid}>
-          {copy.registerButton}
-        </AuthButton>
+        {formError && <p className="auth-glass-error">{formError}</p>}
+        <AuthSubmitButton loading={isSubmitting} disabled={isFormInvalid}>{copy.registerButton}</AuthSubmitButton>
         <SocialButtons />
       </form>
     </AuthScreen>
