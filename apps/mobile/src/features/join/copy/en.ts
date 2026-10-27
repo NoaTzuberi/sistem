@@ -2,9 +2,9 @@ import type { CopyShape } from '@sistem/shared';
 import type { he } from './he';
 
 export const en: CopyShape<typeof he> = {
-  title: 'Join',
-  invitedBy: '{coach} invites you to train with her on Sistem.',
-  invitedHint: "After signing up you fill in a short questionnaire, and your coach builds your plan.",
+  invitesYou: 'invites you to train with her on Sistem',
+  invitedHint: 'After signing up you fill in a short questionnaire, and {coach} builds you a personal plan',
+  steps: { signUp: 'Sign up', questionnaire: 'Questionnaire', plan: 'Her plan' },
   signUp: 'Sign up',
   haveAccount: 'I already have an account',
   confirmJoin: "Join {coach}'s coaching?",
@@ -24,7 +24,10 @@ export const en: CopyShape<typeof he> = {
     revoked: 'This link is no longer active',
     used_up: 'This link has already been used',
   },
-  problemHint: 'Ask your coach for a new link.',
+  invalidTitle: "This link isn't valid",
+  problemHint: 'Ask your coach for a new link',
+  signUpWithoutCoach: 'Sign up without a coach',
+  haveCode: 'I have a code',
   continue: 'Continue',
   failed: 'Something went wrong. Try again.',
   retry: 'Try again',

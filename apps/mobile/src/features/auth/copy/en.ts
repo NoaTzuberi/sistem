@@ -22,7 +22,6 @@ export const en: CopyShape<typeof he> = {
   passwordsMatch: 'Passwords match ✓',
   passwordsMismatch: 'Passwords do not match',
   forgotLink: 'Forgot password?',
-  forgotShort: 'Forgot?',
   loginButton: 'Log In',
   registerButton: 'Create Account',
   noAccount: "Don't have an account?",

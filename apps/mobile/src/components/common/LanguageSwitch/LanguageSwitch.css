@@ -34,3 +34,59 @@
   background: var(--color-primary-deep);
   color: var(--color-on-primary);
 }
+
+/* On the pink stage (signed-out screens): a white 20% track, the chosen language on a white thumb with
+   ink text, the other in white. The thumb springs along the reading direction. Never a filled block. */
+.language-switch-stage {
+  position: relative;
+  grid-auto-columns: minmax(0, 1fr);
+  padding: var(--size-profile-track-inset);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: var(--surface-auth-switch-track);
+}
+
+.language-switch-thumb {
+  position: absolute;
+  inset-block: var(--size-profile-track-inset);
+  inset-inline-start: var(--size-profile-track-inset);
+  width: calc((100% - 2 * var(--size-profile-track-inset)) / var(--ls-count));
+  border-radius: var(--radius-round);
+  background: var(--color-card);
+  transform: translateX(calc(var(--ls-index) * 100%));
+  transition: transform var(--transition-profile-thumb) var(--ease-slide-snap);
+}
+
+:root[dir='rtl'] .language-switch-thumb {
+  transform: translateX(calc(var(--ls-index) * -100%));
+}
+
+.language-switch-stage .language-switch-option {
+  position: relative;
+  z-index: var(--z-raised);
+  min-width: calc(var(--touch-target-min) + var(--space-6));
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-on-primary);
+  transition:
+    color var(--transition-fast) var(--ease-standard),
+    transform var(--transition-press) var(--ease-press);
+}
+
+.language-switch-stage .language-switch-option:active:not(:disabled) {
+  background: transparent;
+  transform: scale(var(--press-scale));
+}
+
+.language-switch-stage .language-switch-option-active,
+.language-switch-stage .language-switch-option-active:active {
+  background: transparent;
+  color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .language-switch-thumb {
+    transition: none;
+  }
+}

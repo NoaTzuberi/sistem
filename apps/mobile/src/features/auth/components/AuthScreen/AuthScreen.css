@@ -1,54 +1,65 @@
-/* Login / sign-up: brand at the top, a glass card under it, the running track behind. The
-   layout is normal flow (not the prototype's fixed phone frame) so it scrolls on short screens
-   and above the keyboard. */
-.auth-screen {
-  --auth-control-height: 58px;
-  --auth-chip-size: 42px;
-  --auth-logo-width: 210px;
-  --auth-card-max-width: 440px;
+/* Signed-out screens: the running track (TrackBackground, unchanged) reaches every edge (under the notch
+   and the home bar), the content keeps to the safe area and scrolls in normal flow (short screens, the
+   keyboard). */
 
+/* iOS Safari paints its bars and the overscroll with the page background: the gradient's edge color. */
+html:has(.auth-screen),
+html:has(.auth-screen) body {
+  background-color: var(--color-auth-stage);
+}
+
+.auth-screen {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
   background: var(--gradient-brand);
-  padding:
-    var(--safe-top)
-    calc(var(--space-3) + var(--safe-right))
-    calc(var(--space-4) + var(--safe-bottom))
-    calc(var(--space-3) + var(--safe-left));
+  color: var(--color-on-primary);
 }
 
 .auth-screen-content {
   position: relative;
   z-index: var(--z-raised);
   display: flex;
+  flex: 1;
   flex-direction: column;
   width: 100%;
-  max-width: var(--auth-card-max-width);
+  max-width: calc(var(--size-auth-column) + 2 * var(--space-3));
   margin-inline: auto;
+  padding:
+    var(--safe-top)
+    calc(var(--space-3) + var(--safe-inline-end))
+    calc(var(--space-4) + var(--safe-bottom))
+    calc(var(--space-3) + var(--safe-inline-start));
 }
 
-/* Tall phones get the prototype's spacing; short ones (iPhone SE) pull everything up. */
+/* The banner already sits under the notch. */
+.auth-screen-has-banner .auth-screen-content {
+  padding-block-start: 0;
+}
+
+/* Tall phones get air above the card; short ones (iPhone SE) pull everything up. */
 .auth-screen-brand {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  padding-block: clamp(var(--space-4), 8dvh, var(--space-7)) clamp(var(--space-6), 12dvh, calc(var(--space-8) + var(--space-4)));
-  color: var(--color-on-primary);
+  padding-block: clamp(var(--space-4), 7dvh, var(--space-7)) clamp(var(--space-4), 5dvh, var(--space-6));
   text-align: center;
 }
 
 .auth-screen .auth-screen-logo {
-  width: var(--auth-logo-width);
+  width: var(--size-auth-logo);
   height: auto;
 }
 
 .auth-screen-tagline {
   margin: 0;
   color: var(--color-on-primary);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: var(--font-weight-medium);
 }
 
@@ -58,21 +69,19 @@
   gap: var(--space-3);
 }
 
-.auth-glass-card {
+/* THE card: solid white, no border, no blur. */
+.auth-panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: var(--border-width-thin) solid var(--glass-border);
-  border-radius: var(--radius-glass);
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: var(--shadow-glass);
-  color: var(--color-text);
+  padding: var(--space-auth-card);
+  border-radius: var(--radius-auth-card);
+  background: var(--color-auth-card);
+  box-shadow: var(--shadow-auth-card);
+  color: var(--color-ink);
 }
 
-.auth-glass-head {
+.auth-panel-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -80,47 +89,60 @@
   gap: var(--space-2);
 }
 
-.auth-glass-title {
+.auth-panel-title {
   margin: 0;
-  font-size: var(--text-display-xl);
+  color: var(--color-ink);
+  font-size: var(--text-auth-title);
 }
 
-.auth-glass-switch {
+/* Links inside the card are pink (Cherry: 4.5:1 on white at this size). */
+.auth-panel-switch,
+.auth-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-target-min);
-  padding-inline: var(--space-3);
-  border: var(--border-width-thin) solid var(--glass-outline);
-  border-radius: var(--radius-round);
-  color: var(--color-text);
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-semibold);
+  padding-inline: var(--space-1);
+  color: var(--color-primary-deep);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
-  transition: background-color var(--transition-fast) var(--ease-standard);
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.auth-glass-switch:active {
-  background: var(--glass-bg-strong);
+.auth-panel-switch:active,
+.auth-link:active {
+  transform: scale(var(--press-scale));
 }
 
-@media (hover: hover) {
-  .auth-glass-switch:hover {
-    background: var(--glass-bg-strong);
+@media (hover: hover) and (pointer: fine) {
+  .auth-panel-switch:hover,
+  .auth-link:hover {
+    text-decoration: underline;
   }
 }
 
-/* The form inside the card (Login / Register). */
-.auth-glass-form {
+.auth-link-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* The form inside the card. */
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.auth-glass-error {
+.auth-form-text {
   margin: 0;
-  padding-inline: var(--space-3);
-  font-size: var(--text-sm);
+  color: var(--color-auth-ink-2);
+  font-size: var(--text-base);
+}
+
+.auth-form-error {
+  margin: 0;
   color: var(--color-error);
+  font-size: var(--text-sm);
 }
 
 .auth-screen-language {
@@ -128,14 +150,11 @@
   justify-content: center;
 }
 
-/* The shared switch, rounded to sit with the pills on this screen. */
-.auth-screen-language .language-switch {
-  overflow: hidden;
-  border-color: var(--glass-border);
-  border-radius: var(--radius-round);
+/* On the pink stage the default pink focus ring disappears; inside the card it stays pink. */
+.auth-screen :focus-visible {
+  outline-color: var(--color-on-primary);
 }
 
-/* On the pink background the default pink focus ring disappears. */
-.auth-screen :focus-visible {
-  outline-color: var(--color-text);
+.auth-panel :focus-visible {
+  outline-color: var(--color-primary);
 }

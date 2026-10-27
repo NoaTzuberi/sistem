@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PageLayout } from '../../../../components/layout/PageLayout/PageLayout';
-import { Container } from '../../../../components/layout/Container/Container';
-import { Section } from '../../../../components/layout/Section/Section';
-import { Input } from '../../../../components/common/Input/Input';
-import { Button } from '../../../../components/common/Button/Button';
-import { AuthCard } from '../../components/AuthCard/AuthCard';
+import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
+import { AuthField } from '../../components/AuthField/AuthField';
+import { AuthButton } from '../../components/AuthButton/AuthButton';
 import { requestPasswordReset } from '../../../../services/auth/authService';
 import { authErrorText, validateEmail, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
 import { ROUTES } from '../../../../app/config/routes';
-import './ForgotPassword.css';
 
 export function ForgotPassword() {
   const location = useLocation();
@@ -44,41 +40,39 @@ export function ForgotPassword() {
   }
 
   return (
-    <PageLayout>
-      <Section className="auth-page">
-        <Container>
-          <AuthCard title={copy.forgotTitle}>
-            {successMessage ? (
-              <p className="forgot-password-success">{successMessage}</p>
-            ) : (
-              <form className="auth-form" onSubmit={handleSubmit} noValidate>
-                <p className="text-body forgot-password-copy">{copy.forgotIntro}</p>
-                <Input
-                  type="email"
-                  label={copy.email}
-                  inputMode="email"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  enterKeyHint="send"
-                  placeholder={copy.emailPlaceholder}
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  error={authErrorText(copy, emailError)}
-                  autoComplete="email"
-                />
-                {formError && <p className="auth-form-error">{formError}</p>}
-                <Button type="submit" variant="primary" loading={isSubmitting}>
-                  {copy.sendResetLink}
-                </Button>
-              </form>
-            )}
-            <p className="auth-switch">
-              <Link to={ROUTES.LOGIN}>{copy.backToLogin}</Link>
-            </p>
-          </AuthCard>
-        </Container>
-      </Section>
-    </PageLayout>
+    <AuthScreen title={copy.forgotTitle}>
+      {successMessage ? (
+        <p className="auth-form-text" role="status">
+          {successMessage}
+        </p>
+      ) : (
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <p className="auth-form-text">{copy.forgotIntro}</p>
+          <AuthField
+            type="email"
+            label={copy.email}
+            inputMode="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="send"
+            placeholder={copy.emailPlaceholder}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            error={authErrorText(copy, emailError)}
+            autoComplete="email"
+          />
+          {formError && <p className="auth-form-error">{formError}</p>}
+          <AuthButton type="submit" loading={isSubmitting}>
+            {copy.sendResetLink}
+          </AuthButton>
+        </form>
+      )}
+      <div className="auth-link-row">
+        <Link className="auth-link" to={ROUTES.LOGIN}>
+          {copy.backToLogin}
+        </Link>
+      </div>
+    </AuthScreen>
   );
 }

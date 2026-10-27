@@ -1,22 +1,27 @@
 import type { ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
+import { IconLinkOff } from '@tabler/icons-react';
 import { fill, useCopy } from '@sistem/shared';
-import { Button } from '../../../../components/common/Button/Button';
 import { Spinner } from '../../../../components/common/Spinner/Spinner';
 import { AuthScreen } from '../../../auth/components/AuthScreen/AuthScreen';
+import { AuthButton } from '../../../auth/components/AuthButton/AuthButton';
+import { JoinCoachBlock } from '../../components/JoinCoachBlock/JoinCoachBlock';
+import { JoinSteps } from '../../components/JoinSteps/JoinSteps';
 import { joinCopy } from '../../copy';
+import { firstNameOf } from '../../data/joinDisplay';
 import { useJoinInvite } from '../../hooks/useJoinInvite';
 import type { JoinView } from '../../hooks/useJoinInvite';
 import './JoinPage.css';
 
+type Join = ReturnType<typeof useJoinInvite>;
+
 /** A coach's link: who invites her, and the one thing she can do next (every rule decided by the server). */
 export function JoinPage() {
   const { code = '' } = useParams();
-  const copy = useCopy(joinCopy);
   const join = useJoinInvite(code);
 
   return (
-    <AuthScreen title={copy.title}>
+    <AuthScreen>
       <div className="join-body" aria-live="polite">
         <JoinContent view={join.view} join={join} />
       </div>
@@ -24,43 +29,54 @@ export function JoinPage() {
   );
 }
 
-function JoinContent({ view, join }: { view: JoinView; join: ReturnType<typeof useJoinInvite> }) {
+function JoinContent({ view, join }: { view: JoinView; join: Join }) {
   const copy = useCopy(joinCopy);
-  const continueButton = (
-    <Button variant="secondary" onClick={join.goOn}>
-      {copy.continue}
-    </Button>
-  );
+  const continueButton = <AuthButton onClick={join.goOn}>{copy.continue}</AuthButton>;
 
   switch (view.kind) {
     case 'loading':
-      return <Spinner />;
+      return (
+        <div className="join-loading">
+          <Spinner />
+        </div>
+      );
     case 'problem':
       return (
         <>
-          <p className="join-lead">{copy.problems[view.problem]}</p>
+          <span className="join-icon-tile" aria-hidden="true">
+            <IconLinkOff size={26} stroke={2} />
+          </span>
+          <h1 className="join-title display-title">{copy.invalidTitle}</h1>
+          {view.problem !== 'invalid' && <p className="join-text">{copy.problems[view.problem]}</p>}
           <p className="join-text">{copy.problemHint}</p>
-          {continueButton}
+          <div className="join-actions">
+            {join.isSignedIn ? continueButton : <AuthButton onClick={join.signUpWithoutCoach}>{copy.signUpWithoutCoach}</AuthButton>}
+            {join.canEnterCode && (
+              <AuthButton variant="soft" onClick={join.enterCode}>
+                {copy.haveCode}
+              </AuthButton>
+            )}
+          </div>
         </>
       );
     case 'refused':
       return (
         <>
-          <p className="join-lead">{view.message}</p>
+          <h1 className="join-title display-title">{view.message}</h1>
           {continueButton}
         </>
       );
     case 'failed':
       return (
         <>
-          <p className="join-lead">{copy.failed}</p>
-          <Button onClick={join.retry}>{copy.retry}</Button>
+          <h1 className="join-title display-title">{copy.failed}</h1>
+          <AuthButton onClick={join.retry}>{copy.retry}</AuthButton>
         </>
       );
     case 'community_joined':
       return (
         <>
-          <p className="join-lead">{fill(copy.communityJoined, { community: view.preview.communityName ?? '' })}</p>
+          <h1 className="join-title display-title">{fill(copy.communityJoined, { community: view.preview.communityName ?? '' })}</h1>
           {continueButton}
         </>
       );
@@ -69,50 +85,57 @@ function JoinContent({ view, join }: { view: JoinView; join: ReturnType<typeof u
   }
 
   const { preview } = view;
-  const coach = <bdi>{preview.coachName}</bdi>;
   switch (preview.action) {
     case 'sign_up':
       return (
         <>
-          <p className="join-lead">{renderWithName(copy.invitedBy, '{coach}', coach)}</p>
-          <p className="join-text">{copy.invitedHint}</p>
-          <Button onClick={join.signUp}>{copy.signUp}</Button>
-          <Button variant="ghost" onClick={join.logIn}>
-            {copy.haveAccount}
-          </Button>
+          <JoinCoachBlock name={preview.coachName} avatar={preview.coachAvatar} line={copy.invitesYou} />
+          <p className="join-text">{renderWithName(copy.invitedHint, '{coach}', <bdi>{firstNameOf(preview.coachName)}</bdi>)}</p>
+          <JoinSteps />
+          <div className="join-actions">
+            <AuthButton onClick={join.signUp}>{copy.signUp}</AuthButton>
+            <AuthButton variant="soft" onClick={join.logIn}>
+              {copy.haveAccount}
+            </AuthButton>
+          </div>
         </>
       );
     case 'join':
       return (
         <>
-          <p className="join-lead">{renderWithName(copy.confirmJoin, '{coach}', coach)}</p>
+          <JoinCoachBlock name={preview.coachName} avatar={preview.coachAvatar} line={copy.invitesYou} />
+          <h2 className="join-question">{renderWithName(copy.confirmJoin, '{coach}', <bdi>{firstNameOf(preview.coachName)}</bdi>)}</h2>
           <p className="join-text">{copy.confirmJoinText}</p>
-          <Button loading={join.isJoining} onClick={join.join}>
+          <AuthButton loading={join.isJoining} onClick={join.join}>
             {copy.join}
-          </Button>
+          </AuthButton>
         </>
       );
     case 'join_community':
       return (
         <>
-          <p className="join-lead">{renderWithName(copy.communityTitle, '{community}', <bdi>{preview.communityName}</bdi>)}</p>
+          <h1 className="join-title display-title">
+            {renderWithName(copy.communityTitle, '{community}', <bdi>{preview.communityName}</bdi>)}
+          </h1>
           <p className="join-text">{copy.communityText}</p>
-          <Button loading={join.isJoining} onClick={join.join}>
+          <AuthButton loading={join.isJoining} onClick={join.join}>
             {copy.join}
-          </Button>
+          </AuthButton>
         </>
       );
     case 'already_hers':
       return (
         <>
-          <p className="join-lead">{renderWithName(copy.alreadyHers, '{coach}', coach)}</p>
+          <h1 className="join-title display-title">{renderWithName(copy.alreadyHers, '{coach}', <bdi>{preview.coachName}</bdi>)}</h1>
           {continueButton}
         </>
       );
     case 'other_coach':
       return (
         <>
-          <p className="join-lead">{renderWithName(copy.otherCoach, '{coach}', <bdi>{preview.otherCoachName}</bdi>)}</p>
+          <h1 className="join-title display-title">
+            {renderWithName(copy.otherCoach, '{coach}', <bdi>{preview.otherCoachName}</bdi>)}
+          </h1>
           <p className="join-text">{copy.otherCoachText}</p>
           {continueButton}
         </>
@@ -120,7 +143,7 @@ function JoinContent({ view, join }: { view: JoinView; join: ReturnType<typeof u
     case 'not_trainee':
       return (
         <>
-          <p className="join-lead">{copy.notTrainee}</p>
+          <h1 className="join-title display-title">{copy.notTrainee}</h1>
           {continueButton}
         </>
       );

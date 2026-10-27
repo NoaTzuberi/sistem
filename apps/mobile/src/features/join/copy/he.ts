@@ -1,9 +1,9 @@
 // /join, "no coach yet" and the admin-only screen. PLACEHOLDER drafts for the owner, except the lines
 // marked "owner" (the task's wording). Feminine to the trainee; buttons are verbs.
 export const he = {
-  title: 'הצטרפות',
-  invitedBy: '{coach} מזמינה אותך להתאמן איתה ב-Sistem.',
-  invitedHint: 'אחרי ההרשמה ממלאים שאלון קצר, והמאמנת בונה לך תוכנית.',
+  invitesYou: 'מזמינה אותך להתאמן איתה ב-Sistem', // owner
+  invitedHint: 'אחרי ההרשמה ממלאות שאלון קצר, ו{coach} בונה לך תוכנית אישית', // owner
+  steps: { signUp: 'הרשמה', questionnaire: 'שאלון', plan: 'תוכנית ממנה' }, // owner
   signUp: 'הרשמה',
   haveAccount: 'יש לי כבר חשבון',
   confirmJoin: 'להצטרף לליווי של {coach}?', // owner
@@ -23,7 +23,10 @@ export const he = {
     revoked: 'הקישור כבר לא פעיל',
     used_up: 'כבר השתמשו בקישור הזה',
   },
-  problemHint: 'אפשר לבקש מהמאמנת קישור חדש.',
+  invalidTitle: 'הקישור לא תקף', // owner
+  problemHint: 'בקשי מהמאמנת קישור חדש', // owner
+  signUpWithoutCoach: 'הרשמה בלי מאמנת', // owner
+  haveCode: 'יש לי קוד', // owner
   continue: 'המשך',
   failed: 'משהו השתבש. אפשר לנסות שוב.',
   retry: 'ניסיון נוסף',

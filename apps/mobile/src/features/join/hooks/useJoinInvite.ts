@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { InviteProblem, JoinPreview } from '@sistem/types';
-import { ROUTES } from '../../../app/config/routes';
+import { ROUTES, coachCodePath } from '../../../app/config/routes';
 import { landingPath } from '../../../app/router/landingPath';
 import { useAuth } from '../../../services/auth/AuthContext';
 import { JoinRequestError, acceptJoin, previewJoin } from '../../../services/invites/joinService';
-import { setPendingInvite } from '../../../services/invites/pendingInvite';
+import { clearPendingInvite, setPendingInvite } from '../../../services/invites/pendingInvite';
 
 export type JoinView =
   | { kind: 'loading' }
@@ -79,8 +79,27 @@ export function useJoinInvite(code: string) {
     navigate(route);
   }
 
+  /** A dead link: on without this code (signed out: the sign-up, no coach attached). */
+  function signUpWithoutCoach() {
+    clearPendingInvite();
+    navigate(ROUTES.REGISTER);
+  }
+
+  /** "I have a code": the coach-code screen. It needs an account, so signed out she signs up first
+      (the first-run screen after the sign-up offers the code). Coach / admin accounts never get here. */
+  function enterCode() {
+    if (!user) return signUpWithoutCoach();
+    navigate(coachCodePath(user.appState === 'choose_path' ? 'firstRun' : 'later'));
+  }
+
+  const canEnterCode = !user || !['coach', 'admin'].includes(user.appState);
+
   return {
     view,
+    isSignedIn: Boolean(user),
+    canEnterCode,
+    signUpWithoutCoach,
+    enterCode,
     isJoining,
     join,
     goOn,

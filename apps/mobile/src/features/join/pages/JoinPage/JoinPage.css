@@ -1,16 +1,50 @@
 .join-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  text-align: center;
 }
 
-.join-lead {
+.join-loading {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-5);
+}
+
+.join-title {
   margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+  font-size: var(--text-auth-name);
 }
 
 .join-text {
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--color-auth-ink-2);
+  font-size: var(--text-base);
+}
+
+/* The dead-link tile: soft pink, Cherry icon. */
+.join-icon-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: var(--size-auth-icon-tile);
+  height: var(--size-auth-icon-tile);
+  border-radius: var(--radius-fr-icon-tile);
+  background: var(--tint-pink);
+  color: var(--ink-pink);
+}
+
+.join-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.join-question {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
 }
