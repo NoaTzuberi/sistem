@@ -16,17 +16,18 @@
   flex: 1;
   height: 5px;
   border-radius: 3px;
-  background-color: var(--color-fill-soft);
+  background-color: var(--surface-on-stage);
   transition: background-color var(--transition-base) ease;
 }
 
+/* On the pink stage: faint white bars, the current exercise a step brighter, done = solid white. */
 .wp-progress-group-current .wp-progress-set {
-  background-color: var(--color-fill-soft-hover);
+  background-color: var(--color-stage-rule);
 }
 
 .wp-progress-set-done,
 .wp-progress-group-current .wp-progress-set-done {
-  background-color: var(--color-ink);
+  background-color: var(--color-on-stage);
 }
 
 @media (prefers-reduced-motion: reduce) {

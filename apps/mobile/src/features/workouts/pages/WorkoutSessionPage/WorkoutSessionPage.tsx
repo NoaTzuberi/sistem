@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { BottomSheet } from '../../../../components/common/BottomSheet/BottomSheet';
 import { Button } from '../../../../components/common/Button/Button';
+import { StageBackground } from '../../../../components/common/StageBackground/StageBackground';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useWakeLock } from '../../../../hooks/useWakeLock';
@@ -256,6 +257,7 @@ export function WorkoutSessionPage() {
 
   return (
     <AppShell hideTabBar bleed>
+      <StageBackground />
       <div className="wp">
         <h1 className="wp-visually-hidden">{session.log.workoutTitle}</h1>
         <PlayerHeader

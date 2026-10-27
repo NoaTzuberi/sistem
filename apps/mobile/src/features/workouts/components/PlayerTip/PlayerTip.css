@@ -5,7 +5,8 @@
   margin-top: 12px;
   padding: 12px 14px;
   border-radius: var(--radius-tile);
-  background-color: var(--color-fill-soft);
+  /* White on the pink stage. */
+  background-color: var(--color-card);
 }
 
 .wp-tip-icon {

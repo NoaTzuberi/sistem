@@ -9,7 +9,7 @@
   margin-bottom: 6px;
   font-size: 13px;
   font-weight: var(--font-weight-semibold);
-  color: var(--color-ink-raised);
+  color: var(--color-on-stage);
 }
 
 .wp-queue-row {
@@ -20,7 +20,7 @@
   width: 100%;
   min-height: 52px;
   padding: 10px 0;
-  border-bottom: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-stage-rule);
   text-align: start;
   transition: transform var(--transition-press) var(--ease-press);
 }
@@ -37,17 +37,17 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-round);
-  background-color: var(--color-fill-soft);
+  background-color: var(--surface-on-stage);
   font-family: var(--font-num);
   font-size: 15px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-muted);
+  color: var(--color-on-stage);
 }
 
-/* White number on the pink circle: solid pink keeps it readable at 15px. */
+/* On the pink stage the current one is the white circle with a Cherry number. */
 .wp-queue-row-current .wp-queue-index {
-  background-color: var(--solid-pink);
-  color: var(--on-pink);
+  background-color: var(--color-on-stage);
+  color: var(--color-primary-deep);
 }
 
 .wp-queue-row-done .wp-queue-index {
@@ -66,7 +66,7 @@
   text-align: match-parent;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--color-ink);
+  color: var(--color-on-stage);
   transition: color var(--transition-fast) ease;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .wp-queue-row-done .wp-queue-name {
-  color: var(--color-text-muted);
+  color: var(--color-on-stage-muted);
 }
 
 .wp-queue-pips {
@@ -92,20 +92,16 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-round);
-  background-color: var(--color-hairline);
+  background-color: var(--color-stage-rule);
 }
 
 .wp-queue-pips .wp-queue-pip-done {
-  background-color: var(--color-primary-deep);
-}
-
-.wp-queue-row-current .wp-queue-pip-done {
-  background-color: var(--color-primary);
+  background-color: var(--color-on-stage);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .wp-queue-row:hover .wp-queue-name {
-    color: var(--color-primary-deep);
+    color: var(--color-on-stage-muted);
   }
 }
 

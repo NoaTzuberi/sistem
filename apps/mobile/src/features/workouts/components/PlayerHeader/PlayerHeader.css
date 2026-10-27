@@ -1,4 +1,4 @@
-/* Sticky white blur over the scrolling exercise. */
+/* Sticky pink frost over the scrolling exercise (the player sits on the pink stage). */
 .wp-header {
   position: sticky;
   top: 0;
@@ -8,7 +8,7 @@
     calc(var(--home-gutter) + var(--safe-inline-end))
     10px
     calc(var(--home-gutter) + var(--safe-inline-start));
-  background-color: var(--surface-header-frost);
+  background-color: var(--surface-stage-full-frost);
   -webkit-backdrop-filter: var(--blur-header);
   backdrop-filter: var(--blur-header);
 }
@@ -27,8 +27,8 @@
   width: var(--touch-target-min);
   height: var(--touch-target-min);
   border-radius: var(--radius-round);
-  background-color: var(--color-fill-soft);
-  color: var(--color-ink);
+  background-color: var(--surface-on-stage);
+  color: var(--color-on-stage);
   transition:
     transform var(--transition-press) var(--ease-press),
     background-color var(--transition-fast) ease,
@@ -41,12 +41,12 @@
 
 /* The shared toggle in the player's round look (two classes: wins over its own CSS in any load order). */
 .wp-sound.sound-toggle {
-  background-color: var(--color-fill-soft);
-  color: var(--color-ink);
+  background-color: var(--surface-on-stage);
+  color: var(--color-on-stage);
 }
 
 .wp-sound.sound-toggle:active {
-  background-color: var(--color-fill-soft-hover);
+  background-color: var(--surface-on-stage-hover);
 }
 
 .wp-sound.sound-toggle svg {
@@ -56,7 +56,7 @@
 
 /* Muted: the speaker steps back. */
 .wp-sound.sound-toggle[aria-pressed='true'] {
-  color: var(--color-text-muted);
+  color: var(--color-on-stage-muted);
 }
 
 .wp-header-title {
@@ -74,7 +74,7 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--color-text-faint);
+  color: var(--color-on-stage-muted);
 }
 
 .wp-header-clock {
@@ -85,7 +85,7 @@
   font-style: italic;
   font-weight: var(--font-weight-extrabold);
   line-height: 1;
-  color: var(--color-ink);
+  color: var(--color-on-stage);
 }
 
 .wp-header-spacer {
@@ -97,19 +97,19 @@
   justify-content: space-between;
   margin-top: 6px;
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-on-stage-muted);
 }
 
 .wp-header-counts b {
   font-family: var(--font-num);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
-  color: var(--color-ink);
+  color: var(--color-on-stage);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .wp-icon-button:hover {
-    background-color: var(--color-fill-soft-hover);
+    background-color: var(--surface-on-stage-hover);
   }
 }
 

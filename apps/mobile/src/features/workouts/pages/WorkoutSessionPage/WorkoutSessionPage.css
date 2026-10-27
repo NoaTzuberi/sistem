@@ -1,8 +1,10 @@
-/* The player: white, full bleed; room at the bottom for the pinned Finish over its fade. */
+/* The player: on the full-screen pink stage (StageBackground); room at the bottom for the pinned
+   Finish over its fade. Text on the stage is white; the exercise sits on a white card. */
 .wp {
+  --eyebrow-color: var(--color-on-stage-muted);
   min-height: 100dvh;
   padding-bottom: calc(140px + var(--safe-bottom));
-  background-color: var(--color-card);
+  color: var(--color-on-stage);
 }
 
 .wp-body {
@@ -28,22 +30,24 @@
 .wp-error {
   margin-top: 12px;
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--color-on-stage-muted);
 }
 
+/* The error red has no contrast on the pink: bold white, announced by role="alert". */
 .wp-error {
-  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-stage);
 }
 
 .wp-notes {
   margin-top: 12px;
   font-size: var(--text-sm);
   line-height: 1.45;
-  color: var(--color-ink-raised);
+  color: var(--color-on-stage);
   white-space: pre-line;
 }
 
-/* Pinned ink Finish over a white fade, inside the app column. */
+/* Pinned ink Finish over a fade of the stage's bottom pink, inside the app column. */
 .wp-footer {
   position: fixed;
   inset-block-end: 0;
@@ -57,7 +61,7 @@
     calc(var(--home-gutter) + var(--safe-inline-end))
     calc(26px + var(--safe-bottom))
     calc(var(--home-gutter) + var(--safe-inline-start));
-  background: linear-gradient(to top, var(--color-card) 45%, color-mix(in srgb, var(--color-card) 0%, transparent));
+  background: linear-gradient(to top, var(--color-stage-full-bottom) 45%, color-mix(in srgb, var(--color-stage-full-bottom) 0%, transparent));
   pointer-events: none;
 }
 
@@ -175,6 +179,7 @@
   padding: var(--space-4) var(--space-3);
   border-radius: var(--radius-fr-panel);
   background-color: var(--color-card);
+  color: var(--color-ink);
   text-align: center;
 }
 

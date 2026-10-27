@@ -1,0 +1,33 @@
+/* iOS Safari paints its bars, the area under its floating toolbar and the overscroll with the page
+   background: the stage's bottom pink. data-surface is set by StageBackground, removed on leave. */
+html[data-surface='stage'],
+html[data-surface='stage'] body {
+  background-color: var(--color-stage-full-bottom);
+}
+
+/* The screen's own shell ground would cover the layer. */
+html[data-surface='stage'] .app-shell {
+  background-color: transparent;
+}
+
+/* Full-bleed: top + sides at 0, the LARGE viewport height so it also fills the area under iOS
+   Safari's floating toolbar (inset 0 alone stops at the small viewport and leaves a band). Behind all content. */
+.stage-background {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: calc(var(--z-base) - 1);
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  background: var(--surface-profile-stage);
+  pointer-events: none;
+}
+
+.stage-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--opacity-profile-grain);
+  mix-blend-mode: multiply;
+  background-image: var(--texture-profile-grain);
+}

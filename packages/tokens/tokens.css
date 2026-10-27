@@ -1110,6 +1110,10 @@
   --texture-profile-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.35 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --opacity-profile-grain: 0.25;
   --surface-profile-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  /* The same stage as a whole screen's background (StageBackground — the workout player). */
+  --color-stage-full-top: var(--color-profile-stage-from);     /* theme-color */
+  --color-stage-full-bottom: var(--color-profile-stage-to);    /* html / body: iOS Safari's bars + overscroll */
+  --surface-stage-full-frost: color-mix(in srgb, var(--color-profile-stage-from) 80%, transparent); /* a sticky bar over it */
   --shadow-profile-card: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent), 0 18px 40px color-mix(in srgb, var(--color-stat-purple) 10%, transparent);
   --shadow-profile-edit: 0 10px 22px color-mix(in srgb, var(--color-primary) 30%, transparent);
   /* The crop square: ink, the outside of the circle dimmed, a white ring. */
@@ -1317,6 +1321,31 @@
   --color-coach-type-photo: var(--color-primary-deep);
   --color-coach-type-measurements: #c23bc0;
   --color-coach-type-joined: var(--color-primary);
+  /* Coach mode Phase B: reactions, messages, the invite / quick message / light edit sheets. */
+  --ease-coach-out: cubic-bezier(0.23, 1, 0.32, 1);          /* presses and small entrances */
+  --scale-coach-press: 0.97;
+  --scale-coach-reaction-press: 0.9;                         /* a reaction gives more, then springs back */
+  --size-coach-reaction: 32px;                               /* drawn height (44px hit area around it) */
+  --size-coach-reaction-min-width: 40px;
+  --text-coach-reaction: 15px;
+  --text-coach-sheet-title: 42px;                            /* "הזמנת מתאמנת" (Karantina) */
+  --size-coach-qr: 220px;
+  --radius-coach-qr: 26px;
+  --size-coach-link-row: 50px;                               /* the invite link row */
+  --size-coach-sheet-button: 52px;
+  --size-coach-template-chip: 32px;
+  --size-coach-day: 50px;                                    /* the 7-day picker */
+  --size-coach-option-icon: 36px;
+  --radius-coach-bubble: 20px;
+  --radius-coach-bubble-tail: 6px;
+  --size-coach-bubble-max: 80%;
+  --color-coach-bubble-mine: var(--color-ink);
+  --color-coach-bubble-mine-text: var(--color-on-ink);
+  --color-coach-bubble-theirs: var(--color-coach-card);
+  --size-coach-unread-dot: 10px;
+  --size-coach-composer-max: 140px;                          /* the message field grows up to this, then scrolls */
+  --size-coach-dock-badge: 16px;
+  --text-coach-dock-badge: 11px;
 }
 
 /* English: the Latin font pair; a display heading is Barlow Condensed italic 800, uppercase. */
@@ -1352,6 +1381,7 @@
   --text-coach-name-lg: 34px;
   --text-coach-name: 20px;
   --text-coach-tab: 16px;
+  --text-coach-sheet-title: 34px;
 }
 
 /* Right-to-left: the same shapes, mirrored (polygons have no logical form). */

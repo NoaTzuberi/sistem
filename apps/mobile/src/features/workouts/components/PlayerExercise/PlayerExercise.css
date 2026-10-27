@@ -1,5 +1,10 @@
+/* A white card on the pink stage: everything inside keeps its ink-on-white look. */
 .wp-exercise {
   margin-top: 18px;
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background-color: var(--color-card);
+  color: var(--color-ink);
 }
 
 .wp-exercise-tags {
