@@ -4,7 +4,8 @@ import type { To } from 'react-router-dom';
 import './PillButton.css';
 
 /** soft = white on the canvas · primary = Neon Pink · fill = grey, inside a white card · dark = charcoal (a sheet's "Done") · danger = quiet red. */
-export type PillButtonVariant = 'soft' | 'primary' | 'fill' | 'dark' | 'danger';
+/** danger = an error-red action · cherry = ending something the trainee feels (end coaching). */
+export type PillButtonVariant = 'soft' | 'primary' | 'fill' | 'dark' | 'danger' | 'cherry';
 
 interface PillButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: PillButtonVariant;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { WorkoutLog } from '@sistem/types';
 import { formatDateOnly, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { traineesCopy } from '../../copy';
@@ -16,14 +17,16 @@ interface WorkoutLogListProps {
   timezone: string;
   /** Her current week's Sunday (for "this week"). */
   currentWeekStart: string;
+  /** Another source of her logs (the read-only archive). */
+  load?: () => Promise<WorkoutLog[]>;
 }
 
 /** The Workout logs tab: four numbers, a filter, and her logs by day — one open at a time. */
-export function WorkoutLogList({ traineeId, timezone, currentWeekStart }: WorkoutLogListProps) {
+export function WorkoutLogList({ traineeId, timezone, currentWeekStart, load }: WorkoutLogListProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(traineesCopy);
-  const logs = useWorkoutLogs(traineeId, timezone, currentWeekStart);
+  const logs = useWorkoutLogs(traineeId, timezone, currentWeekStart, load);
   const [openId, setOpenId] = useState<string | null>(null);
 
   if (logs.isLoading && !logs.logs) return <Skeleton layout="panel" />;

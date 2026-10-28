@@ -12,6 +12,7 @@ import { OverviewPage } from '../../features/overview/pages/OverviewPage/Overvie
 import { StatsPage } from '../../features/stats/pages/StatsPage/StatsPage';
 import { TraineesPage } from '../../features/trainees/pages/TraineesPage/TraineesPage';
 import { TraineeDetailPage } from '../../features/trainees/pages/TraineeDetailPage/TraineeDetailPage';
+import { ArchivedTraineePage } from '../../features/trainees/pages/ArchivedTraineePage/ArchivedTraineePage';
 import { PlanBuilderPage } from '../../features/planBuilder/pages/PlanBuilderPage/PlanBuilderPage';
 import { NutritionBuilderPage } from '../../features/nutrition/pages/NutritionBuilderPage/NutritionBuilderPage';
 import { FoodLibraryPage } from '../../features/nutritionLibrary/pages/FoodLibraryPage/FoodLibraryPage';
@@ -34,6 +35,7 @@ export function AppRouter() {
           <Route path={ROUTES.STATS} element={<StatsPage />} />
           <Route path={ROUTES.TRAINEES} element={<TraineesPage />} />
           <Route path={ROUTES.TRAINEE} element={<TraineeDetailPage />} />
+          <Route path={ROUTES.ARCHIVED_TRAINEE} element={<ArchivedTraineePage />} />
           <Route path={ROUTES.PLAN} element={<PlanBuilderPage />} />
           <Route path={ROUTES.EXERCISES} element={<ExerciseLibraryPage />} />
           <Route path={ROUTES.SETTINGS} element={<CoachSettingsPage />} />

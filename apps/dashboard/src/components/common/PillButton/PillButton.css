@@ -66,6 +66,13 @@
   background-color: var(--color-error-soft);
 }
 
+.pill-button-cherry {
+  padding: 0 22px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary-deep);
+}
+
 .pill-button:disabled {
   opacity: var(--opacity-disabled);
   cursor: default;

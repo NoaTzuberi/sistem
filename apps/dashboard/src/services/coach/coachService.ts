@@ -3,6 +3,10 @@ import { apiClient } from '../api/apiClient';
 
 export const {
   listTrainees,
+  endCoaching,
+  listArchive,
+  getArchivedTrainee,
+  listArchivedWorkoutLogs,
   getCoachStats,
   getTrainee,
   listTraineeWorkoutLogs,

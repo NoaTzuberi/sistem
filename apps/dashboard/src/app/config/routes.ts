@@ -5,6 +5,8 @@ export const ROUTES = {
   STATS: '/stats',
   TRAINEES: '/trainees',
   TRAINEE: '/trainees/:traineeId',
+  /** A trainee whose coaching ended — read-only (the list's archive filter). */
+  ARCHIVED_TRAINEE: '/archive/:traineeId',
   PLAN: '/trainees/:traineeId/plans/:planId',
   // Nutrition (Phase 13a): the coach's food list, templates and numbers, and each
   // trainee's nutrition plan builder.
@@ -48,6 +50,10 @@ export const DUPLICATE_WEEK_STATE = { newPlan: true, duplicate: true } as const;
 export function traineePath(traineeId: string, tab?: TraineeTab): string {
   const path = `${ROUTES.TRAINEES}/${traineeId}`;
   return tab && tab !== DEFAULT_TRAINEE_TAB ? `${path}?${TRAINEE_TAB_PARAM}=${tab}` : path;
+}
+
+export function archivedTraineePath(traineeId: string): string {
+  return `/archive/${traineeId}`;
 }
 
 export function planPath(traineeId: string, planId: string): string {

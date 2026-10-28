@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getTrainee } from '../../../../services/coach/coachService';
-import { sharedCopy, useCopy, useLoad, useServerNow } from '@sistem/shared';
-import { ROUTES, planPath } from '../../../../app/config/routes';
+import { fill, sharedCopy, useCopy, useEndCoaching, useLoad, useServerNow } from '@sistem/shared';
+import { ROUTES, planPath, traineesPath } from '../../../../app/config/routes';
+import { ConfirmDialog } from '../../../../components/common/ConfirmDialog/ConfirmDialog';
+import { endCoaching } from '../../../../services/coach/coachService';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { useCoachData } from '../../../../services/coach/CoachDataContext';
 import { OnboardingAnswers } from '../../components/OnboardingAnswers/OnboardingAnswers';
@@ -35,7 +37,16 @@ export function TraineeDetailPage() {
   const nowMs = useServerNow(data?.serverTime);
   const trainee = data?.trainee;
   const plansLoad = useTraineePlans(traineeId);
-  const { weekOf } = useCoachData();
+  const { weekOf, reload: reloadCoachData } = useCoachData();
+  // ⋯ → "End coaching" → confirm → the archive filter, where she now is.
+  const ending = useEndCoaching(
+    useCallback(() => endCoaching(traineeId), [traineeId]),
+    useCallback(() => {
+      reloadCoachData();
+      navigate(traineesPath('archive'), { replace: true });
+    }, [reloadCoachData, navigate]),
+    shared.coach.endCoaching.error,
+  );
   // The header's pink pill asks the Plans tab for its week picker.
   const [wantsNewPlan, setWantsNewPlan] = useState(false);
   const handleNewPlanHandled = useCallback(() => setWantsNewPlan(false), []);
@@ -70,7 +81,7 @@ export function TraineeDetailPage() {
 
       {trainee && (
         <>
-          <TraineeHeader trainee={trainee} nowMs={nowMs} onBuildPlan={handleBuildPlan} />
+          <TraineeHeader trainee={trainee} nowMs={nowMs} onBuildPlan={handleBuildPlan} onEndCoaching={ending.ask} />
           <TraineeTabs selected={tab} counts={{ plans: plansLoad.plans?.length }} panelId={PANEL_ID} onSelect={selectTab} />
 
           <section
@@ -88,6 +99,18 @@ export function TraineeDetailPage() {
             {tab === 'metrics' && <BodyTracking traineeId={trainee.id} traineeName={trainee.name} timezone={trainee.timezone} />}
             {tab === 'achievements' && <TraineeAchievements traineeId={trainee.id} />}
           </section>
+          <ConfirmDialog
+            isOpen={ending.isConfirming}
+            title={fill(shared.coach.endCoaching.title, { name: trainee.name })}
+            text={fill(shared.coach.endCoaching.explanation, { name: trainee.name })}
+            confirmLabel={shared.coach.endCoaching.confirm}
+            cancelLabel={shared.coach.endCoaching.cancel}
+            confirmVariant="cherry"
+            busy={ending.isEnding}
+            error={ending.error}
+            onConfirm={() => void ending.confirm()}
+            onCancel={ending.cancel}
+          />
         </>
       )}
     </div>

@@ -24,8 +24,9 @@ const hasPr = (log: WorkoutLog) => (log.personalRecords?.length ?? 0) > 0;
  * Her workout logs (newest first, as the server sends them): the four summary numbers, the
  * filter counts, and the filtered logs grouped by her day.
  */
-export function useWorkoutLogs(traineeId: string, timezone: string, currentWeekStart: string) {
-  const load = useCallback(() => listTraineeWorkoutLogs(traineeId), [traineeId]);
+export function useWorkoutLogs(traineeId: string, timezone: string, currentWeekStart: string, loadLogs?: () => Promise<WorkoutLog[]>) {
+  // loadLogs = another source (the read-only archive); default = the live coaching's logs.
+  const load = useCallback(() => (loadLogs ? loadLogs() : listTraineeWorkoutLogs(traineeId)), [loadLogs, traineeId]);
   const { data, error, isLoading, reload } = useLoad(load, sharedCopy[getActiveLanguage()].coach.logsLoadError);
   const [filter, setFilter] = useState<LogFilter>('all');
 

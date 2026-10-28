@@ -50,6 +50,13 @@
   color: var(--color-text-muted);
 }
 
+.confirm-dialog-error {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+}
+
 .confirm-dialog-actions {
   display: flex;
   justify-content: flex-end;

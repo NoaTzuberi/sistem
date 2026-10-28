@@ -3,6 +3,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useDrawerTransition } from '../../../hooks/useDrawerTransition';
 import { PillButton } from '../PillButton/PillButton';
+import type { PillButtonVariant } from '../PillButton/PillButton';
 import './ConfirmDialog.css';
 
 // = --transition-drawer-out: the dialog leaves the page once its fade-out is over.
@@ -16,13 +17,19 @@ interface ConfirmDialogProps {
   cancelLabel: string;
   onConfirm: () => void;
   onCancel: () => void;
+  /** The confirm button's look (default primary pink). */
+  confirmVariant?: PillButtonVariant;
+  /** The action is running: both buttons wait. */
+  busy?: boolean;
+  /** A failed action's line, shown above the buttons. */
+  error?: string | null;
 }
 
 /**
  * A small centered question (instead of window.confirm): Esc and the scrim cancel, Tab stays on its
  * two buttons, the focus starts on Cancel (the safe answer) and goes back to what opened it.
  */
-export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, onConfirm, onCancel }: ConfirmDialogProps) {
+export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, onConfirm, onCancel, confirmVariant = 'primary', busy = false, error = null }: ConfirmDialogProps) {
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   const cardRef = useRef<HTMLDivElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -86,11 +93,16 @@ export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, 
         <p className="confirm-dialog-text" id={textId}>
           {text}
         </p>
+        {error && (
+          <p className="confirm-dialog-error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="confirm-dialog-actions">
-          <PillButton ref={cancelRef} variant="fill" onClick={onCancel}>
+          <PillButton ref={cancelRef} variant="fill" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </PillButton>
-          <PillButton variant="primary" onClick={onConfirm}>
+          <PillButton variant={confirmVariant} onClick={onConfirm} disabled={busy} aria-busy={busy || undefined}>
             {confirmLabel}
           </PillButton>
         </div>

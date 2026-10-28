@@ -1,6 +1,7 @@
 import type { CoachTraineeDetail } from '@sistem/types';
 import { fill, formatTimeLeft, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { ActionMenu } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Tag } from '../../../../components/common/Tag/Tag';
 import { useCoachData } from '../../../../services/coach/CoachDataContext';
 import { traineesCopy } from '../../copy';
@@ -16,6 +17,8 @@ interface TraineeHeaderProps {
   nowMs: number;
   /** The pink pill: build her plan (waiting) / plan next week (active). */
   onBuildPlan: () => void;
+  /** The ⋯ menu's "End coaching" (Cherry text) — opens the confirm dialog. */
+  onEndCoaching: () => void;
 }
 
 function initialsOf(name: string): string {
@@ -32,7 +35,7 @@ function initialsOf(name: string): string {
  * email and time zone), and on the side what the coach owes her now — the 48h window while she
  * waits for her first plan, this week's workouts once she is active — with the one action.
  */
-export function TraineeHeader({ trainee, nowMs, onBuildPlan }: TraineeHeaderProps) {
+export function TraineeHeader({ trainee, nowMs, onBuildPlan, onEndCoaching }: TraineeHeaderProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(traineesCopy);
@@ -93,9 +96,15 @@ export function TraineeHeader({ trainee, nowMs, onBuildPlan }: TraineeHeaderProp
             />
           )
         )}
-        <PillButton variant="primary" onClick={onBuildPlan}>
-          {isActive ? copy.nextWeek : copy.buildPlanShort}
-        </PillButton>
+        <div className="trainee-side-actions">
+          <PillButton variant="primary" onClick={onBuildPlan}>
+            {isActive ? copy.nextWeek : copy.buildPlanShort}
+          </PillButton>
+          <ActionMenu
+            label={shared.coach.endCoaching.moreActions}
+            items={[{ id: 'end-coaching', label: shared.coach.endCoaching.action, danger: true, onSelect: onEndCoaching }]}
+          />
+        </div>
       </div>
     </header>
   );

@@ -28,12 +28,16 @@ import { InviteSheet } from '../../../invites/components/InviteSheet/InviteSheet
 import { invitesCopy } from '../../../invites/copy';
 import { useCoachData } from '../../../../services/coach/CoachDataContext';
 import { WeekSquares } from '../../components/WeekSquares/WeekSquares';
+import { ArchiveTable } from '../../components/ArchiveTable/ArchiveTable';
+import { useCoachArchive } from '../../hooks/useCoachArchive';
 import { traineesCopy } from '../../copy';
 import { describeDaysPerWeek, statusTagTone } from '../../data/traineeFacts';
 import { useTraineeDrawer } from '../../hooks/useTraineeDrawer';
 import './TraineesPage.css';
 
 const NEEDS_NEXT_WEEK: TraineeFilter = 'needs_next_week';
+/** Ended coachings: their own read-only list (/coach/archive), never in the live counts. */
+const ARCHIVE = 'archive';
 
 /** The coach's trainees: status chips with counts, a search, and a table whose rows open the quick view. */
 export function TraineesPage() {
@@ -46,6 +50,7 @@ export function TraineesPage() {
   const [search, setSearch] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const invites = useCopy(invitesCopy);
+  const archive = useCoachArchive();
 
   // The filter lives in the URL: the sidebar's "waiting for a plan" is a link to it.
   const filters: { id: TraineeFilter; label: string }[] = [
@@ -54,13 +59,15 @@ export function TraineesPage() {
   ];
   const requested = searchParams.get(TRAINEE_FILTER_PARAM);
   const filter = filters.find((option) => option.id === requested)?.id ?? 'all';
+  const isArchive = requested === ARCHIVE;
 
-  function selectFilter(next: TraineeFilter) {
+  function selectFilter(next: TraineeFilter | typeof ARCHIVE) {
     setSearchParams(next === 'all' ? {} : { [TRAINEE_FILTER_PARAM]: next }, { replace: true });
   }
 
   const countFor = (id: TraineeFilter) => trainees.filter((trainee) => matchesFilter(trainee, id)).length;
   const visible = trainees.filter((trainee) => matchesFilter(trainee, filter) && matchesSearch(trainee, search));
+  const archived = (archive.data?.items ?? []).filter((trainee) => matchesSearch(trainee, search));
 
   return (
     <div className="trainees-page">
@@ -77,10 +84,13 @@ export function TraineesPage() {
       <div className="trainees-toolbar">
         <div className="trainees-filters" role="group" aria-label={shared.coach.filterLabel}>
           {filters.map(({ id, label }) => (
-            <button key={id} className="trainees-chip" type="button" aria-pressed={filter === id} onClick={() => selectFilter(id)}>
+            <button key={id} className="trainees-chip" type="button" aria-pressed={!isArchive && filter === id} onClick={() => selectFilter(id)}>
               {label} <span className="trainees-chip-count">{countFor(id)}</span>
             </button>
           ))}
+          <button className="trainees-chip" type="button" aria-pressed={isArchive} onClick={() => selectFilter(ARCHIVE)}>
+            {shared.coach.archive.filter} <span className="trainees-chip-count">{archive.data?.items.length ?? 0}</span>
+          </button>
         </div>
         <label className="trainees-search">
           <Icon name="search" size="sm" />
@@ -97,10 +107,22 @@ export function TraineesPage() {
         </label>
       </div>
 
-      {!hasTrainees && !hasTraineesError && <Skeleton layout="rows" />}
-      {hasTraineesError && !hasTrainees && <StateLine error={shared.coach.loadTraineesError} onRetry={reload} />}
+      {isArchive && !archive.data && !archive.error && <Skeleton layout="rows" />}
+      {isArchive && archive.error && !archive.data && <StateLine error={archive.error} onRetry={archive.reload} />}
+      {isArchive && archive.data && (
+        <div className="trainees-table-wrap">
+          {archived.length === 0 ? (
+            <p className="trainees-empty">{archive.data.items.length === 0 ? shared.coach.archive.empty : shared.coach.noMatch}</p>
+          ) : (
+            <ArchiveTable items={archived} nowMs={nowMs} />
+          )}
+        </div>
+      )}
 
-      {hasTrainees && (
+      {!isArchive && !hasTrainees && !hasTraineesError && <Skeleton layout="rows" />}
+      {!isArchive && hasTraineesError && !hasTrainees && <StateLine error={shared.coach.loadTraineesError} onRetry={reload} />}
+
+      {!isArchive && hasTrainees && (
         <div className="trainees-table-wrap">
           {visible.length === 0 ? (
             <p className="trainees-empty">{trainees.length === 0 ? shared.coach.noTrainees : shared.coach.noMatch}</p>
