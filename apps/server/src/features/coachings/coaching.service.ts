@@ -88,9 +88,10 @@ export async function markCoachingActive(coachingId: Id): Promise<void> {
   await Coaching.updateOne({ _id: coachingId, status: 'waiting' }, { $set: { status: 'active' } });
 }
 
-/** Ends a coaching; every record linked to it stays (history). */
-export async function endCoaching(coachingId: Id, now: Date = new Date()): Promise<void> {
-  await Coaching.updateOne({ _id: coachingId, live: true }, { $set: { status: 'ended', live: false, endedAt: now } });
+/** Ends a coaching; every record linked to it stays (history). False when it was not live any more. */
+export async function endCoaching(coachingId: Id, now: Date = new Date()): Promise<boolean> {
+  const result = await Coaching.updateOne({ _id: coachingId, live: true }, { $set: { status: 'ended', live: false, endedAt: now } });
+  return result.modifiedCount === 1;
 }
 
 /**

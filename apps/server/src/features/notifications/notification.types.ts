@@ -12,7 +12,9 @@ export type NotificationPayload =
   | { type: 'workout_completed'; data: { traineeId: string; traineeName: string; logId: string; workoutTitle: string } }
   | { type: 'nutrition_plan_published'; data: { planId: string; version: number; isUpdate: boolean } }
   // noteId = the plan id (plan notes) or the nutrition version id (its intro): one thanks per note.
-  | { type: 'coach_note_thanks'; data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string } };
+  | { type: 'coach_note_thanks'; data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string } }
+  // coachName is a snapshot taken when the coaching ended.
+  | { type: 'coaching_ended'; data: { coachingId: string; coachName: string } };
 
 export interface NotificationDocument {
   userId: Types.ObjectId;

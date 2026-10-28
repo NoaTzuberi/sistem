@@ -24,6 +24,9 @@ function dedupeKeyFor(payload: NotificationPayload): string {
     case 'coach_note_thanks':
       // Per note: a second tap (or another device) never thanks twice.
       return `coach_note_thanks:${payload.data.noteId}`;
+    case 'coaching_ended':
+      // Per coaching: a coaching ends once.
+      return `coaching_ended:${payload.data.coachingId}`;
   }
 }
 

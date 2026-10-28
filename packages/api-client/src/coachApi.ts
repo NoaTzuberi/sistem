@@ -15,11 +15,14 @@ import type {
   CoachStats,
   CoachTodayResponse,
   CoachActivityPage,
+  CoachArchiveList,
+  CoachArchivedTraineeResponse,
   CoachStatsRange,
   CoachTraineeList,
   CoachTraineeResponse,
   CreateNutritionTemplatePayload,
   CreatePlanPayload,
+  EndCoachingResponse,
   DeleteFoodItemResult,
   ExerciseFamilyDetail,
   ExerciseFamilySearchParams,
@@ -122,6 +125,28 @@ export function createCoachApi(client: AxiosInstance) {
   async function getTrainee(traineeId: string): Promise<CoachTraineeResponse> {
     const { data } = await client.get<CoachTraineeResponse>(`/coach/trainees/${traineeId}`);
     return data;
+  }
+
+  /** Ends the coaching: her account and history stay; this coach loses access (the server enforces it). */
+  async function endCoaching(traineeId: string): Promise<EndCoachingResponse> {
+    const { data } = await client.patch<EndCoachingResponse>(`/coach/trainees/${traineeId}/end-coaching`);
+    return data;
+  }
+
+  /** Ended coachings (the "archive" filter) — read-only, past data, no photos. */
+  async function listArchive(): Promise<CoachArchiveList> {
+    const { data } = await client.get<CoachArchiveList>('/coach/archive');
+    return data;
+  }
+
+  async function getArchivedTrainee(traineeId: string): Promise<CoachArchivedTraineeResponse> {
+    const { data } = await client.get<CoachArchivedTraineeResponse>(`/coach/archive/${traineeId}`);
+    return data;
+  }
+
+  async function listArchivedWorkoutLogs(traineeId: string): Promise<WorkoutLog[]> {
+    const { data } = await client.get<{ items: WorkoutLog[] }>(`/coach/archive/${traineeId}/workout-logs`);
+    return data.items;
   }
 
   async function listTraineeWorkoutLogs(traineeId: string): Promise<WorkoutLog[]> {
@@ -403,6 +428,10 @@ export function createCoachApi(client: AxiosInstance) {
 
   return {
     listTrainees,
+    endCoaching,
+    listArchive,
+    getArchivedTrainee,
+    listArchivedWorkoutLogs,
     getCoachStats,
     getCoachToday,
     getCoachActivity,

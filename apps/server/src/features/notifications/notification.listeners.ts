@@ -1,5 +1,6 @@
 import { appEvents } from '../../events/appEvents';
 import type {
+  CoachingEndedEvent,
   NutritionPlanPublishedEvent,
   PlanPublishedEvent,
   TraineeOnboardedEvent,
@@ -8,6 +9,7 @@ import type {
 import { User } from '../users/user.model';
 import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 import { Coaching } from '../coachings/coaching.model';
+import { getCoachName } from '../coachProfiles/coachProfile.service';
 import { notify } from './notification.service';
 
 // Turns domain events into notifications (PRD §9). The features that emit the
@@ -60,6 +62,14 @@ export async function onNutritionPlanPublished(event: NutritionPlanPublishedEven
   });
 }
 
+/** To the trainee — her Home shows "<coach> ended the coaching" until she dismisses it. */
+export async function onCoachingEnded(event: CoachingEndedEvent): Promise<void> {
+  await notify(event.traineeId, {
+    type: 'coaching_ended',
+    data: { coachingId: event.coachingId, coachName: await getCoachName(event.coachId) },
+  });
+}
+
 let registered = false;
 
 /** Called once when the app is created; calling it again does nothing. */
@@ -70,4 +80,5 @@ export function registerNotificationListeners(): void {
   appEvents.on('plan.published', onPlanPublished);
   appEvents.on('workout.completed', onWorkoutCompleted);
   appEvents.on('nutrition_plan.published', onNutritionPlanPublished);
+  appEvents.on('coaching.ended', onCoachingEnded);
 }

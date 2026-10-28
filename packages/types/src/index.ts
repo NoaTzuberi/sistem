@@ -1013,6 +1013,11 @@ export type CoachActivityItem = CoachActivityEvent & {
   /** When it happened (ISO). The feed is ordered by this, newest first. */
   at: string;
   trainee: CoachActivityTrainee;
+  /**
+   * Items she can react on (workouts, cardio, photos): what to send to PUT …/reactions and her
+   * current reaction (null = none). Absent on the others (measurements, joined).
+   */
+  reactionTarget?: { type: ReactionTargetType; id: string; reaction: ReactionId | null };
 };
 
 /** GET /coach/activity?before=<ISO>&limit=<n> — newest first; nextBefore is the next page's `before`. */
@@ -1046,6 +1051,39 @@ export interface AvatarLinkResponse {
 export interface CoachTraineeResponse {
   trainee: CoachTraineeDetail;
   serverTime: string;
+}
+
+/** PATCH /coach/trainees/:traineeId/end-coaching — her account and history stay; the coach loses access. */
+export interface EndCoachingResponse {
+  endedAt: string;
+}
+
+/**
+ * A trainee whose coaching with this coach ended (the "archive" filter). Read-only and limited to what
+ * the coach had before the end: no photos, nothing she logs afterwards. Coming back = a new invite.
+ */
+export interface CoachArchivedTrainee {
+  id: string;
+  name: string;
+  email: string;
+  timezone: string;
+  /** The ended coaching every record shown belongs to. */
+  coachingId: string;
+  coachingStartedAt: string;
+  coachingEndedAt: string;
+  /** Her newest completed workout of that coaching. */
+  lastCompletedAt: string | null;
+}
+
+/** GET /coach/archive — newest ending first. */
+export interface CoachArchiveList {
+  items: CoachArchivedTrainee[];
+  serverTime: string;
+}
+
+/** GET /coach/archive/:traineeId */
+export interface CoachArchivedTraineeResponse {
+  trainee: CoachArchivedTrainee & { onboarding: MyOnboarding | null };
 }
 
 // --- Coach statistics & overview (GET /coach/stats) — read-only aggregates over the coach's own
@@ -1187,7 +1225,8 @@ export type NotificationType =
   | 'plan_published'
   | 'workout_completed'
   | 'nutrition_plan_published'
-  | 'coach_note_thanks';
+  | 'coach_note_thanks'
+  | 'coaching_ended';
 
 /** A coach note the trainee can thank for on Home: this week's plan notes / her nutrition intro. */
 export type CoachNoteId = 'plan' | 'nutrition';
@@ -1223,7 +1262,9 @@ export type AppNotification =
   | (NotificationBase & {
       type: 'coach_note_thanks';
       data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string };
-    });
+    })
+  /** To the trainee: her coach ended the coaching. coachName is a snapshot from that moment. */
+  | (NotificationBase & { type: 'coaching_ended'; data: { coachingId: string; coachName: string } });
 
 /** GET /notifications — newest first. */
 export interface NotificationList {
@@ -2241,3 +2282,6 @@ export interface MarkTabSeenPayload {
 // Cardio sessions + logs.
 export * from './cardio';
 export * from './accounts';
+// Coach mode Phase B: reactions + messages.
+export * from './coachConnect';
+import type { ReactionId, ReactionTargetType } from './coachConnect';

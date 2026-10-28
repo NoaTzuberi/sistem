@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware';
-import { loadCoachTrainee } from '../../middleware/coachTrainee.middleware';
+import { loadCoachArchivedTrainee, loadCoachTrainee } from '../../middleware/coachTrainee.middleware';
 import {
   getTrainees,
   getStats,
@@ -68,6 +68,16 @@ import {
 // Every route needs role=coach; every :traineeId route also needs that trainee to
 // have a live coaching with her (loadCoachTrainee), and coach-owned data is read through that coaching only.
 import { getMyPayment, putMyPayment } from '../coachProfiles/coachProfile.controller';
+import { putTraineeReaction } from '../reactions/reaction.controller';
+import {
+  getCoachThreads,
+  getCoachUnread,
+  getTraineeMessages,
+  postTraineeMessage,
+  postTraineeMessagesRead,
+} from '../messages/message.controller';
+import { messageRateLimit } from '../../middleware/rateLimit.middleware';
+import { getArchive, getArchivedTraineeDetail, getArchivedTraineeWorkoutLogs, patchEndCoaching } from './coachArchive.controller';
 
 export const coachRouter = Router();
 
@@ -92,6 +102,14 @@ coachRouter.get('/stats', getStats);
 coachRouter.get('/today', getToday);
 coachRouter.get('/activity', getActivity);
 
+// Coach mode Phase B: messages (threads = her live coachings) and reactions on the feed.
+coachRouter.get('/messages', getCoachThreads);
+coachRouter.get('/messages/unread', getCoachUnread);
+coachRouter.get('/trainees/:traineeId/messages', loadCoachTrainee, getTraineeMessages);
+coachRouter.post('/trainees/:traineeId/messages', loadCoachTrainee, messageRateLimit, postTraineeMessage);
+coachRouter.post('/trainees/:traineeId/messages/read', loadCoachTrainee, postTraineeMessagesRead);
+coachRouter.put('/trainees/:traineeId/reactions', loadCoachTrainee, putTraineeReaction);
+
 // Invites: her permanent coaching link (+ QR in the dashboard), personal single-use links, and her
 // community-only link. Every query is scoped to the calling coach.
 // Temporary payment links shown to her trainees (Profile coach card).
@@ -104,6 +122,12 @@ coachRouter.get('/invites/community', getMyCommunityInvite);
 coachRouter.delete('/invites/:inviteId', deleteInvite);
 
 coachRouter.get('/trainees', getTrainees);
+// Ending a coaching (her account and history stay) and the read-only archive of ended coachings: only that
+// coaching's records from before the end, no photos (coachArchive.service).
+coachRouter.patch('/trainees/:traineeId/end-coaching', loadCoachTrainee, patchEndCoaching);
+coachRouter.get('/archive', getArchive);
+coachRouter.get('/archive/:traineeId', loadCoachArchivedTrainee, getArchivedTraineeDetail);
+coachRouter.get('/archive/:traineeId/workout-logs', loadCoachArchivedTrainee, getArchivedTraineeWorkoutLogs);
 coachRouter.get('/trainees/:traineeId', loadCoachTrainee, getTrainee);
 coachRouter.get('/trainees/:traineeId/workout-logs', loadCoachTrainee, getTraineeWorkoutLogs);
 coachRouter.get('/trainees/:traineeId/body-metrics', loadCoachTrainee, getTraineeBodyMetrics);

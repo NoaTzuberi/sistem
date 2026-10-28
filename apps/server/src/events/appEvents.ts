@@ -42,11 +42,20 @@ export interface NutritionPlanPublishedEvent {
   publishedAt: Date;
 }
 
+/** Emitted when a coach ends a coaching (coach/coachArchive.service). Her account and history stay. */
+export interface CoachingEndedEvent {
+  coachingId: string;
+  traineeId: string;
+  coachId: string;
+  endedAt: Date;
+}
+
 interface AppEventMap {
   'trainee.onboarded': [TraineeOnboardedEvent];
   'plan.published': [PlanPublishedEvent];
   'workout.completed': [WorkoutCompletedEvent];
   'nutrition_plan.published': [NutritionPlanPublishedEvent];
+  'coaching.ended': [CoachingEndedEvent];
 }
 
 export type AppEventName = keyof AppEventMap;

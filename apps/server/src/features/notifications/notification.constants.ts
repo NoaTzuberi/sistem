@@ -4,6 +4,7 @@ export const NOTIFICATION_TYPE_IDS = [
   'workout_completed',
   'nutrition_plan_published',
   'coach_note_thanks',
+  'coaching_ended',
 ] as const;
 
 /** The coach notes a trainee can thank for on Home: this week's plan notes, her nutrition intro. */
