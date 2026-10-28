@@ -1,0 +1,88 @@
+.cm-quick-to {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-2) + 2px);
+  margin-block-start: calc(var(--space-3) - 2px);
+  padding: calc(var(--space-2) + 2px) var(--space-3);
+  border-radius: var(--radius-coach-tile);
+  background-color: var(--color-coach-soft);
+}
+
+.cm-quick-name {
+  font-size: var(--text-coach-name);
+  line-height: 0.9;
+}
+
+.cm-quick-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space-1) + 2px);
+  margin-block-start: var(--space-3);
+}
+
+.cm-quick-template {
+  position: relative;
+  min-height: var(--size-coach-template-chip);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-blush);
+  color: var(--color-coach-cherry);
+  font: inherit;
+  font-size: var(--text-coach-caption);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), box-shadow var(--transition-fast) ease;
+  /* Drawn 32px tall; the margin keeps 44px of hit area. */
+  margin-block: calc((var(--size-coach-template-chip) - var(--touch-target-min)) / 2);
+}
+
+.cm-quick-template::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-coach-template-chip) - var(--touch-target-min)) / 2) 0;
+}
+
+.cm-quick-template[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 2px var(--color-coach-cherry);
+}
+
+.cm-quick-template:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.cm-quick-text {
+  display: block;
+  width: 100%;
+  min-height: var(--size-coach-quick-text);
+  margin-block-start: calc(var(--space-2) + 2px);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-coach-tile);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font: inherit;
+  /* 16px: no zoom on focus (iOS). */
+  font-size: var(--text-base);
+  line-height: 1.5;
+  resize: none;
+  outline: 0;
+  transition: background-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+}
+
+.cm-quick-text:focus-visible {
+  background-color: var(--color-coach-card);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.cm-quick-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-coach-label);
+  color: var(--color-error);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cm-quick-template:hover {
+    box-shadow: inset 0 0 0 1px var(--color-coach-cherry);
+  }
+}

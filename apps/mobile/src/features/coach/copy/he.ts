@@ -86,7 +86,7 @@ export const he = {
   list: {
     searchPlaceholder: 'חיפוש מתאמנת',
     filterLabel: 'סינון',
-    filters: { all: 'הכול', waiting: 'מחכות', active: 'פעילות', attention: 'תשומת לב' },
+    filters: { all: 'הכול', waiting: 'מחכות', active: 'פעילות', attention: 'תשומת לב', archive: 'ארכיון' },
     tags: { active: 'פעילה', waiting: 'מחכה', attention: 'תשומת לב' },
     weekLine: 'שבוע {week} · {done}/{planned} אימונים',
     planLine: '{done}/{planned} אימונים', // DRAFT: before her first coaching week starts
@@ -154,5 +154,81 @@ export const he = {
     modeTrainee: 'מצב מתאמנת',
     modeError: 'לא הצלחנו להחליף מצב. נסי שוב.', // DRAFT
     settings: 'הגדרות',
+  },
+  // ── Phase B (all PLACEHOLDER unless the spec has the line: spec lines are marked SPEC). ──
+  reactions: {
+    label: 'תגובה', // PLACEHOLDER (screen reader: the group)
+    names: { clap: 'מחיאות כפיים', fire: 'אש', heart: 'לב' }, // PLACEHOLDER (screen reader)
+    error: 'לא הצלחנו לשמור את התגובה. נסי שוב.', // PLACEHOLDER
+  },
+  messages: {
+    title: 'הודעות', // SPEC
+    message: 'הודעה', // SPEC
+    sendMessage: 'שליחת הודעה', // SPEC
+    empty: 'עוד אין הודעות. אפשר לכתוב למתאמנת מהמסך שלה או מהפיד.', // PLACEHOLDER
+    loadError: 'לא הצלחנו לטעון את ההודעות.', // PLACEHOLDER
+    unread: 'לא נקרא', // SPEC (screen reader)
+    youPrefix: 'את: {text}', // PLACEHOLDER
+    unreadBadge: plural({ one: 'הודעה אחת חדשה', two: '2 הודעות חדשות', other: '{count} הודעות חדשות' }), // PLACEHOLDER (screen reader)
+    quickTitle: 'הודעה', // SPEC
+    templatesLabel: 'הודעות מוכנות', // PLACEHOLDER (screen reader)
+    templates: ['כל הכבוד על האימון! 💪', 'מה שלומך? לא ראיתי אימון כמה ימים', 'שבוע חדש מוכן באפליקציה', 'זכרי לעדכן מדידות'], // SPEC, PLACEHOLDER for the owner
+    cancel: 'ביטול', // SPEC
+    send: 'שליחה', // SPEC
+    sent: 'ההודעה נשלחה', // SPEC
+    openThread: 'לכל השיחה', // PLACEHOLDER
+  },
+  invite: {
+    title: 'הזמנת מתאמנת', // SPEC
+    text: 'מתאמנת שנרשמת דרך הקישור או ה-QR מצטרפת אלייך אוטומטית, ממלאת שאלון ומחכה לתוכנית.', // SPEC
+    qrLabel: 'קוד QR להצטרפות', // SPEC (screen reader)
+    linkLabel: 'הקישור שלך', // PLACEHOLDER (screen reader)
+    personalLabel: 'קישור אישי לשימוש אחד', // PLACEHOLDER (screen reader)
+    copy: 'העתקה', // SPEC
+    copied: 'הקישור הועתק', // PLACEHOLDER
+    copyFailed: 'לא הצלחנו להעתיק. אפשר לסמן את הקישור ולהעתיק ידנית.', // PLACEHOLDER
+    share: 'שיתוף', // SPEC
+    shareTitle: 'הצטרפות ל-Sistem', // PLACEHOLDER (the share sheet title)
+    personal: 'קישור אישי', // SPEC
+    personalReady: 'קישור אישי נוצר · לשימוש אחד, 14 ימים', // PLACEHOLDER
+    personalError: 'לא הצלחנו ליצור קישור אישי. נסי שוב.', // PLACEHOLDER
+    loadError: 'לא הצלחנו לטעון את הקישור.', // PLACEHOLDER
+  },
+  edit: {
+    title: 'עריכה קלה', // SPEC
+    open: 'עריכה קלה', // SPEC
+    workoutsLabel: 'האימון לעריכה', // PLACEHOLDER (screen reader)
+    noDay: 'בלי יום', // PLACEHOLDER
+    noPlan: 'אין תוכנית לשבוע הזה. בונים אותה בדשבורד.', // PLACEHOLDER
+    move: 'הזזה ליום אחר', // SPEC
+    moveHint: 'האימון עובר, השאר לא משתנה', // SPEC
+    swap: 'החלפת תרגיל', // SPEC
+    swapHint: 'מתוך הספרייה שלך, לפי אותו שריר', // SPEC
+    duplicate: 'שכפול השבוע לשבוע הבא', // SPEC
+    duplicateHint: 'טיוטה, תפרסמי כשמוכן', // SPEC
+    desk: 'בנייה מאפס', // SPEC
+    deskHint: 'נפתח בדשבורד במחשב', // SPEC
+    doneHint: 'האימון בוצע, אפשר רק לצפות', // PLACEHOLDER
+    moveTitle: 'לאיזה יום?', // SPEC
+    moveCurrent: '{title} · כרגע ביום {day}', // SPEC
+    moveNoDay: '{title} · בלי יום קבוע', // PLACEHOLDER
+    daysLabel: 'ימי השבוע', // PLACEHOLDER (screen reader)
+    moveSave: 'שמירה ועדכון אצלה', // SPEC
+    moved: 'האימון הוזז · {name} תראה את השינוי', // SPEC (adapted: the server tells her by the tab dot)
+    swapTitle: 'איזה תרגיל להחליף?', // PLACEHOLDER
+    swapWithTitle: 'במה להחליף את {name}?', // PLACEHOLDER
+    swapKeeps: 'הסטים, החזרות והמשקלים נשארים.', // PLACEHOLDER
+    swapFamily: 'אותו תרגיל, ציוד אחר', // PLACEHOLDER
+    swapPattern: 'אותה תנועה', // PLACEHOLDER
+    swapNone: 'לא נמצאו תרגילים חלופיים בספרייה.', // PLACEHOLDER
+    swapLoadError: 'לא הצלחנו לטעון תרגילים. נסי שוב.', // PLACEHOLDER
+    swapped: 'התרגיל הוחלף', // PLACEHOLDER
+    duplicated: 'השבוע הבא נוצר כטיוטה', // SPEC (adapted: "שבוע 7 נוצר כטיוטה")
+    nextTaken: 'לשבוע הבא כבר יש תוכנית.', // PLACEHOLDER
+    undo: 'ביטול', // PLACEHOLDER
+    undone: 'השינוי בוטל', // PLACEHOLDER
+    error: 'לא הצלחנו לשמור. נסי שוב.', // PLACEHOLDER
+    back: 'חזרה', // PLACEHOLDER
+    cancel: 'ביטול', // SPEC
   },
 } as const;

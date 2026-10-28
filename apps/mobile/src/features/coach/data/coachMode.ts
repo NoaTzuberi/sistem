@@ -10,7 +10,8 @@ type CoachCopy = (typeof coachCopy)['he'];
 /** The server's default zone, for an account read before its zone arrived. */
 export const DEFAULT_TIMEZONE = 'Asia/Jerusalem';
 
-export const COACH_LIST_FILTERS = ['all', 'waiting', 'active', 'attention'] as const;
+/** archive = ended coachings: a separate read-only list (/coach/archive), never part of the live counts. */
+export const COACH_LIST_FILTERS = ['all', 'waiting', 'active', 'attention', 'archive'] as const;
 export type CoachListFilter = (typeof COACH_LIST_FILTERS)[number];
 
 export const COACH_LIST_FILTER_PARAM = 'filter';
@@ -24,6 +25,7 @@ export function matchesCoachFilter(trainee: CoachTraineeSummary, filter: CoachLi
   if (filter === 'all') return true;
   if (filter === 'waiting') return trainee.coachingStatus === 'waiting';
   if (filter === 'active') return trainee.coachingStatus === 'active';
+  if (filter === 'archive') return false;
   return trainee.attention !== null;
 }
 

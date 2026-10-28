@@ -19,8 +19,10 @@ export * from './planIssues';
 export * from './trainingDisplay';
 export * from './trainingSlots';
 export * from './cardioDisplay';
+export * from './planPayload';
 export { useLoad } from './hooks/useLoad';
 export { useServerNow } from './hooks/useServerNow';
+export { useEndCoaching } from './hooks/useEndCoaching';
 // Phase 15 — languages, copy files, Intl, bidi.
 export * from './i18n/copy';
 export * from './i18n/language';

@@ -15,6 +15,8 @@ interface TraineePlanProps {
   trainee: CoachTraineeDetail;
   /** A plan was published — the trainee's status may have changed. */
   onPlansChanged: () => void;
+  /** Changes after a light edit elsewhere: load the plans again. */
+  refreshKey?: number;
 }
 
 /** The light action waiting for a "yes" in the confirm sheet. */
@@ -31,11 +33,13 @@ interface ActionFailure {
  * mode (PRD §6): publish a ready draft, and duplicate last week and publish. Both
  * use the dashboard's plan calls; every plan rule stays on the server.
  */
-export function TraineePlan({ trainee, onPlansChanged }: TraineePlanProps) {
+export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: TraineePlanProps) {
   const copy = useCopy(coachCopy);
   const shared = useCopy(sharedCopy);
   const language = useLanguage();
-  const load = useCallback(() => listPlans(trainee.id), [trainee.id]);
+  // refreshKey is a dependency on purpose: a new key loads the plans again.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const load = useCallback(() => listPlans(trainee.id), [trainee.id, refreshKey]);
   const { data: plans, error, isLoading, reload } = useLoad(load, copy.plansLoadError);
   const [pending, setPending] = useState<PendingAction>();
   const [isWorking, setIsWorking] = useState(false);

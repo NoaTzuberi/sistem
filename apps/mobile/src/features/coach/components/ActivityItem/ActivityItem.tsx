@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IconBarbell, IconCamera, IconPlus, IconRuler2, IconRun, IconTrophy } from '@tabler/icons-react';
-import type { CoachActivityTrainee } from '@sistem/types';
+import { IconBarbell, IconCamera, IconMessageCircle, IconPlus, IconRuler2, IconRun, IconTrophy } from '@tabler/icons-react';
+import type { CoachActivityTrainee, ReactionId } from '@sistem/types';
 import { useCopy } from '@sistem/shared';
 import { coachTraineePath } from '../../../../app/config/routes';
 import { coachCopy } from '../../copy';
@@ -9,6 +9,7 @@ import type { ActivityChip, ActivityKind } from '../../data/activityDisplay';
 import type { TraineeTab } from '../../data/traineeTabs';
 import { CoachAvatar } from '../CoachAvatar/CoachAvatar';
 import { NameInSentence } from '../NameInSentence/NameInSentence';
+import { ReactionBar } from '../ReactionBar/ReactionBar';
 import './ActivityItem.css';
 
 const TYPE_ICONS: Record<ActivityKind, ReactNode> = {
@@ -34,10 +35,14 @@ interface ActivityItemProps {
   alert?: boolean;
   /** A link button under the line (e.g. "צפייה בשאלון"). */
   cta?: { label: string; tab: TraineeTab };
+  /** 👏 🔥 ❤️ (workouts, cardio, photos). */
+  reaction?: { value: ReactionId | null; onSelect: (reaction: ReactionId) => void };
+  /** The message button ("הודעה" / "שליחת הודעה") — opens the quick message sheet. */
+  message?: { label: string; onOpen: () => void };
 }
 
 /** One feed card: her avatar + type badge, the line (a link to her screen), the time, chips and blurred photos. */
-export function ActivityItem({ trainee, kind, sentence, time, at, chips = [], photos = [], tab, alert = false, cta }: ActivityItemProps) {
+export function ActivityItem({ trainee, kind, sentence, time, at, chips = [], photos = [], tab, alert = false, cta, reaction, message }: ActivityItemProps) {
   const copy = useCopy(coachCopy);
   const [brokenPhotos, setBrokenPhotos] = useState<string[]>([]);
   const visiblePhotos = photos.filter((url) => !brokenPhotos.includes(url)).slice(0, 3);
@@ -79,11 +84,20 @@ export function ActivityItem({ trainee, kind, sentence, time, at, chips = [], ph
             ))}
           </div>
         )}
-        {cta && (
+        {(cta || reaction || message) && (
           <div className="activity-item-actions">
-            <Link className="activity-item-cta" to={coachTraineePath(trainee.id, cta.tab)}>
-              {cta.label}
-            </Link>
+            {reaction && <ReactionBar value={reaction.value} onSelect={reaction.onSelect} />}
+            {cta && (
+              <Link className="activity-item-cta" to={coachTraineePath(trainee.id, cta.tab)}>
+                {cta.label}
+              </Link>
+            )}
+            {message && (
+              <button type="button" className="activity-item-cta activity-item-message" onClick={message.onOpen}>
+                <IconMessageCircle size={13} stroke={2.2} aria-hidden="true" />
+                {message.label}
+              </button>
+            )}
           </div>
         )}
       </div>

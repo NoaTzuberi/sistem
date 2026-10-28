@@ -1,0 +1,56 @@
+.cf-reactions {
+  display: flex;
+  gap: calc(var(--space-1) + 2px);
+}
+
+.cf-reaction {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--size-coach-reaction-min-width);
+  height: var(--size-coach-reaction);
+  padding-inline: calc(var(--space-2) + 2px);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+  font-size: var(--text-coach-reaction);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* Springs back after the press. */
+  transition: transform var(--transition-badge-pop) var(--ease-spring), background-color var(--transition-fast) ease;
+  /* Drawn 32px tall; the margin keeps 44px of hit area. */
+  margin-block: calc((var(--size-coach-reaction) - var(--touch-target-min)) / 2);
+}
+
+.cf-reaction::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-coach-reaction) - var(--touch-target-min)) / 2) 0;
+}
+
+.cf-reaction[aria-pressed='true'] {
+  background-color: var(--color-coach-blush);
+  box-shadow: inset 0 0 0 1.5px var(--color-coach-cherry);
+}
+
+.cf-reaction:active {
+  transform: scale(var(--scale-coach-reaction-press));
+  transition-duration: var(--transition-press);
+  transition-timing-function: var(--ease-coach-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cf-reaction:not([aria-pressed='true']):hover {
+    background-color: var(--color-coach-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-reaction,
+  .cf-reaction:active {
+    transform: none;
+    transition: background-color var(--transition-fast) ease;
+  }
+}

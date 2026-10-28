@@ -1,0 +1,60 @@
+.ch-sheet-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-block-start: calc(var(--space-2) + 2px);
+}
+
+.ch-sheet-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--size-coach-sheet-button);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), background-color var(--transition-fast) ease;
+}
+
+.ch-sheet-button-soft {
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+}
+
+.ch-sheet-button-primary {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.ch-sheet-button-danger {
+  background-color: var(--color-primary-deep);
+  color: var(--color-on-primary);
+}
+
+.ch-sheet-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ch-sheet-button:not(:disabled):active {
+  transform: scale(var(--scale-coach-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ch-sheet-button-soft:not(:disabled):hover {
+    background-color: var(--color-coach-soft-hover);
+  }
+
+  .ch-sheet-button-primary:not(:disabled):hover {
+    background-color: var(--color-ink-raised);
+  }
+
+  .ch-sheet-button-danger:not(:disabled):hover {
+    background-color: color-mix(in srgb, var(--color-primary-deep) 88%, var(--color-ink));
+  }
+}

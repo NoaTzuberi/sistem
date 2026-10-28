@@ -17,20 +17,33 @@ interface TraineeWorkoutsProps {
   trainee: CoachTraineeDetail;
   today: string;
   onPlansChanged: () => void;
+  /** Bumped after a light edit: the plans load again. */
+  plansVersion: number;
+  /** Opens the light edit sheet ("עריכה קלה"). */
+  onOpenEdit: () => void;
 }
 
 /** אימונים: the week (+ the light plan actions), the full workout log (paged), her cardio, the dashboard note. */
-export function TraineeWorkouts({ trainee, today, onPlansChanged }: TraineeWorkoutsProps) {
+export function TraineeWorkouts({ trainee, today, onPlansChanged, plansVersion, onOpenEdit }: TraineeWorkoutsProps) {
   const copy = useCopy(coachCopy).detail;
+  const edit = useCopy(coachCopy).edit;
   const eyebrow = useCopy(appCopy).eyebrow;
   const workouts = useTraineeWorkouts(trainee.id);
   const cardio = (workouts.data ?? []).filter((entry) => entry.kind === 'cardio');
 
   return (
     <>
-      <CoachCard title={copy.thisWeek} eyebrow={eyebrow.thisWeek}>
+      <CoachCard
+        title={copy.thisWeek}
+        eyebrow={eyebrow.thisWeek}
+        action={
+          <button type="button" className="coach-link" aria-haspopup="dialog" onClick={onOpenEdit}>
+            {edit.open}
+          </button>
+        }
+      >
         {trainee.thisWeek && <WeekLanes week={trainee.thisWeek} weekStart={trainee.currentWeekStart} today={today} />}
-        <TraineePlan trainee={trainee} onPlansChanged={onPlansChanged} />
+        <TraineePlan trainee={trainee} onPlansChanged={onPlansChanged} refreshKey={plansVersion} />
       </CoachCard>
 
       <CoachCard title={copy.workoutLog} eyebrow={eyebrow.log}>

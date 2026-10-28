@@ -1,0 +1,11 @@
+.archived-trainee {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.archived-trainee-note {
+  margin: 0;
+  font-size: var(--text-coach-label);
+  color: var(--color-coach-muted);
+}

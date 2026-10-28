@@ -136,7 +136,19 @@
 
 .activity-item-actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space-1) + 2px);
   margin-block-start: calc(var(--space-2) + 2px);
+}
+
+/* The message button sits at the end of the row, after the reactions. */
+.activity-item-message {
+  gap: 5px;
+  margin-inline-start: auto;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .activity-item-cta {
@@ -163,7 +175,7 @@
 }
 
 .activity-item-cta:active {
-  transform: scale(0.95);
+  transform: scale(var(--scale-coach-press));
 }
 
 @media (hover: hover) and (pointer: fine) {

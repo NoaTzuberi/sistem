@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { IconCalendarEvent } from '@tabler/icons-react';
+import { IconCalendarEvent, IconMessageCircle } from '@tabler/icons-react';
 import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
 import { ROUTES, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
@@ -10,6 +10,7 @@ import { useFreeWorkout } from '../../../workouts/hooks/useFreeWorkout';
 import { FreeWorkoutSheet } from '../../../workouts/components/FreeWorkoutSheet/FreeWorkoutSheet';
 import { SgStageAction } from '../SgStageAction/SgStageAction';
 import { JoinCoachCard } from '../JoinCoachCard/JoinCoachCard';
+import { CoachingEndedCard } from '../CoachingEndedCard/CoachingEndedCard';
 import { useJoinCardDismissal } from '../../hooks/useJoinCardDismissal';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
@@ -30,6 +31,9 @@ import type { QuickReply } from '../QuickReplies/QuickReplies';
 import { NextAchievement } from '../NextAchievement/NextAchievement';
 import { MiniAchievements } from '../MiniAchievements/MiniAchievements';
 import { FuelToday } from '../FuelToday/FuelToday';
+import { useCoachConnect } from '../../../messages/hooks/useCoachConnect';
+import { CoachReactionNotice } from '../../../messages/components/CoachReactionNotice/CoachReactionNotice';
+import { messagesCopy } from '../../../messages/copy';
 import './HomeScreen.css';
 
 /**
@@ -50,6 +54,9 @@ export function HomeScreen() {
   const thanks = useCoachThanks(coachMessage ? { id: coachMessage.note, key: coachMessage.key } : null);
   // Self-guided (no live coaching) or a coach she joined later still building the plan: her own tools.
   const coachingStatus = home.user?.coachingStatus ?? null;
+  // Phase B: her coach's newest chat message + newest reaction (only with a coach).
+  const connect = useCoachConnect(coachingStatus !== null);
+  const messagesText = useCopy(messagesCopy);
   const [isFreeOpen, setIsFreeOpen] = useState(false);
   const free = useFreeWorkout(isFreeOpen);
   const joinCard = useJoinCardDismissal(home.user?.id);
@@ -104,8 +111,20 @@ export function HomeScreen() {
       },
     });
   }
-  // A real message gets "👍 Thanks!" (her coach is notified). "Reply" waits for messaging (backlog).
-  if (coachMessage) {
+  // The newest of her coach's chat message and her notes is the one shown; a chat message gets "Reply".
+  const chat = connect.latestMessage;
+  const chatIsNewest = chat !== null && (!coachMessage || chat.createdAt > coachMessage.at);
+  if (coachingStatus !== null) {
+    replies.push({
+      id: 'reply',
+      label: chatIsNewest ? messagesText.reply : messagesText.openThread,
+      icon: <IconMessageCircle size={14} stroke={2} aria-hidden="true" />,
+      accent: chatIsNewest && connect.unread > 0,
+      onSelect: () => navigate(ROUTES.TRAINEE_MESSAGES),
+    });
+  }
+  // A note gets "👍 Thanks!" (her coach is notified).
+  if (coachMessage && !chatIsNewest) {
     replies.push({
       id: 'thanks',
       label: thanks.state === 'sent' ? copy.coach.thanksSent : thanks.state === 'failed' ? copy.coach.thanksFailed : copy.coach.thanks,
@@ -113,7 +132,7 @@ export function HomeScreen() {
       onSelect: thanks.send,
     });
   }
-  const coachAt = coachMessage?.at ?? update?.createdAt ?? null;
+  const coachAt = (chatIsNewest ? chat?.createdAt : coachMessage?.at) ?? update?.createdAt ?? connect.reaction?.at ?? null;
   const nowMs = data ? Date.parse(data.serverTime) : 0;
   const weekStatus =
     week.isLoading && !data ? (
@@ -136,6 +155,10 @@ export function HomeScreen() {
         status={weekStatus}
         noPlanContent={noPlanContent}
       />
+
+      {home.coachingEnded && (
+        <CoachingEndedCard coachName={home.coachingEnded.data.coachName} onDismiss={() => home.markUpdateSeen(home.coachingEnded!.id)} />
+      )}
 
       {coachingStatus === null && !joinCard.isDismissed && (
         <JoinCoachCard onOpen={() => navigate(ROUTES.JOIN_COACH_CODE)} onDismiss={joinCard.dismiss} />
@@ -171,7 +194,7 @@ export function HomeScreen() {
 
       <IntervalTimerEntry lastWorkSec={home.lastInterval} onOpen={() => navigate(ROUTES.INTERVAL_TIMER)} />
 
-      {coachAt && (coachMessage || update) && (
+      {coachAt && (coachMessage || update || chat || connect.reaction) && (
         <section className="home-section" aria-labelledby="home-coach-title">
           <div className="home-section-head">
             <h2 className="home-section-title" id="home-coach-title">
@@ -181,12 +204,13 @@ export function HomeScreen() {
           </div>
           <CoachNote
             coachName={home.coachName}
-            message={coachMessage?.text ?? null}
+            message={(chatIsNewest ? chat?.text : coachMessage?.text) ?? null}
             at={coachAt}
             nowMs={nowMs}
-            unread={Boolean(update) || Boolean(coachMessage?.unread)}
+            unread={Boolean(update) || (chatIsNewest ? connect.unread > 0 : Boolean(coachMessage?.unread))}
             replies={replies}
           />
+          {connect.reaction && <CoachReactionNotice reaction={connect.reaction} nowMs={nowMs} />}
         </section>
       )}
 

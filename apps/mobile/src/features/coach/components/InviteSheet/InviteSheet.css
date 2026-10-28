@@ -1,0 +1,73 @@
+.ci-qr {
+  width: var(--size-coach-qr);
+  height: var(--size-coach-qr);
+  margin: var(--space-3) auto 0;
+  padding: calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-qr);
+  background-color: var(--color-coach-card);
+  box-shadow: 0 0 0 1px var(--color-coach-rule), var(--shadow-coach-thumb);
+}
+
+.ci-qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The link reads left to right in both languages (an address). */
+.ci-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-coach-link-row);
+  margin-block-start: calc(var(--space-3) - 2px);
+  padding-inline: calc(var(--space-3) - 2px) calc(var(--space-1) + 2px);
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+}
+
+.ci-link-url {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-coach-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-coach-ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ci-link-copy {
+  flex: none;
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-card);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
+}
+
+.ci-link-copy:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ci-link-copy:hover {
+    background-color: var(--color-coach-soft-hover);
+  }
+}
+
+.ci-status {
+  min-height: 1.5em;
+  margin: var(--space-2) 0 0;
+  text-align: center;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-coach-ink-2);
+}

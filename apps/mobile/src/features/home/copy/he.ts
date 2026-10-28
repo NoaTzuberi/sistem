@@ -81,4 +81,10 @@ export const he = {
     text: 'יש לך מאמנת? הכניסי קוד',
     dismiss: 'הסתרה',
   },
+  // Her coach ended the coaching (owner's wording for the line).
+  coachingEnded: {
+    label: 'הליווי הסתיים', // DRAFT
+    text: '{coach} סיימה את הליווי',
+    dismiss: 'הסתרה',
+  },
 } as const;

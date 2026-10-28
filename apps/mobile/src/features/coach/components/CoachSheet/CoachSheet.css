@@ -1,0 +1,16 @@
+.ch-sheet .bottom-sheet-body {
+  padding-block-end: max(var(--space-4), var(--safe-bottom));
+}
+
+.ch-sheet-title {
+  margin: 0;
+  font-size: var(--text-coach-sheet-title);
+  line-height: 0.85;
+}
+
+.ch-sheet-subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-coach-label);
+  line-height: 1.5;
+  color: var(--color-coach-muted);
+}

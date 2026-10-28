@@ -1,4 +1,4 @@
-import type { CoachActivityItem, CoachTraineeSummary } from '@sistem/types';
+import type { CoachActivityItem, CoachActivityTrainee, CoachTraineeSummary, ReactionId } from '@sistem/types';
 import { fill, formatDateOnly, formatTimeAgo, useCopy, useLanguage, weekdayName } from '@sistem/shared';
 import { Button } from '../../../../components/common/Button/Button';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
@@ -22,11 +22,15 @@ interface ActivityFeedProps {
   isLoadingMore: boolean;
   loadMoreError: boolean;
   onLoadMore: () => void;
+  /** The coach's current reaction on an item (her taps show at once). */
+  reactionOf: (item: CoachActivityItem) => ReactionId | null;
+  onReact: (item: CoachActivityItem, reaction: ReactionId) => void;
+  onMessage: (trainee: CoachActivityTrainee) => void;
 }
 
 /** The Today feed, grouped by day ("היום" / "אתמול" / a date), newest first. */
 export function ActivityFeed(props: ActivityFeedProps) {
-  const { items, attention, timezone, nowMs, hasMore, isLoadingMore, loadMoreError, onLoadMore } = props;
+  const { items, attention, timezone, nowMs, hasMore, isLoadingMore, loadMoreError, onLoadMore, reactionOf, onReact, onMessage } = props;
   const copy = useCopy(coachCopy);
   const eyebrow = useCopy(appCopy).eyebrow;
   const language = useLanguage();
@@ -52,41 +56,48 @@ export function ActivityFeed(props: ActivityFeedProps) {
               <Eyebrow keepInEnglish={head.eyebrow === dayMonthOf(day.date)}>{head.eyebrow}</Eyebrow>
               {head.label}
             </h2>
-            {day.date === today &&
-              attention.map((trainee) => (
-                <ActivityItem
-                  key={`attention:${trainee.id}`}
-                  trainee={trainee}
-                  kind={null}
-                  alert
-                  sentence={attentionSentence(trainee, copy, language) ?? ''}
-                  time={
-                    trainee.lastCompletedAt
-                      ? fill(copy.feed.lastWorkout, {
-                          date: `${weekdayName(new Date(`${localDateOf(trainee.lastCompletedAt, timezone)}T00:00:00Z`).getUTCDay(), language, 'short')} ${dayMonthOf(localDateOf(trainee.lastCompletedAt, timezone))}`,
-                        })
-                      : ''
-                  }
-                  tab="overview"
-                />
-              ))}
-            {day.items.map((item) => {
-              const view = describeActivity(item, copy, language);
-              return (
-                <ActivityItem
-                  key={item.id}
-                  trainee={item.trainee}
-                  kind={view.kind}
-                  sentence={view.sentence}
-                  at={item.at}
-                  time={day.date === today ? formatTimeAgo(item.at, nowMs, language) : timeOf(item.at, timezone, language)}
-                  chips={view.chips}
-                  photos={view.photos}
-                  tab={view.tab}
-                  cta={view.questionnaireCta ? { label: copy.feed.viewQuestionnaire, tab: 'body' } : undefined}
-                />
-              );
-            })}
+            <ul className="activity-feed-list">
+              {day.date === today &&
+                attention.map((trainee) => (
+                  <li key={`attention:${trainee.id}`}>
+                    <ActivityItem
+                      trainee={trainee}
+                      kind={null}
+                      alert
+                      sentence={attentionSentence(trainee, copy, language) ?? ''}
+                      time={
+                        trainee.lastCompletedAt
+                          ? fill(copy.feed.lastWorkout, {
+                              date: `${weekdayName(new Date(`${localDateOf(trainee.lastCompletedAt, timezone)}T00:00:00Z`).getUTCDay(), language, 'short')} ${dayMonthOf(localDateOf(trainee.lastCompletedAt, timezone))}`,
+                            })
+                          : ''
+                      }
+                      tab="overview"
+                      message={{ label: copy.messages.sendMessage, onOpen: () => onMessage(trainee) }}
+                    />
+                  </li>
+                ))}
+              {day.items.map((item) => {
+                const view = describeActivity(item, copy, language);
+                return (
+                  <li key={item.id}>
+                    <ActivityItem
+                      trainee={item.trainee}
+                      kind={view.kind}
+                      sentence={view.sentence}
+                      at={item.at}
+                      time={day.date === today ? formatTimeAgo(item.at, nowMs, language) : timeOf(item.at, timezone, language)}
+                      chips={view.chips}
+                      photos={view.photos}
+                      tab={view.tab}
+                      cta={view.questionnaireCta ? { label: copy.feed.viewQuestionnaire, tab: 'body' } : undefined}
+                      reaction={item.reactionTarget ? { value: reactionOf(item), onSelect: (reaction) => onReact(item, reaction) } : undefined}
+                      message={view.questionnaireCta ? undefined : { label: copy.messages.message, onOpen: () => onMessage(item.trainee) }}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         );
       })}

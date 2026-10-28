@@ -92,6 +92,27 @@ export const he = {
       achievements: 'הישגים',
     },
     traineesTitle: 'מתאמנות',
+    // Ending a coaching (owner's wording for the action / title / buttons; the explanation is a DRAFT).
+    endCoaching: {
+      moreActions: 'פעולות נוספות',
+      action: 'סיום ליווי',
+      title: 'לסיים את הליווי עם {name}?',
+      explanation:
+        'החשבון וההיסטוריה של {name} נשארים. מרגע הסיום לא תראי נתונים חדשים או תמונות פרטיות שלה, והיא תקבל הודעה. כדי לחזור לליווי היא תצטרך הזמנה חדשה.', // DRAFT
+      confirm: 'סיום ליווי',
+      cancel: 'ביטול',
+      error: 'לא הצלחנו לסיים את הליווי. נסי שוב.', // DRAFT
+    },
+    // The read-only archive of ended coachings.
+    archive: {
+      filter: 'ארכיון',
+      empty: 'אין מתאמנות בארכיון.', // DRAFT
+      loadError: 'לא הצלחנו לטעון את הארכיון.', // DRAFT
+      endedOn: 'הליווי הסתיים ב־{date}', // DRAFT
+      readOnly: 'צפייה בלבד: נתונים עד סיום הליווי, בלי תמונות.', // DRAFT
+      endedColumn: 'סיום הליווי',
+      workouts: 'אימונים',
+    },
     searchPlaceholder: 'חיפוש לפי שם או אימייל',
     searchLabel: 'חיפוש מתאמנות',
     filterLabel: 'סינון לפי סטטוס',

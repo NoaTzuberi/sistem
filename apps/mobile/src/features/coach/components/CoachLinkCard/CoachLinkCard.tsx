@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useCopy, useLoad } from '@sistem/shared';
 import { getInvites } from '../../../../services/coach/coachService';
 import { useToast } from '../../../../hooks/useToast';
@@ -6,15 +7,17 @@ import { StateMessage } from '../../../../components/common/StateMessage/StateMe
 import { useCopyText } from '../../../profile/hooks/useCopyText';
 import { coachCopy } from '../../copy';
 import { CoachCard } from '../CoachCard/CoachCard';
+import { InviteSheet } from '../InviteSheet/InviteSheet';
 import './CoachLinkCard.css';
 
-/** "הקישור שלי": her permanent invite link with copy. (Phase B adds "QR" → the invite sheet.) */
+/** "הקישור שלי": her permanent invite link with copy, and "QR" → the invite sheet. */
 export function CoachLinkCard() {
   const copy = useCopy(coachCopy).profile;
   const { data, error, reload } = useLoad(getInvites, copy.linkError);
   const copyText = useCopyText();
   const { toastMessage, showToast } = useToast();
   const link = data?.permanent;
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   async function handleCopy() {
     if (!link) return;
@@ -32,8 +35,12 @@ export function CoachLinkCard() {
           <button type="button" className="coach-link-card-copy" onClick={() => void handleCopy()}>
             {copy.copy}
           </button>
+          <button type="button" className="coach-link-card-copy" aria-haspopup="dialog" onClick={() => setIsSheetOpen(true)}>
+            {copy.qr}
+          </button>
         </div>
       )}
+      <InviteSheet isOpen={isSheetOpen} onClose={() => setIsSheetOpen(false)} />
       <Toast message={toastMessage} />
     </CoachCard>
   );

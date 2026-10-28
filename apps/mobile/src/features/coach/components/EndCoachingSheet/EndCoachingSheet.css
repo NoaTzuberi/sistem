@@ -1,0 +1,6 @@
+.end-coaching-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+}

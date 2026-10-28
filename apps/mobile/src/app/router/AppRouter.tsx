@@ -2,6 +2,8 @@ import { Routes, Route, type Location } from 'react-router-dom';
 import {
   ROUTES,
   COACH_TRAINEE_PATH,
+  COACH_ARCHIVED_TRAINEE_PATH,
+  COACH_THREAD_PATH,
   WORKOUT_DETAIL_PATH,
   WORKOUT_LOG_PATH,
   WORKOUT_SESSION_PATH,
@@ -57,7 +59,11 @@ import { InboxPage } from '../../features/coach/pages/InboxPage/InboxPage';
 import { TodayPage } from '../../features/coach/pages/TodayPage/TodayPage';
 import { TraineesPage } from '../../features/coach/pages/TraineesPage/TraineesPage';
 import { TraineeDetailPage } from '../../features/coach/pages/TraineeDetailPage/TraineeDetailPage';
+import { ArchivedTraineePage } from '../../features/coach/pages/ArchivedTraineePage/ArchivedTraineePage';
 import { CoachProfilePage } from '../../features/coach/pages/CoachProfilePage/CoachProfilePage';
+import { MessagesPage as CoachMessagesPage } from '../../features/coach/pages/MessagesPage/MessagesPage';
+import { ThreadPage as CoachThreadPage } from '../../features/coach/pages/ThreadPage/ThreadPage';
+import { MessagesPage } from '../../features/messages/pages/MessagesPage/MessagesPage';
 import { ScreenTransition } from '../../components/layout/ScreenTransition/ScreenTransition';
 
 /** Every route, for one location: a screen leaving in a tab transition keeps rendering its own. */
@@ -120,6 +126,7 @@ function AppRoutes({ location }: { location: Location }) {
             <Route path={ROUTES.NUTRITION} element={<NutritionPage />} />
             <Route path={ONBOARDING_EDIT_PATH} element={<OnboardingPage />} />
             <Route path={ROUTES.TRAINEE_HOME} element={<HomePage />} />
+            <Route path={ROUTES.TRAINEE_MESSAGES} element={<MessagesPage />} />
           </Route>
 
           <Route element={<AppStateGuard allow={['admin']} />}>
@@ -131,7 +138,10 @@ function AppRoutes({ location }: { location: Location }) {
             <Route path={ROUTES.COACH_INBOX} element={<InboxPage />} />
             <Route path={ROUTES.COACH_TRAINEES} element={<TraineesPage />} />
             <Route path={COACH_TRAINEE_PATH} element={<TraineeDetailPage />} />
+            <Route path={COACH_ARCHIVED_TRAINEE_PATH} element={<ArchivedTraineePage />} />
             <Route path={ROUTES.COACH_PROFILE} element={<CoachProfilePage />} />
+            <Route path={ROUTES.COACH_MESSAGES} element={<CoachMessagesPage />} />
+            <Route path={COACH_THREAD_PATH} element={<CoachThreadPage />} />
           </Route>
         </Route>
 

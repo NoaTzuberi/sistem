@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { IconBell } from '@tabler/icons-react';
 import { fill, formatPlural, useCopy, useLanguage, useLoad, useServerNow } from '@sistem/shared';
-import { ROUTES, coachTraineesPath } from '../../../../app/config/routes';
+import { ROUTES, coachThreadPath, coachTraineesPath } from '../../../../app/config/routes';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { useToast } from '../../../../hooks/useToast';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { appCopy } from '../../../../copy';
@@ -13,6 +15,9 @@ import { refreshUnreadCount, useUnreadCount } from '../../../notifications/unrea
 import { coachCopy } from '../../copy';
 import { DEFAULT_TIMEZONE, dayMonthOf, dayPartAt, weekEyebrow } from '../../data/coachMode';
 import { useActivityFeed } from '../../hooks/useActivityFeed';
+import { useReactions } from '../../hooks/useReactions';
+import { type MessageRecipient, useQuickMessage } from '../../hooks/useQuickMessage';
+import { QuickMessageSheet } from '../../components/QuickMessageSheet/QuickMessageSheet';
 import { ActivityFeed } from '../../components/ActivityFeed/ActivityFeed';
 import { CoachAvatar } from '../../components/CoachAvatar/CoachAvatar';
 import { CoachScreen } from '../../components/CoachScreen/CoachScreen';
@@ -39,6 +44,15 @@ export function TodayPage() {
   const firstName = name.trim().split(/\s+/)[0] ?? '';
   const { reload: reloadToday } = today;
   const { reload: reloadFeed } = feed;
+  const navigate = useNavigate();
+  const { toastMessage, toastAction, showToast } = useToast();
+  const reactions = useReactions(useCallback(() => showToast(copy.reactions.error), [showToast, copy.reactions.error]));
+  const onSent = useCallback(
+    (recipient: MessageRecipient) =>
+      showToast(copy.messages.sent, { label: copy.messages.openThread, onSelect: () => navigate(coachThreadPath(recipient.id)) }),
+    [showToast, navigate, copy.messages.sent, copy.messages.openThread],
+  );
+  const quick = useQuickMessage(onSent);
 
   // Catch up when the app is looked at again (no push yet).
   useEffect(() => {
@@ -126,8 +140,13 @@ export function TodayPage() {
           isLoadingMore={feed.isLoadingMore}
           loadMoreError={feed.error === 'loadMore'}
           onLoadMore={() => void feed.loadMore()}
+          reactionOf={reactions.reactionOf}
+          onReact={(item, reaction) => void reactions.toggle(item, reaction)}
+          onMessage={(trainee) => quick.open({ id: trainee.id, name: trainee.name, avatarUrl: trainee.avatar?.url })}
         />
       )}
+      <QuickMessageSheet quick={quick} />
+      <Toast message={toastMessage} action={toastAction} />
     </CoachScreen>
   );
 }

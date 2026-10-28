@@ -1,20 +1,21 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { IconPlus } from '@tabler/icons-react';
 import { useCopy } from '@sistem/shared';
-import { ROUTES } from '../../../../app/config/routes';
 import { coachCopy } from '../../copy';
+import { InviteSheet } from '../InviteSheet/InviteSheet';
 import './InvitePill.css';
 
-/**
- * The pink "+ הזמנה" pill (Today stage, Trainees title). Phase A opens her link card on the Profile;
- * Phase B opens the invite sheet (QR + share) here.
- */
+/** The pink "+ הזמנה" pill (Today stage, Trainees title): opens the invite sheet (QR + share). */
 export function InvitePill() {
   const copy = useCopy(coachCopy);
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Link className="invite-pill" to={ROUTES.COACH_PROFILE}>
-      <IconPlus size={14} stroke={2.6} aria-hidden="true" />
-      {copy.today.invite}
-    </Link>
+    <>
+      <button type="button" className="invite-pill" aria-haspopup="dialog" onClick={() => setIsOpen(true)}>
+        <IconPlus size={14} stroke={2.6} aria-hidden="true" />
+        {copy.today.invite}
+      </button>
+      <InviteSheet isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
   );
 }

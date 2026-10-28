@@ -29,6 +29,7 @@ export interface CoachMessage {
 }
 
 type PlanPublishedNotification = Extract<AppNotification, { type: 'plan_published' }>;
+type CoachingEndedNotification = Extract<AppNotification, { type: 'coaching_ended' }>;
 
 /** A part of Home that is only drawn when its own call worked (the week is the screen's one hard need). */
 function useOptionalLoad<T>(load: () => Promise<T>): T | null {
@@ -118,6 +119,12 @@ export function useHomeData(coachingId?: string) {
     return found ?? null;
   }, [updates, data, handledUpdateId]);
 
+  // Her coach ended the coaching: told once on Home until she hides it (it is then read).
+  const coachingEnded: CoachingEndedNotification | null = useMemo(
+    () => updates?.items.find((item): item is CoachingEndedNotification => item.type === 'coaching_ended' && item.id !== handledUpdateId) ?? null,
+    [updates, handledUpdateId],
+  );
+
   const markUpdateSeen = useCallback((id: string) => {
     setHandledUpdateId(id);
     void markRead(id)
@@ -139,6 +146,7 @@ export function useHomeData(coachingId?: string) {
     // Her coach's name for the card (initials + name); the nutrition plan's publisher as a fallback.
     coachName: data?.coach?.name ?? nutrition?.coach?.name ?? null,
     planUpdate,
+    coachingEnded,
     markUpdateSeen,
     lastInterval,
   };

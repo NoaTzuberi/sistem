@@ -38,7 +38,7 @@ export function matchesFilter(trainee: CoachTraineeSummary, filter: TraineeFilte
 }
 
 /** The search box of both trainees lists: name or email, case-insensitive. */
-export function matchesSearch(trainee: CoachTraineeSummary, search: string): boolean {
+export function matchesSearch(trainee: Pick<CoachTraineeSummary, 'name' | 'email'>, search: string): boolean {
   const query = search.trim().toLowerCase();
   return !query || trainee.name.toLowerCase().includes(query) || trainee.email.toLowerCase().includes(query);
 }

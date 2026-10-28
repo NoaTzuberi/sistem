@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import type { WorkoutLog } from '@sistem/types';
 import {
   describeLogSet,
   describePersonalRecord,
@@ -27,15 +28,17 @@ interface WorkoutLogListProps {
   pageSize?: number;
   /** The "more" button's label. */
   moreLabel?: string;
+  /** Another source of her logs (the read-only archive); default = the live coaching's. */
+  load?: () => Promise<WorkoutLog[]>;
 }
 
 // The trainee's logs with their summaries (PRD §6): stats, PRs, rating, notes and the
 // Daily Pump photo — a short-lived signed link the server makes for her coach only.
-export function WorkoutLogList({ traineeId, pageSize, moreLabel }: WorkoutLogListProps) {
+export function WorkoutLogList({ traineeId, pageSize, moreLabel, load: loadLogs }: WorkoutLogListProps) {
   const shared = useCopy(sharedCopy);
   const copy = shared.coach;
   const language = useLanguage();
-  const load = useCallback(() => listTraineeWorkoutLogs(traineeId), [traineeId]);
+  const load = useCallback(() => (loadLogs ? loadLogs() : listTraineeWorkoutLogs(traineeId)), [loadLogs, traineeId]);
   const { data: logs, error, isLoading, reload } = useLoad(load, copy.logsLoadError);
   const [shown, setShown] = useState(pageSize ?? Infinity);
 

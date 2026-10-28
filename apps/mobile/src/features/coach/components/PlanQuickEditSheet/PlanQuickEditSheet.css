@@ -1,0 +1,219 @@
+.ce-note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-coach-body);
+  line-height: 1.5;
+  color: var(--color-coach-muted);
+}
+
+/* Which workout (only when the week has several). */
+.ce-workouts {
+  display: flex;
+  gap: calc(var(--space-1) + 2px);
+  margin-block-start: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ce-workout {
+  flex: none;
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), background-color var(--transition-fast) ease;
+}
+
+.ce-workout[aria-pressed='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.ce-workout:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.ce-options {
+  margin-block-start: var(--space-3);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-soft);
+}
+
+.ce-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-3);
+  border: 0;
+  border-block-end: 1px solid var(--color-coach-rule);
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
+}
+
+.ce-option:last-child {
+  border-block-end: 0;
+}
+
+.ce-option:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ce-option:not(:disabled):active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.ce-option-muted {
+  color: var(--color-coach-muted);
+}
+
+.ce-option-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-coach-option-icon);
+  height: var(--size-coach-option-icon);
+  border-radius: var(--radius-coach-chip);
+  background-color: var(--color-coach-card);
+  transition: background-color var(--transition-fast) ease;
+}
+
+.ce-option-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.ce-option-text small {
+  display: block;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-coach-muted);
+}
+
+.ce-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-block-start: var(--space-3);
+}
+
+.ce-day {
+  min-height: var(--size-coach-day);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-coach-chip);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), background-color var(--transition-fast) ease;
+}
+
+.ce-day[aria-pressed='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.ce-day:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ce-day:not(:disabled):active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.ce-swap-group {
+  margin-block-start: var(--space-3);
+}
+
+.ce-swap-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-coach-ink-2);
+}
+
+.ce-list {
+  margin: var(--space-3) 0 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-soft);
+  list-style: none;
+}
+
+.ce-swap-group .ce-list {
+  margin-block-start: 0;
+}
+
+.ce-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-2);
+  border: 0;
+  border-block-end: 1px solid var(--color-coach-rule);
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
+}
+
+li:last-child > .ce-row {
+  border-block-end: 0;
+}
+
+.ce-row:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ce-row:not(:disabled):active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.ce-row-name {
+  font-size: var(--text-coach-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ce-row-meta {
+  font-size: var(--text-coach-caption);
+  color: var(--color-coach-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ce-option:not(:disabled):hover .ce-option-icon {
+    background-color: var(--color-coach-soft-hover);
+  }
+
+  .ce-workout:not([aria-pressed='true']):hover,
+  .ce-day:not(:disabled):not([aria-pressed='true']):hover {
+    background-color: var(--color-coach-soft-hover);
+  }
+
+  .ce-row:not(:disabled):hover .ce-row-name {
+    color: var(--color-primary-deep);
+  }
+}

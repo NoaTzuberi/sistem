@@ -1,0 +1,15 @@
+.cm-list {
+  margin: calc(var(--space-2) + var(--space-1)) 0 0;
+  padding: 0 calc(var(--space-3) - 2px);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  list-style: none;
+}
+
+.cm-list-empty {
+  margin: var(--space-4) 0;
+  text-align: center;
+  font-size: var(--text-coach-body);
+  line-height: 1.5;
+  color: var(--color-coach-muted);
+}

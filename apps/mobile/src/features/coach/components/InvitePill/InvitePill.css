@@ -5,7 +5,10 @@
   gap: var(--space-1);
   min-height: var(--touch-target-min);
   padding-inline: calc(var(--space-3) - 2px);
+  border: 0;
   border-radius: var(--radius-round);
+  font-family: inherit;
+  cursor: pointer;
   background-color: var(--color-primary);
   color: var(--color-on-primary);
   /* 14px bold: white on Neon Pink reads as large text (3.8:1). */

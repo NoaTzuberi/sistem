@@ -16,3 +16,9 @@
   width: 100%;
   margin-block-start: var(--space-2);
 }
+
+.activity-feed-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -34,6 +34,10 @@ export const ROUTES = {
   COACH_INBOX: '/coach/today/inbox',
   COACH_TRAINEES: '/coach/trainees',
   COACH_PROFILE: '/coach/profile',
+  // Coach mode Phase B: her conversations (a thread is full screen, under the tab's path).
+  COACH_MESSAGES: '/coach/messages',
+  // The trainee's conversation with her coach — under Home, so the Home tab stays highlighted.
+  TRAINEE_MESSAGES: '/home/messages',
   // First run (no invite, no choice yet): "how do you want to train" → the coach code.
   FIRST_RUN: '/start',
   FIRST_RUN_CODE: '/start/code',
@@ -99,7 +103,20 @@ export function coachTraineePath(traineeId: string, tab?: string | null): string
   return tab ? `${path}?tab=${tab}` : path;
 }
 
+// Coach mode: a trainee whose coaching ended (the list's "archive" filter) — read-only, past data only.
+export const COACH_ARCHIVED_TRAINEE_PATH = '/coach/archive/:traineeId';
+
+export function coachArchivedTraineePath(traineeId: string): string {
+  return `/coach/archive/${traineeId}`;
+}
+
 /** The trainees list, optionally preset to a filter (?filter=) — Today's scoreboard opens these. */
+export const COACH_THREAD_PATH = '/coach/messages/:traineeId';
+
+export function coachThreadPath(traineeId: string): string {
+  return `/coach/messages/${traineeId}`;
+}
+
 export function coachTraineesPath(filter?: string | null): string {
   return filter ? `${ROUTES.COACH_TRAINEES}?filter=${filter}` : ROUTES.COACH_TRAINEES;
 }

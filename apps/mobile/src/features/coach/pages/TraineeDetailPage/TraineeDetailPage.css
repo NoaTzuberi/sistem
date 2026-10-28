@@ -56,7 +56,7 @@
 }
 
 .coach-trainee-action:active {
-  transform: scale(0.96);
+  transform: scale(var(--scale-coach-press));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -97,4 +97,16 @@
 
 .coach-trainee-panel {
   padding-block-end: var(--space-3);
+}
+
+/* "הודעה": the first quick action, in pink (docs/design/coach-app.html). */
+.coach-trainee-action-primary {
+  background-color: var(--solid-pink);
+  color: var(--on-pink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .coach-trainee-action-primary:hover {
+    background-color: var(--color-primary-deep);
+  }
 }

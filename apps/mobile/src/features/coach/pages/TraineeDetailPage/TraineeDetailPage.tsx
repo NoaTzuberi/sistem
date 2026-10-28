@@ -1,8 +1,10 @@
-import { useCallback } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { IconBarbell, IconChevronLeft, IconSalad } from '@tabler/icons-react';
+import { useCallback, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { IconBarbell, IconChevronLeft, IconMessageCircle, IconSalad } from '@tabler/icons-react';
 import { fill, formatPlural, sharedCopy, splitLabel, useCopy, useLanguage, useLoad, useServerNow } from '@sistem/shared';
-import { ROUTES } from '../../../../app/config/routes';
+import { ROUTES, coachThreadPath } from '../../../../app/config/routes';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { useToast } from '../../../../hooks/useToast';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { appCopy } from '../../../../copy';
@@ -18,9 +20,16 @@ import { TraineeBody } from '../../components/TraineeBody/TraineeBody';
 import { TraineeNutritionTab } from '../../components/TraineeNutritionTab/TraineeNutritionTab';
 import { TraineeOverview } from '../../components/TraineeOverview/TraineeOverview';
 import { TraineeWorkouts } from '../../components/TraineeWorkouts/TraineeWorkouts';
+import { QuickMessageSheet } from '../../components/QuickMessageSheet/QuickMessageSheet';
+import { PlanQuickEditSheet } from '../../components/PlanQuickEditSheet/PlanQuickEditSheet';
+import { useQuickMessage } from '../../hooks/useQuickMessage';
+import { usePlanQuickEdit } from '../../hooks/usePlanQuickEdit';
+import { TraineeMoreMenu } from '../../components/TraineeMoreMenu/TraineeMoreMenu';
+import { EndCoachingSheet } from '../../components/EndCoachingSheet/EndCoachingSheet';
+import { useTraineeEndCoaching } from '../../hooks/useTraineeEndCoaching';
 import './TraineeDetailPage.css';
 
-// Coach mode: one trainee (docs/design/coach-app.html) — read in Phase A. The server answers 404 for a
+// Coach mode: one trainee (docs/design/coach-app.html) — read in Phase A; Phase B adds the message and light edit sheets. The server answers 404 for a
 // trainee who is not this coach's (no live coaching), which shows as the load error.
 export function TraineeDetailPage() {
   const { traineeId = '' } = useParams();
@@ -34,6 +43,22 @@ export function TraineeDetailPage() {
   const { data, error, isLoading, reload } = useLoad(load, shared.coach.loadTraineeError);
   const nowMs = useServerNow(data?.serverTime);
   const trainee = data?.trainee;
+  const ending = useTraineeEndCoaching(traineeId);
+  const navigate = useNavigate();
+  const { toastMessage, toastAction, showToast } = useToast();
+  // Bumped after a light edit: the plan lists below load again.
+  const [plansVersion, setPlansVersion] = useState(0);
+  const onPlansChanged = useCallback(() => {
+    reload();
+    setPlansVersion((version) => version + 1);
+  }, [reload]);
+  const edit = usePlanQuickEdit(trainee, trainee ? localDateOf(nowMs, trainee.timezone) : '', showToast, onPlansChanged);
+  const quick = useQuickMessage(
+    useCallback(
+      (recipient) => showToast(copy.messages.sent, { label: copy.messages.openThread, onSelect: () => navigate(coachThreadPath(recipient.id)) }),
+      [showToast, navigate, copy.messages.sent, copy.messages.openThread],
+    ),
+  );
 
   function selectTab(next: TraineeTab) {
     setSearchParams(next === DEFAULT_TRAINEE_TAB ? {} : { [TRAINEE_TAB_PARAM]: next }, { replace: true });
@@ -59,6 +84,7 @@ export function TraineeDetailPage() {
             <Eyebrow keepInEnglish>
               {trainee?.coachingWeek ? `${eyebrow.trainee} · ${weekEyebrow(eyebrow.week, trainee.coachingWeek)}` : eyebrow.trainee}
             </Eyebrow>
+            {trainee && <TraineeMoreMenu onEndCoaching={ending.ask} />}
           </div>
           {trainee && (
             <>
@@ -71,9 +97,17 @@ export function TraineeDetailPage() {
                   <p className="coach-trainee-sub">{sub.join(' · ')}</p>
                 </div>
               </div>
-              {/* "הודעה" (pink, first) joins in Phase B with messaging. */}
               <div className="coach-trainee-actions" role="group" aria-label={copy.detail.actionsLabel}>
-                <button type="button" className="coach-trainee-action" onClick={() => selectTab('workouts')}>
+                <button
+                  type="button"
+                  className="coach-trainee-action coach-trainee-action-primary"
+                  aria-haspopup="dialog"
+                  onClick={() => quick.open({ id: trainee.id, name: trainee.name, avatarUrl: trainee.avatar?.url })}
+                >
+                  <IconMessageCircle size={20} aria-hidden="true" />
+                  {copy.detail.actions.message}
+                </button>
+                <button type="button" className="coach-trainee-action" aria-haspopup="dialog" onClick={() => edit.open()}>
                   <IconBarbell size={20} aria-hidden="true" />
                   {copy.detail.actions.plan}
                 </button>
@@ -104,12 +138,31 @@ export function TraineeDetailPage() {
           </div>
           <section role="tabpanel" id="coach-trainee-panel" aria-labelledby={`tab-${tab}`} className="coach-trainee-panel">
             {tab === 'overview' && <TraineeOverview trainee={trainee} today={localDateOf(nowMs, trainee.timezone)} onOpenTab={selectTab} />}
-            {tab === 'workouts' && <TraineeWorkouts trainee={trainee} today={localDateOf(nowMs, trainee.timezone)} onPlansChanged={reload} />}
+            {tab === 'workouts' && (
+              <TraineeWorkouts
+                trainee={trainee}
+                today={localDateOf(nowMs, trainee.timezone)}
+                onPlansChanged={onPlansChanged}
+                plansVersion={plansVersion}
+                onOpenEdit={() => void edit.open()}
+              />
+            )}
             {tab === 'nutrition' && <TraineeNutritionTab traineeId={trainee.id} />}
             {tab === 'body' && <TraineeBody trainee={trainee} />}
           </section>
+          <PlanQuickEditSheet edit={edit} />
+          <EndCoachingSheet
+            name={trainee.name}
+            isOpen={ending.isConfirming}
+            isEnding={ending.isEnding}
+            error={ending.error}
+            onConfirm={() => void ending.confirm()}
+            onCancel={ending.cancel}
+          />
         </>
       )}
+      <QuickMessageSheet quick={quick} />
+      <Toast message={toastMessage} action={toastAction} />
     </CoachScreen>
   );
 }

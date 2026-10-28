@@ -81,4 +81,9 @@ export const en: CopyShape<typeof he> = {
     text: 'Have a coach? Enter a code',
     dismiss: 'Hide',
   },
+  coachingEnded: {
+    label: 'Coaching ended',
+    text: '{coach} ended the coaching',
+    dismiss: 'Hide',
+  },
 };
