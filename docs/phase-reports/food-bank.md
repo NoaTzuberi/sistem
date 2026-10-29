@@ -108,3 +108,12 @@ git commit -m "feat(mobile): food lists with her own daily target (coach's lists
 git add -A -- docs/PRD.md docs/phase-reports/food-bank.md docs/phase-reports/food-bank
 git commit -m "docs: food bank decision, report and screenshots"
 ```
+
+## Update 2026-10-29 — loading the bank into production (Sistem-prod)
+- Production uses `Sistem-prod`; `apps/server/.env` is dev (`Sistem`). Production had no system foods, and its foods
+  come from `seed:nutrition`, not the migration (prod never had the dev coach's 219 items).
+- `--env-file <path>` (new `src/config/envFile.ts`) on `seed:nutrition`, `migrate:food-bank` and the new read-only
+  `status:food-bank`: that file is loaded INSTEAD of `.env` (no fallback to dev — a missing DATABASE_URL stops).
+  Every script prints only the database name + cluster host suffix and the env file's name, and needs `--allow-remote`.
+- `seed:nutrition` is now a dry run by default (`--apply` writes): system items, no coach, upsert by itemKey.
+- `apps/server/.env.prod` is gitignored by the root `.gitignore` (`.env.*`, `!.env.example`).
