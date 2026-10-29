@@ -193,7 +193,7 @@ describe('split menu', () => {
     expect(buildSplitMenu(none, { min: 1, max: 2 })).toMatchObject({ ok: false, message: { code: 'ai_split_none_fits' } });
   });
 
-  it('asks for the patterns of every slot of the offered splits, required ones first', () => {
+  it('asks for the patterns of every slot of the offered splits, in slot order', () => {
     const menu = buildSplitMenu(config, { min: 2, max: 2 });
     const patterns = menu.ok ? neededPatterns(config, menu.value) : [];
     expect(patterns.slice(0, 3)).toEqual(['squat', 'lunge', 'hinge']);
@@ -210,7 +210,7 @@ describe('prompt', () => {
     const message = buildTrainingPlanUserMessage(profile(), [], candidates, config, menu);
     expect(message).toContain('F001 | Back Squat | squat | quadriceps | barbell (beginner)');
     expect(message).toContain('full_body | 3 days: full_body, full_body, full_body');
-    expect(message).toContain('full_body: legs_knee* [squat, lunge] max 2');
+    expect(message).toContain('full_body: legs_knee [squat, lunge] max 2');
     expect(message).toContain('Return exactly 1 split option(s)');
     expect(message).toContain('(none available)');
 

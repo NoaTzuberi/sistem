@@ -231,6 +231,25 @@ describe('plan builder (coach)', () => {
       expect(plan.workouts[1].exercises[0].resolvedSets).toHaveLength(3);
     });
 
+    it('a workout name is trimmed and at most 40 characters; removed slot suggestions stay coach-only', async () => {
+      const draft = await createDraft();
+      const long = await savePlan(draft.id, [{ title: 'x'.repeat(41), exercises: [] }]);
+      expect(long.status).toBe(400);
+      expect(long.body.issues[0]).toMatchObject({ workoutIndex: 0 });
+
+      const res = await savePlan(draft.id, [{ title: '  Legs & glutes  ', workoutType: 'lower', hiddenSlotIds: ['calves', 'calves'], exercises: [] }]);
+      expect(res.status).toBe(200);
+      expect(res.body.plan.workouts[0]).toMatchObject({ title: 'Legs & glutes', workoutType: 'lower', hiddenSlotIds: ['calves'] });
+      // Kept on the stored workout, never in the public shape.
+      const stored = (await Plan.findById(draft.id).lean())!;
+      expect(stored.workouts[0].hiddenSlotIds).toEqual(['calves']);
+
+      // A free workout has no suggestions to remove.
+      const free = await savePlan(draft.id, [{ title: 'Free', hiddenSlotIds: ['calves'], exercises: [] }]);
+      expect(free.body.plan.workouts[0].hiddenSlotIds).toBeUndefined();
+      expect((await savePlan(draft.id, [{ title: 'Bad', workoutType: 'lower', hiddenSlotIds: 'calves', exercises: [] }])).status).toBe(400);
+    });
+
     it('keeps the ids of existing workouts and exercises when they are reordered', async () => {
       const draft = await createDraft();
       const saved = (await savePlan(draft.id, validWorkouts())).body.plan;

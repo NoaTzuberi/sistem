@@ -200,7 +200,7 @@ describe('exercise families & training config (Phase 12b)', () => {
     expect(res.body.config.splits.find((split: { id: string }) => split.id === 'abc')).toMatchObject({ coachToConfirm: true });
     expect(res.body.config.workoutTypes.map((type: { id: string }) => type.id)).toContain('lower_glute');
 
-    const slots = [{ id: 'glute_bridge', patterns: ['glute_bridge'], required: true, maxExercises: 3 }];
+    const slots = [{ id: 'glute_bridge', patterns: ['glute_bridge'], maxExercises: 3 }];
     const saved = await api.request('PUT', '/coach/training/settings', {
       token: coach.token,
       body: { workoutTypes: { lower_glute: { slots } }, splits: { abc: { enabled: false } } },

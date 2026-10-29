@@ -103,7 +103,7 @@ async function seedExercises(count = LIBRARY.length) {
 interface PromptFacts {
   candidates: { alias: string; name: string; patterns: string[]; variants: string[] }[];
   splits: { id: string; days: Record<string, string[]> }[];
-  slots: Record<string, { id: string; required: boolean; patterns: string[] }[]>;
+  slots: Record<string, { id: string; patterns: string[] }[]>;
   optionCount: number;
 }
 
@@ -124,19 +124,19 @@ function promptFacts(request: AiJsonRequest): PromptFacts {
       return [count, types.split(', ')];
     })),
   }));
-  const typeBlock = text.split('WORKOUT TYPES AND THEIR SLOTS')[1].split('CANDIDATE EXERCISE FAMILIES')[0];
+  const typeBlock = text.split('WORKOUT TYPES AND THEIR SUGGESTED SLOTS')[1].split('CANDIDATE EXERCISE FAMILIES')[0];
   const slots: PromptFacts['slots'] = {};
   for (const m of typeBlock.matchAll(/^([a-z_]+): (.+)$/gm)) {
     slots[m[1]] = m[2].split('; ').map((entry) => {
-      const parts = entry.match(/^([a-z_]+)(\*?) \[([^\]]+)\]/)!;
-      return { id: parts[1], required: parts[2] === '*', patterns: parts[3].split(', ') };
+      const parts = entry.match(/^([a-z_]+) \[([^\]]+)\]/)!;
+      return { id: parts[1], patterns: parts[2].split(', ') };
     });
   }
   const optionCount = Number(text.match(/Return (?:exactly )?(\d) split option/)![1]);
   return { candidates, splits, slots, optionCount };
 }
 
-/** A reply that passes every rule: option 1's day pattern, every required slot filled from fitting families. */
+/** A reply that passes every rule: option 1's day pattern, the first six slots filled from fitting families. */
 function validReply(request: AiJsonRequest, splitId = 'full_body', days = 3) {
   const facts = promptFacts(request);
   const types = facts.splits.find((split) => split.id === splitId)!.days[String(days)];
@@ -157,16 +157,21 @@ function validReply(request: AiJsonRequest, splitId = 'full_body', days = 3) {
     ],
     workouts: types.map((type, w) => {
       const used = new Set<string>();
+      // Slots are suggestions: the reply fills up to six that have a fitting family (none is required).
+      const picks = facts.slots[type]
+        .flatMap((slot) => {
+          const candidate = facts.candidates.find((c) => !used.has(c.alias) && c.patterns.some((p) => slot.patterns.includes(p)));
+          if (!candidate) return [];
+          used.add(candidate.alias);
+          return [{ slot, candidate }];
+        })
+        .slice(0, 6);
       return {
         workoutType: type,
         title: `Full body ${w + 1}`,
         dayOfWeek: w * 2,
         focus: 'Whole body strength.',
-        exercises: facts.slots[type]
-          .filter((slot) => slot.required)
-          .map((slot, e) => {
-            const candidate = facts.candidates.find((c) => !used.has(c.alias) && c.patterns.some((p) => slot.patterns.includes(p)))!;
-            used.add(candidate.alias);
+        exercises: picks.map(({ slot, candidate }, e) => {
             return {
               slotId: slot.id,
               exercise: candidate.alias,
@@ -176,7 +181,7 @@ function validReply(request: AiJsonRequest, splitId = 'full_body', days = 3) {
               repsMax: 12,
               durationSec: null,
               restSec: 90,
-              supersetGroup: e >= 4 ? 'A' : null,
+              supersetGroup: picks.length === 6 && e >= 4 ? 'A' : null,
               why: `Reason ${candidate.alias}.`,
             };
           }),
@@ -377,7 +382,6 @@ describe('AI plan recommendations', () => {
       bad.workouts[1].workoutType = 'upper';
       bad.workouts[0].exercises[0].variant = 'trap_bar';
       bad.workouts[0].exercises[2].slotId = 'core';
-      bad.workouts[2].exercises.splice(5, 1); // the core slot is required
       return reply(bad);
     });
 
@@ -392,7 +396,6 @@ describe('AI plan recommendations', () => {
     expect(issues).toContain('workoutType must be "full_body"');
     expect(issues).toContain('variant "trap_bar" is not listed');
     expect(issues).toMatch(/don't fit slot core/);
-    expect(issues).toContain('required slot core is empty');
   });
 
   it('builds the plan for the split the coach asks for, and refuses an unknown split', async () => {

@@ -27,6 +27,9 @@ function food(group: FoodGroup, name: string, dietTags: DietTag[] = [], extra: P
     category: null,
     order: nextId,
     archivedAt: null,
+    source: 'mine',
+    basedOn: null,
+    hidden: false,
     ...extra,
   };
 }

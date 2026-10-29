@@ -11,7 +11,7 @@ import { MAX_CANDIDATES } from './trainingPlan.constants';
 // v2 (Phase 15): the coach-facing texts and the workout titles are written in the coach's language.
 // v3 (Phase 12b): split options from the coach's config with pros / cons; the plan of the first
 // option follows its day pattern; every exercise fills a slot with an exercise family + variant.
-export const TRAINING_PLAN_PROMPT_VERSION = 'training-plan-v3';
+export const TRAINING_PLAN_PROMPT_VERSION = 'training-plan-v4';
 
 /** A split the model may choose: its id and the day counts allowed for her. */
 export interface SplitOffer {
@@ -34,8 +34,8 @@ Step 1 — analysis: read her profile (goals, training days, experience, recover
 
 Step 2 — split options: choose from the SPLITS list only (by id), each with a days-per-week value from that split's allowed days. Return exactly the number of options asked for, best first. For each option: why it fits her, 1-3 pros and 1-3 cons (recovery, time, experience, goals, equipment). A beginner or a returning trainee usually does better with fewer, simpler sessions (full body, upper / lower); more days and push / pull / legs or ABC suit experienced trainees.
 
-Step 3 — the plan for option 1: one workout per day of that split, in the given order of workout types (workoutType). Every workout has a short title (e.g. "Upper A"), a dayOfWeek (0 = Sunday ... 6 = Saturday, each day at most once, rest days between hard sessions when possible), a one-line focus for the coach, and exercises that fill its slots:
-- Fill every required slot (marked *) with one exercise; add optional slots and a second exercise in a slot only when it helps her goals (respect each slot's max). Aim for 4 to 8 exercises per workout.
+Step 3 — the plan for option 1: one workout per day of that split, in the given order of workout types (workoutType). Every workout has a short title (at most 40 characters, e.g. "Upper A"), a dayOfWeek (0 = Sunday ... 6 = Saturday, each day at most once, rest days between hard sessions when possible), a one-line focus for the coach, and exercises that fill its slots:
+- The slots are suggestions, none is required: fill the ones that serve her goals, usually one exercise each; leave a slot empty when it doesn't help her, and add a second exercise in a slot only when it helps (respect each slot's max). Aim for 4 to 8 exercises per workout.
 - Each exercise: slotId (a slot of that workout type), exercise = a candidate family alias (F001, ...) whose patterns fit the slot, and variant = one of the variants listed for that family (only those — they match her equipment and level).
 - Never invent an exercise, a family alias, a variant, a slot or a split.
 - Order: main compound lift first, then secondary compound moves, then isolation, core last.
@@ -160,7 +160,7 @@ function workoutTypeLines(config: TrainingConfig, menu: SplitMenu): string[] {
   return config.workoutTypes
     .filter((type) => used.has(type.id))
     .map((type) => {
-      const slots = type.slots.map((slot) => `${slot.id}${slot.required ? '*' : ''} [${slot.patterns.join(', ')}] max ${slot.maxExercises}`);
+      const slots = type.slots.map((slot) => `${slot.id} [${slot.patterns.join(', ')}] max ${slot.maxExercises}`);
       return `${type.id}: ${slots.join('; ')}`;
     });
 }
@@ -190,7 +190,7 @@ export function buildTrainingPlanUserMessage(
     'SPLITS YOU MAY CHOOSE FROM (id | allowed days per week: workout type of each day, in order):',
     ...splitLines(config, menu),
     '',
-    'WORKOUT TYPES AND THEIR SLOTS (slot id, * = required, [patterns that fit], max exercises):',
+    'WORKOUT TYPES AND THEIR SUGGESTED SLOTS (slot id, [patterns that fit], max exercises):',
     ...workoutTypeLines(config, menu),
     '',
     'CANDIDATE EXERCISE FAMILIES (alias | name | patterns | muscles | variants she can use (level)):',

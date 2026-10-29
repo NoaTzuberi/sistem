@@ -10,6 +10,7 @@ import {
   MAX_WORKOUT_EXERCISES,
   MAX_EXERCISE_SETS,
   MAX_PLAN_TEXT_LENGTH,
+  MAX_WORKOUT_TITLE_LENGTH,
 } from './plan.constants';
 import { isSunday } from './planWeek';
 import { parsePlanCardio } from '../cardio/cardio.validation';
@@ -18,6 +19,8 @@ import { validatePlanExerciseTargets } from './planSets';
 
 /** Ids of the coach's training config (workout types, slots, splits — Phase 12b). */
 const TRAINING_ID_PATTERN = /^[a-z0-9_]{1,40}$/;
+/** Suggested slots one workout can hide (a type has at most 12). */
+const MAX_HIDDEN_SLOTS = 12;
 
 export function validatePlanIdParam(id: unknown): ServerMessage | null {
   if (typeof id !== 'string' || !mongoose.isValidObjectId(id)) {
@@ -274,7 +277,7 @@ export function parseSavePlanPayload(body: unknown): ParseResult<SavePlanInput> 
 
     const title = typeof raw.title === 'string' ? raw.title.trim() : '';
     if (!title) problems.push(msg('plan_workout_title_required'));
-    else if (title.length > MAX_PLAN_TEXT_LENGTH) problems.push(msg('plan_workout_title_too_long'));
+    else if (title.length > MAX_WORKOUT_TITLE_LENGTH) problems.push(msg('plan_workout_title_too_long', { max: MAX_WORKOUT_TITLE_LENGTH }));
 
     let dayOfWeek: number | undefined;
     if (!isMissing(raw.dayOfWeek)) {
@@ -291,6 +294,16 @@ export function parseSavePlanPayload(body: unknown): ParseResult<SavePlanInput> 
     if (!isMissing(raw.workoutType) && raw.workoutType !== '') {
       if (typeof raw.workoutType === 'string' && TRAINING_ID_PATTERN.test(raw.workoutType)) workoutType = raw.workoutType;
       else problems.push(msg('plan_workout_type_unknown'));
+    }
+    // The type's suggested slots she removed (coach-only). An id her config no longer has is harmless.
+    let hiddenSlotIds: string[] | undefined;
+    if (!isMissing(raw.hiddenSlotIds)) {
+      const ids = raw.hiddenSlotIds;
+      if (Array.isArray(ids) && ids.length <= MAX_HIDDEN_SLOTS && ids.every((id) => typeof id === 'string' && TRAINING_ID_PATTERN.test(id))) {
+        if (ids.length > 0) hiddenSlotIds = [...new Set(ids as string[])];
+      } else {
+        problems.push(msg('plan_slot_unknown'));
+      }
     }
     if (rawExercises.length > MAX_WORKOUT_EXERCISES) {
       problems.push(msg('plan_too_many_exercises', { max: MAX_WORKOUT_EXERCISES }));
@@ -312,6 +325,7 @@ export function parseSavePlanPayload(body: unknown): ParseResult<SavePlanInput> 
       notes: workoutNotes,
       // A cardio workout has no slot template.
       workoutType: isCardio ? undefined : workoutType,
+      ...(!isCardio && workoutType && hiddenSlotIds ? { hiddenSlotIds } : {}),
       ...(isCardio && cardio ? { kind: 'cardio' as const, cardio } : {}),
       exercises,
     });

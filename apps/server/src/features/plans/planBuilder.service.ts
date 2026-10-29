@@ -58,6 +58,7 @@ async function toCoachPlans(plans: LeanPlan[]): Promise<CoachPlan[]> {
         return {
           ...workout,
           ...(source?.workoutType ? { workoutType: source.workoutType } : {}),
+          ...(source?.hiddenSlotIds?.length ? { hiddenSlotIds: [...source.hiddenSlotIds] } : {}),
           exercises: workout.exercises.map((exercise) => {
             const slotId = slots.get(exercise.id);
             return slotId ? { ...exercise, slotId } : exercise;

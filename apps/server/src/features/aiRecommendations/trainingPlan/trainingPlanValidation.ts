@@ -208,7 +208,6 @@ export async function validateTrainingPlanReply(
     if (type) {
       for (const slot of type.slots) {
         const count = perSlot.get(slot.id) ?? 0;
-        if (slot.required && count === 0) issues.push(`${workoutLabel(workoutIndex)}: required slot ${slot.id} is empty.`);
         if (count > slot.maxExercises) issues.push(`${workoutLabel(workoutIndex)}: slot ${slot.id} has ${count} exercises (max ${slot.maxExercises}).`);
       }
     }

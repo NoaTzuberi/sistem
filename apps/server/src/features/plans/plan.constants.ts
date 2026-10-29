@@ -18,3 +18,5 @@ export const MAX_PLAN_WORKOUTS = 14;
 export const MAX_WORKOUT_EXERCISES = 40;
 export const MAX_EXERCISE_SETS = 20;
 export const MAX_PLAN_TEXT_LENGTH = 2000;
+/** A workout's name, as the coach types it in the builder (owner, 2026-10-28). */
+export const MAX_WORKOUT_TITLE_LENGTH = 40;

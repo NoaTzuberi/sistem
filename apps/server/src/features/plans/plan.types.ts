@@ -36,6 +36,7 @@ export interface PlanWorkoutFields {
   notes?: string;
   /** Phase 12b, coach-only: the workout type (slot template); missing = free workout. */
   workoutType?: string;
+  hiddenSlotIds?: string[];
   /** Missing = strength. */
   kind?: WorkoutKind;
   /** A cardio workout's blocks (it has no exercises). */

@@ -32,7 +32,7 @@ export function buildSplitMenu(config: TrainingConfig, range: { min: number; max
   return { ok: true, value: { offers: fitting, optionCount: Math.min(MAX_SPLIT_OPTIONS, fitting.length) } };
 }
 
-/** Every pattern a slot of the offered splits asks for — required slots first, in slot order. */
+/** Every pattern a slot of the offered splits asks for, in slot order. */
 export function neededPatterns(config: TrainingConfig, menu: SplitMenu): PatternId[] {
   const typeIds = new Set(
     menu.offers.flatMap(({ splitId, days }) => {
@@ -41,6 +41,5 @@ export function neededPatterns(config: TrainingConfig, menu: SplitMenu): Pattern
     }),
   );
   const slots = config.workoutTypes.filter((type) => typeIds.has(type.id)).flatMap((type) => type.slots);
-  const ordered = [...slots.filter((slot) => slot.required), ...slots.filter((slot) => !slot.required)];
-  return [...new Set(ordered.flatMap((slot) => slot.patterns))];
+  return [...new Set(slots.flatMap((slot) => slot.patterns))];
 }

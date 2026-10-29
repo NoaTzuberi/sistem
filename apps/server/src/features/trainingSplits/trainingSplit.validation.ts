@@ -18,19 +18,19 @@ const fail = (detail: string): Result => ({ error: msg('training_settings_invali
 
 function parseSlot(raw: unknown): TrainingSlot | string {
   if (!isObject(raw)) return 'a slot must be an object';
-  const { id, patterns, required, maxExercises, label } = raw;
+  // `required` (old settings) is accepted and dropped: slots are suggestions (owner, 2026-10-28).
+  const { id, patterns, maxExercises, label } = raw;
   if (typeof id !== 'string' || !ID_PATTERN.test(id)) return 'slot id must be lower_snake_case';
   if (!Array.isArray(patterns) || patterns.length === 0 || !patterns.every((p) => PATTERN_IDS.includes(p as PatternId))) {
     return `slot ${id}: patterns must be known pattern ids`;
   }
-  if (typeof required !== 'boolean') return `slot ${id}: required must be true or false`;
   if (!Number.isInteger(maxExercises) || (maxExercises as number) < 1 || (maxExercises as number) > MAX_EXERCISES_PER_SLOT) {
     return `slot ${id}: maxExercises must be 1–${MAX_EXERCISES_PER_SLOT}`;
   }
   if (label !== undefined && (typeof label !== 'string' || label.trim().length === 0 || label.length > LABEL_MAX)) {
     return `slot ${id}: label must be short text`;
   }
-  return { id, patterns: [...new Set(patterns as PatternId[])], required, maxExercises: maxExercises as number, ...(label ? { label: (label as string).trim() } : {}) };
+  return { id, patterns: [...new Set(patterns as PatternId[])], maxExercises: maxExercises as number, ...(label ? { label: (label as string).trim() } : {}) };
 }
 
 export function parseTrainingSettingsPayload(body: unknown): Result {

@@ -75,6 +75,8 @@ export const planWorkoutSchema = new Schema<PlanWorkoutFields>({
   order: { type: Number, required: true, min: 0 },
   notes: { type: String, trim: true },
   workoutType: { type: String, trim: true },
+  // Coach-only: the type's suggested slots she removed from this workout.
+  hiddenSlotIds: { type: [String], default: undefined },
   // Missing = strength (every plan from before cardio).
   kind: { type: String, enum: WORKOUT_KIND_IDS, default: undefined },
   cardio: { type: planCardioSchema, default: undefined },
