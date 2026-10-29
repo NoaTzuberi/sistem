@@ -1,0 +1,71 @@
+/* The "+ free workout" menu: the photo source sheet's soft grouped list. */
+.free-menu-title {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-display-xl);
+  color: var(--color-ink);
+}
+
+.free-menu-options {
+  margin: var(--space-3) 0 var(--space-2);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-fill-soft);
+  list-style: none;
+}
+
+.free-menu-options li + li {
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.free-menu-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding-block: var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.free-menu-option:active {
+  transform: scale(var(--press-scale));
+}
+
+.free-menu-option:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--space-1);
+  border-radius: var(--radius-profile-icon-tile);
+}
+
+.free-menu-option-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-profile-icon-tile);
+  height: var(--size-profile-icon-tile);
+  border-radius: var(--radius-profile-icon-tile);
+  background-color: var(--color-card);
+  transition: background-color var(--transition-fast) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .free-menu-option:hover .free-menu-option-icon {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-menu-option {
+    transition: none;
+  }
+}

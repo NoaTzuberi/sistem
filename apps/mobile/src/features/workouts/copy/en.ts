@@ -191,6 +191,11 @@ export const en: CopyShape<typeof he> = {
   preview: {
     bodyweight: 'Bodyweight',
   },
+  freeMenu: {
+    strength: 'Free strength workout',
+    timer: 'Interval timer',
+    run: 'Free run',
+  },
   free: {
     intro: 'A workout you build yourself. It is saved to your history and your coach will see it.',
     scratch: 'From scratch',

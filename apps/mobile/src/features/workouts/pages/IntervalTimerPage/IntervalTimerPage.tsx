@@ -50,7 +50,7 @@ function SetupRow({ label, value, canDecrease, canIncrease, onDecrease, onIncrea
 }
 
 /**
- * The free interval timer (opened from Home and the session ⋯ menu): she sets work,
+ * The free interval timer (opened from the Workouts "+ free workout" menu and the session ⋯ menu): she sets work,
  * rest and rounds herself. Same screen, sounds and timing as a planned interval, but
  * it logs nothing and needs no connection.
  */

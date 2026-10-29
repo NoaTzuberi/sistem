@@ -8,7 +8,6 @@ export const he = {
   noPlanThisWeek: 'עדיין אין תוכנית לשבוע הזה.',
   noWorkoutsInPlan: 'אין אימונים בתוכנית הזו.',
   allDone: 'כל האימונים של השבוע הושלמו.',
-  intervalTimer: 'טיימר אינטרוולים',
   loading: 'טוען…',
   loadError: 'לא הצלחנו לטעון את השבוע שלך.',
   dismissStartingPhotoReminder: 'סגירת התזכורת לתמונת התחלה',

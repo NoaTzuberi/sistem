@@ -195,6 +195,12 @@ export const he = {
   preview: {
     bodyweight: 'משקל גוף',
   },
+  // The "+ אימון חופשי" menu (owner wording 2026-10-29).
+  freeMenu: {
+    strength: 'אימון כוח חופשי',
+    timer: 'טיימר אינטרוולים',
+    run: 'ריצה חופשית',
+  },
   free: {
     intro: 'אימון שאת בונה לבד. הוא יישמר בהיסטוריה והמאמנת שלך תראה אותו.',
     scratch: 'מאפס',

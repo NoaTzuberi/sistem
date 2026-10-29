@@ -8,7 +8,6 @@ import { listNotifications, markRead } from '../../../services/notifications/not
 import { refreshUnreadCount } from '../../notifications/unreadCount';
 import { useMyAchievements } from '../../achievements/hooks/useMyAchievements';
 import { celebrate } from '../../achievements/celebration';
-import { readSavedFreeTimerSettings } from '../../workouts/data/freeTimerSettings';
 import { useStartingPhotoReminder } from './useStartingPhotoReminder';
 import { pickNextAchievements, stageState, weekCount } from '../data/homeDisplay';
 import { homeCopy } from '../copy';
@@ -70,7 +69,6 @@ export function useHomeData(coachingId?: string) {
   const nutrition = useOptionalLoad<TraineeNutritionPlanResponse>(getNutritionPlan);
   const updates = useOptionalLoad(loadUpdates);
   const [handledUpdateId, setHandledUpdateId] = useState<string | null>(null);
-  const [lastInterval] = useState(() => readSavedFreeTimerSettings()?.workSec ?? null);
 
   // Anything not celebrated yet (a skipped summary, an unlock on another device) gets its moment here.
   useEffect(() => {
@@ -148,6 +146,5 @@ export function useHomeData(coachingId?: string) {
     planUpdate,
     coachingEnded,
     markUpdateSeen,
-    lastInterval,
   };
 }

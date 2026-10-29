@@ -9,7 +9,6 @@ export const en: CopyShape<typeof he> = {
   noPlanThisWeek: 'No plan for this week yet.',
   noWorkoutsInPlan: 'No workouts in this plan.',
   allDone: "All of this week's workouts are done.",
-  intervalTimer: 'Interval timer',
   loading: 'Loading…',
   loadError: "Couldn't load your week.",
   dismissStartingPhotoReminder: 'Dismiss starting photo reminder',

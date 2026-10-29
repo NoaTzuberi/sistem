@@ -25,7 +25,6 @@ import { StartingPhotoPrompt } from '../StartingPhotoPrompt/StartingPhotoPrompt'
 import { WeekTrack } from '../WeekTrack/WeekTrack';
 import { WeekDayDetail } from '../WeekDayDetail/WeekDayDetail';
 import { Scoreboard } from '../Scoreboard/Scoreboard';
-import { IntervalTimerEntry } from '../IntervalTimerEntry/IntervalTimerEntry';
 import { CoachNote } from '../CoachNote/CoachNote';
 import type { QuickReply } from '../QuickReplies/QuickReplies';
 import { NextAchievement } from '../NextAchievement/NextAchievement';
@@ -191,8 +190,6 @@ export function HomeScreen() {
           <Scoreboard week={home.weekCount} streak={home.achievements.streak.current} />
         </section>
       )}
-
-      <IntervalTimerEntry lastWorkSec={home.lastInterval} onOpen={() => navigate(ROUTES.INTERVAL_TIMER)} />
 
       {coachAt && (coachMessage || update || chat || connect.reaction) && (
         <section className="home-section" aria-labelledby="home-coach-title">

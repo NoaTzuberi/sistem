@@ -14,7 +14,7 @@ import { useStartWorkout } from '../../hooks/useStartWorkout';
 import { useWeekPlan } from '../../hooks/useWeekPlan';
 import { cardioCopy } from '../../../cardio/copy';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { useFreeWorkout } from '../../hooks/useFreeWorkout';
+import { useFreeMenu } from '../../hooks/useFreeMenu';
 import { toPlannedWorkouts, type PlannedWorkout } from '../../data/weekPlanDisplay';
 import { addMonths, HISTORY_FILTERS, weekStartOf, type HistoryFilter, type MonthKey } from '../../data/historyDisplay';
 import { StartConflictModal } from '../StartConflictModal/StartConflictModal';
@@ -27,6 +27,7 @@ import { NextWeekLock } from '../NextWeekLock/NextWeekLock';
 import { FreeWorkoutEntry } from '../FreeWorkoutEntry/FreeWorkoutEntry';
 import { WorkoutPreviewSheet } from '../WorkoutPreviewSheet/WorkoutPreviewSheet';
 import { FreeWorkoutSheet } from '../FreeWorkoutSheet/FreeWorkoutSheet';
+import { FreeMenuSheet } from '../FreeMenuSheet/FreeMenuSheet';
 import { HistorySummary } from '../HistorySummary/HistorySummary';
 import { MonthCalendar } from '../MonthCalendar/MonthCalendar';
 import { HistoryFilters } from '../HistoryFilters/HistoryFilters';
@@ -59,8 +60,9 @@ export function WorkoutsScreen() {
   const cardioText = useCopy(cardioCopy);
   const starter = useStartWorkout();
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
-  const [isFreeOpen, setIsFreeOpen] = useState(false);
-  const free = useFreeWorkout(isFreeOpen);
+  // "+ free workout" opens the menu (strength / interval timer / free run); strength-only actions open the sheet.
+  const freeMenu = useFreeMenu();
+  const openFree = freeMenu.openStrength;
   // Self-guided = no live coaching: no "waiting for your coach" lines, her own tools instead.
   const selfGuided = useAuth().user?.coachingStatus == null;
   const ownCardio = useOwnCardioWorkouts();
@@ -111,11 +113,6 @@ export function WorkoutsScreen() {
     } else {
       setPreview({ planned, isNextWeek: false });
     }
-  }
-
-  function openFree() {
-    free.reset();
-    setIsFreeOpen(true);
   }
 
   // History paging: the sentinel under the list loads the month before.
@@ -243,7 +240,7 @@ export function WorkoutsScreen() {
                   {copy.plan.moreToMove}
                 </h2>
               </div>
-              <FreeWorkoutEntry onOpen={openFree} />
+              <FreeWorkoutEntry onOpen={freeMenu.openMenu} />
             </>
           )}
         </>
@@ -324,7 +321,7 @@ export function WorkoutsScreen() {
       <LargeTitleHeader
         title={copy.list.title}
         action={
-          <button type="button" className="workouts-free-pill" onClick={openFree}>
+          <button type="button" className="workouts-free-pill" onClick={freeMenu.openMenu} aria-haspopup="dialog">
             <span className="workouts-free-pill-icon" aria-hidden="true">
               <IconPlus size={13} stroke={3} />
             </span>
@@ -358,7 +355,8 @@ export function WorkoutsScreen() {
         error={starter.error}
       />
 
-      <FreeWorkoutSheet isOpen={isFreeOpen} onClose={() => setIsFreeOpen(false)} free={free} />
+      <FreeMenuSheet isOpen={freeMenu.isMenuOpen} onClose={freeMenu.closeMenu} onPick={freeMenu.pick} />
+      <FreeWorkoutSheet isOpen={freeMenu.isStrengthOpen} onClose={freeMenu.closeStrength} free={freeMenu.free} />
 
       <StartConflictModal
         active={starter.conflict}
