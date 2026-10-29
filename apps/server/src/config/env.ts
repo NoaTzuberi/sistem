@@ -2,7 +2,8 @@ import dotenv from 'dotenv';
 import { parseClientOrigins } from './clientOrigins';
 import { parsePublicUrl } from './publicUrls';
 
-dotenv.config();
+// A setup script given --env-file already loaded that file instead (config/envFile.ts).
+if (!process.env.SISTEM_ENV_FILE) dotenv.config();
 
 const DEFAULT_PORT = 5002;
 const DEFAULT_JWT_SECRET = 'JWT_SECRET';

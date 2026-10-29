@@ -6,9 +6,11 @@
  *   npm run migrate:food-bank -- --apply                        (writes)
  *   npm run migrate:food-bank -- --from <coachEmail>            (source coach; default coach@sistem.dev)
  *   add --allow-remote for a non-local database (production included)
+ *   add --env-file <path> to use that file instead of .env (e.g. .env.prod)
  *
  * Prints the target database (hosts + name only) and counts — never connection strings or .env values.
  */
+import '../../../config/envFile';
 import mongoose from 'mongoose';
 import { connectDatabase } from '../../../config/database';
 import { User } from '../../users/user.model';

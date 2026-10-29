@@ -119,6 +119,15 @@ export async function readNutritionSeedFile(path: string): Promise<NutritionSeed
   return JSON.parse(await readFile(path, 'utf8')) as NutritionSeedData;
 }
 
+/** seed:nutrition's dry run (read-only): what --apply would add to the system bank. Same checks as apply. */
+export async function planNutritionSeed(data: NutritionSeedData): Promise<{ wouldCreate: number; alreadyThere: number }> {
+  const problems = validateNutritionSeed(data);
+  if (problems.length > 0) throw new Error(`The nutrition seed file is not valid:\n- ${problems.join('\n- ')}`);
+  const keys = data.foods.map((food) => `${data.seedKeyPrefix}:${food.key}`);
+  const alreadyThere = await FoodItem.countDocuments({ scope: 'system', itemKey: { $in: keys } });
+  return { wouldCreate: keys.length - alreadyThere, alreadyThere };
+}
+
 export interface ApplyNutritionSeedOptions {
   /** The file's template (if any) goes to this coach — templates are per coach. Without one it is skipped. */
   templateCoachId?: string;

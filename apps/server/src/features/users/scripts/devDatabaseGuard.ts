@@ -64,7 +64,10 @@ export function assertSetupDatabase(allowRemote: boolean): void {
     process.exit(1);
   }
   const target = describeDatabaseUrl(config.databaseUrl);
-  console.log(`Database: ${target.hosts.join(', ')} / ${target.databaseName}`);
+  // The database name and the cluster's host suffix only (never credentials or the cluster's own name).
+  const suffix = [...new Set(target.hosts.map((host) => (target.isLocal ? host : host.replace(/^[^.]+\./, '*.'))))].join(', ');
+  const source = process.env.SISTEM_ENV_FILE ? `env file ${process.env.SISTEM_ENV_FILE}` : '.env';
+  console.log(`Database: ${target.databaseName} on ${suffix} (from ${source})`);
   if (!target.isLocal) {
     if (!allowRemote) {
       console.error('Refusing to run: DATABASE_URL points to a non-local database. Re-run with --allow-remote if you mean it.');
