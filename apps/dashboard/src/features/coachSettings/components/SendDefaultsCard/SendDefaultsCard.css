@@ -1,17 +1,66 @@
+.send-defaults-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-defaults-card);
+  border-radius: var(--radius-defaults-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-defaults-card);
+  text-align: start;
+}
+
+.send-defaults-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.send-defaults-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-defaults-tile);
+  height: var(--size-defaults-tile);
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-defaults-workouts-tile);
+  color: var(--color-defaults-workouts-icon);
+}
+
+.send-defaults-card[data-kind='nutrition'] .send-defaults-tile {
+  background-color: var(--color-defaults-nutrition-tile);
+  color: var(--color-defaults-nutrition-icon);
+}
+
+.send-defaults-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.send-defaults-title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+.send-defaults-sub {
+  font-size: var(--text-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-muted);
+}
+
 .send-defaults-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-width: 640px;
 }
 
 .send-defaults-empty {
   margin: 0;
-  padding: var(--space-3);
-  border-radius: var(--radius-field);
-  background-color: var(--color-primary-soft);
-  color: var(--color-ink);
   font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .send-defaults-field {
@@ -26,37 +75,84 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Grows with the text (where supported); 52px at least. */
 .send-defaults-input {
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width-thin) solid var(--color-border);
-  border-radius: var(--radius-field);
-  background-color: var(--color-bg);
+  width: 100%;
+  min-height: var(--size-defaults-field-min);
+  padding: 14px 16px;
+  border: 0;
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-defaults-field);
   color: var(--color-ink);
   font: inherit;
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
+  line-height: var(--line-height-base);
+  field-sizing: content;
   resize: vertical;
+  outline: none;
+  transition:
+    background-color var(--transition-fast) ease,
+    box-shadow var(--transition-fast) ease;
 }
 
-.send-defaults-input:focus-visible {
-  outline: var(--border-width-medium) solid var(--color-primary-deep);
-  outline-offset: var(--focus-ring-offset);
+.send-defaults-input:focus {
+  background-color: var(--color-card);
+  box-shadow: var(--ring-field);
+}
+
+.send-defaults-input:disabled {
+  cursor: progress;
 }
 
 .send-defaults-meta {
   display: flex;
   justify-content: space-between;
   gap: var(--space-2);
-  color: var(--color-fr-muted);
+  color: var(--color-text-muted);
   font-size: var(--text-xs);
+}
+
+.send-defaults-count {
+  flex: none;
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
 }
 
 .send-defaults-error {
   margin: 0;
-  color: var(--color-fr-cherry);
+  color: var(--color-error);
   font-size: var(--text-sm);
 }
 
 .send-defaults-actions {
   display: flex;
-  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.send-defaults-remove {
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.send-defaults-remove:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .send-defaults-input,
+  .send-defaults-remove {
+    transition: none;
+  }
 }

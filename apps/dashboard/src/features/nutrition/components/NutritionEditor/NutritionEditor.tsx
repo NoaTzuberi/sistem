@@ -15,7 +15,7 @@ import { nutritionCopy } from '../../copy';
 import { scrollToSection } from '../../data/scrollToSection';
 import { useNutritionCalc } from '../../hooks/useNutritionCalc';
 import { useNutritionEditor } from '../../hooks/useNutritionEditor';
-import { useSendNote } from '../../hooks/useSendNote';
+import { usePlanSendNote } from '../../../sendDefaults/hooks/usePlanSendNote';
 import { useTemplateHandoff } from '../../hooks/useTemplateHandoff';
 import { draftDayPortions, portionsKcal, usePortionBudget } from '../../hooks/usePortionBudget';
 import { usePublishChecklist } from '../../hooks/usePublishChecklist';
@@ -34,7 +34,7 @@ import { PortionBudgetCard } from '../PortionBudgetCard/PortionBudgetCard';
 import { PreferencesCard } from '../PreferencesCard/PreferencesCard';
 import { PublishChecklist } from '../PublishChecklist/PublishChecklist';
 import { SaveTemplateCard } from '../SaveTemplateCard/SaveTemplateCard';
-import { SendNote } from '../SendNote/SendNote';
+import { SendNoteSection } from '../../../sendDefaults/components/SendNoteSection/SendNoteSection';
 import { StepNav } from '../StepNav/StepNav';
 import './NutritionEditor.css';
 
@@ -66,7 +66,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
   // Publishing goes through the designed modal (confirm → the existing publish call → celebration).
   // The modal is the send sheet: the message + tip chosen there go into the draft, then the publish
   // saves and freezes it (the version keeps them as sent).
-  const sendNote = useSendNote();
+  const sendNote = usePlanSendNote('nutrition');
   const { take: takeNote } = sendNote;
   const { publish: publishDraft } = editor;
   const publishWithNote = useCallback(async () => {
@@ -170,7 +170,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
   }
 
   function handlePublish() {
-    sendNote.reset(draft);
+    sendNote.reset(draft.introMessage);
     setMessage(undefined);
     publishFlow.open();
   }
@@ -339,7 +339,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
           navigate(traineePath(traineeId, 'nutrition'));
         }}
       >
-        <SendNote note={sendNote} />
+        <SendNoteSection note={sendNote} />
       </PublishModal>
     </div>
   );

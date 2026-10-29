@@ -3,7 +3,7 @@ import { PageHeader } from '../../../../components/common/PageHeader/PageHeader'
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
 import { PaymentsCard } from '../../components/PaymentsCard/PaymentsCard';
-import { SendDefaultsCard } from '../../components/SendDefaultsCard/SendDefaultsCard';
+import { SendDefaultsSection } from '../../components/SendDefaultsSection/SendDefaultsSection';
 import { coachSettingsCopy } from '../../copy';
 import './CoachSettingsPage.css';
 
@@ -14,7 +14,7 @@ export function CoachSettingsPage() {
   return (
     <div className="coach-settings-page">
       <PageHeader title={copy.title} subtitle={copy.subtitle} />
-      <SendDefaultsCard onToast={showToast} />
+      <SendDefaultsSection />
       <PaymentsCard onToast={showToast} />
       <Toast message={toastMessage} />
     </div>

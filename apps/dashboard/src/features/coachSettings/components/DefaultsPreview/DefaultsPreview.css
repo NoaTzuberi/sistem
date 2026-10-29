@@ -1,0 +1,76 @@
+.defaults-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.defaults-preview-title {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* A slice of her screen: white, the bubble and the tip card on it. */
+.defaults-preview-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width-thin) solid var(--color-hairline);
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-card);
+}
+
+.defaults-preview-bubble {
+  align-self: flex-start;
+  max-width: 92%;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-defaults-field);
+  border-start-start-radius: var(--radius-check);
+  background-color: var(--color-defaults-field);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  line-height: var(--line-height-base);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.defaults-preview-bubble-empty {
+  color: var(--color-text-muted);
+}
+
+.defaults-preview-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-primary-soft);
+  color: var(--color-ink);
+}
+
+.defaults-preview-tip-icon {
+  flex: none;
+  color: var(--color-primary-deep);
+}
+
+.defaults-preview-tip-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.defaults-preview-tip-title {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.defaults-preview-tip-text {
+  font-size: var(--text-sm);
+  line-height: var(--line-height-base);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}

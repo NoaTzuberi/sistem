@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { CoachPlan, PlanIssue } from '@sistem/types';
+import type { CoachPlan, PlanIssue, PublishPlanNote } from '@sistem/types';
 import { PlanRequestError } from '@sistem/api-client';
 import { deletePlan, publishPlan, savePlan, unpublishPlan } from '../../../services/coach/coachService';
 import { AUTOSAVE_DELAY_MS } from '../data/planDefaults';
@@ -118,10 +118,11 @@ export function usePlanEditor(traineeId: string, initialPlan: CoachPlan) {
     return () => window.removeEventListener('beforeunload', warn);
   }, [isDirty]);
 
-  const publish = useCallback(async (): Promise<boolean> => {
+  /** `note` = the message + tip sent with it (the publish sheet). */
+  const publish = useCallback(async (note?: PublishPlanNote): Promise<boolean> => {
     if (!(await save())) return false;
     try {
-      applyPlan(await publishPlan(traineeId, planId));
+      applyPlan(await publishPlan(traineeId, planId, note));
       setIssues([]);
       setError(undefined);
       return true;

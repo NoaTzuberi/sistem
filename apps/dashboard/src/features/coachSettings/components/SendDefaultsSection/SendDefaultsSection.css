@@ -1,0 +1,38 @@
+.send-defaults-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.send-defaults-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.send-defaults-section-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+.send-defaults-section-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Two cards side by side on desktop; stacked on a narrow window. */
+.send-defaults-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .send-defaults-section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

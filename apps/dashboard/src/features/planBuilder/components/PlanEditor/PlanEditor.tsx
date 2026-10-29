@@ -13,6 +13,8 @@ import type { PublishSummary } from '../../../../components/common/PublishModal/
 import { appCopy } from '../../../../copy';
 import { usePublishFlow } from '../../../../hooks/usePublishFlow';
 import { usePlanEditor } from '../../hooks/usePlanEditor';
+import { usePlanSendNote } from '../../../sendDefaults/hooks/usePlanSendNote';
+import { SendNoteSection } from '../../../sendDefaults/components/SendNoteSection/SendNoteSection';
 import { workoutColorClass } from '../../data/workoutColors';
 import { workoutTabId } from '../../data/workoutTabs';
 import { addExerciseToWorkout, moveItem } from '../../planDraft';
@@ -91,7 +93,12 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   const sharedText = useCopy(sharedCopy);
   const appText = useCopy(appCopy);
   // Publishing goes through the designed modal (confirm → the existing publish call → celebration).
-  const publishFlow = usePublishFlow(() => runAction(publish));
+  // The modal is the send sheet: the message + tip chosen there go out with the publish.
+  const sendNote = usePlanSendNote('workouts');
+  const publishFlow = usePublishFlow(async () => {
+    const note = await sendNote.take();
+    return runAction(() => publish(note));
+  });
   const exerciseCount = workouts.reduce((total, workout) => total + workout.exercises.length, 0);
   const publishSummary: PublishSummary = {
     kind: 'plan',
@@ -212,6 +219,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   }
 
   function handlePublish() {
+    sendNote.reset();
     publishFlow.open();
   }
 
@@ -382,7 +390,9 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
           publishFlow.close();
           navigate(plansTab);
         }}
-      />
+      >
+        <SendNoteSection note={sendNote} />
+      </PublishModal>
     </div>
   );
 }
