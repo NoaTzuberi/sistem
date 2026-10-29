@@ -25,5 +25,5 @@ export function useWeekPlan(coachingId?: string) {
   const load = useCallback(() => loadWeekPlan(coachingId), [coachingId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.list.loadError);
   const weekPlan = useMemo(() => (data ? buildWeekPlan(data.week, data.nextWeek) : null), [data]);
-  return { weekPlan, activeLog: data?.week.activeLog ?? null, error, isLoading, reload };
+  return { weekPlan, activeLog: data?.week.activeLog ?? null, coachName: data?.week.coach?.name ?? null, error, isLoading, reload };
 }

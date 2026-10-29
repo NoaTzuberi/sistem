@@ -87,12 +87,13 @@ export function useHomeData(coachingId?: string) {
     return planned.protein + planned.carb + planned.fat + planned.snack > 0 ? day : null;
   }, [mealLogs]);
 
-  // The newest coach-written text she has: this week's plan notes or the nutrition intro.
+  // The newest coach-written text she has: this week's plan message (else its notes) or the nutrition intro.
   const coachMessage: CoachMessage | null = useMemo(() => {
     const candidates: CoachMessage[] = [];
     const plan = data?.plan;
-    if (plan?.notes?.trim() && plan.publishedAt) {
-      candidates.push({ text: plan.notes.trim(), at: plan.publishedAt, note: 'plan', key: `plan:${plan.id}:${plan.publishedAt}`, unread: false });
+    const planText = plan?.introMessage?.trim() || plan?.notes?.trim();
+    if (plan && planText && plan.publishedAt) {
+      candidates.push({ text: planText, at: plan.publishedAt, note: 'plan', key: `plan:${plan.id}:${plan.publishedAt}`, unread: false });
     }
     const view = nutrition?.plan;
     if (view?.intro?.trim()) {

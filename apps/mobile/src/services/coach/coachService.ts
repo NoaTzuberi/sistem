@@ -1,4 +1,4 @@
-import { createCoachApi, createCoachCardioApi, createCoachPaymentApi, createInvitesApi } from '@sistem/api-client';
+import { createCoachApi, createCoachCardioApi, createCoachDefaultsApi, createCoachPaymentApi, createInvitesApi } from '@sistem/api-client';
 import { apiClient } from '../api/apiClient';
 
 // Coach mode follows and reacts (PRD §6): it reads, publishes / duplicates plans, and makes the light edits
@@ -32,3 +32,5 @@ export const { listTraineeCardioLogs } = createCoachCardioApi(apiClient);
 // Her own invite link (the Profile card) and payment details (read-only here — edited in the dashboard).
 export const { getInvites, createPersonalInvite } = createInvitesApi(apiClient);
 export const { getPayment } = createCoachPaymentApi(apiClient);
+// Her fixed message + tip per plan kind (the publish sheet; edited in the dashboard's Settings).
+export const { getSendDefaults, saveSendDefaults } = createCoachDefaultsApi(apiClient);

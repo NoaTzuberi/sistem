@@ -1,0 +1,5 @@
+.plan-coach-message {
+  display: flex;
+  flex-direction: column;
+  margin-block-end: var(--space-3);
+}

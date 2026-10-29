@@ -21,6 +21,7 @@ import { StartConflictModal } from '../StartConflictModal/StartConflictModal';
 import { LargeTitleHeader } from '../LargeTitleHeader/LargeTitleHeader';
 import { SegmentedTabs } from '../SegmentedTabs/SegmentedTabs';
 import { WeekHeader } from '../WeekHeader/WeekHeader';
+import { PlanCoachMessage } from '../PlanCoachMessage/PlanCoachMessage';
 import { UpNextCard } from '../UpNextCard/UpNextCard';
 import { WorkoutTicketCarousel } from '../WorkoutTicketCarousel/WorkoutTicketCarousel';
 import { NextWeekLock } from '../NextWeekLock/NextWeekLock';
@@ -56,7 +57,7 @@ export function WorkoutsScreen() {
   const [params, setParams] = useSearchParams();
   const tab: WorkoutsTab = params.get(TAB_PARAM) === 'history' ? 'history' : 'plan';
 
-  const { weekPlan, activeLog, error, isLoading, reload } = useWeekPlan();
+  const { weekPlan, activeLog, coachName, error, isLoading, reload } = useWeekPlan();
   const cardioText = useCopy(cardioCopy);
   const starter = useStartWorkout();
   const [preview, setPreview] = useState<{ planned: PlannedWorkout; isNextWeek: boolean } | null>(null);
@@ -143,6 +144,7 @@ export function WorkoutsScreen() {
       {weekPlan && (
         <>
           <WeekHeader weekStartDate={weekPlan.weekStartDate} workouts={weekPlan.workouts} doneCount={weekPlan.doneCount} />
+          {weekPlan.plan && <PlanCoachMessage plan={weekPlan.plan} coachName={coachName} />}
 
           {!weekPlan.plan && selfGuided ? (
             <SgEmptyState

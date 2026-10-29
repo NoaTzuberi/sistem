@@ -7,6 +7,8 @@ import { createPlan, listPlans, publishPlan } from '../../../../services/coach/c
 import { Button } from '../../../../components/common/Button/Button';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { ConfirmSheet } from '../ConfirmSheet/ConfirmSheet';
+import { SendNoteFields } from '../SendNoteFields/SendNoteFields';
+import { useWorkoutSendNote } from '../../hooks/useWorkoutSendNote';
 import { PlanCard } from '../PlanCard/PlanCard';
 import { coachCopy } from '../../copy';
 import './TraineePlan.css';
@@ -44,6 +46,8 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   const [pending, setPending] = useState<PendingAction>();
   const [isWorking, setIsWorking] = useState(false);
   const [failure, setFailure] = useState<ActionFailure>();
+  // Both actions publish, so both sheets carry the message + tip that go out with it.
+  const sendNote = useWorkoutSendNote();
 
   if (isLoading && !plans) return <StateMessage>{shared.common.loading}</StateMessage>;
   if (!plans) return <StateMessage onRetry={reload}>{error}</StateMessage>;
@@ -58,6 +62,11 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   // the most recent earlier plan (the server picks it).
   const duplicateWeek = weeks.find((week) => !planFor(week.start))?.start;
   const canDuplicate = duplicateWeek !== undefined && plans.some((plan) => plan.weekStartDate < duplicateWeek);
+
+  function ask(action: PendingAction) {
+    sendNote.reset();
+    setPending(action);
+  }
 
   async function handleConfirm() {
     if (!pending) return;
@@ -75,7 +84,7 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
       } else {
         planId = pending.plan.id;
       }
-      await publishPlan(trainee.id, planId);
+      await publishPlan(trainee.id, planId, await sendNote.take());
     } catch (actionError) {
       const message = (actionError instanceof Error && actionError.message) || copy.publishError;
       setFailure({
@@ -108,7 +117,7 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
             {plan ? (
               <PlanCard plan={plan}>
                 {plan.status === 'draft' && (
-                  <Button className="trainee-plan-action" onClick={() => setPending({ kind: 'publish', plan })}>
+                  <Button className="trainee-plan-action" onClick={() => ask({ kind: 'publish', plan })}>
                     {copy.publishPlan}
                   </Button>
                 )}
@@ -119,7 +128,7 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
                 {canDuplicate && week.start === duplicateWeek && (
                   <Button
                     className="trainee-plan-action"
-                    onClick={() => setPending({ kind: 'duplicate', week: week.start })}
+                    onClick={() => ask({ kind: 'duplicate', week: week.start })}
                   >
                     {copy.duplicateLastWeek}
                   </Button>
@@ -161,7 +170,9 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
         isWorking={isWorking}
         onConfirm={handleConfirm}
         onCancel={() => setPending(undefined)}
-      />
+      >
+        <SendNoteFields note={sendNote} />
+      </ConfirmSheet>
     </div>
   );
 }

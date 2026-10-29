@@ -1,0 +1,157 @@
+/* Full width even inside a centered sheet (its column centers children). */
+.send-note-fields {
+  display: flex;
+  align-self: stretch;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-start: var(--space-4);
+  text-align: start;
+}
+
+.send-note-fields-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.send-note-fields-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* Grows with the text (where supported); 52px at least. */
+.send-note-fields-input {
+  width: 100%;
+  min-height: var(--size-defaults-field-min);
+  max-height: 240px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-defaults-field);
+  font: inherit;
+  font-size: var(--text-base); /* 16px: iOS never zooms into the field */
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  field-sizing: content;
+  outline: none;
+  resize: vertical;
+  transition:
+    background-color var(--transition-fast) ease,
+    box-shadow var(--transition-fast) ease;
+}
+
+.send-note-fields-input:focus {
+  background-color: var(--color-card);
+  box-shadow: var(--ring-field);
+}
+
+.send-note-fields-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.send-note-fields-count {
+  flex-shrink: 0;
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+}
+
+.send-note-fields-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  min-height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.send-note-fields-link:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.send-note-fields-link:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+.send-note-fields-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.send-note-fields-check input {
+  accent-color: var(--color-primary);
+}
+
+.send-note-fields-check[data-disabled] {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.send-note-fields-note {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.send-note-fields-tip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.send-note-fields-tip-text {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-defaults-field);
+  background-color: var(--color-primary-soft);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  line-height: var(--line-height-base);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.send-note-fields-tip-icon {
+  flex: none;
+  color: var(--color-primary-deep);
+}
+
+.send-note-fields-preview {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text);
+}
+
+.send-note-fields-preview b {
+  font-weight: var(--font-weight-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .send-note-fields-input,
+  .send-note-fields-link {
+    transition: none;
+  }
+}
