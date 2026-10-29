@@ -1,6 +1,8 @@
 // Admin — coach accounts. Every line is a PLACEHOLDER draft for the owner (accounts-relationships report).
 export const he = {
   title: 'מאמנות',
+  foodBankTitle: 'מאגר מזונות',
+  foodBankText: 'הרשימה שכל המאמנות והמתאמנות רואות. מאמנת יכולה להסתיר פריט או לשמור גרסה משלה — המקור משתנה רק כאן.',
   subtitle: 'ניהול חשבונות המאמנות במערכת',
   addCoach: '+ מאמנת',
   columns: { name: 'שם', email: 'אימייל', status: 'סטטוס', password: 'סיסמה', trainees: 'מתאמנות', actions: 'פעולות' },

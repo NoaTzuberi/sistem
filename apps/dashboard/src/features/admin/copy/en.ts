@@ -2,6 +2,8 @@ import type { CopyShape } from '@sistem/shared';
 import type { he } from './he';
 
 export const en: CopyShape<typeof he> = {
+  foodBankTitle: 'Food bank',
+  foodBankText: 'The list every coach and trainee sees. A coach can hide an item or save her own version — the original changes only here.',
   title: 'Coaches',
   subtitle: 'Manage the coach accounts on Sistem',
   addCoach: '+ Coach',

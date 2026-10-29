@@ -33,6 +33,7 @@ export const {
   getAiRecommendation,
   generateAiRecommendation,
   listFoods,
+  setFoodHidden,
   createFood,
   updateFood,
   deleteFood,

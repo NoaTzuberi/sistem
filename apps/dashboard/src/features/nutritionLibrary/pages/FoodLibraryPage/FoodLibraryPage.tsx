@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import type { FoodItem, FoodItemPayload, NutritionTemplate } from '@sistem/types';
+import type { NutritionTemplate } from '@sistem/types';
 import { fill, useCopy } from '@sistem/shared';
 import { nutritionBuilderPath } from '../../../../app/config/routes';
 import { PageHeader } from '../../../../components/common/PageHeader/PageHeader';
@@ -9,7 +9,6 @@ import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
 import { useUndoToast } from '../../../../hooks/useUndoToast';
 import { appCopy } from '../../../../copy';
-import { CategoryChips } from '../../../nutrition/components/CategoryChips/CategoryChips';
 import { TEMPLATE_STATE_KEY } from '../../data/templateHandoff';
 import { TAB_PATHS, libraryTabId, tabFromPath } from '../../data/libraryTabs';
 import type { LibraryTab } from '../../data/libraryTabs';
@@ -21,11 +20,8 @@ import { usePortionSplit } from '../../hooks/usePortionSplit';
 import { useUnsavedChangesGuard } from '../../hooks/useUnsavedChangesGuard';
 import { LibraryTabs } from '../../components/LibraryTabs/LibraryTabs';
 import { HowItWorks } from '../../components/HowItWorks/HowItWorks';
+import { FoodBankPanel } from '../../components/FoodBankPanel/FoodBankPanel';
 import type { HowItWorksItem } from '../../components/HowItWorks/HowItWorks';
-import { GroupChips } from '../../components/GroupChips/GroupChips';
-import { FoodToolbar } from '../../components/FoodToolbar/FoodToolbar';
-import { FoodGroupSection } from '../../components/FoodGroupSection/FoodGroupSection';
-import { FoodSheet } from '../../components/FoodSheet/FoodSheet';
 import { TemplatesGrid } from '../../components/TemplatesGrid/TemplatesGrid';
 import { TraineePickerSheet } from '../../components/TraineePickerSheet/TraineePickerSheet';
 import { TemplateRenameSheet } from '../../components/TemplateRenameSheet/TemplateRenameSheet';
@@ -68,7 +64,6 @@ export function FoodLibraryPage() {
   const split = usePortionSplit(settings.form);
   useUnsavedChangesGuard(settings.isDirty, copy.leaveConfirm);
 
-  const [foodSheet, setFoodSheet] = useState<SheetState<FoodItem | null>>({ isOpen: false, subject: null, key: 0 });
   const [picker, setPicker] = useState<SheetState<NutritionTemplate | null>>({ isOpen: false, subject: null, key: 0 });
   const [rename, setRename] = useState<SheetState<NutritionTemplate | null>>({ isOpen: false, subject: null, key: 0 });
 
@@ -79,31 +74,6 @@ export function FoodLibraryPage() {
       settings.cancel();
     }
     navigate(TAB_PATHS[next]);
-  }
-
-  // --- Food list -----------------------------------------------------------------------------
-
-  const openFoodSheet = (item: FoodItem | null) => setFoodSheet((current) => ({ isOpen: true, subject: item, key: current.key + 1 }));
-  const closeFoodSheet = () => setFoodSheet((current) => ({ ...current, isOpen: false }));
-
-  async function saveFood(payload: FoodItemPayload): Promise<boolean> {
-    const result = await foods.save(foodSheet.subject, payload);
-    showToast(result.message);
-    return result.ok;
-  }
-
-  // No confirm: the card goes at once, "Undo" brings it back; the server call waits for the undo window.
-  function removeFood(item: FoodItem) {
-    foods.hide(item.id);
-    offerUndo({
-      message: fill(copy.removing, { name: item.name }),
-      onUndo: () => foods.show(item.id),
-      onCommit: () => void foods.remove(item).then((result) => showToast(result.message)),
-    });
-  }
-
-  async function restoreFood(item: FoodItem) {
-    showToast((await foods.restore(item)).message);
   }
 
   // --- Templates -----------------------------------------------------------------------------
@@ -175,46 +145,7 @@ export function FoodLibraryPage() {
         {tab === 'foods' && (
           <>
             <HowItWorks label={copy.howLabel} items={howFoods} />
-            {!foods.isReady ? (
-              <StateLine error={foods.error} onRetry={foods.reload} />
-            ) : (
-              <>
-                <div className="food-library-filters">
-                  <GroupChips value={foods.filter.group} counts={foods.counts} onChange={foods.setGroup} />
-                  {foods.filter.group && (
-                    <CategoryChips group={foods.filter.group} items={foods.groupItems} value={foods.filter.category} onChange={foods.setCategory} />
-                  )}
-                  <FoodToolbar
-                    query={foods.filter.query}
-                    onQueryChange={foods.setQuery}
-                    showArchived={foods.filter.showArchived}
-                    onShowArchivedChange={foods.setShowArchived}
-                    onAdd={() => openFoodSheet(null)}
-                  />
-                </div>
-                {foods.sections.length === 0 ? (
-                  <div className="food-library-empty" role="status">
-                    <strong className="food-library-empty-title">{copy.noResultsTitle}</strong>
-                    <span className="food-library-empty-text">{copy.noResultsText}</span>
-                  </div>
-                ) : (
-                  foods.sections.map((section) => (
-                    <FoodGroupSection key={section.group} section={section} onEdit={openFoodSheet} onRemove={removeFood} onRestore={restoreFood} />
-                  ))
-                )}
-                {foods.caps && (
-                  <FoodSheet
-                    key={foodSheet.key}
-                    isOpen={foodSheet.isOpen}
-                    item={foodSheet.subject}
-                    defaultGroup={foods.filter.group ?? 'protein'}
-                    caps={foods.caps}
-                    onClose={closeFoodSheet}
-                    onSave={saveFood}
-                  />
-                )}
-              </>
-            )}
+            <FoodBankPanel foods={foods} onToast={showToast} offerUndo={offerUndo} />
           </>
         )}
 

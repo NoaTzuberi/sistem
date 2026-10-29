@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /** Long enough to read the line and reach "Undo"; the plain toast stays 2.2s. */
 const UNDO_MS = 5000;
 
-interface UndoOffer {
+export interface UndoOffer {
   /** What happened ("Oats removed"). */
   message: string;
   /** Puts it back. */

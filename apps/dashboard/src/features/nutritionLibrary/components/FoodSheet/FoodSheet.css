@@ -4,6 +4,16 @@
   gap: 10px;
 }
 
+/* Above the form: what saving will do (a food-bank item becomes her own copy). */
+.food-sheet-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-qv-tile);
+  background-color: var(--color-fill-soft);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+}
+
 .food-sheet-label {
   margin: 8px 0 0;
   font-size: var(--text-xs);

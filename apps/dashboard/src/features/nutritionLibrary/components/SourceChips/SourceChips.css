@@ -1,0 +1,16 @@
+/* One row that scrolls sideways on a narrow screen — never the page. */
+.source-chips {
+  display: flex;
+  gap: var(--space-filter-chip-gap);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.source-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.source-chip-count {
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+}

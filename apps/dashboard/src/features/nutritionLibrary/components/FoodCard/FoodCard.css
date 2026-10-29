@@ -45,6 +45,7 @@
 
 .food-card-category,
 .food-card-new,
+.food-card-mine,
 .food-card-archived-tag {
   display: inline-flex;
   align-items: center;
@@ -58,6 +59,12 @@
 .food-card-category {
   background-color: var(--group-soft);
   color: var(--group-text);
+}
+
+/* "Mine": her own item or her edited copy — soft tint, ink text. */
+.food-card-mine {
+  background-color: var(--color-primary-soft);
+  color: var(--color-text);
 }
 
 /* "New": a charcoal pill. */

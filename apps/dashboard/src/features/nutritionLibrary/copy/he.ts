@@ -21,6 +21,8 @@ export const he = {
   },
 
   // Food list
+  foodsEmpty: 'לא נמצאו מזונות',
+  foodsRetry: 'נסי שוב',
   foodsLoadError: 'לא הצלחנו לטעון את רשימת המזון.',
   groupsLabel: 'סינון לפי קבוצה',
   allGroups: 'כל הקבוצות',
@@ -52,6 +54,22 @@ export const he = {
   restored: '״{name}״ שוחזר.',
   added: '״{name}״ נוסף לרשימה.',
   saved: '״{name}״ נשמר.',
+  // Food bank (owner 2026-10-28). Labels from the owner; the sentences are PLACEHOLDER.
+  sourcesLabel: 'סינון לפי מקור',
+  sourceAll: 'הכל',
+  sourceMine: 'שלי',
+  sourceHidden: 'מוסתרים',
+  mineTag: 'שלי',
+  hiddenTag: 'מוסתר',
+  hideNamed: 'הסתרה של ״{name}״',
+  unhideNamed: 'ביטול ההסתרה של ״{name}״',
+  revertNamed: 'שחזור למקור של ״{name}״',
+  savedAsMine: '״{name}״ נשמר כגרסה שלך. המקור במאגר לא השתנה.', // PLACEHOLDER
+  reverted: '״{name}״ שוחזר למקור.', // PLACEHOLDER
+  hiddenDone: '״{name}״ הוסתר מהרשימות שלך.', // PLACEHOLDER
+  unhiddenDone: '״{name}״ חזר לרשימות שלך.', // PLACEHOLDER
+  systemEditNote: 'זה פריט מהמאגר. השמירה תיצור גרסה שלך — המקור לא ישתנה.', // PLACEHOLDER
+  noHidden: 'אין פריטים מוסתרים.', // PLACEHOLDER
   foodSaveError: 'לא הצלחנו לשמור.',
 
   // The food sheet

@@ -1,0 +1,26 @@
+/* Under the coach table: the system food bank. */
+.admin-food-bank {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-start: var(--space-8);
+  min-width: 0;
+}
+
+.admin-food-bank-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.admin-food-bank-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-food-bank-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

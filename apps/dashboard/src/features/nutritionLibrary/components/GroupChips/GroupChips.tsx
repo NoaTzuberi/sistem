@@ -1,5 +1,6 @@
 import type { FoodGroup } from '@sistem/types';
 import { FOOD_GROUPS, sharedCopy, useCopy } from '@sistem/shared';
+import { GroupFilterChip } from '../../../nutrition/components/GroupFilterChip/GroupFilterChip';
 import { nutritionLibraryCopy } from '../../copy';
 import './GroupChips.css';
 
@@ -9,28 +10,21 @@ interface GroupChipsProps {
   onChange: (group: FoodGroup | null) => void;
 }
 
-/** "All groups" (dark when chosen) + one chip per group with its color dot and count (tinted with a ring when chosen). */
+/** "All groups" + one chip per group with its icon and count — the food list's group filter. */
 export function GroupChips({ value, counts, onChange }: GroupChipsProps) {
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionLibraryCopy);
   return (
     <div className="group-chips" role="group" aria-label={copy.groupsLabel}>
-      <button className="group-chip group-chip-all" type="button" aria-pressed={value === null} onClick={() => onChange(null)}>
+      <GroupFilterChip group={null} isSelected={value === null} onClick={() => onChange(null)}>
         {copy.allGroups}
         <span className="group-chip-count">{counts.all}</span>
-      </button>
+      </GroupFilterChip>
       {FOOD_GROUPS.map((group) => (
-        <button
-          key={group}
-          className={`group-chip food-group-${group}`}
-          type="button"
-          aria-pressed={value === group}
-          onClick={() => onChange(group)}
-        >
-          <span className="group-chip-dot" aria-hidden="true" />
+        <GroupFilterChip key={group} group={group} isSelected={value === group} onClick={() => onChange(group)}>
           {shared.nutrition.groups[group]}
           <span className="group-chip-count">{counts.byGroup[group]}</span>
-        </button>
+        </GroupFilterChip>
       ))}
     </div>
   );

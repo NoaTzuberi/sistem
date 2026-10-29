@@ -13,6 +13,7 @@ import { Tag } from '../../../../components/common/Tag/Tag';
 import { useSaveLanguage } from '../../../../hooks/useSaveLanguage';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { hasRole } from '../../../auth/data/roles';
+import { AdminFoodBank } from '../../components/AdminFoodBank/AdminFoodBank';
 import { CreateCoachSheet } from '../../components/CreateCoachSheet/CreateCoachSheet';
 import { PasswordLink } from '../../components/PasswordLink/PasswordLink';
 import { adminCopy } from '../../copy';
@@ -128,6 +129,8 @@ export function CoachesPage() {
             {admin.actionError}
           </p>
         )}
+
+        <AdminFoodBank />
       </main>
 
       <CreateCoachSheet isOpen={isCreating} onClose={() => setIsCreating(false)} onCreate={admin.create} />

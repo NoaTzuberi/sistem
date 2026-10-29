@@ -12,3 +12,7 @@ export { createCardioApi, createCoachCardioApi } from './cardioApi';
 export type { CardioApi, CoachCardioApi } from './cardioApi';
 export { createJoinApi, createInvitesApi, createAdminApi, createCoachPaymentApi, JoinRequestError } from './accountsApi';
 export type { JoinApi, InvitesApi, AdminApi } from './accountsApi';
+export { createAdminFoodsApi } from './foodBankApi';
+export type { AdminFoodsApi } from './foodBankApi';
+export { createCoachConnectApi, createTraineeConnectApi } from './coachConnectApi';
+export type { CoachConnectApi, TraineeConnectApi } from './coachConnectApi';

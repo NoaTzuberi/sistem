@@ -19,17 +19,29 @@ export function capShare(kcal: number, cap: number): number {
   return cap > 0 ? Math.min(1, Math.max(0, kcal / cap)) : 0;
 }
 
+/** The coach library's source chips: everything she sees, only her own items, or the system items she hid. */
+export type SourceFilter = 'all' | 'mine' | 'hidden';
+
+export const SOURCE_FILTERS: readonly SourceFilter[] = ['all', 'mine', 'hidden'];
+
+export function matchesSource(food: Pick<FoodItem, 'source' | 'hidden'>, source: SourceFilter): boolean {
+  if (source === 'hidden') return food.hidden;
+  return !food.hidden && (source === 'all' || food.source === 'mine');
+}
+
 export interface FoodFilter {
   group: FoodGroup | null;
   category: CategoryFilter;
   query: string;
   showArchived: boolean;
+  source: SourceFilter;
 }
 
 /** Items that pass the filter; a search orders by match (best first), otherwise the list's own order. */
 export function filterFoods(foods: readonly FoodItem[], filter: FoodFilter, searchText: (item: FoodItem) => string): FoodItem[] {
   const passing = foods.filter(
     (food) =>
+      matchesSource(food, filter.source) &&
       (filter.showArchived || !food.archivedAt) &&
       (filter.group === null || food.group === filter.group) &&
       (filter.group === null || matchesCategory(food, filter.category)),

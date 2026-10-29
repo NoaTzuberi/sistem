@@ -83,7 +83,7 @@ export class NutritionRequestError extends Error {
   }
 }
 
-function toNutritionRequestError(error: unknown, fallback: string): NutritionRequestError {
+export function toNutritionRequestError(error: unknown, fallback: string): NutritionRequestError {
   const response = axios.isAxiosError(error) ? error.response : undefined;
   const issues: unknown = response?.data?.issues;
   return new NutritionRequestError(
@@ -344,7 +344,13 @@ export function createCoachApi(client: AxiosInstance) {
     return nutritionCall("Couldn't save the food item.", async () => (await client.patch<{ item: FoodItem }>(`/coach/nutrition/foods/${foodId}`, payload)).data.item);
   }
 
-  /** Deleted when nothing uses it, archived otherwise. */
+  /** A system item out of her lists (true), or back in them (false). */
+  function setFoodHidden(foodId: string, hidden: boolean): Promise<FoodItem> {
+    const path = `/coach/nutrition/foods/${foodId}/hidden`;
+    return nutritionCall("Couldn't update the food item.", async () => (await (hidden ? client.post : client.delete)<{ item: FoodItem }>(path)).data.item);
+  }
+
+  /** Her own item: deleted when nothing uses it, archived otherwise. Her edited copy: restored to the original ('reverted'). */
   function deleteFood(foodId: string): Promise<DeleteFoodItemResult> {
     return nutritionCall("Couldn't remove the food item.", async () => (await client.delete<DeleteFoodItemResult>(`/coach/nutrition/foods/${foodId}`)).data);
   }
@@ -461,6 +467,7 @@ export function createCoachApi(client: AxiosInstance) {
     getAiRecommendation,
     generateAiRecommendation,
     listFoods,
+    setFoodHidden,
     createFood,
     updateFood,
     deleteFood,

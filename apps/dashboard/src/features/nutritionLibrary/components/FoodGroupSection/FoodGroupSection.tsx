@@ -10,10 +10,12 @@ interface FoodGroupSectionProps {
   onEdit: (item: FoodItem) => void;
   onRemove: (item: FoodItem) => void;
   onRestore: (item: FoodItem) => void;
+  onSetHidden?: (item: FoodItem, hidden: boolean) => void;
+  onRevert?: (item: FoodItem) => void;
 }
 
 /** One group: a heading with its dot, the per-portion cap ("free" for vegetables) and the count, then its cards. */
-export function FoodGroupSection({ section, onEdit, onRemove, onRestore }: FoodGroupSectionProps) {
+export function FoodGroupSection({ section, onEdit, onRemove, onRestore, onSetHidden, onRevert }: FoodGroupSectionProps) {
   const { plural } = useI18n();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionLibraryCopy);
@@ -32,7 +34,7 @@ export function FoodGroupSection({ section, onEdit, onRemove, onRestore }: FoodG
         <ul className="food-section-grid">
           {section.items.map((item) => (
             <li key={item.id} className="food-section-cell">
-              <FoodCard item={item} cap={section.cap} onEdit={onEdit} onRemove={onRemove} onRestore={onRestore} />
+              <FoodCard item={item} cap={section.cap} onEdit={onEdit} onRemove={onRemove} onRestore={onRestore} onSetHidden={onSetHidden} onRevert={onRevert} />
             </li>
           ))}
         </ul>

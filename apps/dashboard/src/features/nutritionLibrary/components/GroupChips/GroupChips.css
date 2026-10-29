@@ -1,84 +1,17 @@
 /* One row that scrolls sideways on a narrow screen — never the page. */
 .group-chips {
   display: flex;
-  gap: 6px;
-  padding: 2px;
+  gap: var(--space-filter-chip-gap);
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.group-chip {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 7px;
-  min-height: var(--touch-target-min);
-  padding: 0 14px;
-  border-radius: var(--radius-round);
-  background-color: var(--color-card);
-  box-shadow: var(--shadow-panel);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  transition:
-    background-color var(--transition-fast) ease,
-    color var(--transition-fast) ease,
-    transform var(--transition-press) var(--ease-press);
+.group-chips::-webkit-scrollbar {
+  display: none;
 }
 
-.group-chip:active {
-  transform: scale(0.97);
-}
-
-.group-chip-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: var(--radius-round);
-  background-color: var(--group);
-}
-
+/* The count reads in the chip's own color. */
 .group-chip-count {
   font-size: var(--text-2xs);
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-muted);
-}
-
-/* A chosen group: its tint, its ink, a ring of its color. */
-.group-chip[aria-pressed='true'] {
-  background-color: var(--group-soft);
-  color: var(--group-text);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--group) 40%, transparent);
-}
-
-.group-chip[aria-pressed='true'] .group-chip-count {
-  color: var(--group-text);
-}
-
-/* "All groups" chosen: charcoal. */
-.group-chip-all[aria-pressed='true'] {
-  background-color: var(--color-text);
-  color: var(--color-on-primary);
-  box-shadow: none;
-}
-
-.group-chip-all[aria-pressed='true'] .group-chip-count {
-  color: var(--color-on-ink-muted);
-}
-
-.group-chip:focus-visible {
-  outline: var(--border-width-medium) solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .group-chip:not([aria-pressed='true']):hover {
-    background-color: var(--group-soft, var(--color-fill-soft));
-    color: var(--group-text, var(--color-text));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .group-chip {
-    transition: none;
-  }
 }

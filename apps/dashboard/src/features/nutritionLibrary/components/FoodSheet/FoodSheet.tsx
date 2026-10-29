@@ -16,6 +16,8 @@ interface FoodSheetProps {
   isOpen: boolean;
   /** The item being edited; null = a new one. */
   item: FoodItem | null;
+  /** A line above the form (e.g. a coach editing a food-bank item gets her own copy). */
+  note?: string;
   /** A new item's group (the chosen group chip, else protein). */
   defaultGroup: FoodGroup;
   caps: Record<FoodGroup, number>;
@@ -29,7 +31,7 @@ interface FoodSheetProps {
  * scrim close it; the focus stays inside and returns to what opened it). The kcal cap is checked
  * again by the server. Mount it with a new key for every opening — the form starts fresh.
  */
-export function FoodSheet({ isOpen, item, defaultGroup, caps, onClose, onSave }: FoodSheetProps) {
+export function FoodSheet({ isOpen, item, note, defaultGroup, caps, onClose, onSave }: FoodSheetProps) {
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionLibraryCopy);
   const form = useFoodForm(item, defaultGroup, caps);
@@ -70,6 +72,7 @@ export function FoodSheet({ isOpen, item, defaultGroup, caps, onClose, onSave }:
   return (
     <SideSheet isOpen={isOpen} onClose={onClose} title={item ? copy.sheetEdit : copy.sheetNew} footer={footer} blurScrim>
       <form id={formId} className={`food-sheet food-group-${values.group}`} onSubmit={submit} noValidate>
+        {note && <p className="food-sheet-note">{note}</p>}
         <p className="food-sheet-label" id={groupLabelId}>
           {copy.groupLabel}
         </p>
