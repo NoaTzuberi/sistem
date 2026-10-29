@@ -23,6 +23,8 @@ export const en: CopyShape<typeof he> = {
   daysLabel: 'Days of the week',
   mealPhoto: 'Meal photo',
   coachFrom: 'Message from {name}',
+  tipFrom: 'Tip from {name}',
+  tipFromCoach: 'A tip from your coach',
   coachUnread: 'New message',
   summaryLabel: "Today's portions",
   summaryPortions: 'pick what you like from each group',

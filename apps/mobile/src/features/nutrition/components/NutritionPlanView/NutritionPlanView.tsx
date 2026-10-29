@@ -5,6 +5,7 @@ import { formatDateTime, useCopy, useLanguage } from '@sistem/shared';
 import { MealCard } from '../MealCard/MealCard';
 import { SwapSheet } from '../SwapSheet/SwapSheet';
 import { CoachIntro } from '../CoachIntro/CoachIntro';
+import { CoachTip } from '../CoachTip/CoachTip';
 import { DayTotals } from '../DayTotals/DayTotals';
 import { nutritionCopy } from '../../copy';
 import './NutritionPlanView.css';
@@ -45,6 +46,7 @@ export function NutritionPlanView({ plan, introInitiallyOpen = false, onIntroRea
 
       {/* Keyed by version: a new note opens again. */}
       {plan.intro && <CoachIntro key={plan.version} text={plan.intro} initiallyOpen={introInitiallyOpen} onRead={onIntroRead} />}
+      {plan.introTip && <CoachTip text={plan.introTip} coachName={null} />}
 
       {renderHeader ? (
         renderHeader(openGroup)

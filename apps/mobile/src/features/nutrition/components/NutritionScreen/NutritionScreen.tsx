@@ -13,6 +13,7 @@ import { useNutritionSheet } from '../../hooks/useNutritionSheet';
 import { NutritionHeader } from '../NutritionHeader/NutritionHeader';
 import { WeekStrip } from '../WeekStrip/WeekStrip';
 import { CoachCard } from '../CoachCard/CoachCard';
+import { CoachTip } from '../CoachTip/CoachTip';
 import { PortionSummary } from '../PortionSummary/PortionSummary';
 import { PortionGroupRow } from '../PortionGroupRow/PortionGroupRow';
 import { FreeVegetables } from '../FreeVegetables/FreeVegetables';
@@ -199,6 +200,10 @@ export function NutritionScreen({ userId }: { userId: string }) {
             {/* Keyed by version: a new note opens again. */}
             {plan.intro && (
               <CoachCard key={plan.version} text={plan.intro} coachName={data.coach?.name ?? null} unread={introUnseen} onRead={handleIntroRead} />
+            )}
+            {/* An older cached plan has no introTip. A tip alone counts as reading the version. */}
+            {plan.introTip && (
+              <CoachTip key={`tip-${plan.version}`} text={plan.introTip} coachName={data.coach?.name ?? null} onSeen={plan.intro ? undefined : handleIntroRead} />
             )}
 
             {showRows ? (

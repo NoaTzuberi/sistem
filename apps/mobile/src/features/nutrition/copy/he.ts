@@ -26,6 +26,8 @@ export const he = {
   daysLabel: 'ימי השבוע',
   mealPhoto: 'תמונת ארוחה',
   coachFrom: 'הודעה מ{name}',
+  tipFrom: 'טיפ מ{name}',
+  tipFromCoach: 'טיפ מהמאמנת',
   coachUnread: 'הודעה חדשה',
   summaryLabel: 'מנות היום',
   summaryPortions: 'בחרי מה שבא לך מכל קבוצה',
