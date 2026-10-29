@@ -14,6 +14,8 @@ export interface CoachProfileDocument {
   createdBy: Types.ObjectId | null;
   /** Temporary payment links shown to her own trainees (validated in coachPayment.validation.ts). */
   payment?: { payboxUrl: string | null; bitPhone: string | null; note: string | null } | null;
+  /** Her saved message + tip for sending a plan, per plan kind (coachDefaults.validation.ts). */
+  defaults?: { nutrition?: { message: string | null; tip: string | null } | null } | null;
   /** System food-bank items she hid from her lists (her library's "hidden" filter brings them back). */
   hiddenSystemFoods?: Types.ObjectId[];
   createdAt: Date;
@@ -33,6 +35,25 @@ const coachProfileSchema = new Schema<CoachProfileDocument>(
           payboxUrl: { type: String, default: null, maxlength: 300 },
           bitPhone: { type: String, default: null, match: /^05\d{8}$/ },
           note: { type: String, default: null, maxlength: 140 },
+        },
+        { _id: false },
+      ),
+      default: null,
+    },
+    // Keyed by plan kind so workout plans can add theirs later.
+    defaults: {
+      type: new Schema(
+        {
+          nutrition: {
+            type: new Schema(
+              {
+                message: { type: String, default: null, maxlength: 600 },
+                tip: { type: String, default: null, maxlength: 300 },
+              },
+              { _id: false },
+            ),
+            default: null,
+          },
         },
         { _id: false },
       ),

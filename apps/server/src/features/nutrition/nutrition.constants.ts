@@ -149,6 +149,7 @@ export const MAX_OPTION_LABEL_LENGTH = 60;
 export const MAX_LINE_TEXT_LENGTH = 200;
 export const MAX_TIP_LENGTH = 1000;
 export const MAX_INTRO_MESSAGE_LENGTH = 1500;
+export const MAX_INTRO_TIP_LENGTH = 300;
 export const MAX_TEMPLATE_NAME_LENGTH = 80;
 export const MAX_TEMPLATE_DESCRIPTION_LENGTH = 500;
 export const MAX_FOOD_GRAMS = 5000;

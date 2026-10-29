@@ -6,6 +6,9 @@ import type {
   CoachInvite,
   CoachPayment,
   CoachPaymentResponse,
+  CoachSendDefaults,
+  CoachSendDefaultsResponse,
+  UpdateCoachSendDefaultsPayload,
   CoachInvitesResponse,
   CoachPasswordLinkResponse,
   CoachProfileStatus,
@@ -118,6 +121,25 @@ export function createCoachPaymentApi(client: AxiosInstance) {
   }
 
   return { getPayment, savePayment };
+}
+
+/** Her saved message + tip for sending a plan (GET / PATCH /coach/profile/defaults). */
+export function createCoachDefaultsApi(client: AxiosInstance) {
+  async function getSendDefaults(): Promise<CoachSendDefaults> {
+    const { data } = await client.get<CoachSendDefaultsResponse>('/coach/profile/defaults');
+    return data.defaults;
+  }
+
+  async function saveSendDefaults(payload: UpdateCoachSendDefaultsPayload): Promise<CoachSendDefaults> {
+    try {
+      const { data } = await client.patch<CoachSendDefaultsResponse>('/coach/profile/defaults', payload);
+      return data.defaults;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, ''));
+    }
+  }
+
+  return { getSendDefaults, saveSendDefaults };
 }
 
 /** The platform admin (dashboard): coach accounts only. */

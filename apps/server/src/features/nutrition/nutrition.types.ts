@@ -102,6 +102,7 @@ export interface NutritionPlanDocument {
   meals: MealFields[];
   tips: TipFields[];
   introMessage?: string | null;
+  introTip?: string | null;
   /** 13b (waterTracking). */
   waterGoalMl?: number | null;
   /** The coach's daily protein goal (g); null = none. */
@@ -130,6 +131,7 @@ export interface NutritionPlanVersionDocument {
   meals: MealFields[];
   tips: TipFields[];
   introMessage?: string | null;
+  introTip?: string | null;
   waterGoalMl?: number | null;
   /** The coach's daily protein goal (g); null = none. */
   proteinGramsTarget?: number | null;

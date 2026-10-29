@@ -65,6 +65,8 @@ const nutritionPlanSchema = new Schema<NutritionPlanDocument>(
     tips: { type: [nutritionTipSchema], default: [] },
     // The coach's note at the top of her Nutrition tab (plain text, line breaks kept).
     introMessage: { type: String, default: null },
+    // Her short tip shown under the note (a card "Tip from <coach>"); null = none.
+    introTip: { type: String, default: null },
     waterGoalMl: { type: Number, min: 0, default: null },
     // The coach's daily protein goal in grams (owner, 2026-10-28); null = none.
     proteinGramsTarget: { type: Number, min: 1, default: null },
@@ -99,7 +101,9 @@ const nutritionPlanVersionSchema = new Schema<NutritionPlanVersionDocument>(
     // Kept in portions mode too: the meal photo slots (13a+) use their names.
     meals: { type: [nutritionMealSchema], default: [] },
     tips: { type: [nutritionTipSchema], default: [] },
+    // The note + tip as sent (raw: {name} is filled on read, so a later default never changes it).
     introMessage: { type: String, default: null },
+    introTip: { type: String, default: null },
     waterGoalMl: { type: Number, min: 0, default: null },
     // The coach's daily protein goal in grams (owner, 2026-10-28); null = none.
     proteinGramsTarget: { type: Number, min: 1, default: null },

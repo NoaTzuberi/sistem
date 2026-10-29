@@ -68,7 +68,7 @@ import {
 // The human Coach (PRD §6) — the ATLAS AI chat that used /api/coach is gone.
 // Every route needs role=coach; every :traineeId route also needs that trainee to
 // have a live coaching with her (loadCoachTrainee), and coach-owned data is read through that coaching only.
-import { getMyPayment, putMyPayment } from '../coachProfiles/coachProfile.controller';
+import { getMyDefaults, getMyPayment, patchMyDefaults, putMyPayment } from '../coachProfiles/coachProfile.controller';
 import { putTraineeReaction } from '../reactions/reaction.controller';
 import {
   getCoachThreads,
@@ -116,6 +116,9 @@ coachRouter.put('/trainees/:traineeId/reactions', loadCoachTrainee, putTraineeRe
 // Temporary payment links shown to her trainees (Profile coach card).
 coachRouter.get('/profile/payment', getMyPayment);
 coachRouter.put('/profile/payment', putMyPayment);
+// Her saved message + tip for sending a plan (only hers: the id comes from her token).
+coachRouter.get('/profile/defaults', getMyDefaults);
+coachRouter.patch('/profile/defaults', patchMyDefaults);
 coachRouter.get('/invites', getMyInvites);
 coachRouter.post('/invites', postPersonalInvite);
 coachRouter.post('/invites/regenerate', postRegenerateInvite);

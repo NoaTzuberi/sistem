@@ -5,7 +5,7 @@ import { CoachProfile } from './coachProfile.model';
 import type { CoachProfileDocument } from './coachProfile.model';
 import { ensurePrimaryCommunity } from '../communities/community.service';
 import { toPublicAvatar } from '../users/avatar';
-import type { CoachPayment, PrivatePhoto } from '@sistem/types';
+import type { CoachPayment, CoachSendDefault, CoachSendDefaults, PrivatePhoto } from '@sistem/types';
 
 type Id = Types.ObjectId | string;
 
@@ -85,6 +85,32 @@ export async function getCoachPayment(coachId: Id): Promise<CoachPayment> {
 export async function updateCoachPayment(coachId: Id, changes: Partial<CoachPayment>): Promise<CoachPayment> {
   const next = { ...(await getCoachPayment(coachId)), ...changes };
   await CoachProfile.updateOne({ userId: coachId }, { $set: { payment: next } });
+  return next;
+}
+
+// ---------------------------------------------------------------------------
+// Her saved defaults for sending a plan (message + tip). What a trainee received stays on the
+// published version — changing a default never rewrites it.
+// ---------------------------------------------------------------------------
+
+function toSendDefaults(stored: CoachProfileDocument['defaults']): CoachSendDefaults {
+  const nutrition = stored?.nutrition;
+  return { nutrition: { message: nutrition?.message ?? null, tip: nutrition?.tip ?? null } };
+}
+
+export async function getCoachSendDefaults(coachId: Id): Promise<CoachSendDefaults> {
+  const profile = await CoachProfile.findOne({ userId: coachId }).select('defaults').lean();
+  return toSendDefaults(profile?.defaults);
+}
+
+/** Only the fields sent change (already trimmed + checked by parseCoachDefaultsPayload). */
+export async function updateCoachSendDefaults(
+  coachId: Id,
+  changes: { nutrition?: Partial<CoachSendDefault> },
+): Promise<CoachSendDefaults> {
+  const current = await getCoachSendDefaults(coachId);
+  const next: CoachSendDefaults = { nutrition: { ...current.nutrition, ...changes.nutrition } };
+  await CoachProfile.updateOne({ userId: coachId }, { $set: { defaults: next } });
   return next;
 }
 

@@ -23,6 +23,7 @@ import { getNutritionFeatures } from '../../config/features';
 import { OnboardingResponse } from '../onboarding/onboardingResponse.model';
 import { toPublicNutritionPreferences } from '../onboarding/onboarding.service';
 import { User } from '../users/user.model';
+import { fillTraineeName, firstNameOf } from './introText';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
 import { addDays, localDateString } from '../plans/planWeek';
 import { FOOD_GROUP_IDS } from './nutrition.constants';
@@ -149,7 +150,7 @@ export function storedOverrides(target: Pick<NutritionPlanDocument['calorieTarge
 
 /** What a version / working copy holds that the trainee can see — compared to detect changes. */
 function publishableContent(
-  plan: Pick<NutritionPlanDocument, 'meals' | 'tips' | 'waterGoalMl' | 'proteinGramsTarget' | 'introMessage' | 'mode' | 'dailyPortions' | 'vegetablesFree'>,
+  plan: Pick<NutritionPlanDocument, 'meals' | 'tips' | 'waterGoalMl' | 'proteinGramsTarget' | 'introMessage' | 'introTip' | 'mode' | 'dailyPortions' | 'vegetablesFree'>,
 ): string {
   return JSON.stringify({
     mode: resolvePlanMode(plan),
@@ -158,6 +159,7 @@ function publishableContent(
     meals: toPublicMeals(plan.meals),
     tips: toPublicTips(plan.tips).map((tip) => tip.text),
     intro: plan.introMessage ?? null,
+    tip: plan.introTip ?? null,
     waterGoalMl: plan.waterGoalMl ?? null,
     proteinGramsTarget: plan.proteinGramsTarget ?? null,
   });
@@ -211,6 +213,7 @@ function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersio
     meals,
     tips: toPublicTips(plan.tips),
     introMessage: plan.introMessage ?? null,
+    introTip: plan.introTip ?? null,
     waterGoalMl: plan.waterGoalMl ?? null,
     proteinGramsTarget: plan.proteinGramsTarget ?? null,
     templateId: plan.templateId ? String(plan.templateId) : null,
@@ -231,13 +234,15 @@ function toCoachPlan(plan: LeanPlan, config: NutritionConfig, latest: LeanVersio
 
 /**
  * A published version as she sees it — no calorie numbers anywhere. `foods` resolves the lines by id;
- * `swapFoods` = the coach's current lists (the food bank merge), her swap lists.
+ * `swapFoods` = the coach's current lists (the food bank merge), her swap lists; `traineeFirstName`
+ * fills {name} in the note and tip.
  */
 export function buildPlanView(
   version: LeanVersion,
   foods: Map<string, FoodItem>,
   swapFoods: readonly FoodItem[],
   includeWater: boolean,
+  traineeFirstName: string,
 ): NutritionPlanView {
   const mode = resolvePlanMode(version);
   // Portions mode: no meals for her — she picks from the food lists (the versions keep them for the photo slots).
@@ -268,7 +273,8 @@ export function buildPlanView(
       })),
     })),
     tips: version.tips.map((tip: TipFields) => tip.text),
-    intro: version.introMessage ?? null,
+    intro: fillTraineeName(version.introMessage, traineeFirstName),
+    introTip: fillTraineeName(version.introTip, traineeFirstName),
     dayPortions: dayPortionsOf(version),
     vegetablesFree: resolveVegetablesFree(version),
     swaps: groupSwaps(swapFoods),
@@ -333,7 +339,7 @@ export async function findRecentFoodIds(coachId: string): Promise<Record<FoodGro
 
 export async function getCoachNutritionPlan(traineeId: string, coachId: string): Promise<CoachNutritionPlanResult> {
   const coachingId = await coachingFor(traineeId, coachId);
-  const [plan, latest, foodList, config, preferences, goal, recentFoodIds] = await Promise.all([
+  const [plan, latest, foodList, config, preferences, goal, recentFoodIds, trainee] = await Promise.all([
     NutritionPlan.findOne({ coachingId }).lean<LeanPlan>(),
     findLatestVersion(coachingId),
     listCoachFoods(coachId),
@@ -341,6 +347,7 @@ export async function getCoachNutritionPlan(traineeId: string, coachId: string):
     getNutritionPreferences(traineeId),
     defaultGoal(traineeId),
     findRecentFoodIds(coachId),
+    User.findById(traineeId).select('name').lean(),
   ]);
   const features = getNutritionFeatures();
   // Her lists, plus anything her lines point at that the lists no longer show (archived, hidden, replaced).
@@ -350,7 +357,7 @@ export async function getCoachNutritionPlan(traineeId: string, coachId: string):
   const foods = missing.length > 0 ? new Map([...(await findCoachFoods(coachId, missing)), ...listed]) : listed;
   return {
     plan: plan ? toCoachPlan(plan, config, latest) : null,
-    published: latest ? buildPlanView(latest, foods, foodList, features.waterTracking) : null,
+    published: latest ? buildPlanView(latest, foods, foodList, features.waterTracking, firstNameOf(trainee?.name)) : null,
     preferences,
     defaultGoal: goal,
     foods: foodList,
@@ -424,6 +431,7 @@ export async function saveCoachNutritionPlan(
 
   plan.set('calorieTarget', { kcal, source, goal, formulaSex, overrides, suggestion, floorConfirmation });
   if (input.introMessage !== undefined) plan.set('introMessage', input.introMessage || null);
+  if (input.introTip !== undefined) plan.set('introTip', input.introTip || null);
   const ids = collectContentIds(plan.meals ?? [], plan.tips ?? []);
   plan.set('meals', toStoredMeals(input.meals, foodGroups, ids));
   plan.set('tips', toStoredTips(input.tips, ids.tips));
@@ -495,6 +503,7 @@ export async function publishCoachNutritionPlan(traineeId: string, coachId: stri
       meals: plan.meals,
       tips: plan.tips,
       introMessage: plan.introMessage ?? null,
+      introTip: plan.introTip ?? null,
       waterGoalMl: plan.waterGoalMl ?? null,
       proteinGramsTarget: plan.proteinGramsTarget ?? null,
       groupKcal: config.groupKcal,
@@ -633,13 +642,13 @@ export async function getTraineeNutritionPlan(
   const [foods, swapFoods, user, coachName] = await Promise.all([
     findCoachFoods(coachId, foodIdsOf(toPublicMeals(latest.meals))),
     listCoachFoods(coachId),
-    User.findById(traineeId).select('nutritionIntroSeenVersion').lean(),
+    User.findById(traineeId).select('name nutritionIntroSeenVersion').lean(),
     getCoachName(latest.coachId),
   ]);
-  const plan = buildPlanView(latest, foods, swapFoods, getNutritionFeatures().waterTracking);
+  const plan = buildPlanView(latest, foods, swapFoods, getNutritionFeatures().waterTracking, firstNameOf(user?.name));
   return {
     plan,
-    introUnseen: plan.intro !== null && (user?.nutritionIntroSeenVersion ?? 0) < latest.version,
+    introUnseen: (plan.intro !== null || plan.introTip !== null) && (user?.nutritionIntroSeenVersion ?? 0) < latest.version,
     coach: coachName ? { name: coachName } : null,
     swaps: null,
   };

@@ -32,6 +32,7 @@ import {
   MAX_FOOD_NAME_LENGTH,
   MAX_FOOD_PORTION_LENGTH,
   MAX_INTRO_MESSAGE_LENGTH,
+  MAX_INTRO_TIP_LENGTH,
   MAX_LINE_PORTIONS,
   MAX_LINE_TEXT_LENGTH,
   MAX_MEALS,
@@ -500,6 +501,16 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
       introMessage = body.introMessage.replace(/\r\n/g, '\n').trim() || null;
     }
   }
+  // Her tip under the note: the same rules, shorter.
+  let introTip: string | null | undefined;
+  if (body.introTip !== undefined) {
+    if (body.introTip === null) introTip = null;
+    else if (typeof body.introTip !== 'string' || body.introTip.trim().length > MAX_INTRO_TIP_LENGTH) {
+      issues.push(invalid(msg('nutrition_intro_tip_too_long', { max: MAX_INTRO_TIP_LENGTH })));
+    } else {
+      introTip = body.introTip.replace(/\r\n/g, '\n').trim() || null;
+    }
+  }
 
   // Plan mode (owner, 2026-10-20): omitted keeps; the daily portions in ½ steps.
   let mode: NutritionPlanMode | undefined;
@@ -541,6 +552,7 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
       ...(waterGoalMl !== undefined ? { waterGoalMl } : {}),
       ...(proteinGramsTarget !== undefined ? { proteinGramsTarget } : {}),
       ...(introMessage !== undefined ? { introMessage } : {}),
+      ...(introTip !== undefined ? { introTip } : {}),
       ...(aiRecommendationId !== undefined ? { aiRecommendationId } : {}),
     },
     issues: [],

@@ -560,6 +560,46 @@ describe('nutrition (API)', () => {
       expect(cleared.body.plan.intro).toBeNull();
       expect(cleared.body.introUnseen).toBe(false);
     });
+
+    it('the tip goes out with the note, {name} = her first name, and a later default never changes what she got', async () => {
+      const defaults = (body: object, token = coach.token) => api.request('PATCH', '/coach/profile/defaults', { token, body });
+      expect((await api.request('GET', '/coach/profile/defaults', { token: coach.token })).body.defaults).toEqual({ nutrition: { message: null, tip: null } });
+      expect((await defaults({ nutrition: { message: '  Hi {name}!\r\nLet us go.  ' } })).body.defaults).toEqual({ nutrition: { message: 'Hi {name}!\nLet us go.', tip: null } });
+      expect((await defaults({ nutrition: { tip: 'Water first' } })).body.defaults.nutrition).toEqual({ message: 'Hi {name}!\nLet us go.', tip: 'Water first' });
+      expect((await defaults({ nutrition: { message: 'x'.repeat(601) } })).status).toBe(400);
+      expect((await defaults({ nutrition: { tip: 'x'.repeat(301) } })).status).toBe(400);
+      expect((await defaults({ workouts: { message: 'x' } })).status).toBe(400);
+      expect((await defaults({ nutrition: { other: 'x' } })).status).toBe(400);
+      // Only coaches, and each only her own.
+      expect((await defaults({ nutrition: { tip: 'x' } }, trainee.token)).status).toBe(403);
+      expect((await api.request('GET', '/coach/profile/defaults', { token: trainee.token })).status).toBe(403);
+
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()], introMessage: 'Hi {name}!', introTip: ' Drink water, {name} ' });
+      expect((await api.request('GET', planPath(), { token: coach.token })).body.plan).toMatchObject({ introMessage: 'Hi {name}!', introTip: 'Drink water, {name}' });
+      expect((await publish()).status).toBe(200);
+      const first = await api.request('GET', '/nutrition-plan', { token: trainee.token });
+      const firstName = 'maya'; // createTestUser names her after the email
+      expect(first.body.plan).toMatchObject({ intro: `Hi ${firstName}!`, introTip: `Drink water, ${firstName}` });
+      expect(first.body.coach.name.length).toBeGreaterThan(0);
+      // The coach's view of the published version reads the same.
+      expect((await api.request('GET', planPath(), { token: coach.token })).body.published.introTip).toBe(`Drink water, ${firstName}`);
+
+      // Changing the default touches nothing she received; a changed tip alone is a new version.
+      await defaults({ nutrition: { message: 'Something else', tip: null } });
+      expect((await api.request('GET', '/nutrition-plan', { token: trainee.token })).body.plan.introTip).toBe(`Drink water, ${firstName}`);
+      const sameMeals = (await api.request('GET', planPath(), { token: coach.token })).body.plan.meals;
+      await savePlan({ calorieTarget: target(1500), meals: sameMeals, introTip: 'Sleep well' });
+      expect((await publish()).status).toBe(200);
+      expect((await api.request('GET', '/nutrition-plan', { token: trainee.token })).body.plan).toMatchObject({ version: 2, introTip: 'Sleep well' });
+
+      expect((await savePlan({ calorieTarget: target(1500), meals: sameMeals, introTip: 'x'.repeat(301) })).status).toBe(400);
+      // A tip alone (no note) still opens as unseen.
+      await savePlan({ calorieTarget: target(1500), meals: sameMeals, introMessage: '', introTip: 'Only a tip' });
+      await publish();
+      const tipOnly = await api.request('GET', '/nutrition-plan', { token: trainee.token });
+      expect(tipOnly.body.plan).toMatchObject({ intro: null, introTip: 'Only a tip' });
+      expect(tipOnly.body.introUnseen).toBe(true);
+    });
   });
 
   describe('daily protein goal (owner, 2026-10-28)', () => {

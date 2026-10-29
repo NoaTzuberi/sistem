@@ -2048,8 +2048,10 @@ export interface SaveNutritionPlanPayload {
   dailyPortions?: PortionCounts;
   /** Portions mode: "vegetables free, at every meal". Omitted = keep. */
   vegetablesFree?: boolean;
-  /** Plain text, ≤ 1,500 chars, line breaks kept; '' / null = none. Omitted = keep. */
+  /** Plain text, ≤ 1,500 chars, line breaks kept; '' / null = none. Omitted = keep. May say {name}. */
   introMessage?: string | null;
+  /** Her tip under the note: plain text ≤ 300 chars; '' / null = none. Omitted = keep. May say {name}. */
+  introTip?: string | null;
   /** 13b, waterTracking only — refused while the feature is closed. */
   waterGoalMl?: number | null;
   /** The coach's daily protein goal in grams (whole, 1–400); null clears; omitted keeps. */
@@ -2092,6 +2094,7 @@ export interface CoachNutritionPlan {
   meals: NutritionMeal[];
   tips: NutritionTip[];
   introMessage: string | null;
+  introTip: string | null;
   waterGoalMl: number | null;
   /** The coach's daily protein goal in grams; null = none (no per-portion protein value exists to compute one). */
   proteinGramsTarget: number | null;
@@ -2150,6 +2153,8 @@ export interface NutritionPlanView {
   tips: string[];
   /** The coach's note at the top of the tab (plain text, line breaks kept). */
   intro: string | null;
+  /** The coach's tip under the note (a "Tip from <coach>" card); null = none. {name} already filled. */
+  introTip: string | null;
   /** The day's portions (the day header / tracker): the daily portions, or the meals summed. */
   dayPortions: PortionCounts;
   /** Vegetables free that day (portions mode: the plan's switch; menu mode: any meal with it on). */

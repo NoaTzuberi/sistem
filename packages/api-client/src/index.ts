@@ -10,7 +10,7 @@ export { createTraineeApi } from './traineeApi';
 export type { TraineeApi } from './traineeApi';
 export { createCardioApi, createCoachCardioApi } from './cardioApi';
 export type { CardioApi, CoachCardioApi } from './cardioApi';
-export { createJoinApi, createInvitesApi, createAdminApi, createCoachPaymentApi, JoinRequestError } from './accountsApi';
+export { createJoinApi, createInvitesApi, createAdminApi, createCoachPaymentApi, createCoachDefaultsApi, JoinRequestError } from './accountsApi';
 export type { JoinApi, InvitesApi, AdminApi } from './accountsApi';
 export { createAdminFoodsApi } from './foodBankApi';
 export type { AdminFoodsApi } from './foodBankApi';
