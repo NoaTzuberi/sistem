@@ -154,7 +154,7 @@ export function FoodPicker({ foods, recentFoodIds, initialGroup, onPick }: FoodP
       )}
 
       <ul ref={listRef} id={listId} className="food-picker-results" role="listbox" aria-label={copy.pickerResults}>
-        {results.length === 0 && <li className="food-picker-empty">{copy.pickerEmpty}</li>}
+        {results.length === 0 && <li className="food-picker-empty">{activeFoods.length === 0 ? copy.pickerNoFoods : copy.pickerEmpty}</li>}
         {results.map((food, index) => (
           <li
             key={food.id}

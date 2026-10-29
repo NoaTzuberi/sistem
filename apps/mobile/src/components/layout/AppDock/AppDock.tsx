@@ -1,8 +1,8 @@
 import { type MouseEvent, type ReactNode, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { IconActivityHeartbeat, IconBarbell, IconHome, IconSalad, IconUser, IconUsers } from '@tabler/icons-react';
+import { IconActivityHeartbeat, IconBarbell, IconHome, IconMessageCircle, IconSalad, IconUser, IconUsers } from '@tabler/icons-react';
 import type { TabUpdates } from '@sistem/types';
-import { useCopy } from '@sistem/shared';
+import { formatPlural, useCopy, useLanguage } from '@sistem/shared';
 import { useAuth } from '../../../services/auth/AuthContext';
 import { hapticSelection } from '../../../services/haptics/haptics';
 import { TABS, type TabId, tabIndexOf } from '../../../app/config/tabs';
@@ -12,6 +12,8 @@ import { appCopy } from '../../../copy';
 import { useDockVisible } from './dockStore';
 import './AppDock.css';
 import { appRole } from '../../../services/auth/appRole';
+import { coachMessageUnread } from '../../../features/coach/data/coachUnread';
+import { coachCopy } from '../../../features/coach/copy';
 
 const ICON_SIZE = 21;
 const ICON_STROKE = 2.2;
@@ -23,11 +25,13 @@ const ICONS: Record<TabId, ReactNode> = {
   profile: <IconUser size={ICON_SIZE} stroke={ICON_STROKE} />,
   today: <IconActivityHeartbeat size={ICON_SIZE} stroke={ICON_STROKE} />,
   trainees: <IconUsers size={ICON_SIZE} stroke={ICON_STROKE} />,
+  messages: <IconMessageCircle size={ICON_SIZE} stroke={ICON_STROKE} />,
 };
 
-function badgeOf(id: TabId, updates: TabUpdates): ReactNode {
+function badgeOf(id: TabId, updates: TabUpdates, unreadMessages: ReactNode): ReactNode {
   if (id === 'workouts') return <TabUpdateDot visible={updates.workouts} />;
   if (id === 'nutrition') return <TabUpdateDot visible={updates.nutrition} />;
+  if (id === 'messages') return unreadMessages;
   return null;
 }
 
@@ -48,6 +52,9 @@ export function AppDock({ busy }: AppDockProps) {
   const role = appRole(user);
   const isTrainee = role === 'trainee';
   const updates = useTabUpdates(isTrainee);
+  const language = useLanguage();
+  const messagesCopy = useCopy(coachCopy).messages;
+  const unreadMessages = coachMessageUnread.useCount(role === 'coach');
   const tabs = role ? TABS[role] : [];
   const currentIndex = tabIndexOf(pathname);
   const current = currentIndex === null ? null : tabs[currentIndex];
@@ -84,7 +91,15 @@ export function AppDock({ busy }: AppDockProps) {
             <span className="app-dock-icon" aria-hidden="true">
               {ICONS[tab.id]}
             </span>
-            {badgeOf(tab.id, updates)}
+            {badgeOf(
+              tab.id,
+              updates,
+              unreadMessages > 0 && !isCurrent ? (
+                <span className="app-dock-badge" role="img" aria-label={formatPlural(language, messagesCopy.unreadBadge, unreadMessages)}>
+                  {unreadMessages > 99 ? '99+' : unreadMessages}
+                </span>
+              ) : null,
+            )}
             <span className="app-dock-label">{copy.tabs[tab.id]}</span>
           </Link>
         );

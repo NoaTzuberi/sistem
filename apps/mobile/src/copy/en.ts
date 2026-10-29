@@ -10,6 +10,7 @@ export const en: CopyShape<typeof he> = {
     inbox: 'Inbox',
     today: 'Today',
     trainees: 'Trainees',
+    messages: 'Messages',
     navigation: 'Main',
   },
   // The small Latin mono "eyebrows" next to Hebrew section labels (decoration, aria-hidden). Latin in

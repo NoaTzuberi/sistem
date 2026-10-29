@@ -19,6 +19,8 @@ import { tabUpdatesRouter } from './features/tabUpdates/tabUpdates.routes';
 import { adminRouter } from './features/admin/admin.routes';
 import { joinRouter } from './features/invites/invite.routes';
 import { coachingsRouter, communitiesRouter } from './features/coachings/coaching.routes';
+import { reactionsRouter } from './features/reactions/reaction.routes';
+import { messagesRouter } from './features/messages/message.routes';
 import { registerNotificationListeners } from './features/notifications/notification.listeners';
 import { registerAiRecommendationListeners } from './features/aiRecommendations/aiRecommendation.listeners';
 
@@ -47,6 +49,8 @@ app.use('/api/admin', adminRouter);
 app.use('/api/join', joinRouter);
 app.use('/api/coachings', coachingsRouter);
 app.use('/api/communities', communitiesRouter);
+app.use('/api/reactions', reactionsRouter);
+app.use('/api/messages', messagesRouter);
 
 registerNotificationListeners();
 registerAiRecommendationListeners();

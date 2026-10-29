@@ -38,3 +38,9 @@ export const resetEmailRateLimit = limiter(5, 60, (req) => {
   const email: unknown = req.body?.email;
   return typeof email === 'string' && email.trim() ? `email:${email.trim().toLowerCase()}` : ipKeyGenerator(req.ip ?? '');
 });
+
+/** Sending messages (coach ↔ trainee): per signed-in user, after requireAuth. */
+export const messageRateLimit = limiter(30, 1, (req) => {
+  const userId = (req as Request & { userId?: string }).userId;
+  return userId ? `user:${userId}` : ipKeyGenerator(req.ip ?? '');
+});

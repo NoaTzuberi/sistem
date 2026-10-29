@@ -1,39 +1,11 @@
+/* One row that scrolls sideways when it doesn't fit. */
 .category-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--space-filter-chip-gap);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.category-chip {
-  min-height: 28px;
-  padding: 0 var(--space-2);
-  font-family: var(--font-family-body);
-  font-size: var(--text-xs);
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  border: var(--border-width-thin) solid var(--color-border);
-  border-radius: var(--radius-none);
-  cursor: pointer;
-}
-
-.category-chip:active {
-  background-color: var(--color-primary-soft);
-}
-
-@media (hover: hover) {
-  .category-chip:hover {
-    border-color: var(--color-primary);
-  }
-}
-
-.category-chip-selected,
-.category-chip-selected:active {
-  color: var(--color-primary-deep);
-  background-color: var(--color-primary-soft);
-  border-color: var(--color-primary);
-}
-
-.category-chip:focus-visible {
-  outline: var(--border-width-medium) solid var(--color-primary);
-  outline-offset: 1px;
+.category-chips::-webkit-scrollbar {
+  display: none;
 }

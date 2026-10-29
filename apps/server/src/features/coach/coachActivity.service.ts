@@ -10,6 +10,7 @@ import { PersonalRecord } from '../personalRecords/personalRecord.model';
 import { Exercise } from '../exercises/exercise.model';
 import { PhotoStorageUnavailableError, toPublicPhoto } from '../privatePhotos/privatePhoto.service';
 import { listCoachCoachings } from '../coachings/coaching.service';
+import { type ReactionTargetRef, coachReactionsFor, reactionKeyOf } from '../reactions/reaction.service';
 
 /**
  * GET /coach/activity: the coach mode feed, newest first, built when read from the records that already
@@ -321,6 +322,29 @@ function joinEvents(coachings: { _id: Types.ObjectId; traineeId: Types.ObjectId;
     }));
 }
 
+/** What a feed item's reaction is on (workouts, cardio, photos); null = no reactions on it. */
+function reactionTargetOf(item: CoachActivityItem): ReactionTargetRef | null {
+  const traineeId = item.trainee.id;
+  if (item.type === 'workout_completed') return { traineeId, type: 'workout_log', id: item.logId };
+  if (item.type === 'cardio_completed') return { traineeId, type: 'cardio_log', id: item.logId };
+  if (item.type === 'photos_uploaded') {
+    if (item.source === 'pump') return item.logId ? { traineeId, type: 'pump_photo', id: item.logId } : null;
+    if (!item.date) return null;
+    return { traineeId, type: item.source === 'meal' ? 'meal_photos' : 'progress_photos', id: item.date };
+  }
+  return null;
+}
+
+/** The coach's own reaction on each reactable item of the page (one query). */
+async function attachReactions(coachId: string, items: CoachActivityItem[]): Promise<void> {
+  const refs = items.map(reactionTargetOf);
+  const reactions = await coachReactionsFor(coachId, refs.filter((ref): ref is ReactionTargetRef => ref !== null));
+  items.forEach((item, index) => {
+    const ref = refs[index];
+    if (ref) item.reactionTarget = { type: ref.type, id: ref.id, reaction: reactions.get(reactionKeyOf(ref)) ?? null };
+  });
+}
+
 export async function getCoachActivity(coachId: string, before: Date, limit: number, now: Date = new Date()): Promise<CoachActivityPage> {
   const coachings = await listCoachCoachings(coachId);
   if (coachings.length === 0) return { items: [], nextBefore: null, serverTime: now.toISOString() };
@@ -363,6 +387,7 @@ export async function getCoachActivity(coachId: string, before: Date, limit: num
     const trainee = trainees.get(traineeId);
     return trainee ? [{ ...event, trainee } as CoachActivityItem] : [];
   });
+  await attachReactions(coachId, items);
   return {
     items,
     // An empty page (a source's rows were all filtered out) still moves on, from that source's floor.

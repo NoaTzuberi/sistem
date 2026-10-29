@@ -2,6 +2,7 @@ import type { FoodCategory, FoodGroup } from '@sistem/types';
 import { FOOD_CATEGORIES, sharedCopy, useCopy } from '@sistem/shared';
 import { nutritionCopy } from '../../copy';
 import type { CategoryFilter } from '../../data/foodFilters';
+import { GroupFilterChip } from '../GroupFilterChip/GroupFilterChip';
 import './CategoryChips.css';
 
 interface CategoryChipsProps {
@@ -12,7 +13,7 @@ interface CategoryChipsProps {
   onChange: (value: CategoryFilter) => void;
 }
 
-/** "All" + the group's categories that have items (single-select). Used by the food picker and the food list. */
+/** "All" + the group's categories that have items (single-select), in the group's colors. Used by the food picker and the food list. */
 export function CategoryChips({ group, items, value, onChange }: CategoryChipsProps) {
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
@@ -21,15 +22,9 @@ export function CategoryChips({ group, items, value, onChange }: CategoryChipsPr
   if (present.length === 0) return null;
 
   const chip = (key: string, label: string, chipValue: CategoryFilter) => (
-    <button
-      key={key}
-      type="button"
-      className={'category-chip' + (value === chipValue ? ' category-chip-selected' : '')}
-      aria-pressed={value === chipValue}
-      onClick={() => onChange(chipValue)}
-    >
+    <GroupFilterChip key={key} group={chipValue === null ? null : group} withIcon={false} isSelected={value === chipValue} onClick={() => onChange(chipValue)}>
       {label}
-    </button>
+    </GroupFilterChip>
   );
 
   return (

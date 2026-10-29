@@ -36,11 +36,14 @@
   color: var(--group-text);
 }
 
-/* Group tabs: a row that scrolls sideways when it doesn't fit. */
+/* Group chips: a row that scrolls sideways when it doesn't fit. Each chip = the group's tint + ink, its
+   solid color + white when chosen (the same pills as the dashboard's food filters). */
 .tn-food-sheet-tabs {
   display: flex;
-  gap: var(--space-1);
-  margin-block-end: var(--space-2);
+  gap: var(--space-filter-chip-gap);
+  /* Room for the chips' 44px touch area above and below the 36px pill. */
+  padding-block: var(--space-1);
+  margin-block-end: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -50,27 +53,40 @@
 }
 
 .tn-food-sheet-tab {
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
   gap: var(--space-1);
-  min-height: var(--touch-target-min);
+  height: var(--size-filter-chip);
   padding: 0 var(--space-3);
   border: 0;
-  border-radius: var(--radius-round);
-  background-color: var(--color-fill-soft);
-  color: var(--color-ink);
+  border-radius: var(--radius-filter-chip);
+  background-color: var(--group-soft);
+  color: var(--group-text);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
   cursor: pointer;
-  transition: transform var(--transition-press) var(--ease-press);
+  transition:
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease,
+    transform var(--transition-press) var(--ease-press);
+}
+
+/* The touch target reaches 44px though the pill is 36px. */
+.tn-food-sheet-tab::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-filter-chip) - var(--touch-target-min)) / 2) 0;
 }
 
 .tn-food-sheet-tab svg {
-  width: var(--space-3);
-  height: var(--space-3);
+  width: var(--size-filter-chip-icon);
+  height: var(--size-filter-chip-icon);
   color: var(--group-fill);
+  transition: color var(--transition-fast) ease;
 }
 
 /* Selected: filled with the exact group color. */
@@ -188,7 +204,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .tn-food-sheet-tab:not([aria-pressed='true']):hover {
-    background-color: var(--color-fill-soft-hover);
+    background-color: color-mix(in srgb, var(--group-fill) 12%, var(--group-soft));
   }
 
   .tn-food-add:not(.tn-food-add-on):hover {
@@ -198,7 +214,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tn-food-sheet-tab,
+  .tn-food-sheet-tab svg,
   .tn-food-add {
     transition: none;
+  }
+
+  .tn-food-sheet-tab:active {
+    transform: none;
   }
 }

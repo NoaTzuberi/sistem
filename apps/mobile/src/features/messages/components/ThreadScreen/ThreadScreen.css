@@ -1,0 +1,76 @@
+.cm-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background-color: var(--color-coach-page);
+}
+
+.cm-screen-head {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: max(var(--space-3), var(--safe-top)) var(--space-3) var(--space-2);
+  background-color: var(--color-coach-stage);
+  color: var(--color-coach-on-stage);
+}
+
+.cm-screen-back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--surface-coach-on-stage);
+  color: inherit;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), background-color var(--transition-fast) ease;
+}
+
+.cm-screen-back:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cm-screen-back:hover {
+    background-color: var(--surface-coach-on-stage-hover);
+  }
+}
+
+.cm-screen-title {
+  flex: 1;
+  color: var(--color-coach-on-stage);
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-coach-name);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm-screen-body {
+  flex: 1;
+  padding: var(--space-3);
+}
+
+/* Sticky (not fixed): the page-enter transform on <main> would pin a fixed footer. */
+.cm-screen-foot {
+  position: sticky;
+  inset-block-end: 0;
+  padding: var(--space-2) var(--space-3) max(var(--space-2), var(--safe-bottom));
+  background-color: var(--color-coach-card);
+  box-shadow: var(--shadow-coach-card);
+}
+
+.cm-screen-cannot {
+  margin: 0;
+  padding-block: var(--space-2);
+  text-align: center;
+  font-size: var(--text-coach-label);
+  color: var(--color-coach-muted);
+}

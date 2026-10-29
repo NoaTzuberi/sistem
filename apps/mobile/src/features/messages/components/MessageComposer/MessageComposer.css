@@ -1,0 +1,72 @@
+.cm-composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cm-composer-error {
+  margin: 0;
+  font-size: var(--text-coach-label);
+  color: var(--color-error);
+}
+
+.cm-composer-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.cm-composer-input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--touch-target-min);
+  max-height: var(--size-coach-composer-max);
+  /* Grows with its text (where supported); the max height then scrolls. */
+  field-sizing: content;
+  padding: var(--space-2) calc(var(--space-2) + var(--space-1));
+  border: 0;
+  border-radius: var(--radius-coach-bubble);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-coach-body);
+  line-height: 1.5;
+  resize: none;
+  outline: 0;
+  transition: background-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+}
+
+.cm-composer-input:focus-visible {
+  background-color: var(--color-coach-card);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.cm-composer-send {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out), opacity var(--transition-fast) ease;
+}
+
+.cm-composer-send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cm-composer-send:not(:disabled):active {
+  transform: scale(var(--scale-coach-press));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cm-composer-send:not(:disabled):hover {
+    background-color: var(--color-ink-raised);
+  }
+}

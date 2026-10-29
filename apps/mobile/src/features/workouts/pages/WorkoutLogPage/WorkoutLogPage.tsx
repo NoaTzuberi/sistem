@@ -9,6 +9,7 @@ import { workoutSummaryPath } from '../../../../app/config/routes';
 import { getWorkoutLog } from '../../../../services/workoutLogs/workoutLogsService';
 import { BackButton } from '../../components/BackButton/BackButton';
 import { PersonalRecordList } from '../../components/PersonalRecordList/PersonalRecordList';
+import { LogReactions } from '../../../messages/components/LogReactions/LogReactions';
 import { SummaryStats } from '../../components/SummaryStats/SummaryStats';
 import { workoutCopy } from '../../copy';
 import type { SummaryLocationState } from '../WorkoutSummaryPage/WorkoutSummaryPage';
@@ -46,6 +47,7 @@ export function WorkoutLogPage() {
                 </bdi>
               </h1>
               <span className="workout-log-page-date">{formatDateTime(log.finishedAt ?? log.startedAt, language)}</span>
+              <LogReactions logId={log.id} />
             </div>
           )}
         </header>

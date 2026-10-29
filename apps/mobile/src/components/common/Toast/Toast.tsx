@@ -1,9 +1,16 @@
 import { createPortal } from 'react-dom';
 import './Toast.css';
 
+export interface ToastAction {
+  label: string;
+  onSelect: () => void;
+}
+
 interface ToastProps {
   /** The line to show; undefined = nothing on screen. */
   message: string | undefined;
+  /** One optional button in the toast (e.g. "Undo"). */
+  action?: ToastAction;
 }
 
 /**
@@ -11,13 +18,18 @@ interface ToastProps {
  * to <body>, so the page-enter transform on <main> can't pin it. The live region is always mounted —
  * a region added together with its text is not read aloud.
  */
-export function Toast({ message }: ToastProps) {
+export function Toast({ message, action }: ToastProps) {
   return createPortal(
     <div className="toast-region" role="status" aria-live="polite">
       {message !== undefined && (
         // Keyed by the text: a new message enters again instead of swapping in place.
-        <p key={message} className="toast" dir="auto">
-          {message}
+        <p key={message} className={'toast' + (action ? ' toast-with-action' : '')} dir="auto">
+          <span>{message}</span>
+          {action && (
+            <button type="button" className="toast-action" onClick={action.onSelect}>
+              {action.label}
+            </button>
+          )}
         </p>
       )}
     </div>,

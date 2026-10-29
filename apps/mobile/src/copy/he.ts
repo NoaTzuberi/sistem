@@ -11,6 +11,7 @@ export const he = {
     inbox: 'הודעות',
     today: 'היום',
     trainees: 'מתאמנות',
+    messages: 'הודעות',
     navigation: 'ראשי',
   },
   // The small Latin mono "eyebrows" next to Hebrew section labels (decoration, aria-hidden). Latin in

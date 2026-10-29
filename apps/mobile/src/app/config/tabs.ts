@@ -1,11 +1,11 @@
 import { matchPath } from 'react-router-dom';
-import { CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, ROUTES, WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH } from './routes';
+import { CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, COACH_THREAD_PATH, ROUTES, WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH } from './routes';
 
 // The dock's tabs by app side (PRD §5 trainee tabs, §6 coach mode — services/auth/appRole; an admin
 // without a coach role has no dock), in dock order — the order decides
 // the direction of the screen transition (a higher index = forward).
 
-export type TabId = 'home' | 'workouts' | 'nutrition' | 'profile' | 'today' | 'trainees';
+export type TabId = 'home' | 'workouts' | 'nutrition' | 'profile' | 'today' | 'trainees' | 'messages';
 
 export interface TabRoute {
   id: TabId;
@@ -20,16 +20,17 @@ export const TABS: Record<'trainee' | 'coach', TabRoute[]> = {
     { id: 'profile', to: ROUTES.PROFILE },
   ],
   coach: [
-    // Messages (with its unread badge) joins in Phase B, with the message model.
     { id: 'today', to: ROUTES.COACH_TODAY },
     { id: 'trainees', to: ROUTES.COACH_TRAINEES },
+    { id: 'messages', to: ROUTES.COACH_MESSAGES },
     { id: 'profile', to: ROUTES.COACH_PROFILE },
   ],
 };
 
 // Full-screen flows under a tab's path: no dock, no tab transition.
 // The cardio detail too: its slide floats where the dock would be (docs/design/trainee-cardio.html).
-const FULL_SCREEN = [WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH, CARDIO_DETAIL_PATH, CARDIO_RUN_PATH];
+// A conversation too: its composer sits where the dock would be.
+const FULL_SCREEN = [WORKOUT_SESSION_PATH, WORKOUT_SUMMARY_PATH, CARDIO_DETAIL_PATH, CARDIO_RUN_PATH, COACH_THREAD_PATH, ROUTES.TRAINEE_MESSAGES];
 
 function belongsTo(pathname: string, to: string): boolean {
   return pathname === to || pathname.startsWith(`${to}/`);

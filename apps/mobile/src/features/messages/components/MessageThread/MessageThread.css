@@ -1,0 +1,99 @@
+.cm-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cm-thread-older {
+  align-self: center;
+}
+
+.cm-thread-empty {
+  margin: var(--space-4) 0;
+  text-align: center;
+  font-size: var(--text-coach-body);
+  color: var(--color-coach-muted);
+}
+
+.cm-thread-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cm-bubble-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Mine at the end side (left in Hebrew, right in English). */
+.cm-bubble-row-mine {
+  justify-content: flex-end;
+}
+
+.cm-bubble {
+  max-width: var(--size-coach-bubble-max);
+  padding: var(--space-2) calc(var(--space-2) + var(--space-1));
+  border-radius: var(--radius-coach-bubble);
+  border-end-start-radius: var(--radius-coach-bubble-tail);
+  background-color: var(--color-coach-bubble-theirs);
+  box-shadow: var(--shadow-coach-card);
+  animation: cm-bubble-in var(--transition-drawer-in) var(--ease-coach-out);
+}
+
+.cm-bubble-mine {
+  border-end-start-radius: var(--radius-coach-bubble);
+  border-end-end-radius: var(--radius-coach-bubble-tail);
+  background-color: var(--color-coach-bubble-mine);
+  color: var(--color-coach-bubble-mine-text);
+}
+
+.cm-bubble-who {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cm-bubble-text {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-coach-body);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cm-bubble-time {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--text-coach-caption);
+  color: var(--color-coach-muted);
+  text-align: end;
+}
+
+.cm-bubble-mine .cm-bubble-text {
+  color: var(--color-coach-bubble-mine-text);
+}
+
+.cm-bubble-mine .cm-bubble-time {
+  color: var(--color-coach-on-stage-muted);
+}
+
+@keyframes cm-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-bubble {
+    animation: none;
+  }
+}
