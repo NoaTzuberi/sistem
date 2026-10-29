@@ -537,4 +537,28 @@ export const he = {
     minutes: '{count}′',
     rounds: plural({ one: 'סבב אחד', two: '2 סבבים', other: '{count} סבבים' }),
   },
+  // The send sheet's message + tip (nutrition send + workout publish, both coach apps). PLACEHOLDER copy.
+  sendNote: {
+    messageTitle: 'הודעה למתאמנת',
+    modeLabel: 'איזו הודעה לשלוח',
+    modeDefault: 'הודעת ברירת המחדל',
+    modeNew: 'הודעה חדשה',
+    newPlaceholder: 'כתבי הודעה למתאמנת…',
+    saveAsDefault: {
+      nutrition: 'לשמור כהודעת ברירת המחדל לתוכניות תזונה',
+      workouts: 'לשמור כהודעת ברירת המחדל לתוכניות אימונים',
+    },
+    updateDefault: 'שמירה כברירת מחדל',
+    updatingDefault: 'שומרת…',
+    defaultSaved: 'נשמר',
+    attachTip: 'לצרף את הטיפ הקבוע',
+    setUpDefault: 'הגדרת הודעה קבועה',
+    nameHint: '{name} יוחלף בשם המתאמנת',
+    count: '{count}/{max}',
+    defaultTooLong: 'הודעת ברירת מחדל יכולה להיות עד {max} תווים',
+    previewLabel: 'המתאמנת תקבל:',
+    previewMessage: 'הודעה',
+    previewTip: 'טיפ',
+    previewNone: 'את התוכנית, בלי הודעה',
+  },
 } as const;

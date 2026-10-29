@@ -509,6 +509,19 @@
   --disabled-bg: var(--tint-pink);
   --disabled-ink: var(--ink-pink);
 
+  /* Default messages sent with a plan (coach Settings + the send sheet, 2026-10-29). */
+  --color-defaults-field: #f5f3f6;                              /* A message box's soft fill */
+  --color-defaults-nutrition-tile: var(--tint-purple);          /* The nutrition card's icon tile … */
+  --color-defaults-nutrition-icon: var(--ink-purple);           /* … and its bowl */
+  --color-defaults-workouts-tile: var(--tint-pink);             /* The workouts card's icon tile … */
+  --color-defaults-workouts-icon: var(--color-portion-protein-deep); /* … and its dumbbell (#c80058, icon only) */
+  --radius-defaults-card: 24px;
+  --radius-defaults-field: 16px;
+  --space-defaults-card: 22px;
+  --size-defaults-tile: 40px;
+  --size-defaults-field-min: 52px;
+  --shadow-defaults-card: 0 10px 30px color-mix(in srgb, var(--color-ink) 6%, transparent);
+
   /* Trainee Home, direction B ("training OS", docs/design/trainee-home-b.html): white screen, ink type,
      one hot-pink stage, the ink dock. Light only by design. */
   --color-ink: #141116;                 /* The dock, today's lane, the timer bar, the coach avatar */
