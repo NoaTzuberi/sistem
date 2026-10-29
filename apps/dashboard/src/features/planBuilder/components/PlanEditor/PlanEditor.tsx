@@ -192,14 +192,10 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     setOpenSheet('library');
   }
 
-  // From the library sheet. Opened for a slot: into that slot — refused once it is full. Otherwise
-  // into the first slot that fits it (typed workout), else "Other".
+  // From the library sheet. Opened for a slot: into that slot (any number — slots are suggestions).
+  // Otherwise into the first shown slot that fits it (typed workout), else "Other".
   function handleAddExercise(facts: ExerciseFacts): boolean {
     if (!selected) return false;
-    if (librarySlot && selected.exercises.filter((exercise) => exercise.slotId === librarySlot.id).length >= librarySlot.maxExercises) {
-      showToast(copy.slotFull);
-      return false;
-    }
     const next = addExerciseToWorkout(selected, facts, findWorkoutType(config, selected.workoutType), librarySlot?.id);
     setWorkouts((current) => current.map((workout) => (workout.key === next.key ? next : workout)));
     showToast(fill(copy.toastAdded, { name: facts.name }));
@@ -310,6 +306,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
                 workout={selected}
                 index={selectedIndex}
                 count={workouts.length}
+                autoFocusTitle={selected.key === planWorkouts.addedKey}
                 issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
                 onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
                 onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}
@@ -326,6 +323,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
               suggestions={suggestionsFor(selectedIndex)}
               index={selectedIndex}
               count={workouts.length}
+              autoFocusTitle={selected.key === planWorkouts.addedKey}
               issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
               onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
               onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}

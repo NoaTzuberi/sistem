@@ -46,6 +46,8 @@ export function usePlanWorkouts({ workouts, setWorkouts, placeholderTitle, onDup
   // The workout folding away right now (a second press during the fold does nothing).
   const [leavingKey, setLeavingKey] = useState<string>();
   const collapse = useRef<Animation | null>(null);
+  // The workout just added with "+ Add workout": its name field takes the focus once.
+  const [addedKey, setAddedKey] = useState<string>();
 
   const selected = workouts.find((workout) => workout.key === selectedKey) ?? workouts[0];
   const selectedIndex = selected ? workouts.indexOf(selected) : -1;
@@ -133,6 +135,7 @@ export function usePlanWorkouts({ workouts, setWorkouts, placeholderTitle, onDup
 
   function add(workout: DraftWorkout) {
     setWorkouts((current) => [...current, workout]);
+    setAddedKey(workout.key);
     select(workout, { scroll: true });
   }
 
@@ -176,5 +179,6 @@ export function usePlanWorkouts({ workouts, setWorkouts, placeholderTitle, onDup
     /** The workout folding away (its panel clips while it does). */
     leavingKey,
     emptyFocusRef,
+    addedKey,
   };
 }

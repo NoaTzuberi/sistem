@@ -51,11 +51,36 @@
   color: var(--color-text-muted);
 }
 
-.workout-slot-hint {
-  margin: 0;
+.workout-restore {
+  align-self: flex-start;
+  min-height: 44px;
   padding: 0 6px;
   font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
   color: var(--workout-text);
+  background-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.workout-restore:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workout-restore:hover {
+    text-decoration: underline;
+  }
+}
+
+.workout-restore:focus-visible {
+  outline: var(--border-width-medium) solid var(--workout-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-restore {
+    transition: none;
+  }
 }
 
 /* "+ Add exercise": full width, in the workout's soft color. */

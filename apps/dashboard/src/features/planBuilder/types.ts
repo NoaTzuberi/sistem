@@ -45,6 +45,8 @@ export interface DraftWorkout {
   notes: string;
   /** Phase 12b: the workout type (slot template); undefined = free workout. */
   workoutType?: string;
+  /** The type's suggested slots the coach removed from this workout (× on an empty slot). */
+  hiddenSlotIds?: string[];
   /** undefined = strength. A cardio workout has no exercises; its blocks are in `cardio`. */
   kind?: 'cardio';
   cardio?: PlanCardio;

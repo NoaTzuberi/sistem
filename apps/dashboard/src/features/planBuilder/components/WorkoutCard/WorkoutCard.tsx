@@ -1,9 +1,10 @@
-import { emptyRequiredSlots, fill, findWorkoutType, formatPlural, groupBySlot, slotLabel, useCopy, useLanguage } from '@sistem/shared';
+import { fill, findWorkoutType, formatPlural, groupBySlot, slotLabel, useCopy, useLanguage } from '@sistem/shared';
 import { useState } from 'react';
 import type { AiPlanExercise, PlanIssue, TrainingConfig, TrainingSlot } from '@sistem/types';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { changeWorkoutType, moveItem, newExercise, orderBySlots, removeExercise, setIntervalFlag, supersetWarnings } from '../../planDraft';
 import type { DraftExercise, DraftWorkout } from '../../types';
+import { workoutLetter } from '../../data/workoutLetters';
 import { ExerciseRow } from '../ExerciseRow/ExerciseRow';
 import { SlotSection } from '../SlotSection/SlotSection';
 import { WorkoutHero } from '../WorkoutHero/WorkoutHero';
@@ -22,6 +23,8 @@ interface WorkoutCardProps {
   /** Its place in the plan's order (what the trainee's list follows). */
   index: number;
   count: number;
+  /** A workout just added: its name field takes the focus so she names it right away. */
+  autoFocusTitle?: boolean;
   /** Problems the server reported for this workout and its exercises. */
   issues: PlanIssue[];
   onChange: (workout: DraftWorkout) => void;
@@ -46,6 +49,7 @@ export function WorkoutCard({
   suggestions,
   index,
   count,
+  autoFocusTitle,
   issues,
   onChange,
   onMove,
@@ -121,8 +125,15 @@ export function WorkoutCard({
     );
   }
 
+  // A removed suggestion stays hidden while it is empty (an exercise in it shows it again).
+  const hidden = new Set(workout.hiddenSlotIds ?? []);
   const grouped = type ? groupBySlot(exercises, type) : null;
-  const emptyRequired = emptyRequiredSlots(exercises, type);
+  const sections = grouped ? grouped.sections.filter(({ slot, exerciseIndexes }) => !hidden.has(slot.id) || exerciseIndexes.length > 0) : [];
+  const hiddenCount = grouped ? grouped.sections.length - sections.length : 0;
+
+  function hideSlot(slotId: string) {
+    onChange({ ...workout, hiddenSlotIds: [...hidden, slotId] });
+  }
   // The hero's chips: the slots that already have an exercise.
   const coveredGroups = grouped ? grouped.sections.filter((section) => section.exerciseIndexes.length > 0).map((section) => slotLabel(section.slot, language)) : [];
 
@@ -132,6 +143,9 @@ export function WorkoutCard({
         workout={workout}
         config={config}
         type={type}
+        letter={workoutLetter(index)}
+        autoFocusTitle={autoFocusTitle}
+        defaultTitle={fill(copy.workoutPlaceholder, { n: index + 1 })}
         coveredGroups={coveredGroups}
         menuItems={[
           { id: 'up', label: fill(copy.moveUpNamed, { name: title }), disabled: index === 0, onSelect: () => onMove(-1) },
@@ -158,11 +172,11 @@ export function WorkoutCard({
 
         {grouped ? (
           <>
-            {grouped.sections.map(({ slot, exerciseIndexes }) => (
+            {sections.map(({ slot, exerciseIndexes }) => (
               <SlotSection
                 key={slot.id}
                 name={slotLabel(slot, language)}
-                slot={{ required: slot.required, max: slot.maxExercises, onAdd: () => onAddExercise(slot) }}
+                slot={{ onAdd: () => onAddExercise(slot), onRemove: () => hideSlot(slot.id) }}
                 count={exerciseIndexes.length}
               >
                 {exerciseIndexes.map((exerciseIndex) => renderRow(exercises[exerciseIndex], exerciseIndex))}
@@ -181,6 +195,11 @@ export function WorkoutCard({
                   ))}
               </SlotSection>
             ))}
+            {hiddenCount > 0 && (
+              <button className="workout-restore" type="button" onClick={() => onChange({ ...workout, hiddenSlotIds: undefined })}>
+                {formatPlural(language, copy.restoreSuggestions, hiddenCount)}
+              </button>
+            )}
             {grouped.other.length > 0 && (
               <SlotSection name={copy.otherSlot} count={grouped.other.length}>
                 {grouped.other.map((exerciseIndex) => renderRow(exercises[exerciseIndex], exerciseIndex))}
@@ -193,8 +212,6 @@ export function WorkoutCard({
             {exercises.map((exercise, exerciseIndex) => renderRow(exercise, exerciseIndex))}
           </SlotSection>
         )}
-
-        {emptyRequired.length > 0 && <p className="workout-slot-hint">{formatPlural(language, copy.emptyRequired, emptyRequired.length)}</p>}
 
         {/* Any exercise, whatever its slot: a typed workout puts it in the first slot it fits, else "Other". */}
         <button className="workout-add" type="button" onClick={() => onAddExercise()}>

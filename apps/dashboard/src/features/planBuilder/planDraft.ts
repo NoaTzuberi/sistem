@@ -1,5 +1,5 @@
-import { fill, rematchSlots } from '@sistem/shared';
-import type { planBuilderCopy } from './copy';
+import { fill, getActiveLanguage, rematchSlots, withoutHiddenSlots } from '@sistem/shared';
+import { planBuilderCopy } from './copy';
 import type { CoachPlan, ExerciseFacts, PlanExerciseInput, SavePlanPayload, SetType, WorkoutTypeConfig } from '@sistem/types';
 import type { DraftExercise, DraftKeys, DraftSetTarget, DraftTargets, DraftWorkout, PlanDraft } from './types';
 import { DEFAULT_REPS, DEFAULT_SETS } from './data/planDefaults';
@@ -24,6 +24,7 @@ export function draftFromPlan(plan: CoachPlan): PlanDraft {
       dayOfWeek: workout.dayOfWeek,
       notes: workout.notes ?? '',
       workoutType: workout.workoutType,
+      hiddenSlotIds: workout.hiddenSlotIds,
       ...(workout.kind === 'cardio' && workout.cardio ? { kind: 'cardio' as const, cardio: workout.cardio } : {}),
       exercises: workout.exercises.map((exercise) => ({
         key: newKey(),
@@ -88,12 +89,14 @@ export function toPayload(draft: PlanDraft): SavePlanPayload {
     notes: draft.notes.trim() || undefined,
     aiRecommendationId: draft.aiRecommendationId ?? null,
     splitId: draft.splitId ?? null,
-    workouts: draft.workouts.map((workout) => ({
+    workouts: draft.workouts.map((workout, index) => ({
       id: workout.id,
-      title: workout.title,
+      // A name is required: a cleared field saves as the default name of its place ("Workout 2").
+      title: workout.title.trim() || fill(planBuilderCopy[getActiveLanguage()].workoutPlaceholder, { n: index + 1 }),
       dayOfWeek: workout.dayOfWeek,
       notes: workout.notes.trim() || undefined,
       workoutType: workout.workoutType,
+      ...(workout.workoutType && workout.hiddenSlotIds?.length ? { hiddenSlotIds: workout.hiddenSlotIds } : {}),
       ...(workout.kind === 'cardio' && workout.cardio ? { kind: 'cardio' as const, cardio: workout.cardio } : {}),
       exercises: workout.exercises.map(exerciseToInput),
     })),
@@ -251,15 +254,16 @@ export function changeWorkoutType(workout: DraftWorkout, type: WorkoutTypeConfig
     type,
   );
   const exercises = workout.exercises.map((exercise, index) => ({ ...exercise, slotId: slots[index] }));
-  return { ...workout, workoutType: type?.id, exercises: orderBySlots(exercises, type) };
+  // A new type brings its own suggestions: none of them is removed yet.
+  return { ...workout, workoutType: type?.id, hiddenSlotIds: undefined, exercises: orderBySlots(exercises, type) };
 }
 
-/** Adds an exercise to a workout: into `slotId`, else the first slot that fits it with room, else "Other". */
+/** Adds an exercise to a workout: into `slotId`, else the first shown slot that fits it, else "Other". */
 export function addExerciseToWorkout(workout: DraftWorkout, facts: ExerciseFacts, type: WorkoutTypeConfig | undefined, slotId?: string): DraftWorkout {
   let slot = slotId;
   if (!slot && type) {
     const all = [...workout.exercises.map((exercise) => ({ slotId: exercise.slotId, patterns: exercise.facts?.patterns })), { patterns: facts.patterns }];
-    slot = rematchSlots(all, type)[all.length - 1];
+    slot = rematchSlots(all, withoutHiddenSlots(type, workout.hiddenSlotIds))[all.length - 1];
   }
   return { ...workout, exercises: orderBySlots([...workout.exercises, newExercise(facts, slot)], type) };
 }

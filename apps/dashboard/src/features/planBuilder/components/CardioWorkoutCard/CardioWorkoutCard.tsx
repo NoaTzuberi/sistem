@@ -3,6 +3,7 @@ import { cardioMinutes, cardioTotals, fill, formatClock, useCopy } from '@sistem
 import { CardioEditor } from '../../../cardio/components/CardioEditor/CardioEditor';
 import { cardioCopy } from '../../../cardio/copy';
 import type { DraftWorkout } from '../../types';
+import { workoutLetter } from '../../data/workoutLetters';
 import { WorkoutHero } from '../WorkoutHero/WorkoutHero';
 import { planBuilderCopy } from '../../copy';
 import './CardioWorkoutCard.css';
@@ -11,6 +12,8 @@ interface CardioWorkoutCardProps {
   workout: DraftWorkout;
   index: number;
   count: number;
+  /** A workout just added: its name field takes the focus. */
+  autoFocusTitle?: boolean;
   /** Problems the server reported for this workout. */
   issues: PlanIssue[];
   onChange: (workout: DraftWorkout) => void;
@@ -24,7 +27,7 @@ interface CardioWorkoutCardProps {
  * The selected cardio workout: the same hero as a strength workout (name, day, note, ⋯ menu) with its
  * own three numbers, then the cardio editor. It is saved and published with the plan, like any workout.
  */
-export function CardioWorkoutCard({ workout, index, count, issues, onChange, onMove, onDuplicate, onRemove }: CardioWorkoutCardProps) {
+export function CardioWorkoutCard({ workout, index, count, autoFocusTitle, issues, onChange, onMove, onDuplicate, onRemove }: CardioWorkoutCardProps) {
   const copy = useCopy(planBuilderCopy);
   const cardioText = useCopy(cardioCopy);
   const title = workout.title.trim() || fill(copy.workoutPlaceholder, { n: index + 1 });
@@ -38,6 +41,9 @@ export function CardioWorkoutCard({ workout, index, count, issues, onChange, onM
         workout={workout}
         config={null}
         type={undefined}
+        letter={workoutLetter(index)}
+        autoFocusTitle={autoFocusTitle}
+        defaultTitle={fill(copy.workoutPlaceholder, { n: index + 1 })}
         coveredGroups={[]}
         menuItems={[
           { id: 'up', label: fill(copy.moveUpNamed, { name: title }), disabled: index === 0, onSelect: () => onMove(-1) },

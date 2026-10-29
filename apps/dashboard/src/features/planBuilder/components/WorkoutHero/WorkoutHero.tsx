@@ -5,6 +5,7 @@ import { ActionMenu } from '../../../../components/common/ActionMenu/ActionMenu'
 import { Icon } from '../../../../components/common/Icon/Icon';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { estimateWorkoutMinutes, workoutSetCount } from '../../data/planStats';
+import { WORKOUT_TITLE_MAX, useWorkoutTitle } from '../../hooks/useWorkoutTitle';
 import type { DraftWorkout } from '../../types';
 import { planBuilderCopy } from '../../copy';
 import './WorkoutHero.css';
@@ -15,6 +16,12 @@ interface WorkoutHeroProps {
   config: TrainingConfig | null;
   /** This workout's type in her config; undefined for a free workout or a type she removed. */
   type: WorkoutTypeConfig | undefined;
+  /** Its letter marker (A, B, C …); the name is the title. */
+  letter?: string;
+  /** "Workout 2": an emptied name falls back to it. */
+  defaultTitle: string;
+  /** A workout just added: the name field takes the focus. */
+  autoFocusTitle?: boolean;
   /** The muscle groups the workout already covers (its slots that have exercises). */
   coveredGroups: string[];
   /** The band's "⋯": move, duplicate, delete. */
@@ -40,12 +47,13 @@ export interface HeroStat {
  * The top of the selected workout: a soft cloud in the workout's own color, with its title, its
  * day / type / note chips, and the workout in three big numbers.
  */
-export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, onDelete, deleteLabel, onChange, onTypeChange, stats }: WorkoutHeroProps) {
+export function WorkoutHero({ workout, config, type, letter, defaultTitle, autoFocusTitle, coveredGroups, menuItems, onDelete, deleteLabel, onChange, onTypeChange, stats }: WorkoutHeroProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   // The notes field is tucked behind its chip; the chip says whether there is a note.
   const [showNotes, setShowNotes] = useState(false);
   const hasNotes = workout.notes.trim() !== '';
+  const titleField = useWorkoutTitle({ title: workout.title, defaultTitle, autoFocus: autoFocusTitle, onCommit: (title) => onChange({ ...workout, title }) });
 
   return (
     <div className="workout-hero">
@@ -53,13 +61,26 @@ export function WorkoutHero({ workout, config, type, coveredGroups, menuItems, o
       <div className="workout-hero-cloud" aria-hidden="true" />
 
       <div className="workout-hero-top">
-        <span className="workout-hero-dot" aria-hidden="true" />
+        {letter ? (
+          <span className="workout-hero-letter" aria-hidden="true">
+            {letter}
+          </span>
+        ) : (
+          <span className="workout-hero-dot" aria-hidden="true" />
+        )}
         <input
+          ref={titleField.inputRef}
           className="workout-hero-title"
           type="text"
+          dir="auto"
           aria-label={copy.workoutTitle}
-          value={workout.title}
-          onChange={(event) => onChange({ ...workout, title: event.target.value })}
+          placeholder={copy.workoutTitleHint}
+          maxLength={WORKOUT_TITLE_MAX}
+          enterKeyHint="done"
+          value={titleField.value}
+          onChange={titleField.onChange}
+          onBlur={titleField.onBlur}
+          onKeyDown={titleField.onKeyDown}
         />
         <button className="workout-hero-delete" type="button" aria-label={deleteLabel} title={deleteLabel} onClick={onDelete}>
           <Icon name="close" className="workout-hero-delete-icon" />

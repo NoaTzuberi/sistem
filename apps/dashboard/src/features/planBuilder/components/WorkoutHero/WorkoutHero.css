@@ -51,6 +51,23 @@
   background-color: var(--workout-color);
 }
 
+/* The workout's letter (A, B, C …) in its color: the card's marker; the name is the title. */
+.workout-hero-letter {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-round);
+  font-family: var(--font-family-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  color: var(--color-on-primary); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
+  background-color: var(--workout-color);
+}
+
 /* An inline title: it reads as text until it has the focus, then a line in the workout's color. */
 .workout-hero-title {
   flex: 1;
@@ -69,6 +86,15 @@
 .workout-hero-title:focus {
   outline: none;
   border-bottom-color: var(--workout-color);
+}
+
+.workout-hero-title::placeholder {
+  color: var(--color-text-faint);
+}
+
+/* No tracking on Hebrew letters. */
+.workout-hero-title:lang(he) {
+  letter-spacing: normal;
 }
 
 /* "×": deletes this workout only. Small and quiet next to the "⋯"; its press area reaches 44px. */

@@ -8,6 +8,7 @@ import type { DraftWorkout } from '../../types';
 import { AddWorkoutMenu } from '../AddWorkoutMenu/AddWorkoutMenu';
 import { planBuilderCopy } from '../../copy';
 import './WorkoutTabs.css';
+import { workoutLetter } from '../../data/workoutLetters';
 
 interface WorkoutTabsProps {
   workouts: DraftWorkout[];
@@ -54,7 +55,9 @@ export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelec
               tabIndex={isSelected ? 0 : -1}
               onClick={() => onSelect(workout.key)}
             >
-              <span className="workout-tab-dot" aria-hidden="true" />
+              <span className="workout-tab-dot" aria-hidden="true">
+                {workoutLetter(index)}
+              </span>
               <span className="workout-tab-text">
                 <bdi className="workout-tab-name">{workout.title.trim() || fill(copy.workoutPlaceholder, { n: index + 1 })}</bdi>
                 <span className="workout-tab-meta">
