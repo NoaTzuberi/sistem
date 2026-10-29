@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AiNutritionRecommendation, CoachNutritionPlanResponse, NutritionTemplate, PortionCounts } from '@sistem/types';
 import { describePortion, fill, formatDateTime, formatKcal, formatNumber, formatPlural, formatPortionCountLtr, isolateLtr, nutritionGoalLabel, PORTION_GROUPS, useCopy, useI18n } from '@sistem/shared';
 import { PublishModal } from '../../../../components/common/PublishModal/PublishModal';
@@ -15,6 +15,7 @@ import { nutritionCopy } from '../../copy';
 import { scrollToSection } from '../../data/scrollToSection';
 import { useNutritionCalc } from '../../hooks/useNutritionCalc';
 import { useNutritionEditor } from '../../hooks/useNutritionEditor';
+import { useSendNote } from '../../hooks/useSendNote';
 import { useTemplateHandoff } from '../../hooks/useTemplateHandoff';
 import { draftDayPortions, portionsKcal, usePortionBudget } from '../../hooks/usePortionBudget';
 import { usePublishChecklist } from '../../hooks/usePublishChecklist';
@@ -33,6 +34,7 @@ import { PortionBudgetCard } from '../PortionBudgetCard/PortionBudgetCard';
 import { PreferencesCard } from '../PreferencesCard/PreferencesCard';
 import { PublishChecklist } from '../PublishChecklist/PublishChecklist';
 import { SaveTemplateCard } from '../SaveTemplateCard/SaveTemplateCard';
+import { SendNote } from '../SendNote/SendNote';
 import { StepNav } from '../StepNav/StepNav';
 import './NutritionEditor.css';
 
@@ -62,7 +64,17 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
   const navigate = useNavigate();
   const appText = useCopy(appCopy);
   // Publishing goes through the designed modal (confirm → the existing publish call → celebration).
-  const publishFlow = usePublishFlow(editor.publish);
+  // The modal is the send sheet: the message + tip chosen there go into the draft, then the publish
+  // saves and freezes it (the version keeps them as sent).
+  const sendNote = useSendNote();
+  const { take: takeNote } = sendNote;
+  const { publish: publishDraft } = editor;
+  const publishWithNote = useCallback(async () => {
+    const note = await takeNote();
+    updateDraft((current) => ({ ...current, ...note }));
+    return publishDraft();
+  }, [takeNote, updateDraft, publishDraft]);
+  const publishFlow = usePublishFlow(publishWithNote);
   const isPublishing = publishFlow.step === 'publishing';
   const ai = useLatestAiDraft(traineeId, 'nutrition_plan');
   const { suggestion, requestError } = useNutritionCalc(traineeId, draft.target);
@@ -158,6 +170,7 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
   }
 
   function handlePublish() {
+    sendNote.reset(draft);
     setMessage(undefined);
     publishFlow.open();
   }
@@ -325,7 +338,9 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
           publishFlow.close();
           navigate(traineePath(traineeId, 'nutrition'));
         }}
-      />
+      >
+        <SendNote note={sendNote} />
+      </PublishModal>
     </div>
   );
 }

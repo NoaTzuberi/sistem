@@ -46,6 +46,11 @@
   pointer-events: none;
 }
 
+/* With fields (the nutrition send sheet): room for the text areas. */
+.publish-card[data-wide] {
+  width: min(480px, 100%);
+}
+
 @keyframes publish-fade {
   from {
     opacity: 0;

@@ -24,9 +24,11 @@ interface PublishModalProps {
   summary: PublishSummary;
   /** "To her profile": closes, then opens her profile on the relevant tab. */
   onOpenProfile: () => void;
+  /** Extra fields on the confirm step, under the summary (the nutrition send sheet's message + tip). */
+  children?: ReactNode;
 }
 
-const FOCUSABLE = 'button:not([disabled])';
+const FOCUSABLE = 'button:not([disabled]), textarea:not([disabled]), input:not([disabled])';
 /** The confetti: a fixed set of pieces (where each lands and how long it takes), in four brand colors. */
 const CONFETTI = Array.from({ length: 28 }, (_, index) => ({
   x: ((index * 37) % 100) - 50,
@@ -42,7 +44,7 @@ const CONFETTI = Array.from({ length: 28 }, (_, index) => ({
  * the existing publish call succeeds — a short celebration. An alert dialog: focus starts on the
  * main button and stays inside; Esc, "not yet" and the scrim close it (not while publishing).
  */
-export function PublishModal({ flow, traineeName, summary, onOpenProfile }: PublishModalProps) {
+export function PublishModal({ flow, traineeName, summary, onOpenProfile, children }: PublishModalProps) {
   const copy = useCopy(appCopy).publish;
   const titleId = useId();
   const textId = useId();
@@ -166,6 +168,7 @@ export function PublishModal({ flow, traineeName, summary, onOpenProfile }: Publ
             ))}
           </ul>
         </div>
+        {children}
         {step === 'failed' && (
           <p className="publish-error" role="alert">
             {copy.failed}
@@ -190,6 +193,7 @@ export function PublishModal({ flow, traineeName, summary, onOpenProfile }: Publ
         ref={cardRef}
         className="publish-card"
         data-step={isDone ? 'done' : 'confirm'}
+        data-wide={(children !== undefined && !isDone) || undefined}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}

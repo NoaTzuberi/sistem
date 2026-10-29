@@ -68,6 +68,8 @@ export interface NutritionDraft {
   tips: DraftTip[];
   /** The note at the top of her Nutrition tab (13a+); '' = none. */
   introMessage: string;
+  /** Her tip under the note, chosen in the send sheet; '' = none. */
+  introTip: string;
   /** The AI draft the meals were loaded from (13c, coach-only); null = none. */
   aiRecommendationId: string | null;
   /** The coach's daily protein goal in grams; null = none. */
@@ -110,6 +112,7 @@ export function emptyDraft(goal: NutritionGoal, mealNames: Record<DefaultMealKey
     meals: DEFAULT_MEALS.map((meal) => newMeal(mealNames[meal.key], meal.portions)),
     tips: [],
     introMessage: '',
+    introTip: '',
     aiRecommendationId: null,
     proteinGramsTarget: null,
   };
@@ -127,6 +130,7 @@ export function draftFromPlan(plan: CoachNutritionPlan): NutritionDraft {
       confirmBelowFloor: target.floorConfirmation !== null && target.floorConfirmation.kcal === target.kcal,
     },
     introMessage: plan.introMessage ?? '',
+    introTip: plan.introTip ?? '',
     aiRecommendationId: plan.aiRecommendationId,
     proteinGramsTarget: plan.proteinGramsTarget ?? null,
     mode: plan.mode,
@@ -181,6 +185,7 @@ export function toPayload(draft: NutritionDraft): SaveNutritionPlanPayload {
       confirmBelowFloor: draft.target.confirmBelowFloor,
     },
     introMessage: draft.introMessage.trim() ? draft.introMessage : null,
+    introTip: draft.introTip.trim() ? draft.introTip : null,
     mode: draft.mode,
     dailyPortions: draft.dailyPortions,
     vegetablesFree: draft.vegetablesFree,

@@ -1,0 +1,102 @@
+.send-note-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: start;
+}
+
+.send-note-field-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.send-note-field-input {
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--radius-chart-tip);
+  background-color: var(--color-fill-soft);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text);
+  outline: none;
+  resize: vertical;
+  transition:
+    background-color var(--transition-fast) ease,
+    box-shadow var(--transition-fast) ease;
+}
+
+.send-note-field-input:focus {
+  background-color: var(--color-card);
+  box-shadow: var(--ring-field);
+}
+
+.send-note-field-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.send-note-field-count {
+  flex-shrink: 0;
+}
+
+.send-note-field-link {
+  align-self: flex-start;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.send-note-field-link:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.send-note-field-link:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+.send-note-field-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.send-note-field-check input {
+  accent-color: var(--color-primary);
+}
+
+.send-note-field-check[data-disabled] {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.send-note-field-note {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .send-note-field-input,
+  .send-note-field-link {
+    transition: none;
+  }
+}
