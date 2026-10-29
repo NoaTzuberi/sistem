@@ -27,6 +27,8 @@ interface MealsSectionProps {
   onDailyChange: (group: PortionGroup, value: number) => void;
   vegetablesFree: boolean;
   onVegetablesChange: (value: boolean) => void;
+  proteinGramsTarget: number | null;
+  onProteinChange: (value: number | null) => void;
   meals: DraftMeal[];
   onMealsChange: (update: (meals: DraftMeal[]) => DraftMeal[]) => void;
   groupKcal: Record<FoodGroup, number>;
@@ -46,7 +48,7 @@ interface MealsSectionProps {
  * option or a row is undone from the toast.
  */
 export function MealsSection(props: MealsSectionProps) {
-  const { mode, onModeChange, dailyPortions, recommended, onDailyChange, vegetablesFree, onVegetablesChange } = props;
+  const { mode, onModeChange, dailyPortions, recommended, onDailyChange, vegetablesFree, onVegetablesChange, proteinGramsTarget, onProteinChange } = props;
   const { meals, onMealsChange, groupKcal, foods, recentFoodIds, foodsById, issues, templates, onApplyTemplate, isDone } = props;
   const copy = useCopy(nutritionCopy);
   const app = useCopy(appCopy);
@@ -97,6 +99,8 @@ export function MealsSection(props: MealsSectionProps) {
           foods={foods}
           onChange={onDailyChange}
           onVegetablesChange={onVegetablesChange}
+          proteinGramsTarget={proteinGramsTarget}
+          onProteinChange={onProteinChange}
         />
       ) : (
         <BuilderUndoContext.Provider value={builderUndo}>

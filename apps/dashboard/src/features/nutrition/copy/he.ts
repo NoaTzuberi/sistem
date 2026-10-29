@@ -119,6 +119,7 @@ export const he = {
   pickerSearch: 'חיפוש בקבוצה…',
   pickerRecent: 'בשימוש לאחרונה',
   pickerResults: 'פריטי מזון',
+  pickerNoFoods: 'לא נמצאו מזונות',
   pickerEmpty: 'אין פריטים מתאימים.',
   pickerHint: 'הקלידי לחיפוש · ↑ ↓ למעבר · Enter להוספה · Esc לסגירה',
   categoryFilter: 'קטגוריות',
@@ -183,6 +184,11 @@ export const he = {
     byTarget: 'לפי היעד',
     recommendedReset: 'מומלץ {count} · החזרה',
     vegAllMeals: 'ירקות חופשי, בכל ארוחה',
+    // Daily protein goal (owner, 2026-10-28) — DRAFT wording.
+    proteinTarget: 'יעד חלבון יומי (גרם)',
+    proteinTargetOptional: 'לא חובה',
+    proteinTargetUnit: 'גרם',
+    proteinTargetInvalid: 'מספר שלם בין 1 ל־{max}',
     appPreviewTitle: 'מה היא תראה באפליקציה',
     previewMore: 'ועוד {count}',
     appPreviewEmpty: 'אין עדיין פריטים בקבוצה הזו', // PLACEHOLDER

@@ -70,6 +70,8 @@ export interface NutritionDraft {
   introMessage: string;
   /** The AI draft the meals were loaded from (13c, coach-only); null = none. */
   aiRecommendationId: string | null;
+  /** The coach's daily protein goal in grams; null = none. */
+  proteinGramsTarget: number | null;
 }
 
 export const NO_OVERRIDES: CalculationOverrides = {
@@ -109,6 +111,7 @@ export function emptyDraft(goal: NutritionGoal, mealNames: Record<DefaultMealKey
     tips: [],
     introMessage: '',
     aiRecommendationId: null,
+    proteinGramsTarget: null,
   };
 }
 
@@ -125,6 +128,7 @@ export function draftFromPlan(plan: CoachNutritionPlan): NutritionDraft {
     },
     introMessage: plan.introMessage ?? '',
     aiRecommendationId: plan.aiRecommendationId,
+    proteinGramsTarget: plan.proteinGramsTarget ?? null,
     mode: plan.mode,
     dailyPortions: { ...plan.dailyPortions },
     vegetablesFree: plan.vegetablesFree,
@@ -180,6 +184,7 @@ export function toPayload(draft: NutritionDraft): SaveNutritionPlanPayload {
     mode: draft.mode,
     dailyPortions: draft.dailyPortions,
     vegetablesFree: draft.vegetablesFree,
+    proteinGramsTarget: draft.proteinGramsTarget,
     meals: draft.meals.map((meal) => ({
       id: meal.id,
       name: meal.name,

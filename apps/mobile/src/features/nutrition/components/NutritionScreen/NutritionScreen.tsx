@@ -24,6 +24,7 @@ import { OwnTargetSheet } from '../OwnTargetSheet/OwnTargetSheet';
 import { SgEmptyState } from '../../../../components/common/SgEmptyState/SgEmptyState';
 import { IconTarget } from '@tabler/icons-react';
 import { FoodSheet } from '../FoodSheet/FoodSheet';
+import { ProteinGoal } from '../ProteinGoal/ProteinGoal';
 import { nutritionCopy } from '../../copy';
 import './NutritionScreen.css';
 
@@ -100,7 +101,9 @@ export function NutritionScreen({ userId }: { userId: string }) {
 
   const { day, date } = nutritionDay;
   const ownTarget = nutritionDay.ownTarget;
-  // A day tracked against her own target (no coach plan) works like a plan day, without foods.
+  // A day tracked against her own target (no coach plan) works like a plan day; its food lists are her
+  // coach's, or the app's food bank when she has no coach (the server decides — `swaps`).
+  const swaps = plan?.swaps ?? data?.swaps ?? null;
   const isOwnDay = !plan && day !== null && day.source === 'own';
   const dayHasPlan = day !== null && (day.planVersion !== null || isOwnDay) && sumPortions(day.planned) > 0;
   // Before the days arrive (first open offline): the plan's portions, nothing marked, read-only.
@@ -164,11 +167,12 @@ export function NutritionScreen({ userId }: { userId: string }) {
                       eaten={day.eaten[group]}
                       editable={canEdit}
                       onChange={(value) => celebrate(nutritionDay.setGroup(group, value))}
+                      onOpenFoods={swaps && swaps[group].length > 0 ? () => sheet.open(group) : undefined}
                       popKey={pops[group]}
                     />
                   ))}
                 </ul>
-                {ownTarget.freeVegetables && <FreeVegetables />}
+                {ownTarget.freeVegetables && <FreeVegetables onOpen={swaps && swaps.vegetable.length > 0 ? () => sheet.open('vegetable') : undefined} />}
               </>
             ) : (
               <p className="tn-note">{copy.trackerNoPlan}</p>
@@ -211,6 +215,7 @@ export function NutritionScreen({ userId }: { userId: string }) {
                       onChange={(value) => celebrate(nutritionDay.setGroup(group, value))}
                       onOpenFoods={() => sheet.open(group)}
                       popKey={pops[group]}
+                      footer={group === 'protein' && plan.proteinGramsTarget ? <ProteinGoal grams={plan.proteinGramsTarget} /> : undefined}
                     />
                   ))}
                 </ul>
@@ -259,10 +264,10 @@ export function NutritionScreen({ userId }: { userId: string }) {
         )}
       </div>
 
-      {plan && (
+      {swaps && (
         <FoodSheet
           group={sheet.group}
-          swaps={plan.swaps}
+          swaps={swaps}
           groups={groups}
           remaining={remaining}
           canMark={canEdit}

@@ -13,8 +13,17 @@ import type {
   PortionGroup,
 } from '@sistem/types';
 
+export type FoodScope = 'system' | 'coach';
+
 export interface FoodItemDocument {
-  coachId: Types.ObjectId;
+  /** system = the app-wide bank (no coachId); coach (or missing, before the food bank) = one coach's item. */
+  scope?: FoodScope;
+  /** Only on coach items. */
+  coachId?: Types.ObjectId | null;
+  /** A coach's edited copy of a system item (copy-on-write): replaces it in her lists. */
+  basedOn?: Types.ObjectId | null;
+  /** System items only: stable and unique (seed:nutrition upserts by it). */
+  itemKey?: string;
   group: FoodGroup;
   name: string;
   portion: string;
@@ -95,6 +104,8 @@ export interface NutritionPlanDocument {
   introMessage?: string | null;
   /** 13b (waterTracking). */
   waterGoalMl?: number | null;
+  /** The coach's daily protein goal (g); null = none. */
+  proteinGramsTarget?: number | null;
   templateId?: Types.ObjectId | null;
   /** 13c: coach-only link to the AI draft the meals came from. */
   aiRecommendationId?: Types.ObjectId | null;
@@ -120,6 +131,8 @@ export interface NutritionPlanVersionDocument {
   tips: TipFields[];
   introMessage?: string | null;
   waterGoalMl?: number | null;
+  /** The coach's daily protein goal (g); null = none. */
+  proteinGramsTarget?: number | null;
   /** The group values and kcal at publish time, so a later config change never rewrites history. */
   groupKcal: Record<FoodGroup, number>;
   mealKcal: { mealId: Types.ObjectId; kcal: number }[];

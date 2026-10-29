@@ -36,6 +36,15 @@ export const he = {
   doneToday: 'השלמת להיום',
   overGoal: '{n} מעבר',
   whatCanI: 'מה אפשר?',
+  // The coach's daily protein goal (owner, 2026-10-28) — DRAFT wording for the owner.
+  protein: {
+    // {grams} is drawn as "~120" (the sign stays in front of the number in Hebrew too).
+    line: '{grams} גרם חלבון ביום',
+    infoLabel: 'מה זה יעד החלבון?',
+    infoTitle: 'יעד החלבון היומי',
+    infoText: 'המאמנת שלך קבעה לך יעד של כ־{grams} גרם חלבון ביום. מנות החלבון בתוכנית עוזרות לך להגיע אליו.',
+    close: 'הבנתי',
+  },
   vegetablesTitle: 'ירקות',
   vegetablesLine: 'חופשי, בכל ארוחה ובכל כמות',
   menuTitle: 'התפריט שלך',

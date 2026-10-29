@@ -66,6 +66,8 @@ const nutritionPlanSchema = new Schema<NutritionPlanDocument>(
     // The coach's note at the top of her Nutrition tab (plain text, line breaks kept).
     introMessage: { type: String, default: null },
     waterGoalMl: { type: Number, min: 0, default: null },
+    // The coach's daily protein goal in grams (owner, 2026-10-28); null = none.
+    proteinGramsTarget: { type: Number, min: 1, default: null },
     templateId: { type: Schema.Types.ObjectId, ref: 'Template', default: null },
     // The AI nutrition draft the meals were loaded from (13c). Coach-only: never copied
     // into a version, never sent to the trainee.
@@ -99,6 +101,8 @@ const nutritionPlanVersionSchema = new Schema<NutritionPlanVersionDocument>(
     tips: { type: [nutritionTipSchema], default: [] },
     introMessage: { type: String, default: null },
     waterGoalMl: { type: Number, min: 0, default: null },
+    // The coach's daily protein goal in grams (owner, 2026-10-28); null = none.
+    proteinGramsTarget: { type: Number, min: 1, default: null },
     groupKcal: { type: Schema.Types.Mixed, required: true },
     mealKcal: {
       type: [new Schema({ mealId: Schema.Types.ObjectId, kcal: Number }, { _id: false })],

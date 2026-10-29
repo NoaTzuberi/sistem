@@ -3,6 +3,7 @@ import { fill, formatKcal, formatPortionCountLtr, PORTION_GROUPS, sharedCopy, us
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { nutritionCopy } from '../../copy';
 import { AppPreview } from '../AppPreview/AppPreview';
+import { ProteinTarget } from '../ProteinTarget/ProteinTarget';
 import { VegToggle } from '../VegToggle/VegToggle';
 import './DailyPortions.css';
 
@@ -19,13 +20,16 @@ interface DailyPortionsProps {
   foods: FoodItem[];
   onChange: (group: PortionGroup, value: number) => void;
   onVegetablesChange: (value: boolean) => void;
+  /** The coach's daily protein goal in grams; null = none. */
+  proteinGramsTarget: number | null;
+  onProteinChange: (value: number | null) => void;
 }
 
 /**
  * Portions mode (owner, 2026-10-20): her portions per group per day, in ½ steps, each tile with its kcal and
  * the recommendation one press away; vegetables free; and what she will see in the app.
  */
-export function DailyPortions({ portions, recommended, groupKcal, vegetablesFree, foods, onChange, onVegetablesChange }: DailyPortionsProps) {
+export function DailyPortions({ portions, recommended, groupKcal, vegetablesFree, foods, onChange, onVegetablesChange, proteinGramsTarget, onProteinChange }: DailyPortionsProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
@@ -78,6 +82,8 @@ export function DailyPortions({ portions, recommended, groupKcal, vegetablesFree
           );
         })}
       </div>
+
+      <ProteinTarget value={proteinGramsTarget} onChange={onProteinChange} />
 
       <div className="nm-daily-veg">
         <VegToggle label={b.vegAllMeals} checked={vegetablesFree} onChange={onVegetablesChange} />

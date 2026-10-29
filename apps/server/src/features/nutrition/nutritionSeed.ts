@@ -9,12 +9,12 @@ import { DIET_TAG_IDS, FOOD_GROUP_IDS, PORTION_GROUP_IDS, isCategoryOf } from '.
 import { isPortionCount } from './nutrition.validation';
 import type { MealFields } from './nutrition.types';
 
-// seed:nutrition — the coach's food list. The ONLY source is the coach's md food lists in
+// seed:nutrition — the app-wide food bank (system items, owner 2026-10-28). The ONLY source is the coach's md food lists in
 // docs/reference/ (owner decision, 2026-10-08: 150-dairy, protien, carbohydrates_and_fruits_guide_120_calories,
 // fats_spreads_nuts_90_calories, snacks), turned once into apps/server/data/nutrition/food-lists.json (gitignored);
-// committed code only knows its shape. Idempotent per coach: every item has a seedKey; anything already seeded
-// is left as it is (the coach may have edited it), so a re-run adds only missing items. A file may also carry a
-// nutrition template (none does today).
+// committed code only knows its shape. Idempotent: every item has a unique itemKey; anything already there is
+// left as it is (the admin may have edited it), so a re-run adds only missing items. A file may also carry a
+// nutrition template for one coach (none does today).
 
 const SEED_DIR = path.resolve(__dirname, '../../../data/nutrition');
 
@@ -65,7 +65,7 @@ export interface NutritionSeedResult {
   foodsKept: number;
   /** Existing items that had no category and got the file's (13a+). */
   categoriesFilled: number;
-  /** null = the file has no template (the coach's md lists have none). */
+  /** null = no template in the file (the coach's md lists have none), or no coach was given for it. */
   templateCreated: boolean | null;
 }
 
@@ -119,27 +119,38 @@ export async function readNutritionSeedFile(path: string): Promise<NutritionSeed
   return JSON.parse(await readFile(path, 'utf8')) as NutritionSeedData;
 }
 
-export async function applyNutritionSeed(coachId: string, data: NutritionSeedData): Promise<NutritionSeedResult> {
+export interface ApplyNutritionSeedOptions {
+  /** The file's template (if any) goes to this coach — templates are per coach. Without one it is skipped. */
+  templateCoachId?: string;
+}
+
+/**
+ * The food items become SYSTEM items of the app-wide food bank (owner 2026-10-28), upserted by their
+ * itemKey (`<seedKeyPrefix>:<key>`, the same key the items had as one coach's seeded list, so the
+ * migrated items match). Existing items are left as they are (the admin may have edited them).
+ */
+export async function applyNutritionSeed(data: NutritionSeedData, { templateCoachId }: ApplyNutritionSeedOptions = {}): Promise<NutritionSeedResult> {
   const problems = validateNutritionSeed(data);
   if (problems.length > 0) throw new Error(`The nutrition seed file is not valid:\n- ${problems.join('\n- ')}`);
 
-  const seedKey = (key: string) => `${data.seedKeyPrefix}:${key}`;
+  const itemKey = (key: string) => `${data.seedKeyPrefix}:${key}`;
   let foodsCreated = 0;
   let categoriesFilled = 0;
-  // New items go after what she already has in that group (her order stays as it is).
+  // New items go after the bank's items in that group (the existing order stays as it is).
   const last = await FoodItem.aggregate<{ _id: FoodGroup; order: number }>([
-    { $match: { coachId: new Types.ObjectId(coachId) } },
+    { $match: { scope: 'system' } },
     { $group: { _id: '$group', order: { $max: '$order' } } },
   ]);
   const nextOrder = new Map<FoodGroup, number>(last.map((entry) => [entry._id, entry.order + 1]));
   for (const food of data.foods) {
     const order = nextOrder.get(food.group) ?? 0;
     const result = await FoodItem.updateOne(
-      { coachId, seedKey: seedKey(food.key) },
+      { scope: 'system', itemKey: itemKey(food.key) },
       {
         $setOnInsert: {
-          coachId,
-          seedKey: seedKey(food.key),
+          scope: 'system',
+          coachId: null,
+          itemKey: itemKey(food.key),
           group: food.group,
           name: food.name.trim(),
           portion: food.portion.trim(),
@@ -157,27 +168,30 @@ export async function applyNutritionSeed(coachId: string, data: NutritionSeedDat
     foodsCreated += result.upsertedCount;
     if (result.upsertedCount > 0) nextOrder.set(food.group, order + 1);
     else if (food.category) {
-      // Never overwrites her choice: only an item with no category (null or missing) gets one.
+      // Never overwrites a chosen category: only an item with none (null or missing) gets one.
       const filled = await FoodItem.updateOne(
-        { coachId, seedKey: seedKey(food.key), group: food.group, category: null },
+        { scope: 'system', itemKey: itemKey(food.key), group: food.group, category: null },
         { $set: { category: food.category } },
       );
       categoriesFilled += filled.modifiedCount;
     }
   }
 
-  if (!data.template) {
+  // null = no template in the file, or no coach to give it to.
+  if (!data.template || !templateCoachId) {
     return { foodsCreated, foodsKept: data.foods.length - foodsCreated, categoriesFilled, templateCreated: null };
   }
+  const coachId = templateCoachId;
+  const seedKey = itemKey;
   const templateKey = seedKey(data.template.key);
   if (await Template.exists({ coachId, seedKey: templateKey })) {
     return { foodsCreated, foodsKept: data.foods.length - foodsCreated, categoriesFilled, templateCreated: false };
   }
 
-  const items = await FoodItem.find({ coachId, seedKey: { $in: data.foods.map((food) => seedKey(food.key)) } })
-    .select('seedKey group')
+  const items = await FoodItem.find({ scope: 'system', itemKey: { $in: data.foods.map((food) => itemKey(food.key)) } })
+    .select('itemKey group')
     .lean();
-  const byKey = new Map(items.map((item) => [item.seedKey!, item]));
+  const byKey = new Map(items.map((item) => [item.itemKey!, item]));
   const meals: MealFields[] = data.template.meals.map((meal) => ({
     _id: new Types.ObjectId(),
     name: meal.name.trim(),

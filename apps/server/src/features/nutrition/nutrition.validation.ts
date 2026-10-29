@@ -48,6 +48,7 @@ import {
   MAX_TIPS,
   MAX_TIP_LENGTH,
   MAX_WATER_GOAL_ML,
+  MAX_PROTEIN_GRAMS_TARGET,
   MIN_TARGET_KCAL,
   NUTRITION_GOAL_IDS,
   PORTION_GROUP_IDS,
@@ -480,6 +481,15 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
     }
   }
 
+  // The coach's daily protein goal (whole grams; null clears, omitted keeps).
+  let proteinGramsTarget: number | null | undefined;
+  if (body.proteinGramsTarget !== undefined) {
+    const value = body.proteinGramsTarget;
+    if (value === null) proteinGramsTarget = null;
+    else if (typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= MAX_PROTEIN_GRAMS_TARGET) proteinGramsTarget = value;
+    else issues.push(invalid(msg('nutrition_protein_target_invalid', { max: MAX_PROTEIN_GRAMS_TARGET })));
+  }
+
   // The coach's intro: plain text, line breaks kept (only the ends are trimmed).
   let introMessage: string | null | undefined;
   if (body.introMessage !== undefined) {
@@ -529,6 +539,7 @@ export function parseSaveNutritionPlanPayload(body: unknown, features: Nutrition
       ...(dailyPortions !== undefined ? { dailyPortions } : {}),
       ...(vegetablesFree !== undefined ? { vegetablesFree } : {}),
       ...(waterGoalMl !== undefined ? { waterGoalMl } : {}),
+      ...(proteinGramsTarget !== undefined ? { proteinGramsTarget } : {}),
       ...(introMessage !== undefined ? { introMessage } : {}),
       ...(aiRecommendationId !== undefined ? { aiRecommendationId } : {}),
     },

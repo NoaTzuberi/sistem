@@ -366,6 +366,7 @@
   --color-portion-protein: #ff006e;
   --color-portion-protein-text: var(--ink-pink);   /* the -text inks keep 4.5:1 on their soft */
   --color-portion-protein-soft: #ffe3ee;
+  --color-portion-protein-deep: #c80058;           /* the daily protein grams line (owner, 2026-10-28) */
   --color-portion-carb: #7c4dff;
   --color-portion-carb-text: #5b2fd6;
   --color-portion-carb-soft: #efe7ff;
@@ -384,6 +385,13 @@
   --color-portion-fat-glow: rgb(255 122 0 / 35%);
   --color-portion-snack-glow: rgb(0 148 255 / 35%);
   --color-portion-vegetable-glow: rgb(165 0 71 / 35%);
+  /* A food-group filter chip (both apps: food list, food picker, the trainee's food sheet): a pill, the group's
+     tint + ink when off, its solid color + white when on; "All" = soft fill, ink when on. */
+  --size-filter-chip: 36px;
+  --radius-filter-chip: 18px;
+  --space-filter-chip-gap: 8px;
+  --size-filter-chip-icon: 16px;
+  --color-filter-chip-all: #f5f3f6;
   /* Trainee Nutrition (docs/design/trainee-nutrition.html — "training OS", like Home B / Workouts).
      Fills (cells, badges, the MIX bar) take the bright group color; text on a tint or white takes the
      group's -text ink (the reference's fat / snack text colors miss 4.5:1 on their tints). */
@@ -1343,7 +1351,8 @@
   --color-coach-bubble-mine-text: var(--color-on-ink);
   --color-coach-bubble-theirs: var(--color-coach-card);
   --size-coach-unread-dot: 10px;
-  --size-coach-composer-max: 140px;                          /* the message field grows up to this, then scrolls */
+  --size-coach-composer-max: 140px;
+  --size-coach-quick-text: 110px;                            /* the quick message field */                          /* the message field grows up to this, then scrolls */
   --size-coach-dock-badge: 16px;
   --text-coach-dock-badge: 11px;
 }

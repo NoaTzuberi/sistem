@@ -281,6 +281,8 @@ export function NutritionEditor({ traineeId, traineeName, initial, templates }: 
             onDailyChange={(group, value) => updateDraft((current) => ({ ...current, dailyPortions: { ...current.dailyPortions, [group]: value } }))}
             vegetablesFree={draft.vegetablesFree}
             onVegetablesChange={(vegetablesFree) => updateDraft((current) => ({ ...current, vegetablesFree }))}
+            proteinGramsTarget={draft.proteinGramsTarget}
+            onProteinChange={(proteinGramsTarget) => updateDraft((current) => ({ ...current, proteinGramsTarget }))}
             isDone={step2Done}
             meals={draft.meals}
             onMealsChange={(update) => updateDraft((current) => ({ ...current, meals: update(current.meals) }))}

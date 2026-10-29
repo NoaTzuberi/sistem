@@ -13,6 +13,9 @@ import type {
   ReligiousId,
 } from '@sistem/types';
 
+/** The food bank's two kinds of items (foodItem.model.ts). */
+export const FOOD_SCOPE_IDS = ['system', 'coach'] as const;
+
 export const FOOD_GROUP_IDS = ['protein', 'carb', 'fat', 'snack', 'vegetable'] as const satisfies readonly FoodGroup[];
 /**
  * Food categories per group (13a+, the picker / list filters) — derived from the section headings of the coach's md
@@ -152,3 +155,5 @@ export const MAX_FOOD_GRAMS = 5000;
 export const MIN_TARGET_KCAL = 500;
 export const MAX_TARGET_KCAL = 6000;
 export const MAX_WATER_GOAL_ML = 10000;
+/** The coach's daily protein goal: whole grams, 1 to this (owner, 2026-10-28). */
+export const MAX_PROTEIN_GRAMS_TARGET = 400;

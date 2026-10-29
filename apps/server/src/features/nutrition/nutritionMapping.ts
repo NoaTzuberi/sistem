@@ -29,6 +29,9 @@ export function toPublicFoodItem(item: LeanFoodItem): FoodItem {
     category: item.category ?? null,
     order: item.order ?? 0,
     archivedAt: item.archivedAt ? item.archivedAt.toISOString() : null,
+    source: item.scope === 'system' ? 'system' : 'mine',
+    basedOn: item.basedOn ? String(item.basedOn) : null,
+    hidden: false,
   };
 }
 

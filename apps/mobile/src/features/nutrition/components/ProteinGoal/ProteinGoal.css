@@ -1,0 +1,89 @@
+/* Under the protein row: the coach's daily grams in the protein dark tone, and (i). */
+.tn-protein {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-block-start: calc(var(--space-1) * -1);
+}
+
+.tn-protein-line {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tn-protein-number {
+  font-family: var(--font-num);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-base);
+  color: var(--color-portion-protein-deep);
+}
+
+/* 44px tap area around an 18px icon. */
+.tn-protein-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  margin-inline-start: calc(var(--space-2) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--color-portion-protein-deep);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+}
+
+.tn-protein-info:active {
+  transform: scale(var(--scale-fr-press));
+}
+
+.tn-protein-info:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-portion-protein-deep);
+  outline-offset: -4px;
+}
+
+.tn-protein-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-fr-sheet-title);
+  line-height: 0.85;
+  letter-spacing: 0;
+  text-transform: var(--font-display-case);
+}
+
+.tn-protein-text {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-base);
+  line-height: var(--line-height-base);
+  color: var(--color-ink);
+}
+
+.tn-protein-close {
+  width: 100%;
+  min-height: var(--size-fr-cta);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-fr-out);
+}
+
+.tn-protein-close:active {
+  transform: scale(var(--scale-fr-press));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-protein-info,
+  .tn-protein-close {
+    transition: none;
+  }
+}

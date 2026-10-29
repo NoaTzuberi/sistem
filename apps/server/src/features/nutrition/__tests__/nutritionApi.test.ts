@@ -562,6 +562,28 @@ describe('nutrition (API)', () => {
     });
   });
 
+  describe('daily protein goal (owner, 2026-10-28)', () => {
+    it('saves whole grams on the plan, counts as a change, reaches her view; null clears; out of range is refused', async () => {
+      await savePlan({ calorieTarget: target(1500), meals: [breakfast()] });
+      expect((await publish()).status).toBe(200);
+      expect((await api.request('GET', '/nutrition-plan', { token: trainee.token })).body.plan.proteinGramsTarget).toBeNull();
+
+      const meals = (await api.request('GET', planPath(), { token: coach.token })).body.plan.meals;
+      const saved = await savePlan({ calorieTarget: target(1500), meals, proteinGramsTarget: 120 });
+      expect(saved.body.plan.proteinGramsTarget).toBe(120);
+      expect(saved.body.plan.changedSincePublish).toBe(true);
+      expect((await publish()).status).toBe(200);
+      expect((await api.request('GET', '/nutrition-plan', { token: trainee.token })).body.plan.proteinGramsTarget).toBe(120);
+
+      // Omitted keeps it.
+      expect((await savePlan({ calorieTarget: target(1500), meals })).body.plan.proteinGramsTarget).toBe(120);
+      for (const bad of [0, 401, 12.5, '120']) {
+        expect((await savePlan({ calorieTarget: target(1500), meals, proteinGramsTarget: bad })).status).toBe(400);
+      }
+      expect((await savePlan({ calorieTarget: target(1500), meals, proteinGramsTarget: null })).body.plan.proteinGramsTarget).toBeNull();
+    });
+  });
+
   describe('snack group (13a+)', () => {
     it('snack items are capped at 150; a meal with a snack portion counts it, she sees it as a group with its own swaps', async () => {
       const tooMuch = await api.request('POST', '/coach/nutrition/foods', { token: coach.token, body: { group: 'snack', name: 'Bamba', portion: '28 g', kcal: 160 } });

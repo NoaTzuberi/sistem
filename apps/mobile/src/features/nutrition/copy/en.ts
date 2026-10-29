@@ -32,6 +32,13 @@ export const en: CopyShape<typeof he> = {
   doneToday: 'Done for today',
   overGoal: '{n} over',
   whatCanI: 'What can I have?',
+  protein: {
+    line: '{grams} g protein a day',
+    infoLabel: 'What is the protein goal?',
+    infoTitle: 'Your daily protein goal',
+    infoText: 'Your coach set you a goal of about {grams} g of protein a day. The protein portions in your plan help you reach it.',
+    close: 'Got it',
+  },
   vegetablesTitle: 'Vegetables',
   vegetablesLine: 'Free, at any meal, in any amount',
   menuTitle: 'Your menu',

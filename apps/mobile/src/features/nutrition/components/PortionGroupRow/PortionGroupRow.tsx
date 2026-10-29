@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { PortionGroup } from '@sistem/types';
 import { fill, sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { IconCheck, IconChevronRight } from '@tabler/icons-react';
@@ -18,13 +19,15 @@ interface PortionGroupRowProps {
   onOpenFoods?: () => void;
   /** Bumped when she completes the group: the badge pops once per bump (0 = never). */
   popKey: number;
+  /** A line under the row (the protein row: the coach's daily grams). */
+  footer?: ReactNode;
 }
 
 /**
  * One group on the day (docs/design/trainee-nutrition.html): badge, name and "eaten/goal", the fuel bar,
  * then what is left (or done / over) and "what can I have?" (the food sheet on this group). No calories.
  */
-export function PortionGroupRow({ group, planned, eaten, editable, onChange, onOpenFoods, popKey }: PortionGroupRowProps) {
+export function PortionGroupRow({ group, planned, eaten, editable, onChange, onOpenFoods, popKey, footer }: PortionGroupRowProps) {
   const { plural } = useI18n();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
@@ -69,6 +72,7 @@ export function PortionGroupRow({ group, planned, eaten, editable, onChange, onO
           </button>
         )}
       </div>
+      {footer}
     </li>
   );
 }

@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import type { CoachNutritionPlanResponse, FormulaSex, NutritionGoal, NutritionIssuesBody } from '@sistem/types';
+import type { CoachNutritionPlanResponse, FormulaSex, NutritionGoal, NutritionIssuesBody, TraineeNutritionPlanResponse } from '@sistem/types';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { getNutritionFeatures } from '../../config/features';
 import {
@@ -9,8 +9,14 @@ import {
   createCoachFood,
   deleteCoachFood,
   listCoachFoods,
+  createSystemFood,
+  deleteSystemFood,
+  listSystemFoods,
   restoreCoachFood,
+  restoreSystemFood,
+  setSystemFoodHidden,
   updateCoachFood,
+  updateSystemFood,
 } from './foodItem.service';
 import { NutritionSettingsConflictError, getNutritionSettings, previewNutritionSettings, saveNutritionSettings } from './nutritionSettings.service';
 import {
@@ -92,7 +98,8 @@ function readId(req: AuthenticatedRequest, res: Response, param: string, label: 
 // --- Food list (coach) -------------------------------------------------------
 
 export async function getFoods(req: AuthenticatedRequest, res: Response) {
-  res.status(200).json({ items: await listCoachFoods(req.userId!) });
+  // Her library: hidden system items too (flagged) for its "hidden" filter.
+  res.status(200).json({ items: await listCoachFoods(req.userId!, { includeHidden: true }) });
 }
 
 export async function postFood(req: AuthenticatedRequest, res: Response) {
@@ -138,6 +145,71 @@ export async function postRestoreFood(req: AuthenticatedRequest, res: Response) 
   if (!foodId) return;
   try {
     res.status(200).json({ item: await restoreCoachFood(req.userId!, foodId) });
+  } catch (error) {
+    sendNutritionError(res, error);
+  }
+}
+
+/** A system item out of her lists (POST), or back in them (DELETE). */
+export async function putFoodHidden(req: AuthenticatedRequest, res: Response) {
+  const foodId = readId(req, res, 'foodId', 'food item');
+  if (!foodId) return;
+  try {
+    res.status(200).json({ item: await setSystemFoodHidden(req.userId!, foodId, req.method === 'POST') });
+  } catch (error) {
+    sendNutritionError(res, error);
+  }
+}
+
+// --- System food bank (admin only — mounted under /api/admin) -------------------
+
+export async function getSystemFoods(_req: AuthenticatedRequest, res: Response) {
+  res.status(200).json(await listSystemFoods());
+}
+
+export async function postSystemFood(req: AuthenticatedRequest, res: Response) {
+  const { value, error } = parseFoodItemPayload(req.body, false);
+  if (!value) {
+    sendError(res, 400, error);
+    return;
+  }
+  try {
+    res.status(201).json({ item: await createSystemFood(value) });
+  } catch (createError) {
+    sendNutritionError(res, createError);
+  }
+}
+
+export async function patchSystemFood(req: AuthenticatedRequest, res: Response) {
+  const foodId = readId(req, res, 'foodId', 'food item');
+  if (!foodId) return;
+  const { value, error } = parseFoodItemPayload(req.body, true);
+  if (!value) {
+    sendError(res, 400, error);
+    return;
+  }
+  try {
+    res.status(200).json({ item: await updateSystemFood(foodId, value) });
+  } catch (updateError) {
+    sendNutritionError(res, updateError);
+  }
+}
+
+export async function deleteSystemFoodItem(req: AuthenticatedRequest, res: Response) {
+  const foodId = readId(req, res, 'foodId', 'food item');
+  if (!foodId) return;
+  try {
+    res.status(200).json(await deleteSystemFood(foodId));
+  } catch (error) {
+    sendNutritionError(res, error);
+  }
+}
+
+export async function postRestoreSystemFood(req: AuthenticatedRequest, res: Response) {
+  const foodId = readId(req, res, 'foodId', 'food item');
+  if (!foodId) return;
+  try {
+    res.status(200).json({ item: await restoreSystemFood(foodId) });
   } catch (error) {
     sendNutritionError(res, error);
   }
@@ -291,8 +363,8 @@ export async function postTraineeNutritionTemplate(req: AuthenticatedRequest, re
 
 /** Her newest published version — no calorie numbers. */
 export async function getMyNutritionPlan(req: AuthenticatedRequest, res: Response) {
-  const { plan, introUnseen, coach } = await getTraineeNutritionPlan(req.userId!);
-  res.status(200).json({ plan, introUnseen, coach, features: getNutritionFeatures() });
+  const result: TraineeNutritionPlanResponse = { ...(await getTraineeNutritionPlan(req.userId!)), features: getNutritionFeatures() };
+  res.status(200).json(result);
 }
 
 /** She has read the coach's intro of this version — it starts collapsed from now on. */

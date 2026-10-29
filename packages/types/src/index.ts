@@ -334,6 +334,8 @@ export interface PlanWorkout {
   notes?: string;
   /** Phase 12b, coach-only: its workout type (slot template); missing = free workout. */
   workoutType?: string;
+  /** Coach-only: the type's suggested slots the coach removed from this workout. */
+  hiddenSlotIds?: string[];
   /** Missing = strength. A cardio workout has no exercises; its blocks are in `cardio`. */
   kind?: WorkoutKind;
   cardio?: PlanCardio;
@@ -468,6 +470,8 @@ export interface PlanWorkoutInput {
   notes?: string;
   /** A workout type of the coach's training config (Phase 12b); omitted = free workout. */
   workoutType?: string;
+  /** Suggested slots of the type she removed from this workout. */
+  hiddenSlotIds?: string[];
   /** Omitted = strength. A cardio workout sends `cardio` and no exercises. */
   kind?: WorkoutKind;
   cardio?: PlanCardio;
@@ -1577,7 +1581,12 @@ export interface TrainingSlot {
   id: string;
   /** An exercise family fits the slot when it has one of these patterns. */
   patterns: PatternId[];
-  required: boolean;
+  /**
+   * Old data only — no longer read (owner, 2026-10-28): slots are suggestions, none is required.
+   * Coach settings saved before may still carry it.
+   */
+  required?: boolean;
+  /** A guide for the AI draft only; the coach may add any number of exercises to a slot. */
   maxExercises: number;
   /** The coach's own label (a slot she added); default slots are labelled by id in the copy. */
   label?: string;
@@ -1760,6 +1769,20 @@ export interface FoodItem {
   category: FoodCategory | null;
   order: number;
   archivedAt: string | null;
+  /** system = the app-wide food bank; mine = the coach's own item (new, or her edited copy of a system item). */
+  source: FoodSource;
+  /** Her edited copy: the system item it replaces in her lists ("restore to original" deletes the copy). */
+  basedOn: string | null;
+  /** A system item she hid from her lists (only in her library's "hidden" filter). */
+  hidden: boolean;
+}
+
+export type FoodSource = 'system' | 'mine';
+
+/** GET /admin/foods — the system food bank, checked against the default group values. */
+export interface AdminFoodBankResponse {
+  items: FoodItem[];
+  config: NutritionConfig;
 }
 
 /** POST / PATCH /coach/nutrition/foods. On PATCH every key is optional; null clears grams / kcal. */
@@ -1778,7 +1801,8 @@ export interface FoodItemPayload {
 
 /** DELETE /coach/nutrition/foods/:id — an item a plan / template uses is archived instead. */
 export interface DeleteFoodItemResult {
-  outcome: 'deleted' | 'archived';
+  /** reverted = her edited copy is gone and the system item is back in her lists. */
+  outcome: 'deleted' | 'archived' | 'reverted';
   item: FoodItem | null;
 }
 
@@ -2028,6 +2052,8 @@ export interface SaveNutritionPlanPayload {
   introMessage?: string | null;
   /** 13b, waterTracking only — refused while the feature is closed. */
   waterGoalMl?: number | null;
+  /** The coach's daily protein goal in grams (whole, 1–400); null clears; omitted keeps. */
+  proteinGramsTarget?: number | null;
   /** Links the plan to the AI nutrition draft it was loaded from (13c); null clears; omitted keeps. */
   aiRecommendationId?: string | null;
 }
@@ -2067,6 +2093,8 @@ export interface CoachNutritionPlan {
   tips: NutritionTip[];
   introMessage: string | null;
   waterGoalMl: number | null;
+  /** The coach's daily protein goal in grams; null = none (no per-portion protein value exists to compute one). */
+  proteinGramsTarget: number | null;
   templateId: string | null;
   /** 0 = never published. */
   publishedVersion: number;
@@ -2130,6 +2158,8 @@ export interface NutritionPlanView {
   swaps: Record<FoodGroup, NutritionFoodFacts[]>;
   /** Only while waterTracking is open (13b). */
   waterGoalMl?: number | null;
+  /** The coach's daily protein goal in grams; null = none (show nothing). */
+  proteinGramsTarget: number | null;
 }
 
 /** GET /nutrition-plan (trainee). */
@@ -2139,6 +2169,11 @@ export interface TraineeNutritionPlanResponse {
   coach: { name: string } | null;
   /** She hasn't read this version's intro yet (open it; POST /nutrition-plan/intro-seen after). */
   introUnseen: boolean;
+  /**
+   * No published plan yet: the food lists she can browse with her own daily target — her coach's lists,
+   * or the system bank when she has no coach. null when `plan` carries them (plan.swaps).
+   */
+  swaps: Record<FoodGroup, NutritionFoodFacts[]> | null;
   features: NutritionFeatures;
 }
 
