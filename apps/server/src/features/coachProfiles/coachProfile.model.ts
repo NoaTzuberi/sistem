@@ -14,6 +14,8 @@ export interface CoachProfileDocument {
   createdBy: Types.ObjectId | null;
   /** Temporary payment links shown to her own trainees (validated in coachPayment.validation.ts). */
   payment?: { payboxUrl: string | null; bitPhone: string | null; note: string | null } | null;
+  /** System food-bank items she hid from her lists (her library's "hidden" filter brings them back). */
+  hiddenSystemFoods?: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +38,7 @@ const coachProfileSchema = new Schema<CoachProfileDocument>(
       ),
       default: null,
     },
+    hiddenSystemFoods: { type: [{ type: Schema.Types.ObjectId, ref: 'FoodItem' }], default: [] },
   },
   { timestamps: true },
 );

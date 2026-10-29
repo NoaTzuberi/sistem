@@ -21,7 +21,8 @@
     "media:compress": "tsx src/features/onboardingMedia/scripts/compressOnboardingVideos.ts",
     "media:upload": "tsx src/features/onboardingMedia/scripts/uploadOnboardingMedia.ts",
     "seed:nutrition": "tsx src/features/nutrition/scripts/seedNutrition.ts",
-    "reset:nutrition": "tsx src/features/nutrition/scripts/resetNutrition.ts"
+    "reset:nutrition": "tsx src/features/nutrition/scripts/resetNutrition.ts",
+    "migrate:food-bank": "tsx src/features/nutrition/scripts/migrateFoodBank.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

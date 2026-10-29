@@ -238,11 +238,11 @@ async function main() {
       }
     }
 
-    // The coach's food lists + template (Phase 13a / 13a+), when her data is on this machine.
+    // The system food bank (+ a template for the dev coach, if the file has one), when the data is on this machine.
     const nutritionFiles = NUTRITION_SEED_FILES.filter((file) => existsSync(file));
     if (nutritionFiles.length === 0) console.log('Nutrition: no food list data file (apps/server/data/nutrition/) — skipped.');
     for (const file of nutritionFiles) {
-      const result = await applyNutritionSeed(String(coach._id), await readNutritionSeedFile(file));
+      const result = await applyNutritionSeed(await readNutritionSeedFile(file), { templateCoachId: String(coach._id) });
       console.log(`Nutrition (${file.split('/').pop()}): ${result.foodsCreated} food item(s) created.`);
     }
 

@@ -52,3 +52,24 @@ export function assertDevDatabase(allowRemote: boolean): void {
     console.warn('WARNING: --allow-remote given — writing to a NON-LOCAL database. Never use this on production.');
   }
 }
+
+/**
+ * For setup scripts that production needs too (seed:nutrition, migrate:food-bank — like create:admin):
+ * prints the target (hosts + database name only, never credentials) and refuses a non-local database
+ * unless --allow-remote was passed. No NODE_ENV check.
+ */
+export function assertSetupDatabase(allowRemote: boolean): void {
+  if (!config.databaseUrl) {
+    console.error('DATABASE_URL is not set.');
+    process.exit(1);
+  }
+  const target = describeDatabaseUrl(config.databaseUrl);
+  console.log(`Database: ${target.hosts.join(', ')} / ${target.databaseName}`);
+  if (!target.isLocal) {
+    if (!allowRemote) {
+      console.error('Refusing to run: DATABASE_URL points to a non-local database. Re-run with --allow-remote if you mean it.');
+      process.exit(1);
+    }
+    console.warn('WARNING: --allow-remote given — using a NON-LOCAL database.');
+  }
+}

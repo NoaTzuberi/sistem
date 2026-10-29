@@ -31,6 +31,7 @@ import {
   patchFood,
   deleteFood,
   postRestoreFood,
+  putFoodHidden,
   getSettings,
   putSettings,
   postSettingsPreview,
@@ -155,6 +156,8 @@ coachRouter.post('/nutrition/foods', postFood);
 coachRouter.patch('/nutrition/foods/:foodId', patchFood);
 coachRouter.delete('/nutrition/foods/:foodId', deleteFood);
 coachRouter.post('/nutrition/foods/:foodId/restore', postRestoreFood);
+coachRouter.post('/nutrition/foods/:foodId/hidden', putFoodHidden);
+coachRouter.delete('/nutrition/foods/:foodId/hidden', putFoodHidden);
 coachRouter.get('/nutrition/settings', getSettings);
 coachRouter.put('/nutrition/settings', putSettings);
 coachRouter.post('/nutrition/settings/preview', postSettingsPreview);

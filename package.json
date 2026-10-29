@@ -27,6 +27,7 @@
     "seed:dev": "npm run seed:dev -w @sistem/server --",
     "seed:nutrition": "npm run seed:nutrition -w @sistem/server --",
     "reset:nutrition": "npm run reset:nutrition -w @sistem/server --",
+    "migrate:food-bank": "npm run migrate:food-bank -w @sistem/server --",
     "backfill:achievements": "npm run backfill:achievements -w @sistem/server --",
     "test:i18n": "vitest run --config vitest.i18n.config.mts",
     "lint:i18n": "node scripts/i18n-audit.mjs",
