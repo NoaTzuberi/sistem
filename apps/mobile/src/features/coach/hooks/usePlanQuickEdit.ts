@@ -45,7 +45,8 @@ export function usePlanQuickEdit(trainee: CoachTraineeDetail | undefined, today:
   const traineeId = trainee?.id ?? '';
   const traineeName = trainee?.name ?? '';
   const weekStart = trainee?.currentWeekStart ?? '';
-  const nextWeekStart = addDaysToDate(weekStart, 7);
+  // Before her screen loads there is no week yet ('' is not a date: addDaysToDate would throw).
+  const nextWeekStart = weekStart ? addDaysToDate(weekStart, 7) : '';
   // This week's plan (published first: the one she sees).
   const plan = useMemo(() => {
     const week = (plans ?? []).filter((entry) => entry.weekStartDate === weekStart);
