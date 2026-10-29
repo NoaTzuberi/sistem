@@ -11,6 +11,8 @@ import {
   MAX_EXERCISE_SETS,
   MAX_PLAN_TEXT_LENGTH,
   MAX_WORKOUT_TITLE_LENGTH,
+  MAX_PLAN_INTRO_MESSAGE_LENGTH,
+  MAX_PLAN_INTRO_TIP_LENGTH,
 } from './plan.constants';
 import { isSunday } from './planWeek';
 import { parsePlanCardio } from '../cardio/cardio.validation';
@@ -425,4 +427,38 @@ export function parseCreatePlanPayload(body: unknown): { value: CreatePlanInput;
     return { value: null, error: msg('plan_duplicate_flag_invalid') };
   }
   return { value: { weekStartDate: body.weekStartDate, duplicatePrevious: body.duplicatePrevious === true }, error: null };
+}
+
+export interface PublishNoteInput {
+  introMessage?: string | null;
+  introTip?: string | null;
+}
+
+function readNoteText(value: unknown, max: number, error: 'coach_default_message_too_long' | 'coach_default_tip_too_long'): { text?: string | null; error?: ServerMessage } {
+  if (value === undefined) return {};
+  if (value !== null && typeof value !== 'string') return { error: msg('invalid_body') };
+  const text = (value ?? '').replace(/\r\n/g, '\n').trim();
+  if (text.length > max) return { error: msg(error, { max }) };
+  return { text: text || null };
+}
+
+/**
+ * POST …/plans/:planId/publish body (optional): the message + tip sent with it. Trimmed (line
+ * breaks kept); '' / null = none. No body = the plan's stored message + tip stay as they are.
+ */
+export function parsePublishNotePayload(body: unknown): { value: PublishNoteInput; error?: undefined } | { value?: undefined; error: ServerMessage } {
+  if (body === undefined || body === null) return { value: {} };
+  if (typeof body !== 'object' || Array.isArray(body)) return { error: msg('invalid_body') };
+  const raw = body as Record<string, unknown>;
+  if (Object.keys(raw).some((key) => key !== 'introMessage' && key !== 'introTip')) return { error: msg('invalid_body') };
+  const message = readNoteText(raw.introMessage, MAX_PLAN_INTRO_MESSAGE_LENGTH, 'coach_default_message_too_long');
+  if (message.error) return { error: message.error };
+  const tip = readNoteText(raw.introTip, MAX_PLAN_INTRO_TIP_LENGTH, 'coach_default_tip_too_long');
+  if (tip.error) return { error: tip.error };
+  return {
+    value: {
+      ...(message.text !== undefined ? { introMessage: message.text } : {}),
+      ...(tip.text !== undefined ? { introTip: tip.text } : {}),
+    },
+  };
 }

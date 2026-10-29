@@ -4,7 +4,7 @@ import { DEFAULT_TIMEZONE } from '../users/users.constants';
 import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 import { cardioLogRefs } from '../cardio/cardio.service';
 import { Plan } from './plan.model';
-import { PlanNotFoundError, attachExerciseFacts, toPublicPlan } from './plan.service';
+import { PlanNotFoundError, attachExerciseFacts, fillPlanIntros, toPublicPlan } from './plan.service';
 import type { LeanPlan } from './plan.service';
 import { pickNextWorkoutId, toTraineePlan } from './planStatus';
 import type { WorkoutLogRef } from './planStatus';
@@ -22,7 +22,7 @@ export async function todayFor(traineeId: string, now: Date): Promise<string> {
 }
 
 async function toTraineePlans(traineeId: string, plans: LeanPlan[], today: string): Promise<TraineePlan[]> {
-  const publicPlans: PublicPlan[] = plans.map(toPublicPlan);
+  const publicPlans: PublicPlan[] = await fillPlanIntros(traineeId, plans.map((plan) => toPublicPlan(plan)));
   const [logs, cardioLogs] = await Promise.all([
     WorkoutLog.find({ traineeId, planId: { $in: plans.map((plan) => plan._id) } })
       .sort({ startedAt: -1 })

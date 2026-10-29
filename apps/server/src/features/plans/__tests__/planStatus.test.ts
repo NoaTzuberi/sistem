@@ -16,6 +16,8 @@ function plan(workouts: { id: string; dayOfWeek?: number }[], weekStartDate = WE
     weekStartDate,
     status: 'published',
     publishedAt: null,
+    introMessage: null,
+    introTip: null,
     workouts: workouts.map((workout, order) => ({ ...workout, title: `Workout ${order + 1}`, order, exercises: [] })),
     createdAt: '',
     updatedAt: '',

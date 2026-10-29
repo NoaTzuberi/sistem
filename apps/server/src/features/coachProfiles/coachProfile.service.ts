@@ -93,9 +93,13 @@ export async function updateCoachPayment(coachId: Id, changes: Partial<CoachPaym
 // published version — changing a default never rewrites it.
 // ---------------------------------------------------------------------------
 
+function toSendDefault(stored: { message?: string | null; tip?: string | null } | null | undefined): CoachSendDefault {
+  return { message: stored?.message ?? null, tip: stored?.tip ?? null };
+}
+
+// A kind never saved reads as { message: null, tip: null } — no backfill needed.
 function toSendDefaults(stored: CoachProfileDocument['defaults']): CoachSendDefaults {
-  const nutrition = stored?.nutrition;
-  return { nutrition: { message: nutrition?.message ?? null, tip: nutrition?.tip ?? null } };
+  return { nutrition: toSendDefault(stored?.nutrition), workouts: toSendDefault(stored?.workouts) };
 }
 
 export async function getCoachSendDefaults(coachId: Id): Promise<CoachSendDefaults> {
@@ -106,10 +110,13 @@ export async function getCoachSendDefaults(coachId: Id): Promise<CoachSendDefaul
 /** Only the fields sent change (already trimmed + checked by parseCoachDefaultsPayload). */
 export async function updateCoachSendDefaults(
   coachId: Id,
-  changes: { nutrition?: Partial<CoachSendDefault> },
+  changes: Partial<Record<keyof CoachSendDefaults, Partial<CoachSendDefault>>>,
 ): Promise<CoachSendDefaults> {
   const current = await getCoachSendDefaults(coachId);
-  const next: CoachSendDefaults = { nutrition: { ...current.nutrition, ...changes.nutrition } };
+  const next: CoachSendDefaults = {
+    nutrition: { ...current.nutrition, ...changes.nutrition },
+    workouts: { ...current.workouts, ...changes.workouts },
+  };
   await CoachProfile.updateOne({ userId: coachId }, { $set: { defaults: next } });
   return next;
 }

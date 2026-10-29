@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance } from 'axios';
 import type {
+  PublishPlanNote,
   AchievementOverview,
   AiRecommendation,
   AiRecommendationLatest,
@@ -257,9 +258,10 @@ export function createCoachApi(client: AxiosInstance) {
     }
   }
 
-  async function publishPlan(traineeId: string, planId: string): Promise<CoachPlan> {
+  /** `note` = the message + tip sent with it ('' / null = none; omitted = keep what the plan holds). */
+  async function publishPlan(traineeId: string, planId: string, note?: PublishPlanNote): Promise<CoachPlan> {
     try {
-      const { data } = await client.post<{ plan: CoachPlan }>(`${plansPath(traineeId)}/${planId}/publish`);
+      const { data } = await client.post<{ plan: CoachPlan }>(`${plansPath(traineeId)}/${planId}/publish`, note);
       return data.plan;
     } catch (error) {
       throw toPlanRequestError(error, "Couldn't publish the plan. Please try again.");

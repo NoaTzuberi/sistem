@@ -23,6 +23,10 @@ const planSchema = new Schema<PlanDocument>(
     // (the Workouts tab dot, Phase 13a). Unset on plans from before 13a → publishedAt.
     liveUpdatedAt: { type: Date, default: null },
     notes: { type: String, trim: true },
+    // The coach's message + tip sent with the publish, stored as sent (may say {name}, filled when
+    // read). Set only by publish; a later default never changes them. Never copied by duplicate.
+    introMessage: { type: String, default: null },
+    introTip: { type: String, default: null },
     workouts: { type: [planWorkoutSchema], default: [] },
     // The AI recommendation the coach loaded into this plan (Phase 12) — coach-only, so the
     // builder can show its rationale. Never copied by "duplicate last week".

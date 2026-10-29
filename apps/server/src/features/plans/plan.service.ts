@@ -6,6 +6,8 @@ import { resolvePlanExerciseSets } from './planSets';
 import type { PlanDocument, PlanExerciseFields, PlanWorkoutFields } from './plan.types';
 import { LocalizedError } from '../../i18n';
 import { coachingIdsOf } from '../coachings/coaching.service';
+import { User } from '../users/user.model';
+import { fillTraineeName, firstNameOf } from '../nutrition/introText';
 
 export class PlanNotFoundError extends LocalizedError {}
 
@@ -52,6 +54,9 @@ export function toPublicPlan(plan: LeanPlan): PublicPlan {
     status: plan.status,
     publishedAt: plan.publishedAt ? plan.publishedAt.toISOString() : null,
     notes: plan.notes,
+    // Raw here ({name} kept); fillPlanIntros fills her first name for every reader.
+    introMessage: plan.introMessage ?? null,
+    introTip: plan.introTip ?? null,
     workouts: [...plan.workouts].sort((a, b) => a.order - b.order).map(toPublicWorkout),
     createdAt: plan.createdAt.toISOString(),
     updatedAt: plan.updatedAt.toISOString(),
@@ -83,4 +88,16 @@ export async function hasPublishedPlan(traineeId: string): Promise<boolean> {
   const liveIds = await coachingIdsOf(traineeId);
   if (liveIds.length === 0) return false;
   return (await Plan.exists({ traineeId, status: 'published', coachingId: { $in: liveIds } })) !== null;
+}
+
+/** The message + tip as she reads them: {name} → her first name (one lookup for one trainee's plans). */
+export async function fillPlanIntros<T extends PublicPlan>(traineeId: string, plans: T[]): Promise<T[]> {
+  if (!plans.some((plan) => plan.introMessage || plan.introTip)) return plans;
+  const user = await User.findById(traineeId).select('name').lean();
+  const firstName = firstNameOf(user?.name);
+  return plans.map((plan) => ({
+    ...plan,
+    introMessage: fillTraineeName(plan.introMessage, firstName),
+    introTip: fillTraineeName(plan.introTip, firstName),
+  }));
 }

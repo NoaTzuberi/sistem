@@ -9,13 +9,13 @@ import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 import { findCoachLibraryIds } from '../exercises/exercise.service';
 import { isLinkableRecommendation } from '../aiRecommendations/aiRecommendation.service';
 import { Plan } from './plan.model';
-import { PlanNotFoundError, attachExerciseFacts, toPublicPlan } from './plan.service';
+import { PlanNotFoundError, attachExerciseFacts, fillPlanIntros, toPublicPlan } from './plan.service';
 import type { LeanPlan } from './plan.service';
 import { addDays, currentWeekStart, localDateString } from './planWeek';
 import { resolveWorkoutStatus } from './planStatus';
 import { checkTrainingIds, findPublishIssues } from './plan.validation';
 import { getEffectiveTrainingConfig } from '../trainingSplits/trainingSplit.service';
-import type { CreatePlanInput, PlanProblem, SavePlanInput } from './plan.validation';
+import type { CreatePlanInput, PlanProblem, PublishNoteInput, SavePlanInput } from './plan.validation';
 import { LocalizedError, msg } from '../../i18n';
 
 // The coach's side of plans (PRD §6 plan builder). Every function takes the trainee
@@ -39,7 +39,8 @@ function isDuplicateKeyError(error: unknown): boolean {
 }
 
 async function toCoachPlans(plans: LeanPlan[]): Promise<CoachPlan[]> {
-  const publicPlans = plans.map(toPublicPlan);
+  // All of one trainee's plans: the coach reads the message as she does ({name} filled).
+  const publicPlans = plans.length > 0 ? await fillPlanIntros(String(plans[0].traineeId), plans.map((plan) => toPublicPlan(plan))) : [];
   const [startedPlanIds] = await Promise.all([
     WorkoutLog.distinct('planId', { planId: { $in: plans.map((plan) => plan._id) } }),
     attachExerciseFacts(publicPlans),
@@ -260,9 +261,10 @@ export async function saveCoachPlan(traineeId: string, coachingId: string, planI
 /**
  * Makes a draft visible to the trainee and announces it ('plan.published' → her
  * notification). Publishing an already published plan changes nothing and
- * announces nothing.
+ * announces nothing. `note` = the message + tip sent with it (stored as sent; omitted keeps
+ * what the plan holds).
  */
-export async function publishCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<CoachPlan> {
+export async function publishCoachPlan(traineeId: string, coachingId: string, planId: string, note: PublishNoteInput = {}): Promise<CoachPlan> {
   const plan = await findPlan(traineeId, coachingId, planId);
   if (plan.status === 'published') {
     return getCoachPlan(traineeId, coachingId, planId);
@@ -277,7 +279,7 @@ export async function publishCoachPlan(traineeId: string, coachingId: string, pl
   const publishedAt = new Date();
   const published = await Plan.findOneAndUpdate(
     { _id: planId, traineeId, coachingId, status: 'draft' },
-    { $set: { status: 'published', publishedAt, liveUpdatedAt: publishedAt } },
+    { $set: { status: 'published', publishedAt, liveUpdatedAt: publishedAt, ...note } },
     { returnDocument: 'after' },
   ).lean<LeanPlan>();
 

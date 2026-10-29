@@ -351,9 +351,19 @@ export interface Plan {
   status: PlanStatus;
   publishedAt: string | null;
   notes?: string;
+  /** The coach's message sent with the publish ({name} filled with her first name); null = none. */
+  introMessage: string | null;
+  /** The coach's tip sent with the publish; null = none. */
+  introTip: string | null;
   workouts: PlanWorkout[];
   createdAt: string;
   updatedAt: string;
+}
+
+/** POST /coach/trainees/:id/plans/:planId/publish body (optional): what goes out with it. */
+export interface PublishPlanNote {
+  introMessage?: string | null;
+  introTip?: string | null;
 }
 
 // ---------------------------------------------------------------------------

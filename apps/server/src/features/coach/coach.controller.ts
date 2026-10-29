@@ -19,7 +19,7 @@ import {
   PlanValidationError,
   PlanConflictError,
 } from '../plans/planBuilder.service';
-import { validatePlanIdParam, parseCreatePlanPayload, parseSavePlanPayload, type PlanProblem } from '../plans/plan.validation';
+import { validatePlanIdParam, parseCreatePlanPayload, parsePublishNotePayload, parseSavePlanPayload, type PlanProblem } from '../plans/plan.validation';
 import { listWorkoutLogsForCoaching } from '../workoutLogs/workoutLog.service';
 import { listBodyMetricsForTrainee } from '../bodyMetrics/bodyMetric.service';
 import { getAchievementOverview } from '../achievements/achievement.service';
@@ -194,8 +194,14 @@ export async function publishTraineePlan(req: AuthenticatedRequest, res: Respons
   const planId = readPlanId(req, res);
   if (!planId) return;
 
+  const note = parsePublishNotePayload(req.body);
+  if (!note.value) {
+    sendError(res, 400, note.error);
+    return;
+  }
+
   try {
-    res.status(200).json({ plan: await publishCoachPlan(req.traineeId!, req.coachingId!, planId) });
+    res.status(200).json({ plan: await publishCoachPlan(req.traineeId!, req.coachingId!, planId, note.value) });
   } catch (error) {
     sendPlanError(res, error);
   }

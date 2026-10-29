@@ -382,6 +382,40 @@ describe('plan builder (coach)', () => {
       // Edits do not notify again.
       expect(await waitForNotifications(trainee.id, 1)).toHaveLength(1);
     });
+
+    it('stores the message + tip sent with the publish; {name} = her first name; never copied by duplicate', async () => {
+      const draft = await createDraft();
+      await savePlan(draft.id, validWorkouts());
+      const publishPath = `${plansPath()}/${draft.id}/publish`;
+      const tooLong = await api.request('POST', publishPath, { token: coach.token, body: { introTip: 'x'.repeat(301) } });
+      expect(tooLong.status).toBe(400);
+      expect((await api.request('POST', publishPath, { token: coach.token, body: { other: 'x' } })).status).toBe(400);
+
+      const res = await api.request('POST', publishPath, {
+        token: coach.token,
+        body: { introMessage: '  Hi {name}!\r\nNew week.  ', introTip: ' Warm up, {name} ' },
+      });
+      expect(res.status).toBe(200);
+      const firstName = trainee.user.name.split(' ')[0];
+      expect(res.body.plan).toMatchObject({ introMessage: `Hi ${firstName}!\nNew week.`, introTip: `Warm up, ${firstName}` });
+      // Stored raw, as sent.
+      expect((await Plan.findById(draft.id).lean())).toMatchObject({ introMessage: 'Hi {name}!\nNew week.', introTip: 'Warm up, {name}' });
+
+      const week = await api.request('GET', '/plans/week', { token: trainee.token });
+      expect(week.body.plan).toMatchObject({ introMessage: `Hi ${firstName}!\nNew week.`, introTip: `Warm up, ${firstName}` });
+
+      // A later default changes nothing she received.
+      await api.request('PATCH', '/coach/profile/defaults', { token: coach.token, body: { workouts: { message: 'Other', tip: null } } });
+      expect((await api.request('GET', '/plans/week', { token: trainee.token })).body.plan.introTip).toBe(`Warm up, ${firstName}`);
+
+      // Saving the plan keeps what was sent.
+      const saved = await savePlan(draft.id, res.body.plan.workouts.map((workout: { id: string; title: string; dayOfWeek?: number; exercises: CoachPlan['workouts'][number]['exercises'] }) => ({ id: workout.id, title: workout.title, dayOfWeek: workout.dayOfWeek, exercises: workout.exercises.map(toInput) })));
+      expect(saved.status).toBe(200);
+      expect(saved.body.plan.introTip).toBe(`Warm up, ${firstName}`);
+
+      const copy = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, duplicatePrevious: true } });
+      expect(copy.body.plan).toMatchObject({ introMessage: null, introTip: null });
+    });
   });
 
   describe('interval exercises (Phase 8)', () => {

@@ -563,12 +563,17 @@ describe('nutrition (API)', () => {
 
     it('the tip goes out with the note, {name} = her first name, and a later default never changes what she got', async () => {
       const defaults = (body: object, token = coach.token) => api.request('PATCH', '/coach/profile/defaults', { token, body });
-      expect((await api.request('GET', '/coach/profile/defaults', { token: coach.token })).body.defaults).toEqual({ nutrition: { message: null, tip: null } });
-      expect((await defaults({ nutrition: { message: '  Hi {name}!\r\nLet us go.  ' } })).body.defaults).toEqual({ nutrition: { message: 'Hi {name}!\nLet us go.', tip: null } });
+      expect((await api.request('GET', '/coach/profile/defaults', { token: coach.token })).body.defaults).toEqual({ nutrition: { message: null, tip: null }, workouts: { message: null, tip: null } });
+      expect((await defaults({ nutrition: { message: '  Hi {name}!\r\nLet us go.  ' } })).body.defaults).toEqual({ nutrition: { message: 'Hi {name}!\nLet us go.', tip: null }, workouts: { message: null, tip: null } });
       expect((await defaults({ nutrition: { tip: 'Water first' } })).body.defaults.nutrition).toEqual({ message: 'Hi {name}!\nLet us go.', tip: 'Water first' });
       expect((await defaults({ nutrition: { message: 'x'.repeat(601) } })).status).toBe(400);
       expect((await defaults({ nutrition: { tip: 'x'.repeat(301) } })).status).toBe(400);
-      expect((await defaults({ workouts: { message: 'x' } })).status).toBe(400);
+      // Workouts is its own default: saving it leaves nutrition as it was.
+      expect((await defaults({ workouts: { message: 'Week ready, {name}', tip: 'Warm up' } })).body.defaults).toMatchObject({
+        nutrition: { tip: 'Water first' },
+        workouts: { message: 'Week ready, {name}', tip: 'Warm up' },
+      });
+      expect((await defaults({ other: { message: 'x' } })).status).toBe(400);
       expect((await defaults({ nutrition: { other: 'x' } })).status).toBe(400);
       // Only coaches, and each only her own.
       expect((await defaults({ nutrition: { tip: 'x' } }, trainee.token)).status).toBe(403);

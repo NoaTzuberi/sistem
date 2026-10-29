@@ -47,8 +47,7 @@ export interface CoachPaymentResponse {
 }
 
 // ---------------------------------------------------------------------------
-// The coach's saved defaults for what goes out with a plan (a message + a tip). Keyed by plan
-// kind so workout plans can use the same shape later; only `nutrition` exists today.
+// The coach's saved defaults for what goes out with a plan (a message + a tip), per plan kind.
 // ---------------------------------------------------------------------------
 
 export interface CoachSendDefault {
@@ -58,14 +57,15 @@ export interface CoachSendDefault {
   tip: string | null;
 }
 
+export type SendDefaultsKind = 'nutrition' | 'workouts';
+
 export interface CoachSendDefaults {
   nutrition: CoachSendDefault;
+  workouts: CoachSendDefault;
 }
 
 /** PATCH /coach/profile/defaults — only the fields sent change; null or '' clears one. */
-export interface UpdateCoachSendDefaultsPayload {
-  nutrition?: Partial<Record<keyof CoachSendDefault, string | null>>;
-}
+export type UpdateCoachSendDefaultsPayload = Partial<Record<SendDefaultsKind, Partial<Record<keyof CoachSendDefault, string | null>>>>;
 
 /** GET / PATCH /coach/profile/defaults */
 export interface CoachSendDefaultsResponse {

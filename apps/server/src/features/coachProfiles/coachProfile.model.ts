@@ -15,12 +15,25 @@ export interface CoachProfileDocument {
   /** Temporary payment links shown to her own trainees (validated in coachPayment.validation.ts). */
   payment?: { payboxUrl: string | null; bitPhone: string | null; note: string | null } | null;
   /** Her saved message + tip for sending a plan, per plan kind (coachDefaults.validation.ts). */
-  defaults?: { nutrition?: { message: string | null; tip: string | null } | null } | null;
+  defaults?: { nutrition?: SendDefaultFields | null; workouts?: SendDefaultFields | null } | null;
   /** System food-bank items she hid from her lists (her library's "hidden" filter brings them back). */
   hiddenSystemFoods?: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+interface SendDefaultFields {
+  message: string | null;
+  tip: string | null;
+}
+
+const sendDefaultSchema = new Schema<SendDefaultFields>(
+  {
+    message: { type: String, default: null, maxlength: 600 },
+    tip: { type: String, default: null, maxlength: 300 },
+  },
+  { _id: false },
+);
 
 const coachProfileSchema = new Schema<CoachProfileDocument>(
   {
@@ -40,20 +53,12 @@ const coachProfileSchema = new Schema<CoachProfileDocument>(
       ),
       default: null,
     },
-    // Keyed by plan kind so workout plans can add theirs later.
+    // Keyed by plan kind: what goes out with a nutrition plan / a workout plan.
     defaults: {
       type: new Schema(
         {
-          nutrition: {
-            type: new Schema(
-              {
-                message: { type: String, default: null, maxlength: 600 },
-                tip: { type: String, default: null, maxlength: 300 },
-              },
-              { _id: false },
-            ),
-            default: null,
-          },
+          nutrition: { type: sendDefaultSchema, default: null },
+          workouts: { type: sendDefaultSchema, default: null },
         },
         { _id: false },
       ),

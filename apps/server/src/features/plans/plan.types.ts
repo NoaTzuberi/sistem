@@ -59,6 +59,8 @@ export interface PlanDocument {
   publishedAt?: Date | null;
   liveUpdatedAt?: Date | null;
   notes?: string;
+  introMessage?: string | null;
+  introTip?: string | null;
   workouts: (PlanWorkoutFields & { _id: Types.ObjectId })[];
   aiRecommendationId?: Types.ObjectId | null;
   /** Phase 12b, coach-only. */
