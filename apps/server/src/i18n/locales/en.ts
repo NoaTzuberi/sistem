@@ -25,6 +25,12 @@ export const en: Record<keyof typeof he, string> = {
   reset_token_required: 'Reset token is required.',
   reset_link_sent: 'If an account exists for that email, a reset link has been sent.',
   password_reset_done: 'Password reset successfully.',
+  // Account deletion
+  account_password_wrong: 'Wrong password.',
+  account_confirm_required: 'Type your password to delete your account.',
+  account_admin_cannot_delete: 'An admin account can\'t be deleted here.',
+  account_coach_has_trainees: 'You have active trainees ({count}). End their coaching before deleting your account.',
+  account_photo_cleanup_failed: 'We couldn\'t delete your photos. Your account was not deleted — try again in a few minutes.',
   // Preferences (units + language)
   preferences_empty: 'Send a weight unit, a length unit, a language or an app mode.',
   activity_before_invalid: 'before must be an ISO date-time.',

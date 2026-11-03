@@ -24,6 +24,12 @@ export const he = {
   reset_token_required: 'חסר קוד איפוס.',
   reset_link_sent: 'אם קיים חשבון עם האימייל הזה, נשלח אליו קישור לאיפוס.',
   password_reset_done: 'הסיסמה אופסה בהצלחה.',
+  // Account deletion
+  account_password_wrong: 'הסיסמה שגויה.',
+  account_confirm_required: 'כדי למחוק את החשבון יש להקליד את הסיסמה שלך.',
+  account_admin_cannot_delete: 'אי אפשר למחוק חשבון מנהלת מכאן.',
+  account_coach_has_trainees: 'יש לך מתאמנות פעילות ({count}). צריך לסיים את הליווי שלהן לפני מחיקת החשבון.',
+  account_photo_cleanup_failed: 'לא הצלחנו למחוק את התמונות שלך. החשבון לא נמחק — אפשר לנסות שוב בעוד כמה דקות.',
   // Preferences (units + language)
   preferences_empty: 'יש לשלוח יחידת משקל, יחידת אורך, שפה או מצב אפליקציה.',
   activity_before_invalid: 'before חייב להיות תאריך ושעה (ISO).',

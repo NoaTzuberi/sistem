@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config/env';
+import { securityHeaders } from './middleware/securityHeaders.middleware';
+import { errorHandler } from './middleware/errorHandler.middleware';
 import { healthRouter } from './features/health/health.routes';
 import { authRouter } from './features/auth/auth.routes';
 import { usersRouter } from './features/users/users.routes';
@@ -21,11 +23,17 @@ import { joinRouter } from './features/invites/invite.routes';
 import { coachingsRouter, communitiesRouter } from './features/coachings/coaching.routes';
 import { reactionsRouter } from './features/reactions/reaction.routes';
 import { messagesRouter } from './features/messages/message.routes';
+import { accountRouter } from './features/account/account.routes';
 import { registerNotificationListeners } from './features/notifications/notification.listeners';
 import { registerAiRecommendationListeners } from './features/aiRecommendations/aiRecommendation.listeners';
 
 const app = express();
 
+app.disable('x-powered-by');
+// Behind a host's proxy (Render) the client address is in X-Forwarded-For. Without this every
+// visitor shares the proxy's address — one rate-limit bucket for everyone (config/trustProxy.ts).
+app.set('trust proxy', config.trustProxy);
+app.use(securityHeaders);
 // Only the listed origins get CORS headers. No `credentials`: auth is a Bearer header, not a cookie.
 app.use(cors({ origin: config.clientOrigins }));
 app.use(express.json());
@@ -33,6 +41,7 @@ app.use(express.json());
 app.use('/api', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/account', accountRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/onboarding', onboardingRouter);
 app.use('/api/plans', plansRouter);
@@ -51,6 +60,8 @@ app.use('/api/coachings', coachingsRouter);
 app.use('/api/communities', communitiesRouter);
 app.use('/api/reactions', reactionsRouter);
 app.use('/api/messages', messagesRouter);
+
+app.use(errorHandler);
 
 registerNotificationListeners();
 registerAiRecommendationListeners();

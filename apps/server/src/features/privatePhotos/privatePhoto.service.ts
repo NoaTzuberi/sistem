@@ -59,6 +59,30 @@ export async function deletePrivatePhoto(publicId: string): Promise<void> {
   });
 }
 
+/** Whether Cloudinary is configured at all (an account with no photos can be deleted without it). */
+export function isPhotoStorageConfigured(): boolean {
+  const { cloudName, apiKey, apiSecret } = config.cloudinary;
+  return Boolean(cloudName && apiKey && apiSecret);
+}
+
+/**
+ * Account deletion: removes every private photo stored under `prefix` (e.g. `sistem/avatars/<userId>/`),
+ * including any the database lost track of, then lists the folder again. Returns how many are still
+ * there (0 = really gone) — the caller refuses to finish the deletion otherwise.
+ */
+export async function deletePrivatePhotosByPrefix(prefix: string): Promise<number> {
+  const options = { ...cloudinaryOptions(), resource_type: 'image', type: 'authenticated', invalidate: true };
+  // Cloudinary deletes up to 1000 per call and answers `partial` while more are left.
+  for (let round = 0; round < 10; round += 1) {
+    const result = (await cloudinary.api.delete_resources_by_prefix(prefix, options)) as { partial?: boolean };
+    if (!result.partial) break;
+  }
+  const left = (await cloudinary.api.resources({ ...cloudinaryOptions(), resource_type: 'image', type: 'authenticated', prefix, max_results: 10 })) as {
+    resources?: unknown[];
+  };
+  return left.resources?.length ?? 0;
+}
+
 /** A signed link to the photo that stops working after PHOTO_URL_TTL_SEC. */
 export function photoUrl(publicId: string, now: Date = new Date()): { url: string; urlExpiresAt: string } {
   const expiresAt = Math.floor(now.getTime() / 1000) + PHOTO_URL_TTL_SEC;

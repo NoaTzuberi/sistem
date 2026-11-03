@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { Coaching } from '../features/coachings/coaching.model';
+import { User } from '../features/users/user.model';
 import type { AuthenticatedRequest } from './auth.middleware';
 import { sendError } from '../i18n';
 
@@ -41,11 +42,13 @@ export async function loadCoachArchivedTrainee(req: AuthenticatedRequest, res: R
     return;
   }
 
-  const [ended, live] = await Promise.all([
+  const [ended, live, account] = await Promise.all([
     Coaching.findOne({ traineeId, coachId: req.userId, status: 'ended' }).sort({ endedAt: -1 }).select('_id').lean(),
     Coaching.exists({ traineeId, coachId: req.userId, live: true }),
+    // A deleted account leaves only the ended coaching's dates: no archive.
+    User.exists({ _id: traineeId }),
   ]);
-  if (!ended || live) {
+  if (!ended || live || !account) {
     sendError(res, 404, 'trainee_not_found');
     return;
   }
