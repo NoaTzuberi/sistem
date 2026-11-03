@@ -56,5 +56,9 @@ services:
         value: "false"
       - key: FEATURE_WATER_TRACKING
         value: "false"
+      # Public, not a secret: Render puts ONE proxy in front of the service. Without it every visitor
+      # has the proxy's address and shares one rate-limit bucket (docs/deploy/render.md).
+      - key: TRUST_PROXY
+        value: "1"
       # Optional, add in the dashboard only to change the defaults: AI_MODEL, AI_FALLBACK_MODEL.
       # PORT is set by Render.

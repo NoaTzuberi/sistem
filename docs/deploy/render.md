@@ -61,6 +61,11 @@ Already set by `render.yaml` (nothing to type):
 - `AI_PAID_TIER=false` — the server never calls the AI in production until this is `true`, and it
   must stay `false` while the provider is Gemini's free tier (PRD §14: no real trainee data there).
 - `FEATURE_NUTRITION_RECIPES=false`, `FEATURE_WATER_TRACKING=false`
+- `TRUST_PROXY=1` — how many proxies sit in front of the server (Render has one). Without it every
+  visitor looks like Render's proxy, so the login / sign-up rate limits are shared by everyone and one
+  person can lock all users out. Never higher than the real hop count: a higher number lets a client
+  fake its address and skip the limits. To check it: log `req.ip` next to `X-Forwarded-For` for one
+  request — `req.ip` must be your own address. Not a secret (already in the Blueprint).
 - `PORT` is given by Render itself. Do not add it.
 
 ## 3. MongoDB Atlas — let Render in
