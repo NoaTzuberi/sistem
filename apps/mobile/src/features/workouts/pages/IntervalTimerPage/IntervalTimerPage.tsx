@@ -1,7 +1,9 @@
-import { fill, useCopy } from '@sistem/shared';
+import { useCopy } from '@sistem/shared';
 import { useState } from 'react';
+import { IconMinus, IconPlus } from '@tabler/icons-react';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Button } from '../../../../components/common/Button/Button';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { useWakeLock } from '../../../../hooks/useWakeLock';
 import { BackButton } from '../../components/BackButton/BackButton';
 import { IntervalTimer } from '../../components/IntervalTimer/IntervalTimer';
@@ -39,11 +41,13 @@ function SetupRow({ label, value, canDecrease, canIncrease, onDecrease, onIncrea
     <div className="interval-setup-row" role="group" aria-label={label}>
       <span className="interval-setup-label">{label}</span>
       <button type="button" className="interval-setup-button" aria-label={`− ${label}`} disabled={!canDecrease} onClick={onDecrease}>
-        −
+        <IconMinus size={18} stroke={2.6} aria-hidden="true" />
       </button>
-      <span className="interval-setup-value">{value}</span>
+      <bdi className="interval-setup-value" dir="ltr">
+        {value}
+      </bdi>
       <button type="button" className="interval-setup-button" aria-label={`+ ${label}`} disabled={!canIncrease} onClick={onIncrease}>
-        +
+        <IconPlus size={18} stroke={2.6} aria-hidden="true" />
       </button>
     </div>
   );
@@ -62,6 +66,7 @@ export function IntervalTimerPage() {
 
   const { workSec, restSec, rounds } = settings;
   const totalSec = workSec * rounds + restSec * Math.max(0, rounds - 1);
+  const [totalBefore = '', totalAfter = ''] = copy.interval.timerTotal.split('{total}');
 
   function update(patch: Partial<Settings>) {
     const next = { ...settings, ...patch };
@@ -77,10 +82,11 @@ export function IntervalTimerPage() {
     <AppShell hideTabBar>
       <div className="interval-setup">
         <header className="interval-setup-header">
-          <BackButton />
+          <BackButton variant="disc" />
           <h1 className="interval-setup-title display-title">{copy.interval.timerTitle}</h1>
         </header>
 
+        <div className="interval-setup-list">
         <SetupRow
           label={copy.interval.timerWork}
           value={formatClock(workSec)}
@@ -105,12 +111,20 @@ export function IntervalTimerPage() {
           onDecrease={() => update({ rounds: Math.max(1, rounds - 1) })}
           onIncrease={() => update({ rounds: Math.min(FREE_TIMER_MAX_ROUNDS, rounds + 1) })}
         />
+        </div>
 
-        <p className="interval-setup-total">{fill(copy.interval.timerTotal, { total: formatClock(totalSec) })}</p>
+        <p className="interval-setup-total">
+          {/* The copy's words around the number; only the number is set in mono. */}
+          {totalBefore}
+          <bdi className="interval-setup-total-value" dir="ltr">
+            {formatClock(totalSec)}
+          </bdi>
+          {totalAfter}
+        </p>
 
-        <Button className="interval-setup-start" onClick={start}>
+        <PillButton className="interval-setup-start" onClick={start}>
           {copy.interval.timerStart}
-        </Button>
+        </PillButton>
 
         {/* Dev only: checks the beeps without running a timer. Not in production builds. */}
         {import.meta.env.DEV && (

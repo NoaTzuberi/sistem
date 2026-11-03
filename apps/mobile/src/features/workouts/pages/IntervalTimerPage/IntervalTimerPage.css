@@ -1,49 +1,72 @@
+/* "טיימר אינטרוולים" (direction B): the soft page surface, one white card per setting. */
 .interval-setup {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  min-height: 100dvh;
+  padding-block: calc(var(--space-3) + var(--safe-top)) calc(var(--space-5) + var(--safe-bottom));
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
+}
+
+.app-shell:has(.interval-setup) {
+  background-color: var(--color-subscreen-page);
 }
 
 .interval-setup-header {
   display: flex;
-  align-items: center;
-  gap: var(--space-1);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
 .interval-setup-title {
   margin: 0;
-  font-size: var(--text-display-lg);
+  font-size: var(--text-subscreen-title);
+}
+
+.interval-setup-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .interval-setup-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 56px 96px 56px;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) 0;
-  border-top: var(--border-width-thin) solid var(--color-border);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-wk-card);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
 }
 
 .interval-setup-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
 }
 
 .interval-setup-button {
-  height: 56px;
-  border: none;
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--text-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-it-step);
+  height: var(--size-it-step);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
   cursor: pointer;
   touch-action: manipulation;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .interval-setup-button:active:not(:disabled) {
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
+  transform: scale(var(--press-scale));
 }
 
 .interval-setup-button:disabled {
@@ -51,19 +74,46 @@
   cursor: default;
 }
 
+.interval-setup-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interval-setup-button:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
 .interval-setup-value {
+  min-width: 84px;
   font-family: var(--font-num);
-  font-size: var(--text-2xl);
+  font-size: var(--text-it-setting);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
+  line-height: 1;
   text-align: center;
 }
 
 .interval-setup-total {
-  margin: 0;
+  margin: var(--space-1) 0 0;
+  text-align: center;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
+.interval-setup-total-value {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
 .interval-setup-start {
-  width: 100%;
+  margin-block-start: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interval-setup-button {
+    transition: none;
+  }
 }

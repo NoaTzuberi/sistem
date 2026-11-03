@@ -2,14 +2,17 @@ import type { Language } from '@sistem/types';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { fill, formatDuration, useCopy, useI18n, isolateLtr } from '@sistem/shared';
+import { IconPlayerPauseFilled, IconPlayerPlayFilled, IconPlayerSkipForwardFilled, IconPlayerStopFilled } from '@tabler/icons-react';
 import { Button } from '../../../../components/common/Button/Button';
 import { Modal } from '../../../../components/common/Modal/Modal';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import { countRoundsDone, nextWork } from '../../data/intervalTimeline';
 import { unlockAudio } from '../../data/intervalSounds';
 import type { IntervalRun } from '../../data/intervalTimeline';
 import { formatClock } from '../../data/workoutDisplay';
 import { workoutCopy } from '../../copy';
-import { CountdownBar } from '../CountdownBar/CountdownBar';
+import { CountdownRing } from '../CountdownRing/CountdownRing';
 import { SoundToggle } from '../SoundToggle/SoundToggle';
 import './IntervalTimer.css';
 
@@ -45,9 +48,10 @@ function describeNext(run: IntervalRun, copy: (typeof workoutCopy)['he'], langua
 }
 
 /**
- * The interval run, full screen and hands-free (HIIT / Tabata): the phase, a huge
- * countdown, the exercise, the round and what's next. Portaled above the app so the
- * page-enter animation can't move it.
+ * The interval run, full screen and hands-free (HIIT / Tabata): the phase, a big ring with the
+ * countdown, the exercise, the round and what's next; stop / pause / skip as media buttons. Work (and
+ * the done screen) = the pink stage, rest / get ready = ink — the browser edges follow the phase.
+ * Portaled above the app so the page-enter animation can't move it.
  */
 export function IntervalTimer({
   run,
@@ -68,6 +72,8 @@ export function IntervalTimer({
   const isPaused = run.pausedMs !== null;
   const durationMs = phase.durationSec * 1000;
   const showDone = run.finished && catchUpCount === 0;
+  const onStage = showDone || phase.kind === 'work';
+  useDocumentSurface(onStage ? 'stage' : 'interval-rest', onStage ? '--color-stage-full-top' : '--color-it-rest');
 
   const subtitle =
     phase.kind === 'work'
@@ -84,13 +90,6 @@ export function IntervalTimer({
       onPointerDown={unlockAudio}
     >
       <div className="interval-timer-top">
-        {!showDone && (
-          <button type="button" className="interval-timer-icon" aria-label={copy.interval.stop} onClick={() => setConfirmStop(true)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-        )}
         <SoundToggle className="interval-timer-mute" />
       </div>
 
@@ -101,11 +100,13 @@ export function IntervalTimer({
             {fill(copy.interval.roundsDone, { progress: isolateLtr(`${countRoundsDone(run)} / ${phase.rounds}`) })}
           </span>
           <div className="interval-timer-done-actions">
-            <Button onClick={onClose}>{doneLabel}</Button>
+            <PillButton className="interval-timer-done-primary" onClick={onClose}>
+              {doneLabel}
+            </PillButton>
             {onAgain && (
-              <Button variant="secondary" onClick={onAgain}>
+              <PillButton variant="soft" className="interval-timer-done-again" onClick={onAgain}>
                 {copy.interval.again}
-              </Button>
+              </PillButton>
             )}
           </div>
         </div>
@@ -113,29 +114,41 @@ export function IntervalTimer({
         <>
           <div className="interval-timer-main" role="timer" aria-live="off">
             <span className="interval-timer-phase display-title">{copy.interval.phase[phase.kind]}</span>
-            <span className="interval-timer-clock">{formatClock(Math.ceil(remainingMs / 1000))}</span>
-            {isPaused && <span className="interval-timer-paused">{copy.interval.paused}</span>}
+            {/* Continuous: drawn every frame from the stored end time, not from the tick. */}
+            <CountdownRing endsAt={run.endsAt} pausedRemainingMs={run.pausedMs} durationMs={durationMs}>
+              <bdi className="interval-timer-clock" dir="ltr">
+                {formatClock(Math.ceil(remainingMs / 1000))}
+              </bdi>
+              {isPaused && <span className="interval-timer-paused">{copy.interval.paused}</span>}
+            </CountdownRing>
             {subtitle && <span className="interval-timer-subtitle">{subtitle}</span>}
             <span className="interval-timer-round">{fill(copy.interval.round, { round: phase.round, rounds: phase.rounds })}</span>
-            {/* Continuous: drawn every frame from the stored end time, not from the tick. */}
-            <CountdownBar
-              className="interval-timer-progress"
-              endsAt={run.endsAt}
-              pausedRemainingMs={run.pausedMs}
-              durationMs={durationMs}
-              direction="fill"
-            />
             <span className="interval-timer-next">
               {copy.interval.next} {describeNext(run, copy, language)}
             </span>
           </div>
 
+          {/* Media controls read left → right in both languages (like a player): stop, pause, skip. */}
           <div className="interval-timer-controls">
+            <button type="button" className="interval-timer-control" aria-label={copy.interval.stop} onClick={() => setConfirmStop(true)}>
+              <span className="interval-timer-control-disc" aria-hidden="true">
+                <IconPlayerStopFilled size={24} />
+              </span>
+              <span className="interval-timer-control-label" aria-hidden="true">
+                {copy.interval.stopConfirm}
+              </span>
+            </button>
             <button type="button" className="interval-timer-control" onClick={isPaused ? onResume : onPause}>
-              {isPaused ? `▶ ${copy.interval.resume}` : `❚❚ ${copy.interval.pause}`}
+              <span className="interval-timer-control-disc" aria-hidden="true">
+                {isPaused ? <IconPlayerPlayFilled size={24} /> : <IconPlayerPauseFilled size={24} />}
+              </span>
+              <span className="interval-timer-control-label">{isPaused ? copy.interval.resume : copy.interval.pause}</span>
             </button>
             <button type="button" className="interval-timer-control" onClick={onSkip}>
-              ⏭ {copy.interval.skip}
+              <span className="interval-timer-control-disc" aria-hidden="true">
+                <IconPlayerSkipForwardFilled size={24} />
+              </span>
+              <span className="interval-timer-control-label">{copy.interval.skip}</span>
             </button>
           </div>
         </>

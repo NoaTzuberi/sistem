@@ -1,4 +1,5 @@
-/* Full screen above the app, below sheets (the stop / catch-up questions). */
+/* Full screen above the app, below sheets (the stop / catch-up questions). Work + the done screen = the
+   pink stage (the workout player's layer: gradient + grain); rest / get ready = ink. White text on both. */
 .interval-timer {
   position: fixed;
   inset: 0;
@@ -7,55 +8,56 @@
   flex-direction: column;
   padding:
     calc(var(--space-2) + var(--safe-top))
-    calc(var(--space-3) + var(--safe-right))
-    calc(var(--space-4) + var(--safe-bottom))
-    calc(var(--space-3) + var(--safe-left));
-  background-color: var(--color-bg);
-  color: var(--color-text);
+    calc(var(--home-gutter) + var(--safe-right))
+    calc(var(--space-5) + var(--safe-bottom))
+    calc(var(--home-gutter) + var(--safe-left));
+  background-color: var(--color-it-rest);
+  color: var(--color-on-ink);
   overscroll-behavior: contain;
 }
 
-.interval-timer-work {
-  background-color: var(--solid-pink); /* its 16px "next" line needs 4.5:1 — Neon Pink is 3.8:1 */
+.interval-timer-work,
+.interval-timer-done {
+  background: var(--surface-profile-stage);
   color: var(--color-on-primary);
 }
 
-.interval-timer-rest {
-  background-color: var(--color-surface);
+.interval-timer-work::before,
+.interval-timer-done::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--opacity-profile-grain);
+  mix-blend-mode: multiply;
+  background-image: var(--texture-profile-grain);
+  pointer-events: none;
+}
+
+/* The browser edges while resting (the stage's are set by StageBackground.css for 'stage'). */
+html[data-surface='interval-rest'],
+html[data-surface='interval-rest'] body {
+  background-color: var(--color-it-rest);
+}
+
+.interval-timer-top,
+.interval-timer-main,
+.interval-timer-controls {
+  position: relative;
 }
 
 .interval-timer-top {
   display: flex;
-  justify-content: space-between;
-}
-
-.interval-timer-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-.interval-timer-icon:active {
-  background-color: color-mix(in srgb, currentColor 15%, transparent);
-}
-
-.interval-timer-icon svg {
-  width: 26px;
-  height: 26px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
+  justify-content: flex-end;
 }
 
 .interval-timer-mute {
-  margin-inline-start: auto;
+  border-radius: var(--radius-round);
+  background-color: var(--surface-it-on-stage);
+}
+
+.interval-timer-mute svg {
+  width: 22px;
+  height: 22px;
 }
 
 .interval-timer-main {
@@ -64,31 +66,37 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-height: 0;
   text-align: center;
 }
 
 .interval-timer-phase {
-  font-size: var(--text-display-lg);
+  font-size: var(--text-it-phase);
 }
 
-/* As big as the phone allows: read from across the room. */
+/* Read from across the room: inside the ring, as big as it allows. */
 .interval-timer-clock {
   font-family: var(--font-num);
-  font-size: min(34vw, 30dvh);
+  font-size: min(var(--text-it-clock), 22vw, 11dvh);
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .interval-timer-paused {
-  padding: 2px var(--space-2);
-  border: var(--border-width-medium) solid currentColor;
+  margin-block-start: var(--space-1);
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-round);
+  background-color: var(--surface-it-on-stage);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
+}
+
+/* The ring: white on the stage, pink on ink. */
+.interval-timer-rest .countdown-ring-value,
+.interval-timer-ready .countdown-ring-value {
+  stroke: var(--color-primary);
 }
 
 .interval-timer-subtitle {
@@ -100,12 +108,7 @@
 
 .interval-timer-round {
   font-size: var(--text-lg);
-}
-
-.interval-timer-progress {
-  width: 100%;
-  height: 6px;
-  background-color: color-mix(in srgb, currentColor 20%, transparent);
+  font-weight: var(--font-weight-semibold);
 }
 
 .interval-timer-next {
@@ -113,26 +116,56 @@
   overflow-wrap: anywhere;
 }
 
+/* Media controls: always left → right (stop, pause, skip), like any player. */
 .interval-timer-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+  direction: ltr; /* physical order on purpose: media controls never mirror */
 }
 
 .interval-timer-control {
-  min-height: 64px;
-  border: var(--border-width-medium) solid currentColor;
-  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
   font-family: var(--font-body);
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.interval-timer-control:active {
-  background-color: color-mix(in srgb, currentColor 18%, transparent);
+.interval-timer-control-disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-it-control);
+  height: var(--size-it-control);
+  border-radius: var(--radius-round);
+  background-color: var(--surface-it-on-stage);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.interval-timer-control:active .interval-timer-control-disc {
+  transform: scale(var(--press-scale));
+}
+
+.interval-timer-control:focus-visible {
+  outline: none;
+}
+
+.interval-timer-control:focus-visible .interval-timer-control-disc {
+  outline: var(--border-width-medium) solid currentColor;
+  outline-offset: var(--focus-ring-offset);
+}
+
+.interval-timer-control-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .interval-timer-done-actions {
@@ -143,6 +176,28 @@
   margin-top: var(--space-4);
 }
 
+/* On the pink stage the primary pill turns white (a pink pill would vanish). */
+.interval-timer-done-primary {
+  background-color: var(--color-card);
+  color: var(--color-primary-deep);
+  box-shadow: none;
+}
+
+.interval-timer-done-again {
+  background-color: var(--surface-it-on-stage);
+  color: var(--color-on-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interval-timer-done-primary:hover:not(:disabled) {
+    background-color: var(--color-card);
+  }
+
+  .interval-timer-done-again:hover:not(:disabled) {
+    background-color: var(--surface-profile-on-stage-hover);
+  }
+}
+
 .interval-timer-dialog {
   display: flex;
   flex-direction: column;
@@ -151,4 +206,10 @@
 
 .interval-timer-dialog-text {
   margin: 0 0 var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interval-timer-control-disc {
+    transition: none;
+  }
 }
