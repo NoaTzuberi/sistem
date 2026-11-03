@@ -6,6 +6,7 @@ import { config } from '../config/env';
 import { User, hasRole } from '../features/users/user.model';
 import { isCoachActive } from '../features/coachProfiles/coachProfile.service';
 import { sendError } from '../i18n';
+import { logSecurityEvent } from './securityLog';
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
@@ -28,13 +29,14 @@ export async function requireAuth(req: AuthenticatedRequest, res: Response, next
 
   let payload: { sub?: string; sv?: number };
   try {
-    payload = jwt.verify(token, config.jwtSecret) as { sub?: string; sv?: number };
+    // Only the algorithm we sign with: a token can't pick a weaker one for itself.
+    payload = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] }) as { sub?: string; sv?: number };
   } catch {
     sendError(res, 401, 'invalid_token');
     return;
   }
 
-  // A coach / admin password reset raises the account's session version: tokens signed before it
+  // A password reset raises the account's session version: tokens signed before it
   // stop here. Tokens from before this check have no `sv` = version 0.
   const user = mongoose.isValidObjectId(payload.sub) ? await User.findById(payload.sub).select('sessionVersion').lean() : null;
   if (!user || (user.sessionVersion ?? 0) !== (payload.sv ?? 0)) {
@@ -65,6 +67,7 @@ export function requireRole(role: UserRole) {
     }
 
     if (!hasRole(user, role)) {
+      logSecurityEvent('forbidden', req, { userId: req.userId, role });
       sendError(res, 403, 'forbidden');
       return;
     }

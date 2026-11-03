@@ -64,6 +64,12 @@ export interface LoginPayload {
   password: string;
 }
 
+/** DELETE /api/account: her password; an account without one types the confirm word instead. */
+export interface DeleteAccountPayload {
+  password?: string;
+  confirmWord?: string;
+}
+
 export interface RegisterPayload {
   name: string;
   email: string;

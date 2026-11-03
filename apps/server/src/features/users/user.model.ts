@@ -41,7 +41,7 @@ export interface UserDocument {
   roles: UserRole[];
   passwordResetTokenHash?: string;
   passwordResetExpires?: Date;
-  /** In every JWT (`sv`); raised when a coach / admin resets her password, which signs out every older session. */
+  /** In every JWT (`sv`); raised by every password reset, which signs out every older session. */
   sessionVersion?: number;
   preferences?: UserPreferences;
   onboardingStatus: OnboardingStatus;

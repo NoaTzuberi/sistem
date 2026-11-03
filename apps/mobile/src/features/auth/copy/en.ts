@@ -39,7 +39,6 @@ export const en: CopyShape<typeof he> = {
   backToLogin: 'Back to Log In',
   resetLinkInvalid: 'This reset link is missing or invalid. Request a new one to continue.',
   requestNewLink: 'Request a new link',
-  resetDone: 'Your password has been reset.',
   newPassword: 'New Password',
   newPasswordInputPlaceholder: 'Enter a new password',
   resetButton: 'Reset Password',

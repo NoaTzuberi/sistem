@@ -41,7 +41,7 @@ function signToken(userId: string, sessionVersion = 0): string {
   return jwt.sign({ sub: userId, sv: sessionVersion }, config.jwtSecret, { expiresIn: TOKEN_EXPIRY });
 }
 
-/** Coach and admin accounts get the dashboard reset flow (dashboard link, older sessions signed out). */
+/** Coach and admin accounts get the dashboard reset flow (a dashboard link). */
 export function isStaffAccount(user: Pick<UserDocument, 'roles'>): boolean {
   return hasRole(user, 'coach') || hasRole(user, 'admin');
 }
@@ -88,7 +88,11 @@ export async function registerUser(
   inviteCode?: string,
 ): Promise<AuthResponse> {
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
+  // The ADMIN_EMAIL account gets the admin role at server start (accountsMigration), and sign-up
+  // emails are not verified: whoever registered it first would become admin. Only `create:admin`
+  // makes that account; here it answers like a taken address.
+  const isAdminEmail = Boolean(config.adminEmail) && email.trim().toLowerCase() === config.adminEmail;
+  if (existingUser || isAdminEmail) {
     throw new EmailAlreadyInUseError('email_taken');
   }
 
@@ -198,28 +202,29 @@ export async function isResetTokenLive(token: string): Promise<boolean> {
 
 /**
  * Uses a reset / set-password token: sets the password and burns the token in ONE conditional update,
- * so the same link can never work twice. Coach / admin accounts also get a new session version, which
- * signs out every older session (trainee accounts keep their sessions, as before).
+ * so the same link can never work twice. Every account also gets a new session version, which signs
+ * out every older session on every device; the caller signs her in fresh.
  */
 async function consumeResetToken(token: string, password: string) {
   const live = { passwordResetTokenHash: hashResetToken(token), passwordResetExpires: { $gt: new Date() } };
-  const holder = await User.findOne(live).select('roles');
+  const holder = await User.findOne(live).select('_id');
   if (!holder) return null;
   return User.findOneAndUpdate(
     { _id: holder._id, ...live },
     {
       $set: { passwordHash: await bcrypt.hash(password, SALT_ROUNDS) },
       $unset: { passwordResetTokenHash: 1, passwordResetExpires: 1 },
-      ...(isStaffAccount(holder) ? { $inc: { sessionVersion: 1 } } : {}),
+      $inc: { sessionVersion: 1 },
     },
     { returnDocument: 'after' },
   );
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  if (!(await consumeResetToken(token, newPassword))) {
-    throw new InvalidResetTokenError('reset_token_invalid');
-  }
+/** Her own reset (emailed link): every other session ends; this device gets a fresh one. */
+export async function resetPassword(token: string, newPassword: string): Promise<AuthResponse> {
+  const user = await consumeResetToken(token, newPassword);
+  if (!user) throw new InvalidResetTokenError('reset_token_invalid');
+  return { token: signToken(String(user._id), user.sessionVersion ?? 0), user: await toPublicUser(user) };
 }
 
 /**

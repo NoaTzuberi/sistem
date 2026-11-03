@@ -38,7 +38,6 @@ export const he = {
   backToLogin: 'חזרה להתחברות',
   resetLinkInvalid: 'הקישור לאיפוס חסר או לא תקין. בקשי קישור חדש כדי להמשיך.',
   requestNewLink: 'בקשת קישור חדש',
-  resetDone: 'הסיסמה שלך אופסה.',
   newPassword: 'סיסמה חדשה',
   newPasswordInputPlaceholder: 'הזיני סיסמה חדשה',
   resetButton: 'איפוס סיסמה',

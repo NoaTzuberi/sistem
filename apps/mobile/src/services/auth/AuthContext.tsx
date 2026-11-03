@@ -40,6 +40,8 @@ interface AuthContextValue {
   register: (payload: RegisterPayload) => Promise<RegisterResult>;
   /** A fresh user from the server (e.g. after joining a coach). */
   setUser: (user: AuthUser) => void;
+  /** A session the server handed out elsewhere (her password reset signs her in fresh). */
+  signInWithSession: (token: string, user: AuthUser) => void;
   logout: () => void;
   updateUser: (patch: Partial<AuthUser>) => void;
 }
@@ -103,6 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { inviteCode, inviteError: inviteError?.message ?? null, user: registeredUser };
   }
 
+  function signInWithSession(token: string, sessionUser: AuthUser) {
+    setToken(token);
+    setUser(sessionUser);
+  }
+
   function logout() {
     clearToken();
     setUser(null);
@@ -119,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     setUser,
+    signInWithSession,
     logout,
     updateUser,
   };

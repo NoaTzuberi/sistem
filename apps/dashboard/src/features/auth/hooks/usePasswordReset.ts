@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthApiError } from '@sistem/api-client';
 import { getActiveLanguage } from '@sistem/shared';
 import { appCopy } from '../../../copy';
 import { checkResetToken, requestPasswordReset, resetPassword } from '../../../services/auth/authService';
+import { useAuth } from '../../../services/auth/AuthContext';
+import { ROUTES } from '../../../app/config/routes';
+import { dashboardHome } from '../data/roles';
 
 // Same rules as the server (auth.validation); the server checks them again.
 export const MIN_PASSWORD_LENGTH = 8;
@@ -77,10 +80,13 @@ type LinkState = 'checking' | 'valid' | 'invalid' | 'done';
 
 /**
  * The emailed link's screen: checks the token first, then two password fields with inline rules.
- * `onSaved` runs after a successful save (the page hides the shown passwords).
+ * `onSaved` runs after a successful save (the page hides the shown passwords). The reset signs out
+ * every other session and signs her in here; an account with no dashboard home sees the done card.
  */
 export function usePasswordReset(onSaved: () => void) {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const { signInWithToken } = useAuth();
   const token = params.get('token') ?? '';
   const [linkState, setLinkState] = useState<LinkState>(token ? 'checking' : 'invalid');
   const [password, setPassword] = useState('');
@@ -114,10 +120,16 @@ export function usePasswordReset(onSaved: () => void) {
     setError(undefined);
     setIsSaving(true);
     try {
-      await resetPassword(token, password, confirm);
+      const session = await resetPassword(token, password, confirm);
       setPassword('');
       setConfirm('');
       onSaved();
+      const home = dashboardHome(session.user, { home: ROUTES.HOME, admin: ROUTES.ADMIN_COACHES });
+      if (home) {
+        signInWithToken(session.token, session.user);
+        navigate(home, { replace: true });
+        return;
+      }
       setLinkState('done');
     } catch (saveError) {
       if (saveError instanceof AuthApiError && saveError.code === 'reset_token_invalid') {

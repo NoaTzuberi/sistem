@@ -8,6 +8,7 @@ import { Input } from '../../../../components/common/Input/Input';
 import { Button } from '../../../../components/common/Button/Button';
 import { AuthCard } from '../../components/AuthCard/AuthCard';
 import { resetPassword } from '../../../../services/auth/authService';
+import { useAuth } from '../../../../services/auth/AuthContext';
 import { authErrorText, validatePassword, validateConfirmPassword, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
@@ -20,6 +21,7 @@ export function ResetPassword() {
   const token = searchParams.get('token') ?? '';
   const navigate = useNavigate();
   const copy = useCopy(authCopy);
+  const { signInWithSession } = useAuth();
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,7 +32,6 @@ export function ResetPassword() {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [formError, setFormError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDone, setIsDone] = useState(false);
   const passwordsMatch = password === confirmPassword;
   const isFormInvalid = Boolean(validatePassword(password) || !confirmPassword || !passwordsMatch);
 
@@ -58,8 +59,10 @@ export function ResetPassword() {
 
     setIsSubmitting(true);
     try {
-      await resetPassword(token, password, confirmPassword);
-      setIsDone(true);
+      // Every other device is signed out; this one gets a fresh session (the app state picks the screen).
+      const session = await resetPassword(token, password, confirmPassword);
+      signInWithSession(session.token, session.user);
+      navigate(ROUTES.HOME, { replace: true });
     } catch (error) {
       setFormError((error instanceof Error && error.message) || copy.somethingWrong);
     } finally {
@@ -77,23 +80,6 @@ export function ResetPassword() {
               <p className="auth-switch">
                 <Link to={ROUTES.FORGOT_PASSWORD}>{copy.requestNewLink}</Link>
               </p>
-            </AuthCard>
-          </Container>
-        </Section>
-      </PageLayout>
-    );
-  }
-
-  if (isDone) {
-    return (
-      <PageLayout>
-        <Section className="auth-page">
-          <Container>
-            <AuthCard title={copy.resetTitle}>
-              <p className="reset-password-message">{copy.resetDone}</p>
-              <Button variant="primary" onClick={() => navigate(ROUTES.LOGIN)}>
-                {copy.loginButton}
-              </Button>
             </AuthCard>
           </Container>
         </Section>

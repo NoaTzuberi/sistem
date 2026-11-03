@@ -95,14 +95,19 @@ describe('dashboard password reset', () => {
     expect((await api.request('POST', '/auth/reset-password', { body: { token: 'not-a-token', password: NEW_PASSWORD } })).status).toBe(400);
   });
 
-  it('keeps the trainee flow as it was (app link, sessions kept)', async () => {
+  it('a trainee reset (app link) signs out every other session and signs her in fresh', async () => {
     const trainee = await createTestUser('trainee@example.com');
     await api.request('POST', '/auth/forgot-password', { body: { email: 'trainee@example.com', app: 'dashboard' } });
     expect(sent.dashboard).toHaveLength(0);
     expect(sent.trainee).toHaveLength(1);
     const token = tokenOf(sent.trainee[0]);
-    expect((await api.request('POST', '/auth/reset-password', { body: { token, password: NEW_PASSWORD } })).status).toBe(200);
-    expect((await api.request('GET', '/auth/me', { token: trainee.token })).status).toBe(200);
+    const reset = await api.request('POST', '/auth/reset-password', { body: { token, password: NEW_PASSWORD } });
+    expect(reset.status).toBe(200);
+    expect(reset.body.user.id).toBe(trainee.id);
+    expect(typeof reset.body.message).toBe('string');
+    // The old token (another device) stops; the fresh one works.
+    expect((await api.request('GET', '/auth/me', { token: trainee.token })).status).toBe(401);
+    expect((await api.request('GET', '/auth/me', { token: reset.body.token })).status).toBe(200);
   });
 
   it('the admin fallback makes a copyable reset link with the same rules', async () => {

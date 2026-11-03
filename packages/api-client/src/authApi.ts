@@ -4,6 +4,7 @@ import type {
   AuthUser,
   AvatarLinkResponse,
   AvatarResponse,
+  DeleteAccountPayload,
   LoginPayload,
   PrivatePhoto,
   RegisterPayload,
@@ -65,10 +66,23 @@ export function createAuthApi(client: AxiosInstance) {
     }
   }
 
-  async function resetPassword(token: string, password: string, confirmPassword?: string): Promise<string> {
+  /** Sets the new password; every other session is signed out and this device gets a fresh one. */
+  async function resetPassword(token: string, password: string, confirmPassword?: string): Promise<AuthResponse & { message: string }> {
     try {
-      const { data } = await client.post<{ message: string }>('/auth/reset-password', { token, password, confirmPassword });
-      return data.message;
+      const { data } = await client.post<AuthResponse & { message: string }>('/auth/reset-password', { token, password, confirmPassword });
+      return data;
+    } catch (error) {
+      throw toAuthApiError(error);
+    }
+  }
+
+  /**
+   * Deletes HER OWN account for good (the server reads the id from the token). Errors keep the
+   * server's code (e.g. 'account_coach_has_trainees', 'account_password_wrong').
+   */
+  async function deleteAccount(payload: DeleteAccountPayload): Promise<void> {
+    try {
+      await client.delete('/account', { data: payload });
     } catch (error) {
       throw toAuthApiError(error);
     }
@@ -123,6 +137,7 @@ export function createAuthApi(client: AxiosInstance) {
     setPassword,
     resetPassword,
     checkResetToken,
+    deleteAccount,
     updatePreferences,
     uploadAvatar,
     removeAvatar,

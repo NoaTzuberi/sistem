@@ -22,6 +22,7 @@ import {
 } from './auth.service';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { requestLanguage, sendError, translate } from '../../i18n';
+import { hashEmail, logSecurityEvent } from '../../middleware/securityLog';
 
 export async function register(req: Request, res: Response) {
   const validationError = validateRegisterInput(req.body);
@@ -56,9 +57,11 @@ export async function login(req: Request, res: Response) {
 
   try {
     const result = await loginUser(email, password);
+    logSecurityEvent('login_succeeded', req, { userId: result.user.id });
     res.status(200).json(result);
   } catch (error) {
     if (error instanceof InvalidCredentialsError) {
+      logSecurityEvent('login_failed', req, { emailHash: hashEmail(email) });
       sendError(res, 401, error.serverMessage);
       return;
     }
@@ -73,6 +76,7 @@ export async function forgotPassword(req: Request, res: Response) {
     return;
   }
 
+  logSecurityEvent('password_reset_requested', req, { emailHash: hashEmail(req.body.email) });
   await requestPasswordReset(req.body.email, parsePasswordResetApp(req.body.app));
   sendError(res, 200, 'reset_link_sent');
 }
@@ -93,8 +97,10 @@ export async function resetPassword(req: Request, res: Response) {
   const { token, password } = req.body;
 
   try {
-    await resetPasswordService(token, password);
-    sendError(res, 200, 'password_reset_done');
+    // Older sessions are signed out; she gets a fresh one here (AuthResponse + the done message).
+    const result = await resetPasswordService(token, password);
+    logSecurityEvent('password_reset_done', req, { userId: result.user.id });
+    res.status(200).json({ ...result, message: translate(requestLanguage(req), 'password_reset_done') });
   } catch (error) {
     if (error instanceof InvalidResetTokenError) {
       sendError(res, 400, error.serverMessage);
@@ -112,7 +118,9 @@ export async function setPassword(req: Request, res: Response) {
     return;
   }
   try {
-    res.status(200).json(await setPasswordWithToken(req.body.token, req.body.password));
+    const result = await setPasswordWithToken(req.body.token, req.body.password);
+    logSecurityEvent('set_password_done', req, { userId: result.user.id });
+    res.status(200).json(result);
   } catch (error) {
     if (error instanceof SetPasswordTokenError) {
       sendError(res, 400, error.serverMessage);
