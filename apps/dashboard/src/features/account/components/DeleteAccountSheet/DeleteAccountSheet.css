@@ -1,0 +1,103 @@
+.delete-account-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.delete-account-text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.delete-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-inline-start: var(--space-5);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+}
+
+.delete-account-label {
+  margin-block-start: var(--space-2);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.delete-account-input {
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--radius-field);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-base);
+}
+
+.delete-account-input:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.delete-account-error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+}
+
+.delete-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.delete-account-button {
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-4);
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--radius-round);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    opacity var(--transition-fast) ease;
+}
+
+.delete-account-confirm {
+  border-color: var(--color-primary-deep);
+  background-color: var(--color-primary-deep);
+  color: var(--on-pink);
+}
+
+.delete-account-button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.delete-account-button:not(:disabled):active {
+  transform: scale(var(--press-scale));
+}
+
+.delete-account-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .delete-account-button:not(.delete-account-confirm):not(:disabled):hover {
+    border-color: var(--color-primary-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-account-button {
+    transition: none;
+  }
+}
