@@ -1,0 +1,74 @@
+.meas-chips {
+  display: flex;
+  gap: var(--space-2);
+  /* Bleeds to the screen edges while scrolling, lined up with the content at rest. */
+  margin-inline: calc(-1 * var(--home-gutter));
+  padding-inline: var(--home-gutter);
+  padding-block: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.meas-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.meas-chip {
+  flex: none;
+  min-height: var(--size-meas-chip);
+  padding-inline: var(--space-4);
+  border: var(--border-width-thin) solid var(--color-meas-chip-border);
+  border-radius: var(--radius-meas-chip);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A 36px pill keeps a 44px hit area. */
+.meas-chip::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc((var(--size-meas-chip) - var(--touch-target-min)) / 2);
+}
+
+.meas-chip {
+  position: relative;
+}
+
+.meas-chip-selected {
+  border-color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.meas-chip:active {
+  transform: scale(var(--press-scale));
+}
+
+.meas-chip:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .meas-chip:not(.meas-chip-selected):hover {
+    background-color: var(--color-fill-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meas-chip {
+    transition: none;
+  }
+}

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import type { LengthUnit } from '@sistem/types';
 import { directionOf, fill, measurementLabel, roundOneDecimal, unitLabel, useCopy, useI18n } from '@sistem/shared';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
-import { ROUTES } from '../../../../app/config/routes';
+import { measurementsPath } from '../../../../app/config/routes';
 import { buildMiniChart } from '../../data/profileDisplay';
 import type { MeasurementRow } from '../../hooks/useMeasurements';
 import { profileCopy } from '../../copy';
@@ -56,7 +56,7 @@ export function MeasurementList({ rows, unit }: MeasurementListProps) {
             const spark = buildMiniChart(row.points, SPARK, rtl);
             return (
               <li key={row.id}>
-                <Link to={ROUTES.PROFILE_MEASUREMENTS} className={'pf-measure' + (COLORED.has(row.id) ? ` pf-measure-${row.id}` : '')}>
+                <Link to={measurementsPath(row.id)} className={'pf-measure' + (COLORED.has(row.id) ? ` pf-measure-${row.id}` : '')}>
                   <span className="pf-measure-bar" aria-hidden="true" />
                   <span className="pf-measure-text">
                     <span className="pf-measure-name">{measurementLabel(row.id, language)}</span>

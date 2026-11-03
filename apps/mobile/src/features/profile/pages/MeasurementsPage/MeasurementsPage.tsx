@@ -1,70 +1,71 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { measurementDays, measurementLabel, measurementPoints, useCopy, useLanguage } from '@sistem/shared';
 import { IconPlus } from '@tabler/icons-react';
+import { measurementLabel, useCopy, useLanguage } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
-import { Button } from '../../../../components/common/Button/Button';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { ROUTES, measurementsLogPath } from '../../../../app/config/routes';
-import { MeasurementHistory } from '../../../bodyTracking/components/MeasurementHistory/MeasurementHistory';
-import { MeasurementPicker } from '../../../bodyTracking/components/MeasurementPicker/MeasurementPicker';
-import { TrendChart } from '../../../bodyTracking/components/TrendChart/TrendChart';
 import { bodyCopy } from '../../../bodyTracking/copy';
-import { SubPageHeader } from '../../components/SubPageHeader/SubPageHeader';
-import { useMyBodyMetrics, useMyUnits } from '../../hooks/useMyBody';
+import { SubScreenHeader } from '../../components/SubScreenHeader/SubScreenHeader';
+import { MeasChips } from '../../components/MeasChips/MeasChips';
+import { MeasHero } from '../../components/MeasHero/MeasHero';
+import { MeasHistory } from '../../components/MeasHistory/MeasHistory';
+import { useMeasurementTrend } from '../../hooks/useMeasurementTrend';
 import './MeasurementsPage.css';
 
-// Body measurements over time (PRD §5.5): pick one for the chart; every day listed.
+/**
+ * Body measurements over time (PRD §5.5, direction B): the measurement chips, a hero card (latest value,
+ * change over the range, the chart) and every day as a card. Opens on `?m=<id>` (tapped on the Profile).
+ */
 export function MeasurementsPage() {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
   const navigate = useNavigate();
-  const { list, error, isLoading, reload } = useMyBodyMetrics();
-  const { units, today } = useMyUnits();
-  const [picked, setPicked] = useState<string | null>(null);
-  // The first measurement she has logged, until she picks one.
-  const firstLogged = list?.measurementIds.find((id) => measurementDays(list.items).some((day) => day.measurements[id] !== undefined));
-  const measurementId = picked ?? firstLogged ?? list?.measurementIds[0] ?? '';
+  const trend = useMeasurementTrend();
 
   return (
-    <AppShell>
-      <div className="measurements-page">
-        <SubPageHeader
+    <AppShell bleed>
+      <div className="meas-screen">
+        <SubScreenHeader
           title={copy.measurementsTitle}
           fallbackPath={ROUTES.PROFILE}
           action={
-            <Button
-              variant="secondary"
-              icon={<IconPlus size={18} aria-hidden="true" />}
-              aria-label={copy.logMeasurements}
-              onClick={() => navigate(measurementsLogPath())}
-            >
+            <button type="button" className="meas-log-pill" aria-label={copy.logMeasurements} onClick={() => navigate(measurementsLogPath())}>
+              <IconPlus size={16} stroke={3} aria-hidden="true" />
               {copy.logShort}
-            </Button>
+            </button>
           }
         />
 
-        {isLoading && !list && <StateMessage>{copy.loading}</StateMessage>}
-        {error && !list && <StateMessage onRetry={reload}>{error}</StateMessage>}
+        <div className="meas-content">
+          {trend.isLoading && !trend.list && <StateMessage>{copy.loading}</StateMessage>}
+          {trend.error && !trend.list && <StateMessage onRetry={trend.reload}>{trend.error}</StateMessage>}
 
-        {list && (
-          <>
-            <MeasurementPicker ids={list.measurementIds} value={measurementId} onChange={setPicked} />
-            <TrendChart
-              key={measurementId}
-              points={measurementPoints(list.items, measurementId, units.length)}
-              unit={units.length}
-              title={measurementLabel(measurementId, language)}
-              today={today}
-            />
-            <MeasurementHistory
-              metrics={list.items}
-              measurementIds={list.measurementIds}
-              unit={units.length}
-              onEdit={(metric) => navigate(measurementsLogPath(metric.date))}
-            />
-          </>
-        )}
+          {trend.list && (
+            <>
+              <MeasChips ids={trend.ids} value={trend.measurementId} onChange={trend.selectMeasurement} />
+              <MeasHero
+                title={measurementLabel(trend.measurementId, language)}
+                unit={trend.unit}
+                latest={trend.latest}
+                total={trend.total}
+                visible={trend.visible}
+                change={trend.change}
+                range={trend.range}
+                onRange={trend.selectRange}
+                tappedIndex={trend.tappedIndex}
+                onTap={trend.tap}
+                drawKey={`${trend.measurementId}-${trend.range}`}
+              />
+              <MeasHistory
+                days={trend.days}
+                ids={trend.ids}
+                unit={trend.unit}
+                selectedId={trend.measurementId}
+                onOpen={(day) => navigate(measurementsLogPath(day.date))}
+              />
+            </>
+          )}
+        </div>
       </div>
     </AppShell>
   );

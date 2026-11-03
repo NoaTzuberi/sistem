@@ -1,0 +1,129 @@
+.meas-chart {
+  position: relative;
+  width: 100%;
+  height: var(--size-meas-chart);
+}
+
+.meas-chart-svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meas-chart-svg:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.meas-chart-svg:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-check);
+}
+
+.meas-chart-grid {
+  stroke: var(--color-hairline);
+  stroke-width: 1;
+}
+
+.meas-chart-axis {
+  fill: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-meas-axis);
+}
+
+.meas-chart-area-top {
+  stop-color: var(--color-meas-area-top);
+}
+
+.meas-chart-area-bottom {
+  stop-color: var(--color-meas-area-bottom);
+}
+
+.meas-chart-line {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: var(--stroke-meas-line);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: meas-chart-draw var(--transition-meas-draw) var(--ease-out) both;
+}
+
+.meas-chart-area {
+  animation: meas-chart-fade var(--transition-meas-draw) var(--ease-out) both;
+}
+
+.meas-chart-crosshair {
+  stroke: var(--color-text-faint);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.meas-chart-dot {
+  fill: var(--color-primary);
+}
+
+/* The latest point: bigger, with a white ring. */
+.meas-chart-dot-latest,
+.meas-chart-dot-tapped {
+  stroke: var(--color-card);
+  stroke-width: 3;
+}
+
+.meas-chart-tip {
+  position: absolute;
+  /* physical: the chart is always drawn left → right, so the tip follows the point's x from the left */
+  left: var(--meas-tip-x);
+  top: var(--meas-tip-y);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - var(--space-3)));
+  pointer-events: none;
+}
+
+.meas-chart-tip-value {
+  font-weight: var(--font-weight-bold);
+}
+
+.meas-chart-tip-value bdi {
+  font-family: var(--font-num);
+}
+
+.meas-chart-tip-date {
+  color: var(--color-on-ink-muted);
+}
+
+@keyframes meas-chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes meas-chart-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meas-chart-line,
+  .meas-chart-area {
+    animation: none;
+  }
+}
