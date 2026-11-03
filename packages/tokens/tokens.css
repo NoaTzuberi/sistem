@@ -1159,6 +1159,32 @@
   --transition-profile-thumb: 320ms;   /* The segmented thumb's spring (on --ease-slide-snap) */
   --transition-profile-draw: 1s;       /* The weight line drawing itself */
 
+  /* Workout detail, workout log, interval timer (direction B, design group 1). */
+  --size-pill-button: 56px;            /* The full-width pill (components/common/PillButton) */
+  --radius-wk-hero: 28px;              /* The white hero card */
+  --radius-wk-card: 20px;              /* An exercise card */
+  --radius-wk-tile: 18px;              /* A stat tile */
+  --radius-wk-letter: 16px;            /* The workout's letter tile */
+  --space-wk-card: 14px;               /* An exercise card's padding */
+  --size-wk-letter: 56px;
+  --size-wk-set: 30px;                 /* A set's number circle (as in the player) */
+  --size-wk-done: 28px;                /* A done set's check */
+  --text-wk-name: 40px;                /* The workout name in the hero */
+  --text-wk-letter: 34px;
+  --text-wk-index: 20px;               /* 01, 02… (Barlow) */
+  --text-wk-exercise: 16px;
+  --text-wk-stat: 28px;                /* A stat tile's number (Barlow) */
+  --text-wk-stat-label: 12px;
+  --size-it-step: 44px;                /* The timer's round ± buttons */
+  --size-it-control: 56px;             /* Stop / pause / skip */
+  --size-it-ring: 264px;
+  --stroke-it-ring: 12px;
+  --text-it-setting: 32px;             /* A setting's value (Barlow) */
+  --text-it-clock: 88px;               /* The running clock (Barlow) */
+  --text-it-phase: 56px;               /* עבודה / מנוחה (Karantina) */
+  --surface-it-on-stage: color-mix(in srgb, var(--color-on-primary) 20%, transparent);   /* Round buttons + ring track on pink / ink */
+  --color-it-rest: var(--color-ink);   /* The rest phase's background (and its theme-color) */
+
   /* Body measurements screen ("מידות", direction B): chips, the hero card + chart, history cards. */
   --size-meas-action: 40px;            /* The "+ תיעוד" pill's drawn height (its hit area stays 44px) */
   --size-meas-chip: 36px;

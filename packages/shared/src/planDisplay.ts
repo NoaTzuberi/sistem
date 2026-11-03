@@ -35,11 +35,14 @@ function formatAmount(set: PlanSetTarget, language: Language): string {
   return set.repsMax !== undefined ? isolateLtr(`${set.reps}–${set.repsMax}`) : `${set.reps}`;
 }
 
-function formatExtras(set: PlanSetTarget, language: Language): string[] {
+/** How a rest time is written: '1 דק׳ 30 שנ׳' by default; the trainee's cards pass the player's short form (1′ / 45″). */
+export type RestFormat = (sec: number, language: Language) => string;
+
+function formatExtras(set: PlanSetTarget, language: Language, formatRest: RestFormat = formatDuration): string[] {
   const copy = sharedCopy[language];
   return [
     ...(set.targetWeight !== undefined ? [`${set.targetWeight} ${copy.units.kg}`] : []),
-    ...(set.restSec ? [fill(copy.plan.rest, { time: formatDuration(set.restSec, language) })] : []),
+    ...(set.restSec ? [fill(copy.plan.rest, { time: formatRest(set.restSec, language) })] : []),
   ];
 }
 
@@ -69,17 +72,17 @@ function isSameTarget(a: ResolvedPlanSet, b: ResolvedPlanSet): boolean {
  * otherwise one line per set ('1 · Warm-up · 10 · 20 kg'). 'sets × amount' is kept
  * left to right inside Hebrew text.
  */
-export function describeTargets(sets: ResolvedPlanSet[], language: Language): string[] {
+export function describeTargets(sets: ResolvedPlanSet[], language: Language, formatRest?: RestFormat): string[] {
   if (sets.length === 0) return [];
 
   const first = sets[0];
   if (first.type === 'working' && sets.every((set) => isSameTarget(set, first))) {
-    return [[timesAmount(sets.length, formatAmount(first, language)), ...formatExtras(first, language)].join(' · ')];
+    return [[timesAmount(sets.length, formatAmount(first, language)), ...formatExtras(first, language, formatRest)].join(' · ')];
   }
 
   const setTypes = sharedCopy[language].plan.setTypes;
   return sets.map((set) =>
-    [`${set.setIndex + 1}`, setTypes[set.type], formatAmount(set, language), ...formatExtras(set, language)].join(' · '),
+    [`${set.setIndex + 1}`, setTypes[set.type], formatAmount(set, language), ...formatExtras(set, language, formatRest)].join(' · '),
   );
 }
 

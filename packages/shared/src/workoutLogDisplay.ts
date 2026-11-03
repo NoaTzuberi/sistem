@@ -8,12 +8,17 @@ import { formatDuration } from './format';
 // Placeholder formats — the owner decides the final ones.
 
 /** '1 · 10 reps × 40 kg' — one performed set. */
-export function describeLogSet(set: WorkoutLogSet, language: Language): string {
+/** What one logged set was: '12 חזרות', '45 שנ׳', '10 חזרות × 20 ק״ג' (no number, no "not done"). */
+export function describeLogSetAmount(set: WorkoutLogSet, language: Language): string {
   const copy = sharedCopy[language];
   const amount =
     set.durationSec !== undefined ? formatDuration(set.durationSec, language) : fill(copy.log.reps, { reps: set.reps ?? '—' });
-  const performed = set.weight !== undefined ? `${amount} × ${set.weight} ${copy.units.kg}` : amount;
-  return `${set.setIndex + 1} · ${performed}${set.completed ? '' : ` · ${copy.log.notDone}`}`;
+  return set.weight !== undefined ? `${amount} × ${set.weight} ${copy.units.kg}` : amount;
+}
+
+export function describeLogSet(set: WorkoutLogSet, language: Language): string {
+  const copy = sharedCopy[language];
+  return `${set.setIndex + 1} · ${describeLogSetAmount(set, language)}${set.completed ? '' : ` · ${copy.log.notDone}`}`;
 }
 
 export interface LogExerciseGroup {

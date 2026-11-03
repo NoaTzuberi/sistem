@@ -9,14 +9,17 @@ import { useEffect } from 'react';
 export function useDocumentSurface(surface: string, themeColorToken: string) {
   useEffect(() => {
     const root = document.documentElement;
+    // An overlay (the interval timer over the workout player) puts back the screen's surface under it;
+    // on navigation the next screen's effect runs after this cleanup and sets its own anyway.
+    const previous = root.dataset.surface;
     root.dataset.surface = surface;
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
     meta.content = getComputedStyle(root).getPropertyValue(themeColorToken).trim();
     document.head.appendChild(meta);
     return () => {
-      // The next screen's effect runs after this cleanup and sets its own surface again.
-      delete root.dataset.surface;
+      if (previous === undefined) delete root.dataset.surface;
+      else root.dataset.surface = previous;
       meta.remove();
     };
   }, [surface, themeColorToken]);

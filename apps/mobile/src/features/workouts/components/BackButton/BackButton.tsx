@@ -9,7 +9,12 @@ import './BackButton.css';
 const FIRST_ENTRY_KEY = 'default';
 
 /** Back to where the trainee came from (Home or Workouts); Workouts when opened directly. */
-export function BackButton() {
+interface BackButtonProps {
+  /** 'disc' = the round white button of the direction-B screens (on the soft page surface). */
+  variant?: 'plain' | 'disc';
+}
+
+export function BackButton({ variant = 'plain' }: BackButtonProps = {}) {
   const copy = useCopy(workoutCopy);
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,8 +25,14 @@ export function BackButton() {
   }
 
   return (
-    <button className="back-button" type="button" onClick={goBack} aria-label={copy.list.back}>
-      <IconChevronLeft className="flip-rtl" size={24} aria-hidden="true" />
+    <button className={variant === 'disc' ? 'back-button back-button-disc' : 'back-button'} type="button" onClick={goBack} aria-label={copy.list.back}>
+      {variant === 'disc' ? (
+        <span className="back-button-face" aria-hidden="true">
+          <IconChevronLeft className="flip-rtl" size={20} />
+        </span>
+      ) : (
+        <IconChevronLeft className="flip-rtl" size={24} aria-hidden="true" />
+      )}
     </button>
   );
 }

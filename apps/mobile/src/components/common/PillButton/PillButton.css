@@ -1,0 +1,65 @@
+.pill-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--size-pill-button);
+  padding-inline: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-round);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) var(--ease-press),
+    opacity var(--transition-fast) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill-button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-profile-cta);
+}
+
+.pill-button-soft {
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+}
+
+.pill-button-icon {
+  display: flex;
+}
+
+.pill-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.pill-button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.pill-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill-button-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+
+  .pill-button-soft:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-button {
+    transition: none;
+  }
+}

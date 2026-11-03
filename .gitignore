@@ -37,3 +37,6 @@ AGENTS.md
 CLAUDE.md
 .agents/
 .claude/
+
+# Static design previews (local only)
+docs/design-preview/

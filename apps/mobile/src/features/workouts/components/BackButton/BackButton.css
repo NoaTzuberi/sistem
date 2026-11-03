@@ -11,3 +11,49 @@
 .back-button:active {
   background-color: var(--color-surface);
 }
+
+/* Direction B: a 40px white disc (the hit area stays 44px). */
+.back-button-disc {
+  margin-inline-start: calc((var(--touch-target-min) - var(--size-subscreen-back)) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back-button-disc:active {
+  background: none;
+}
+
+.back-button-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-subscreen-back);
+  height: var(--size-subscreen-back);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.back-button-disc:active .back-button-face {
+  transform: scale(var(--press-scale));
+}
+
+.back-button-disc:focus-visible {
+  outline: none;
+}
+
+.back-button-disc:focus-visible .back-button-face {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-button-face {
+    transition: none;
+  }
+}
