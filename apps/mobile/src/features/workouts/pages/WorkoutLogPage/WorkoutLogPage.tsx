@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { describeLogSet, formatDateTime, groupLogSetsByExercise, logExerciseNames, sharedCopy, useCopy, useLanguage, useLoad } from '@sistem/shared';
+import { IconCamera, IconPencil, IconPlus } from '@tabler/icons-react';
+import { formatDateTime, useCopy, useLanguage, useLoad } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
-import { Button } from '../../../../components/common/Button/Button';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { workoutSummaryPath } from '../../../../app/config/routes';
@@ -11,22 +12,21 @@ import { BackButton } from '../../components/BackButton/BackButton';
 import { PersonalRecordList } from '../../components/PersonalRecordList/PersonalRecordList';
 import { LogReactions } from '../../../messages/components/LogReactions/LogReactions';
 import { SummaryStats } from '../../components/SummaryStats/SummaryStats';
+import { WorkoutLogSets } from '../../components/WorkoutLogSets/WorkoutLogSets';
 import { workoutCopy } from '../../copy';
 import type { SummaryLocationState } from '../WorkoutSummaryPage/WorkoutSummaryPage';
 import { nameScript } from '../../data/weekPlanDisplay';
 import './WorkoutLogPage.css';
 
-// One workout log, read-only (PRD §5.4): what was performed, the summary and the Daily
-// Pump photo. The summary itself is changed on the summary screen.
+// One workout log, read-only (PRD §5.4, direction B): the hero card, the stats, the summary and the
+// Daily Pump photo, then what was performed. The summary itself is changed on the summary screen.
 export function WorkoutLogPage() {
   const language = useLanguage();
-  const shared = useCopy(sharedCopy);
   const copy = useCopy(workoutCopy);
   const { logId = '' } = useParams();
   const navigate = useNavigate();
   const load = useCallback(() => getWorkoutLog(logId), [logId]);
   const { data: log, error, isLoading, reload } = useLoad(load, copy.list.logLoadError);
-  const exerciseNames = log ? logExerciseNames(log) : new Map<string, string>();
   const hasFullSummary = log?.rating !== undefined && log?.notes !== undefined && log?.pumpPhoto !== null;
 
   function openSummary() {
@@ -35,37 +35,40 @@ export function WorkoutLogPage() {
   }
 
   return (
-    <AppShell>
-      <div className="workout-log-page">
-        <header className="workout-log-page-header">
-          <BackButton />
-          {log && (
-            <div className="workout-log-page-heading">
-              <h1 className="workout-log-page-title">
-                <bdi className="display-name" {...nameScript(log.workoutTitle)}>
-                  {log.workoutTitle}
-                </bdi>
-              </h1>
-              <span className="workout-log-page-date">{formatDateTime(log.finishedAt ?? log.startedAt, language)}</span>
-              <LogReactions logId={log.id} />
-            </div>
-          )}
-        </header>
+    <AppShell bleed>
+      <div className="wk-log">
+        <div className="wk-log-top">
+          <BackButton variant="disc" />
+        </div>
 
         {isLoading && !log && <StateMessage>{copy.list.loading}</StateMessage>}
         {error && !log && <StateMessage onRetry={reload}>{error}</StateMessage>}
 
         {log && (
           <>
+            <section className="wk-log-hero">
+              <span className="wk-log-date">{formatDateTime(log.finishedAt ?? log.startedAt, language)}</span>
+              <h1 className="wk-log-title">
+                <bdi className="display-name" {...nameScript(log.workoutTitle)}>
+                  {log.workoutTitle}
+                </bdi>
+              </h1>
+              <LogReactions logId={log.id} />
+            </section>
+
             {log.stats && <SummaryStats stats={log.stats} />}
             <PersonalRecordList log={log} title={copy.summary.personalRecords} />
 
             {log.rating !== undefined && (
-              <p className="workout-log-page-rating">
-                {copy.summary.rating}: {log.rating} / 5
+              <p className="wk-log-rating">
+                {copy.summary.rating}: <bdi dir="ltr">{log.rating} / 5</bdi>
               </p>
             )}
-            {log.notes && <p className="workout-log-page-notes" dir="auto">{log.notes}</p>}
+            {log.notes && (
+              <p className="wk-log-notes" dir="auto">
+                {log.notes}
+              </p>
+            )}
 
             {log.pumpPhoto ? (
               <PrivatePhoto
@@ -76,27 +79,21 @@ export function WorkoutLogPage() {
                 onLinkExpired={reload}
               />
             ) : (
-              <p className="workout-log-page-photo-slot">{copy.pumpPhoto.noPhoto}</p>
+              <p className="wk-log-photo-slot">
+                <span className="wk-log-photo-icon" aria-hidden="true">
+                  <IconCamera size={20} stroke={2} />
+                </span>
+                {copy.pumpPhoto.noPhoto}
+              </p>
             )}
 
             {log.status === 'completed' && (
-              <Button variant="secondary" onClick={openSummary}>
+              <PillButton variant="soft" className="wk-log-summary" icon={hasFullSummary ? <IconPencil size={18} /> : <IconPlus size={18} stroke={2.4} />} onClick={openSummary}>
                 {hasFullSummary ? copy.list.editSummary : copy.list.addSummary}
-              </Button>
+              </PillButton>
             )}
 
-            <ul className="workout-log-page-exercises">
-              {groupLogSetsByExercise(log.sets).map((group, index) => (
-                <li key={index} className="workout-log-page-exercise">
-                  <span className="workout-log-page-exercise-name"><bdi>{exerciseNames.get(group.exerciseId) ?? shared.log.exercise}</bdi></span>
-                  {group.sets.map((set) => (
-                    <span key={set.setIndex} className="workout-log-page-set">
-                      {describeLogSet(set, language)}
-                    </span>
-                  ))}
-                </li>
-              ))}
-            </ul>
+            <WorkoutLogSets log={log} />
           </>
         )}
       </div>
