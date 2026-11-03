@@ -43,7 +43,7 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** Scrolls a section into view and moves focus to it (the header's settings button, the coach chip). */
+/** Scrolls a section into view and moves focus to it (the coach chip). The gear opens the Settings screen. */
 function jumpTo(element: HTMLElement | null) {
   if (!element) return;
   element.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
@@ -78,7 +78,6 @@ export function ProfilePage() {
   const { coachings } = useActiveCoachings(profile.user?.coachingStatus != null);
   const coaching = coachings[0] ?? null;
   const coachRef = useRef<HTMLElement>(null);
-  const settingsRef = useRef<HTMLHeadingElement>(null);
 
   const weekOf = (date: string) => (profile.joinDate ? memberWeek(profile.joinDate, date) : 1);
   const describePhoto = (photo: ProfilePhoto) =>
@@ -127,7 +126,7 @@ export function ProfilePage() {
           isUploading={avatar.isUploading}
           onAvatarExpired={avatar.refreshExpired}
           onOpenPhoto={() => setPhotoSheetOpen(true)}
-          onOpenSettings={() => jumpTo(settingsRef.current)}
+          onOpenSettings={() => navigate(ROUTES.SETTINGS)}
           onOpenCoach={() => jumpTo(coachRef.current)}
         />
 
@@ -216,7 +215,7 @@ export function ProfilePage() {
               />
             )
           )}
-          <ProfileSettings ref={settingsRef} />
+          <ProfileSettings />
         </div>
 
         <MeasurementSheet
