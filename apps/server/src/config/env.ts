@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { parseClientOrigins } from './clientOrigins';
 import { parsePublicUrl } from './publicUrls';
+import { parseTrustProxy } from './trustProxy';
 
 // A setup script given --env-file already loaded that file instead (config/envFile.ts).
 if (!process.env.SISTEM_ENV_FILE) dotenv.config();
@@ -12,6 +13,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 export const config = {
   nodeEnv: NODE_ENV,
   port: Number(process.env.PORT) || DEFAULT_PORT,
+  // Proxy hops in front of the server (trustProxy.ts) — the client address for the rate limits.
+  trustProxy: parseTrustProxy(process.env.TRUST_PROXY),
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || DEFAULT_JWT_SECRET,
   voyageApiKey: process.env.VOYAGE_API_KEY || '',
