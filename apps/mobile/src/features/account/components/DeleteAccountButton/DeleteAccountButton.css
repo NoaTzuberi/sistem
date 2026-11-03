@@ -1,0 +1,35 @@
+.delete-account-entry {
+  align-self: center;
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--color-primary-deep);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.delete-account-entry:active {
+  transform: scale(var(--press-scale));
+}
+
+.delete-account-entry:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .delete-account-entry:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-account-entry {
+    transition: none;
+  }
+}

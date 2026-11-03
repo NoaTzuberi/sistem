@@ -12,6 +12,7 @@ import { SegmentedControl } from '../../components/SegmentedControl/SegmentedCon
 import { ModeSwitch } from '../../../coach/components/ModeSwitch/ModeSwitch';
 import { coachCopy } from '../../../coach/copy';
 import { LogoutSheet } from '../../components/LogoutSheet/LogoutSheet';
+import { DeleteAccountButton } from '../../../account/components/DeleteAccountButton/DeleteAccountButton';
 import { useLanguagePreference } from '../../hooks/useLanguagePreference';
 import { useUnitPreferences } from '../../hooks/useUnitPreferences';
 import { profileCopy } from '../../copy';
@@ -44,7 +45,7 @@ function SectionTitle({ eyebrow, id, children }: { eyebrow: string; id: string; 
 }
 
 /**
- * Settings (PRD §5.5, direction B): units, language, account (time zone), log out, the app version.
+ * Settings (PRD §5.5, direction B): units, language, account (time zone), log out, delete account, the app version.
  * Notification switches, personal details and privacy screens don't exist yet (push is Phase 5b) — not shown.
  */
 export function SettingsPage() {
@@ -151,6 +152,9 @@ export function SettingsPage() {
           <button type="button" className="st-logout" onClick={() => setConfirmLogout(true)}>
             {shared.common.logout}
           </button>
+
+          {/* Admin accounts can't be deleted from the app (the server refuses too). */}
+          {!user?.roles.includes('admin') && <DeleteAccountButton />}
 
           <p className="st-version">
             <Eyebrow keepInEnglish>{fill(copy.eyebrow.version, { version: __APP_VERSION__ })}</Eyebrow>

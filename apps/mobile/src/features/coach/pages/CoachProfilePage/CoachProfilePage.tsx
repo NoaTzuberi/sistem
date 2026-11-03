@@ -1,6 +1,7 @@
 import type { Language } from '@sistem/types';
 import { sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { LogoutButton } from '../../../../components/common/LogoutButton/LogoutButton';
+import { DeleteAccountButton } from '../../../account/components/DeleteAccountButton/DeleteAccountButton';
 import { LanguageSwitch } from '../../../../components/common/LanguageSwitch/LanguageSwitch';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { updatePreferences } from '../../../../services/users/usersService';
@@ -55,6 +56,7 @@ export function CoachProfilePage() {
       <DeskNote text={copy.desk} />
       <div className="coach-profile-logout">
         <LogoutButton />
+        {!user?.roles.includes('admin') && <DeleteAccountButton />}
       </div>
     </CoachScreen>
   );
