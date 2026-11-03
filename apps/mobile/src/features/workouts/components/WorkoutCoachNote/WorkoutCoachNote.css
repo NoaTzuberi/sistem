@@ -1,0 +1,42 @@
+.wk-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-wk-card);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--tint-pink);
+  color: var(--color-ink);
+}
+
+.wk-note-avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-qn-tile);
+  height: var(--size-qn-tile);
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.wk-note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wk-note-name {
+  font-size: var(--text-sm);
+}
+
+.wk-note-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}

@@ -1,68 +1,55 @@
-.workout-detail {
+/* Direction B: the soft page surface, white cards on it. */
+.wk-detail {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  min-height: 100dvh;
+  padding-block: calc(var(--space-3) + var(--safe-top)) var(--space-5);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
 }
 
-.workout-detail-header {
+.app-shell:has(.wk-detail) {
+  --dock-scrim-color: var(--color-subscreen-page);
+  background-color: var(--color-subscreen-page);
+}
+
+.wk-detail-top {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-1);
 }
 
-.workout-detail-heading {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  min-width: 0;
-  padding-top: var(--space-1);
-}
-
-.workout-detail-title {
-  line-height: var(--line-height-numeric);
-  margin: 0;
-  font-size: var(--text-preview-title);
-  overflow-wrap: anywhere;
-}
-
-.workout-detail-meta {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.workout-detail-status {
-  text-transform: none;
-}
-
-.workout-detail-notes {
-  margin: 0;
-  color: var(--color-text-muted);
-  overflow-wrap: anywhere;
-}
-
-.workout-detail-hint {
-  margin: 0;
-  padding: var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  background-color: var(--color-surface);
-}
-
-.workout-detail-log-link {
+.wk-detail-log-link {
   display: flex;
   align-items: center;
-  min-height: var(--touch-target-min);
+  justify-content: center;
+  min-height: var(--size-pill-button);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary-deep);
+  text-decoration: none;
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.workout-detail-log-link:active {
-  background-color: var(--color-surface);
+.wk-detail-log-link:active {
+  transform: scale(var(--press-scale));
 }
 
-.workout-detail-error {
+.wk-detail-hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.wk-detail-error {
   margin: 0;
   font-size: var(--text-sm);
   color: var(--color-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-detail-log-link {
+    transition: none;
+  }
 }

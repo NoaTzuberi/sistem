@@ -1,0 +1,89 @@
+.wk-ex-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wk-ex-card {
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+.wk-ex {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-wk-card);
+}
+
+.wk-ex-index {
+  flex: none;
+  min-width: var(--space-5);
+  font-family: var(--font-num);
+  font-size: var(--text-wk-index);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-faint);
+}
+
+.wk-ex-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.wk-ex-name {
+  font-size: var(--text-wk-exercise);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.wk-ex-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.wk-ex-notes {
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+/* A superset: one card, a thin pink line on the start side, rows split by a hairline. */
+.wk-ex-superset {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-block: var(--space-1);
+  overflow: hidden;
+}
+
+.wk-ex-superset::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--space-wk-card);
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+}
+
+.wk-ex-superset .wk-ex + .wk-ex {
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.wk-ex-chip {
+  align-self: flex-start;
+  margin: var(--space-2) var(--space-wk-card) 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
