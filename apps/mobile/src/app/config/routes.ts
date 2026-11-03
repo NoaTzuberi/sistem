@@ -154,6 +154,11 @@ export function onboardingEditPath(step: string): string {
   return `/onboarding/${step}`;
 }
 
+// The measurements screen, opened on one measurement (e.g. 'waist'); the first with data when none.
+export function measurementsPath(measurementId?: string): string {
+  return measurementId ? `${ROUTES.PROFILE_MEASUREMENTS}?m=${encodeURIComponent(measurementId)}` : ROUTES.PROFILE_MEASUREMENTS;
+}
+
 // One day of measurements / progress photos ('YYYY-MM-DD'); today when no date is given.
 export function measurementsLogPath(date?: string): string {
   return date ? `${ROUTES.PROFILE_MEASUREMENTS_LOG}?date=${date}` : ROUTES.PROFILE_MEASUREMENTS_LOG;

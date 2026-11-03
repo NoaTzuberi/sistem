@@ -1159,6 +1159,22 @@
   --transition-profile-thumb: 320ms;   /* The segmented thumb's spring (on --ease-slide-snap) */
   --transition-profile-draw: 1s;       /* The weight line drawing itself */
 
+  /* Body measurements screen ("מידות", direction B): chips, the hero card + chart, history cards. */
+  --size-meas-action: 40px;            /* The "+ תיעוד" pill's drawn height (its hit area stays 44px) */
+  --size-meas-chip: 36px;
+  --radius-meas-chip: 18px;
+  --radius-meas-hero: 24px;
+  --radius-meas-row: 18px;
+  --space-meas-row: 14px;              /* A history card's padding */
+  --text-meas-value: 56px;             /* The latest value (Barlow Condensed) */
+  --text-meas-axis: 12px;
+  --size-meas-chart: 180px;
+  --stroke-meas-line: 2.5px;
+  --color-meas-chip-border: var(--color-hairline);
+  --color-meas-area-top: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --color-meas-area-bottom: color-mix(in srgb, var(--color-primary) 0%, transparent);
+  --transition-meas-draw: 400ms;       /* The line drawing in on a range change (on --ease-out) */
+
   /* ═══ 14. Questionnaire + Settings (Profile sub-screens, direction B — like the Profile) ═════ */
   --color-subscreen-page: #f6f4f7;     /* The page surface under the white cards */
   --surface-subscreen-bar: color-mix(in srgb, var(--color-subscreen-page) 92%, transparent);  /* The sticky top bar */
