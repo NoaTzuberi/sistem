@@ -13,6 +13,7 @@ import { type ServerMessage, msg } from '../../i18n';
 const MIN_PAGE = 1;
 const MIN_LIMIT = 1;
 const MAX_LIMIT = 100;
+const MAX_SEARCH_LENGTH = 100;
 
 function isStringInSet(value: unknown, allowed: readonly string[]): boolean {
   return typeof value === 'string' && (allowed as readonly string[]).includes(value);
@@ -75,7 +76,8 @@ export function validateExerciseListQuery(query: unknown): ServerMessage | null 
     return msg('exercise_query_param_invalid', { param: 'isUnilateral' });
   }
 
-  if (params.search !== undefined && typeof params.search !== 'string') {
+  // The list is public and scored in memory per request: a cap keeps one request cheap.
+  if (params.search !== undefined && (typeof params.search !== 'string' || params.search.length > MAX_SEARCH_LENGTH)) {
     return msg('exercise_query_param_invalid', { param: 'search' });
   }
 

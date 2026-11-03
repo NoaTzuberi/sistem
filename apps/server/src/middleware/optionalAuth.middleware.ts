@@ -8,7 +8,7 @@ export function optionalAuth(req: AuthenticatedRequest, _res: Response, next: Ne
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
     try {
-      req.userId = (jwt.verify(header.slice('Bearer '.length), config.jwtSecret) as { sub: string }).sub;
+      req.userId = (jwt.verify(header.slice('Bearer '.length), config.jwtSecret, { algorithms: ['HS256'] }) as { sub: string }).sub;
     } catch {
       // A stale token on a public page: treat as signed out.
     }
