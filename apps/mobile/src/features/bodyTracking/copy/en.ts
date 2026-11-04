@@ -1,4 +1,4 @@
-import type { CopyShape } from '@sistem/shared';
+import { type CopyShape, plural } from '@sistem/shared';
 import type { he } from './he';
 
 export const en: CopyShape<typeof he> = {
@@ -79,5 +79,11 @@ export const en: CopyShape<typeof he> = {
   comparePose: 'Pose',
   before: 'Before',
   after: 'After',
-  compareEmpty: 'Add photos of this pose on two different days to compare them.',
+  compareEmpty: 'You need at least 2 photos of the same pose to compare',
+  compareAdd: 'Add a photo',
+  compareMode: 'View',
+  compareSide: 'Side by side',
+  compareSlide: 'Slider',
+  compareDays: plural({ one: '1 day', two: '2 days', other: '{count} days' }),
+  compareDate: '{side}: {date}',
 };

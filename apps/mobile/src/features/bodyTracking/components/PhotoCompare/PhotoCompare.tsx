@@ -1,8 +1,14 @@
-import { useState } from 'react';
-import type { BodyMetric, ProgressPhotoPose, WeightUnit } from '@sistem/types';
-import { fill, formatDateOnly, formatDateShort, formatWeight, photoDatesForPose, photoForPose, poseLabel, PROGRESS_PHOTO_POSES, useCopy, useLanguage } from '@sistem/shared';
+import type { BodyMetric, WeightUnit } from '@sistem/types';
+import { IconChevronDown, IconColumns2, IconPlus } from '@tabler/icons-react';
+import { directionOf, fill, formatDateOnly, formatDateShort, formatPlural, formatWeight, poseLabel, PROGRESS_PHOTO_POSES, useCopy, useLanguage } from '@sistem/shared';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
-import { Select } from '../../../../components/common/Select/Select';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { SegmentedControl } from '../../../profile/components/SegmentedControl/SegmentedControl';
+import { PhotoCompareFrame } from '../../../profile/components/PhotoCompareFrame/PhotoCompareFrame';
+import { usePhotoCompare } from '../../../profile/hooks/usePhotoCompare';
+import type { ProfilePhoto } from '../../../profile/hooks/usePhotoCompare';
+import { usePhotoComparison } from '../../hooks/usePhotoComparison';
+import type { CompareMode } from '../../hooks/usePhotoComparison';
 import { bodyCopy } from '../../copy';
 import './PhotoCompare.css';
 
@@ -10,83 +16,125 @@ interface PhotoCompareProps {
   metrics: BodyMetric[];
   weightUnit: WeightUnit;
   onLinkExpired: () => void;
-}
-
-interface Choice {
-  before: string;
-  after: string;
-}
-
-/** First and latest day of a pose: the default before / after. */
-function defaultChoice(dates: string[]): Choice {
-  return { before: dates[0] ?? '', after: dates[dates.length - 1] ?? '' };
+  /** Her own screen: the empty state offers "הוספת תמונה" (the coach's read-only view passes nothing). */
+  onAdd?: () => void;
 }
 
 /**
- * Side by side: one pose on two days (owner decision — a slider overlay is backlog).
- * Opens on the first and the latest day; each side can pick any day that has a photo of
- * that pose. The weight of that day is shown under it when she logged one.
+ * One pose on two days (direction B): pose chips, the two days as soft pills, the days between them, and the
+ * photos side by side or in the slider (the Profile's before / after frame). Photos are signed links only.
  */
-export function PhotoCompare({ metrics, weightUnit, onLinkExpired }: PhotoCompareProps) {
+export function PhotoCompare({ metrics, weightUnit, onLinkExpired, onAdd }: PhotoCompareProps) {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
-  const [pose, setPose] = useState<ProgressPhotoPose>('front');
-  const dates = photoDatesForPose(metrics, pose);
-  const [choice, setChoice] = useState<Choice>(() => defaultChoice(dates));
-  // A pick that no longer has a photo (another pose, a removed photo) falls back to the default.
-  const before = dates.includes(choice.before) ? choice.before : defaultChoice(dates).before;
-  const after = dates.includes(choice.after) ? choice.after : defaultChoice(dates).after;
-  const options = dates.map((date) => ({ value: date, label: formatDateShort(date, language) }));
+  const compare = usePhotoComparison(metrics);
+  const { before, after } = compare;
+  const options = compare.dates.map((date) => ({ value: date, label: formatDateShort(date, language) }));
+  const toFrame = (side: typeof before): ProfilePhoto[] =>
+    side.photo ? [{ key: `pose:${side.date}:${compare.pose}`, date: side.date, kind: 'pose', pose: compare.pose, photo: side.photo }] : [];
+  const slider = usePhotoCompare([...toFrame(before), ...toFrame(after)], directionOf(language) === 'rtl');
+  const alt = (date: string) => fill(copy.photoAlt, { pose: poseLabel(compare.pose, language), date: formatDateOnly(date, language) });
 
-  function changePose(next: ProgressPhotoPose) {
-    setPose(next);
-    setChoice(defaultChoice(photoDatesForPose(metrics, next)));
+  function datePill(label: string, side: typeof before, onChange: (date: string) => void) {
+    return (
+      <label className="pc-date">
+        <span className="pc-date-text">{fill(copy.compareDate, { side: label, date: formatDateShort(side.date, language) })}</span>
+        <IconChevronDown size={16} aria-hidden="true" />
+        {/* The native list opens the phone's picker; the pill shows the choice. */}
+        <select className="pc-date-select" aria-label={label} value={side.date} onChange={(event) => onChange(event.target.value)}>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
   }
 
-  function side(label: string, date: string, onChange: (date: string) => void) {
-    const metric = metrics.find((item) => item.date === date);
-    const photo = photoForPose(metric, pose);
+  function sidePhoto(label: string, side: typeof before) {
     return (
-      <div className="photo-compare-side">
-        {photo && (
+      <div className="pc-photo">
+        {side.photo && (
           <PrivatePhoto
-            photo={photo}
+            photo={side.photo}
             thumbnail
-            alt={fill(copy.photoAlt, { pose: poseLabel(pose, language), date: formatDateOnly(date, language) })}
-            openLabel={fill(copy.openPhoto, { pose: poseLabel(pose, language) })}
+            alt={alt(side.date)}
+            openLabel={fill(copy.openPhoto, { pose: poseLabel(compare.pose, language) })}
             closeLabel={copy.close}
             onLinkExpired={onLinkExpired}
           />
         )}
-        <Select label={label} options={options} value={date} onChange={(event) => onChange(event.target.value)} />
-        {metric?.weight !== undefined && <span className="photo-compare-weight">{formatWeight(metric.weight, weightUnit, language)}</span>}
+        <span className="pc-tag pc-tag-side">{label}</span>
+        {side.metric?.weight !== undefined && <span className="pc-tag pc-tag-weight">{formatWeight(side.metric.weight, weightUnit, language)}</span>}
       </div>
     );
   }
 
   return (
-    <div className="photo-compare">
-      <div className="photo-compare-poses" role="group" aria-label={copy.comparePose}>
+    <div className="pc">
+      <div className="pc-chips" role="group" aria-label={copy.comparePose}>
         {PROGRESS_PHOTO_POSES.map((option) => (
           <button
             key={option}
             type="button"
-            className={'photo-compare-pose' + (option === pose ? ' photo-compare-pose-active' : '')}
-            aria-pressed={option === pose}
-            onClick={() => changePose(option)}
+            className={option === compare.pose ? 'pc-chip pc-chip-selected' : 'pc-chip'}
+            aria-pressed={option === compare.pose}
+            onClick={() => compare.changePose(option)}
           >
             {poseLabel(option, language)}
           </button>
         ))}
       </div>
 
-      {dates.length < 2 ? (
-        <p className="photo-compare-empty">{copy.compareEmpty}</p>
-      ) : (
-        <div className="photo-compare-sides">
-          {side(copy.before, before, (date) => setChoice({ before: date, after }))}
-          {side(copy.after, after, (date) => setChoice({ before, after: date }))}
+      {!compare.canCompare ? (
+        <div className="pc-empty">
+          <span className="pc-empty-icon" aria-hidden="true">
+            <IconColumns2 size={26} />
+          </span>
+          <p className="pc-empty-text">{copy.compareEmpty}</p>
+          {onAdd && (
+            <PillButton className="pc-empty-add" icon={<IconPlus size={16} stroke={2.6} />} onClick={onAdd}>
+              {copy.compareAdd}
+            </PillButton>
+          )}
         </div>
+      ) : (
+        <>
+          <div className="pc-dates">
+            {datePill(copy.before, before, compare.setBefore)}
+            {datePill(copy.after, after, compare.setAfter)}
+          </div>
+          <div className="pc-meta">
+            <span className="pc-days">{formatPlural(language, copy.compareDays, compare.daysBetween)}</span>
+          </div>
+          <SegmentedControl<CompareMode>
+            block
+            label={copy.compareMode}
+            options={[
+              { value: 'side', label: copy.compareSide },
+              { value: 'slide', label: copy.compareSlide },
+            ]}
+            value={compare.mode}
+            onChange={compare.setMode}
+          />
+          {compare.mode === 'side' ? (
+            <div className="pc-pair">
+              {sidePhoto(copy.before, before)}
+              {sidePhoto(copy.after, after)}
+            </div>
+          ) : (
+            <div className="pc-frame">
+              <PhotoCompareFrame
+                compare={slider}
+                weekOf={() => 1}
+                onLinkExpired={onLinkExpired}
+                describe={() => poseLabel(compare.pose, language)}
+                labels={{ before: copy.before, after: copy.after }}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

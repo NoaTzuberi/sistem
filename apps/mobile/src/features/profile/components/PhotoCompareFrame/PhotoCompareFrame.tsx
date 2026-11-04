@@ -15,10 +15,12 @@ interface PhotoCompareFrameProps {
   /** The signed links last an hour: called once per link that fails, to fetch fresh ones. */
   onLinkExpired: () => void;
   describe: (photo: ProfilePhoto) => string;
+  /** Other side labels (the compare screen: לפני / אחרי); then no week codes. */
+  labels?: { before: string; after: string };
 }
 
 /** Before (her first photo) / after (the latest, or the one picked) with a draggable divider. */
-export function PhotoCompareFrame({ compare, weekOf, onLinkExpired, describe }: PhotoCompareFrameProps) {
+export function PhotoCompareFrame({ compare, weekOf, onLinkExpired, describe, labels }: PhotoCompareFrameProps) {
   const copy = useCopy(profileCopy);
   const language = useLanguage();
   const [failedUrls, setFailedUrls] = useState<string[]>([]);
@@ -45,12 +47,12 @@ export function PhotoCompareFrame({ compare, weekOf, onLinkExpired, describe }: 
       </div>
 
       <span className="pf-compare-label pf-compare-label-start">
-        {copy.compareStart}
-        <code aria-hidden="true">{fill(copy.eyebrow.week, { week: padWeek(weekOf(before.date)) })}</code>
+        {labels ? labels.before : copy.compareStart}
+        {!labels && <code aria-hidden="true">{fill(copy.eyebrow.week, { week: padWeek(weekOf(before.date)) })}</code>}
       </span>
       <span className="pf-compare-label pf-compare-label-end">
-        {compare.isLatest ? copy.compareNow : copy.compareChosen}
-        <code aria-hidden="true">{fill(copy.eyebrow.week, { week: padWeek(weekOf(after.date)) })}</code>
+        {labels ? labels.after : compare.isLatest ? copy.compareNow : copy.compareChosen}
+        {!labels && <code aria-hidden="true">{fill(copy.eyebrow.week, { week: padWeek(weekOf(after.date)) })}</code>}
       </span>
 
       <div className="pf-compare-divider">

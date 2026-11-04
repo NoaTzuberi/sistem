@@ -1,5 +1,7 @@
 // Body tracking (Phase 10, PRD §5.5), shared by her Profile screens and the coach's Body tab.
 // DRAFT Hebrew of the English placeholders (phase-15 report).
+import { plural } from '@sistem/shared';
+
 export const he = {
   loading: 'טוען…',
   loadError: 'לא הצלחנו לטעון את מעקב הגוף שלך.',
@@ -78,5 +80,11 @@ export const he = {
   comparePose: 'תנוחה',
   before: 'לפני',
   after: 'אחרי',
-  compareEmpty: 'הוסיפי תמונות של התנוחה הזו בשני ימים שונים כדי להשוות ביניהן.',
+  compareEmpty: 'צריך לפחות 2 תמונות מאותה תנוחה כדי להשוות', // owner, 2026-11-04
+  compareAdd: 'הוספת תמונה', // owner, 2026-11-04
+  compareMode: 'תצוגה', // DRAFT (screen readers only)
+  compareSide: 'זה לצד זה', // owner, 2026-11-04
+  compareSlide: 'החלקה', // owner, 2026-11-04
+  compareDays: plural({ one: 'יום אחד', two: 'יומיים', other: '{count} ימים' }), // DRAFT
+  compareDate: '{side}: {date}',
 } as const;

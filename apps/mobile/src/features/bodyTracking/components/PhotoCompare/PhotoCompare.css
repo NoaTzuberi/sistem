@@ -1,61 +1,184 @@
-.photo-compare {
+.pc {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.photo-compare-poses {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: var(--border-width-thin) solid var(--color-border);
+/* Pose chips: white with a soft border, the chosen one solid ink. */
+.pc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.photo-compare-pose {
-  min-height: var(--touch-target-min);
-  border: 0;
-  border-inline-start: var(--border-width-thin) solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text);
+.pc-chip {
+  min-height: var(--size-meas-chip);
+  padding-inline: var(--space-4);
+  border: var(--border-width-thin) solid var(--color-meas-chip-border);
+  border-radius: var(--radius-meas-chip);
+  background-color: var(--color-card);
+  color: var(--color-ink);
   font: inherit;
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.photo-compare-pose:first-child {
-  border-inline-start: 0;
+.pc-chip-selected {
+  border-color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
 }
 
-.photo-compare-pose:active {
-  background: var(--color-surface);
+.pc-chip:active {
+  transform: scale(var(--press-scale));
 }
 
-.photo-compare-pose-active,
-.photo-compare-pose-active:active {
-  background: var(--color-primary-deep);
-  color: var(--color-on-primary);
-}
-
-.photo-compare-sides {
+.pc-dates {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
-.photo-compare-side {
+/* A day: a soft pill, the native select over it (transparent) opens the picker. */
+.pc-date {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.photo-compare-weight {
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
 }
 
-.photo-compare-empty {
-  margin: 0;
+.pc-date:active {
+  transform: scale(var(--press-scale));
+}
+
+.pc-date:focus-within {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.pc-date-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pc-date-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pc-meta {
+  display: flex;
+  justify-content: center;
+}
+
+.pc-days {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-round);
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  font-weight: var(--font-weight-bold);
+}
+
+.pc-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.pc-photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-fill-soft);
+  overflow: hidden;
+}
+
+.pc-photo > :first-child,
+.pc-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pc-tag {
+  position: absolute;
+  inset-block-end: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--surface-profile-photo-label);
+  color: var(--color-ink);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+}
+
+.pc-tag-side {
+  inset-inline-start: var(--space-2);
+}
+
+.pc-tag-weight {
+  inset-inline-end: var(--space-2);
+}
+
+.pc-frame {
+  border-radius: var(--radius-wk-card);
+  overflow: hidden;
+}
+
+.pc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-meas-hero);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  text-align: center;
+}
+
+.pc-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-confirm-icon);
+  height: var(--size-confirm-icon);
+  border-radius: var(--radius-confirm-icon);
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
+}
+
+.pc-empty-text {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.pc-empty-add {
+  width: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-chip,
+  .pc-date {
+    transition: none;
+  }
 }
