@@ -1159,6 +1159,34 @@
   --transition-profile-thumb: 320ms;   /* The segmented thumb's spring (on --ease-slide-snap) */
   --transition-profile-draw: 1s;       /* The weight line drawing itself */
 
+  /* Her own run builder (cardio/OwnCardioBuilderPage, redesign 2026-11-03). */
+  --text-cb-total: 40px;               /* The total in the summary (Barlow) */
+  --size-cb-fact: 26px;                /* A summary chip */
+  --size-cb-chart: 76px;               /* The profile chart */
+  --size-cb-row: 60px;                 /* A collapsed block row */
+  --size-cb-icon: 36px;                /* Drag handle / ⋯ (the hit area stays 44px) */
+  --width-cb-stripe: 4px;              /* A block's zone stripe */
+  --transition-cb-expand: 240ms;       /* A block opening / closing; a chart bar's width (on --ease-out) */
+
+  /* The confirm sheet (components/common/ConfirmSheet, direction B). */
+  --radius-confirm-sheet: 28px;
+  --space-confirm-sheet: 22px;
+  --size-confirm-handle-width: 36px;
+  --color-confirm-handle: #e4e0e6;
+  --color-confirm-scrim: color-mix(in srgb, var(--color-ink) 40%, transparent);
+  --size-confirm-close: 36px;
+  --size-confirm-icon: 48px;
+  --radius-confirm-icon: 16px;
+  --text-confirm-title: 30px;          /* Karantina */
+  --text-confirm-body: 15px;
+  --size-confirm-button: 54px;
+
+  /* Log measurements (profile/MeasurementsLogPage, direction B). */
+  --size-ml-input: 52px;
+  --size-ml-input-width: 88px;
+  --radius-ml-input: 14px;
+  --text-ml-input: 24px;               /* The typed number (Barlow) */
+
   /* Workout detail, workout log, interval timer (direction B, design group 1). */
   --size-pill-button: 56px;            /* The full-width pill (components/common/PillButton) */
   --radius-wk-hero: 28px;              /* The white hero card */

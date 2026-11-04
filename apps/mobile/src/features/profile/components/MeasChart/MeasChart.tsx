@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { CSSProperties } from 'react';
-import type { LengthUnit } from '@sistem/types';
+import type { LengthUnit, WeightUnit } from '@sistem/types';
 import { formatChartDate, formatNumber, unitLabel, useLanguage } from '@sistem/shared';
 import type { ChartPoint } from '@sistem/shared';
 import { MEAS_CHART_HEIGHT, useMeasChart } from '../../hooks/useMeasChart';
@@ -8,7 +8,7 @@ import './MeasChart.css';
 
 interface MeasChartProps {
   points: ChartPoint[];
-  unit: LengthUnit;
+  unit: LengthUnit | WeightUnit;
   ariaLabel: string;
   tappedIndex: number | null;
   onTap: (index: number | null) => void;

@@ -1,4 +1,4 @@
-import type { LengthUnit } from '@sistem/types';
+import type { LengthUnit, WeightUnit } from '@sistem/types';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import { CHART_RANGES, chartRangeLabel, fill, formatChartDate, formatDateOnly, formatNumber, roundOneDecimal, unitLabel, useCopy, useLanguage } from '@sistem/shared';
 import type { ChartPoint, ChartRange } from '@sistem/shared';
@@ -9,7 +9,7 @@ import './MeasHero.css';
 
 interface MeasHeroProps {
   title: string;
-  unit: LengthUnit;
+  unit: LengthUnit | WeightUnit;
   latest: ChartPoint | null;
   total: number;
   visible: ChartPoint[];
@@ -19,10 +19,12 @@ interface MeasHeroProps {
   tappedIndex: number | null;
   onTap: (index: number | null) => void;
   drawKey: string;
+  /** The line when there is nothing yet (default: no measurements). */
+  emptyText?: string;
 }
 
 /** The change pill: down = cherry tint + down arrow, up = soft grey + up arrow. No judgment words. */
-function ChangePill({ change, unit }: { change: number; unit: LengthUnit }) {
+function ChangePill({ change, unit }: { change: number; unit: LengthUnit | WeightUnit }) {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
   const rounded = roundOneDecimal(change);
@@ -44,14 +46,14 @@ function ChangePill({ change, unit }: { change: number; unit: LengthUnit }) {
 }
 
 /** The white hero card: the latest value, its date, the change over the range, the range control, the chart. */
-export function MeasHero({ title, unit, latest, total, visible, change, range, onRange, tappedIndex, onTap, drawKey }: MeasHeroProps) {
+export function MeasHero({ title, unit, latest, total, visible, change, range, onRange, tappedIndex, onTap, drawKey, emptyText }: MeasHeroProps) {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
 
   if (!latest) {
     return (
       <section className="meas-hero" aria-label={title}>
-        <p className="meas-hero-note">{copy.noMeasurements}</p>
+        <p className="meas-hero-note">{emptyText ?? copy.noMeasurements}</p>
       </section>
     );
   }

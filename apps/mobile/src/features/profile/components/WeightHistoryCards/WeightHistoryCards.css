@@ -1,0 +1,103 @@
+.wt-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.wt-history-title {
+  margin: 0;
+  font-size: var(--text-qn-section);
+  color: var(--color-ink);
+}
+
+.wt-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wt-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-meas-row);
+  border: 0;
+  border-radius: var(--radius-meas-row);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wt-row:active {
+  transform: scale(var(--press-scale));
+}
+
+.wt-row:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.wt-row-date {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+/* The change since the weigh-in before: down = Cherry on its tint, up = soft grey (never good / bad). */
+.wt-row-change {
+  flex: none;
+  min-width: var(--space-6);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.wt-row-change-down {
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
+}
+
+.wt-row-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  flex: none;
+}
+
+.wt-row-value bdi {
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.wt-row-value small {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.wt-row-chevron {
+  flex: none;
+  color: var(--color-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wt-row {
+    transition: none;
+  }
+}

@@ -1,5 +1,75 @@
-.weight-page {
+/* "משקל" (direction B): the soft page surface, white cards — the measurements screen's layout. */
+.wt-screen {
+  min-height: 100dvh;
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.app-shell:has(.wt-screen) {
+  --dock-scrim-color: var(--color-subscreen-page);
+}
+
+.wt-content {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  width: 100%;
+  max-width: var(--app-column-max);
+  margin-inline: auto;
+  padding-block: var(--space-2) var(--space-6);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+}
+
+.wt-log-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-meas-action);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-profile-cta);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A 40px pill keeps a 44px hit area. */
+.wt-log-pill::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc((var(--size-meas-action) - var(--touch-target-min)) / 2);
+}
+
+.wt-log-pill:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.wt-log-pill:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+.wt-log-pill:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wt-log-pill:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wt-log-pill {
+    transition: none;
+  }
 }
