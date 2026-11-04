@@ -50,8 +50,11 @@ services:
         value: "https://noatzuberi.github.io/sistem/#"
       - key: EMAIL_FROM
         sync: false
-      - key: DEFAULT_COACH_EMAIL
+      # The admin account's email: that user gets the admin role at server start (empty = none).
+      - key: ADMIN_EMAIL
         sync: false
+      - key: MULTI_COACH_ENABLED
+        value: "false"
       - key: FEATURE_NUTRITION_RECIPES
         value: "false"
       - key: FEATURE_WATER_TRACKING

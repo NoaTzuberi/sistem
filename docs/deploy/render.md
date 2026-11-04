@@ -35,7 +35,7 @@ Type these in Render's dashboard (the service → **Environment**). Never paste 
 | `JWT_SECRET` | yes | A long random value. Make one with `openssl rand -base64 48`. The server refuses to start in production without it. |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | for photos | Cloudinary → Settings → API Keys. Without them the server runs, but Daily Pump / progress / meal photos fail. |
 | `RESEND_API_KEY`, `EMAIL_FROM` | optional | Password-reset email (backlog). Empty = no email is sent. |
-| `DEFAULT_COACH_EMAIL` | optional | The coach new sign-ups are assigned to. Empty = the only coach, when there is exactly one. |
+| `ADMIN_EMAIL` | yes (once) | The admin's email: that account gets the admin role at server start. The admin creates the coaches. |
 | `GEMINI_API_KEY`, `VOYAGE_API_KEY` | not now | The AI drafts are **off** in production (see below), so these are not read. |
 
 If Render does not accept an empty value for an optional key, delete that key in the dashboard —
@@ -61,6 +61,7 @@ Already set by `render.yaml` (nothing to type):
 - `AI_PAID_TIER=false` — the server never calls the AI in production until this is `true`, and it
   must stay `false` while the provider is Gemini's free tier (PRD §14: no real trainee data there).
 - `FEATURE_NUTRITION_RECIPES=false`, `FEATURE_WATER_TRACKING=false`
+- `MULTI_COACH_ENABLED=false` — one live coach per trainee.
 - `TRUST_PROXY=1` — how many proxies sit in front of the server (Render has one). Without it every
   visitor looks like Render's proxy, so the login / sign-up rate limits are shared by everyone and one
   person can lock all users out. Never higher than the real hop count: a higher number lets a client
