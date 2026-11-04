@@ -60,7 +60,9 @@ export async function getMyBodyMetrics(req: AuthenticatedRequest, res: Response)
 export const putMyBodyMetric = withDate(async (req, res, date) => {
   const parsed = parseSaveBodyMetricPayload(req.body);
   if (parsed.error !== undefined) {
-    sendError(res, 400, parsed.error);
+    // A measurement's own error names it (`field`), so the form can show it under that row.
+    const field = parsed.error.params?.id;
+    sendError(res, 400, parsed.error, typeof field === 'string' ? { field } : {});
     return;
   }
   await sendSavedDay(res, req.userId!, await saveBodyMetric(req.userId!, date, parsed.value));

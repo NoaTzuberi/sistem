@@ -146,6 +146,13 @@ describe('body tracking (/api/body-metrics)', () => {
       expect(await BodyMetric.countDocuments()).toBe(0);
     });
 
+    it('a measurement out of range names it (field), so the form can show the message under that row', async () => {
+      const res = await save(today, { measurements: { waist: 2 } });
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({ code: 'body_measurement_range', field: 'waist' });
+      expect((await save(today, { weight: 500 })).body.field).toBeUndefined();
+    });
+
     it('"today" is her own time zone', async () => {
       // Kiritimati is UTC+14: its today can be our tomorrow.
       const far = await createTestUser('far@example.com', { timezone: 'Pacific/Kiritimati' });

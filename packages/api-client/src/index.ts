@@ -1,4 +1,4 @@
-export { createApiClient, extractErrorMessage } from './createApiClient';
+export { createApiClient, extractErrorField, extractErrorMessage } from './createApiClient';
 export type { ApiClientOptions } from './createApiClient';
 export { createAuthApi, AuthApiError } from './authApi';
 export type { AuthApi } from './authApi';

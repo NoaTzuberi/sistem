@@ -65,6 +65,12 @@ export function createApiClient({ baseURL, getToken, onUnauthorized, getLanguage
 }
 
 /** The server's message (already in the language on screen), else `fallback` (e.g. no connection). */
+/** The field an error is about, when the server names one (e.g. a body measurement's id). */
+export function extractErrorField(error: unknown): string | null {
+  const field: unknown = axios.isAxiosError(error) ? error.response?.data?.field : undefined;
+  return typeof field === 'string' ? field : null;
+}
+
 export function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error) && typeof error.response?.data?.message === 'string') {
     return error.response.data.message;
