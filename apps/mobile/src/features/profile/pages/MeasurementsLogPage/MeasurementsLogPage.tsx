@@ -1,154 +1,127 @@
 import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import type { BodyMetric } from '@sistem/types';
-import { extractErrorMessage } from '@sistem/api-client';
-import { fill, formatLength, latestMeasurements, measurementLabel, parseDecimalInput, toCm, toDisplayLength, useCopy, useLanguage } from '@sistem/shared';
+import { IconCalendar, IconTrash } from '@tabler/icons-react';
+import { fill, formatDateOnly, formatLength, formatNumber, measurementLabel, toDisplayLength, unitLabel, useCopy, useLanguage } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
-import { Button } from '../../../../components/common/Button/Button';
-import { Input } from '../../../../components/common/Input/Input';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { ROUTES } from '../../../../app/config/routes';
-import { saveBodyMetric } from '../../../../services/bodyMetrics/bodyMetricsService';
-import { celebrate } from '../../../achievements/celebration';
 import { bodyCopy } from '../../../bodyTracking/copy';
-import { SubPageHeader } from '../../components/SubPageHeader/SubPageHeader';
-import { useGoBack } from '../../hooks/useGoBack';
-import { useMyBodyMetrics, useMyUnits } from '../../hooks/useMyBody';
+import { SubScreenHeader } from '../../components/SubScreenHeader/SubScreenHeader';
+import { useMeasurementsLog } from '../../hooks/useMeasurementsLog';
 import './MeasurementsLogPage.css';
 
-function valuesOf(day: BodyMetric | undefined, ids: string[], unit: 'cm' | 'in'): Record<string, string> {
-  return Object.fromEntries(
-    ids.map((id) => [id, day?.measurements[id] !== undefined ? String(toDisplayLength(day.measurements[id], unit)) : '']),
-  );
-}
-
-/**
- * Log or change one day's measurements (full screen). The form always shows the chosen
- * day: picking a date that already has measurements opens them for editing (one day
- * per date). Empty fields are skipped; emptying a saved one clears it.
- */
+/** "תיעוד מידות" (direction B, full screen): the day as a soft pill, one white card per measurement, the sticky save pill. */
 export function MeasurementsLogPage() {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
-  const [params] = useSearchParams();
-  const { list, error, isLoading, reload } = useMyBodyMetrics();
-  const { units, today } = useMyUnits();
-  const goBack = useGoBack(ROUTES.PROFILE_MEASUREMENTS);
-  const [date, setDate] = useState(params.get('date') ?? today);
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [filledFor, setFilledFor] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const log = useMeasurementsLog();
   const [confirmDelete, setConfirmDelete] = useState(false);
-
-  const ids = list?.measurementIds ?? [];
-  const day = list?.items.find((item) => item.date === date);
-  const hasSaved = Object.keys(day?.measurements ?? {}).length > 0;
-  // Fill the fields from the chosen day once it is known (and again when the date changes).
-  if (list && filledFor !== date) {
-    setFilledFor(date);
-    setValues(valuesOf(day, ids, units.length));
-    setConfirmDelete(false);
-  }
-  const lastElsewhere = new Map(
-    latestMeasurements(list?.items.filter((item) => item.date !== date) ?? [], ids).map((item) => [item.id, item.cm]),
-  );
-
-  async function send(measurements: Record<string, number | null>) {
-    setFormError(null);
-    setIsSaving(true);
-    try {
-      const saved = await saveBodyMetric(date, { measurements });
-      celebrate(saved.achievementsUnlocked);
-      goBack();
-    } catch (caught) {
-      setFormError(extractErrorMessage(caught, copy.saveError));
-      setIsSaving(false);
-    }
-  }
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const measurements: Record<string, number | null> = {};
-    for (const id of ids) {
-      const text = values[id]?.trim() ?? '';
-      if (text === '') {
-        if (day?.measurements[id] !== undefined) measurements[id] = null;
-        continue;
-      }
-      const parsed = parseDecimalInput(text);
-      if (parsed === null) {
-        setFormError(copy.measurementsInvalid);
-        return;
-      }
-      measurements[id] = toCm(parsed, units.length);
-    }
-    if (!date || Object.keys(measurements).length === 0) {
-      setFormError(copy.measurementsInvalid);
-      return;
-    }
-    void send(measurements);
-  }
+  const unit = unitLabel(log.unit, language);
 
   return (
-    <AppShell hideTabBar>
-      <div className="measurements-log-page">
-        <SubPageHeader title={hasSaved ? copy.editMeasurements : copy.logMeasurements} fallbackPath={ROUTES.PROFILE_MEASUREMENTS} />
+    <AppShell hideTabBar bleed>
+      <div className="ml-screen">
+        <SubScreenHeader title={log.hasSaved ? copy.editMeasurements : copy.logMeasurements} fallbackPath={ROUTES.PROFILE_MEASUREMENTS} />
 
-        {isLoading && !list && <StateMessage>{copy.loading}</StateMessage>}
-        {error && !list && <StateMessage onRetry={reload}>{error}</StateMessage>}
+        <div className="ml-content">
+          {log.isLoading && !log.list && <StateMessage>{copy.loading}</StateMessage>}
+          {log.error && !log.list && <StateMessage onRetry={log.reload}>{log.error}</StateMessage>}
 
-        {list && (
-          <form className="measurements-log-page-form" onSubmit={handleSubmit} noValidate>
-            <Input label={copy.date} type="date" max={today} value={date} onChange={(event) => setDate(event.target.value)} />
-            {ids.map((id) => {
-              const last = lastElsewhere.get(id);
-              return (
-                <Input
-                  key={id}
-                  label={fill(copy.measurementField, { label: measurementLabel(id, language), unit: units.length })}
-                  type="text"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  enterKeyHint="next"
-                  value={values[id] ?? ''}
-                  helperText={last !== undefined ? fill(copy.lastValue, { value: formatLength(last, units.length, language) }) : undefined}
-                  onChange={(event) => setValues((previous) => ({ ...previous, [id]: event.target.value }))}
+          {log.list && (
+            <form className="ml-form" onSubmit={log.submit} noValidate>
+              {/* The pill shows the day; the native date input on top of it opens the phone's picker. */}
+              <label className="ml-date">
+                <IconCalendar size={18} aria-hidden="true" />
+                <span>{log.date ? formatDateOnly(log.date, language) : copy.date}</span>
+                <input
+                  className="ml-date-input"
+                  type="date"
+                  aria-label={copy.date}
+                  max={log.today}
+                  value={log.date}
+                  onChange={(event) => log.setDate(event.target.value)}
                 />
-              );
-            })}
-            {formError && (
-              <p className="measurements-log-page-error" role="alert">
-                {formError}
-              </p>
-            )}
-            <Button type="submit" loading={isSaving} disabled={isSaving}>
-              {copy.save}
-            </Button>
-            {hasSaved &&
-              (confirmDelete ? (
-                <div className="measurements-log-page-confirm">
-                  <span>{copy.deleteMeasurementsTitle}</span>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    disabled={isSaving}
-                    onClick={() => void send(Object.fromEntries(Object.keys(day!.measurements).map((id) => [id, null])))}
-                  >
-                    {copy.delete}
-                  </Button>
-                  <Button type="button" variant="ghost" disabled={isSaving} onClick={() => setConfirmDelete(false)}>
-                    {copy.cancel}
-                  </Button>
-                </div>
-              ) : (
-                <Button type="button" variant="ghost" disabled={isSaving} onClick={() => setConfirmDelete(true)}>
+              </label>
+
+              <div className="ml-list">
+                {log.ids.map((id) => {
+                  const last = log.lastElsewhere.get(id);
+                  const inputId = `ml-${id}`;
+                  const error = log.fieldError?.id === id ? log.fieldError.message : null;
+                  return (
+                    <div key={id} className="ml-row">
+                      <div className="ml-line">
+                        <label className="ml-label" htmlFor={inputId}>
+                          <b>{measurementLabel(id, language)}</b>
+                          {last !== undefined && <small>{fill(copy.lastValue, { value: formatLength(last, log.unit, language) })}</small>}
+                        </label>
+                        <span className="ml-field">
+                          <input
+                            id={inputId}
+                            className={error ? 'ml-input ml-input-error' : 'ml-input'}
+                            type="text"
+                            inputMode="decimal"
+                            autoComplete="off"
+                            enterKeyHint="next"
+                            dir="ltr"
+                            aria-label={fill(copy.measurementField, { label: measurementLabel(id, language), unit })}
+                            aria-invalid={error ? true : undefined}
+                            aria-describedby={error ? `${inputId}-error` : undefined}
+                            placeholder={last !== undefined ? formatNumber(toDisplayLength(last, log.unit), language) : ''}
+                            value={log.values[id] ?? ''}
+                            onChange={(event) => log.setValue(id, event.target.value)}
+                          />
+                          <span className="ml-unit" aria-hidden="true">
+                            {unit}
+                          </span>
+                        </span>
+                      </div>
+                      {error && (
+                        <p className="ml-error" id={`${inputId}-error`} role="alert">
+                          {error}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {log.formError && (
+                <p className="ml-error ml-form-error" role="alert">
+                  {log.formError}
+                </p>
+              )}
+
+              {log.hasSaved && (
+                <button type="button" className="ml-delete" disabled={log.isSaving} onClick={() => setConfirmDelete(true)}>
                   {copy.delete}
-                </Button>
-              ))}
-          </form>
-        )}
+                </button>
+              )}
+
+              <div className="ml-actions">
+                <PillButton type="submit" loading={log.isSaving} disabled={!log.isDirty}>
+                  {copy.save}
+                </PillButton>
+              </div>
+            </form>
+          )}
+        </div>
+
+        <ConfirmSheet
+          isOpen={confirmDelete}
+          tone="destructive"
+          icon={<IconTrash size={22} />}
+          title={copy.deleteMeasurementsTitle}
+          confirmLabel={copy.delete}
+          cancelLabel={copy.cancel}
+          isWorking={log.isSaving}
+          onConfirm={() => {
+            setConfirmDelete(false);
+            log.deleteDay();
+          }}
+          onCancel={() => setConfirmDelete(false)}
+        />
       </div>
     </AppShell>
   );
