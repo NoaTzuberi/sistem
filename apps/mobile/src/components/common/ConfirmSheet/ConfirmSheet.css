@@ -1,0 +1,163 @@
+/* The confirm's own look over BottomSheet (its motion, drag and focus stay): radius 28, padding 22, a smaller
+   lighter handle, the ink 40% scrim. */
+.bottom-sheet.confirm-sheet {
+  border-start-start-radius: var(--radius-confirm-sheet);
+  border-start-end-radius: var(--radius-confirm-sheet);
+}
+
+.bottom-sheet-layer:has(.confirm-sheet) .bottom-sheet-scrim {
+  background-color: var(--color-confirm-scrim);
+}
+
+.confirm-sheet .bottom-sheet-handle::before {
+  width: var(--size-confirm-handle-width);
+  background-color: var(--color-confirm-handle);
+}
+
+.confirm-sheet .bottom-sheet-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-inline: calc(var(--space-confirm-sheet) + var(--safe-inline-start)) calc(var(--space-confirm-sheet) + var(--safe-inline-end));
+  padding-block-end: calc(var(--space-confirm-sheet) + var(--safe-bottom));
+}
+
+.confirm-sheet-close {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: var(--space-confirm-sheet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-confirm-close);
+  height: var(--size-confirm-close);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A 36px button keeps a 44px hit area. */
+.confirm-sheet-close::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-confirm-close) - var(--touch-target-min)) / 2);
+}
+
+.confirm-sheet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-confirm-icon);
+  height: var(--size-confirm-icon);
+  border-radius: var(--radius-confirm-icon);
+}
+
+.confirm-sheet-icon-destructive {
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
+}
+
+.confirm-sheet-icon-default {
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+}
+
+.confirm-sheet-title {
+  margin: var(--space-1) 0 0;
+  padding-inline-end: calc(var(--size-confirm-close) + var(--space-2));
+  font-size: var(--text-confirm-title);
+  color: var(--color-ink);
+}
+
+.confirm-sheet-message {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-confirm-body);
+  color: var(--color-text);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.confirm-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin-block-start: var(--space-3);
+}
+
+.confirm-sheet-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--size-confirm-button);
+  padding-inline: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-round);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) var(--ease-press),
+    opacity var(--transition-fast) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.confirm-sheet-confirm-destructive {
+  background-color: var(--color-primary-deep);
+  color: var(--color-on-primary);
+}
+
+.confirm-sheet-confirm-default {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-profile-cta);
+}
+
+.confirm-sheet-soft {
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+}
+
+.confirm-sheet-soft-destructive {
+  color: var(--color-primary-deep);
+}
+
+.confirm-sheet-button:active:not(:disabled),
+.confirm-sheet-close:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.confirm-sheet-button:disabled,
+.confirm-sheet-close:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .confirm-sheet-soft:hover:not(:disabled),
+  .confirm-sheet-close:hover:not(:disabled) {
+    background-color: var(--color-fill-soft-hover);
+  }
+
+  .confirm-sheet-confirm-default:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-sheet-button,
+  .confirm-sheet-close {
+    transition: none;
+  }
+}

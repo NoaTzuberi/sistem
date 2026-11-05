@@ -1,9 +1,8 @@
 import { fill, useCopy } from '@sistem/shared';
 import type { ActiveWorkoutRef } from '@sistem/types';
-import { Modal } from '../../../../components/common/Modal/Modal';
-import { Button } from '../../../../components/common/Button/Button';
+import { IconBarbell } from '@tabler/icons-react';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { workoutCopy } from '../../copy';
-import './StartConflictModal.css';
 
 interface StartConflictModalProps {
   active: ActiveWorkoutRef | null;
@@ -17,18 +16,17 @@ interface StartConflictModalProps {
 export function StartConflictModal({ active, isBusy, onClose, onResume, onDiscardAndStart }: StartConflictModalProps) {
   const copy = useCopy(workoutCopy);
   return (
-    <Modal isOpen={active !== null} onClose={onClose} variant="flat" title={copy.session.conflictTitle}>
-      {active && (
-        <div className="start-conflict">
-          <p className="start-conflict-text">{fill(copy.session.conflictText, { title: active.workoutTitle })}</p>
-          <Button onClick={onResume} disabled={isBusy}>
-            {fill(copy.session.conflictResume, { title: active.workoutTitle })}
-          </Button>
-          <Button variant="danger" onClick={onDiscardAndStart} loading={isBusy}>
-            {copy.session.conflictDiscardAndStart}
-          </Button>
-        </div>
-      )}
-    </Modal>
+    <ConfirmSheet
+      isOpen={active !== null}
+      icon={<IconBarbell size={22} />}
+      title={copy.session.conflictTitle}
+      message={active ? fill(copy.session.conflictText, { title: active.workoutTitle }) : undefined}
+      confirmLabel={active ? fill(copy.session.conflictResume, { title: active.workoutTitle }) : ''}
+      onConfirm={onResume}
+      secondary={{ label: copy.session.conflictDiscardAndStart, onClick: onDiscardAndStart, tone: 'destructive' }}
+      hideCancel
+      isWorking={isBusy}
+      onCancel={onClose}
+    />
   );
 }

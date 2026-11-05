@@ -1,9 +1,0 @@
-.confirm-sheet-message {
-  margin: 0 0 var(--space-4);
-}
-
-.confirm-sheet-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
