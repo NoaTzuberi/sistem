@@ -1,10 +1,11 @@
 import { fill, getActiveLanguage, sharedCopy, useCopy, useI18n } from '@sistem/shared';
-import { IconPlus } from '@tabler/icons-react';
+import { IconFlag, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { BottomSheet } from '../../../../components/common/BottomSheet/BottomSheet';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { Button } from '../../../../components/common/Button/Button';
 import { StageBackground } from '../../../../components/common/StageBackground/StageBackground';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
@@ -390,39 +391,29 @@ export function WorkoutSessionPage() {
         </div>
       </BottomSheet>
 
-      <BottomSheet isOpen={dialog === 'confirmDiscard'} onClose={() => setDialog(null)} labelledBy="wp-discard-title">
-        <div className="wp-sheet">
-          <h2 className="wp-sheet-title display-title" id="wp-discard-title">
-            {copy.session.confirmDiscardTitle}
-          </h2>
-          <p className="wp-sheet-text">{copy.session.confirmDiscard}</p>
-          <div className="wp-sheet-actions">
-            <button type="button" className="wp-sheet-button wp-sheet-button-danger-solid" onClick={() => void handleDiscard()} disabled={isDiscarding}>
-              {copy.session.discardConfirm}
-            </button>
-            <button type="button" className="wp-sheet-button" onClick={() => setDialog(null)} disabled={isDiscarding}>
-              {copy.session.cancel}
-            </button>
-          </div>
-        </div>
-      </BottomSheet>
+      <ConfirmSheet
+        isOpen={dialog === 'confirmDiscard'}
+        tone="destructive"
+        icon={<IconTrash size={22} />}
+        title={copy.session.confirmDiscardTitle}
+        message={copy.session.confirmDiscard}
+        confirmLabel={copy.session.discardConfirm}
+        cancelLabel={copy.session.cancel}
+        isWorking={isDiscarding}
+        onConfirm={() => void handleDiscard()}
+        onCancel={() => setDialog(null)}
+      />
 
-      <BottomSheet isOpen={dialog === 'confirmFinish' || dialog === 'allDone'} onClose={() => setDialog(null)} labelledBy="wp-finish-title">
-        <div className="wp-sheet">
-          <h2 className="wp-sheet-title display-title" id="wp-finish-title">
-            {copy.player.confirmTitle}
-          </h2>
-          <p className="wp-sheet-text">{dialog === 'allDone' ? copy.player.allDone : plural(copy.player.confirmLeft, totalSets - doneSets)}</p>
-          <div className="wp-sheet-actions">
-            <button type="button" className="wp-sheet-button wp-sheet-button-primary" onClick={() => void doFinish()}>
-              {copy.player.finishSave}
-            </button>
-            <button type="button" className="wp-sheet-button" onClick={() => setDialog(null)}>
-              {copy.player.backToWorkout}
-            </button>
-          </div>
-        </div>
-      </BottomSheet>
+      <ConfirmSheet
+        isOpen={dialog === 'confirmFinish' || dialog === 'allDone'}
+        icon={<IconFlag size={22} />}
+        title={copy.player.confirmTitle}
+        message={dialog === 'allDone' ? copy.player.allDone : plural(copy.player.confirmLeft, totalSets - doneSets)}
+        confirmLabel={copy.player.finishSave}
+        cancelLabel={copy.player.backToWorkout}
+        onConfirm={() => void doFinish()}
+        onCancel={() => setDialog(null)}
+      />
 
       <BottomSheet isOpen={dialog === 'nothingDone'} onClose={() => setDialog(null)} labelledBy="wp-nothing-title">
         <div className="wp-sheet">

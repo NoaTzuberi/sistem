@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import axios from 'axios';
 import type { WorkoutLog } from '@sistem/types';
-import { IconCamera, IconLock, IconPhoto } from '@tabler/icons-react';
+import { IconCamera, IconLock, IconPhoto, IconTrash } from '@tabler/icons-react';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { appCopy } from '../../../../copy';
 import { Button } from '../../../../components/common/Button/Button';
-import { Modal } from '../../../../components/common/Modal/Modal';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
 import { removePumpPhoto, uploadPumpPhoto } from '../../../../services/workoutLogs/workoutLogsService';
 import { PhotoTooLargeError, compressPhoto } from '../../../privatePhotos/data/photoCompression';
@@ -177,16 +177,17 @@ export function PumpPhotoField({ log, onLogChange, onLinkExpired }: PumpPhotoFie
       <input ref={cameraRef} className="ws-pump-input" type="file" accept="image/*" capture onChange={handlePicked} />
       <input ref={galleryRef} className="ws-pump-input" type="file" accept="image/*" onChange={handlePicked} />
 
-      <Modal isOpen={confirmRemove} onClose={() => setConfirmRemove(false)} variant="flat" title={copy.pumpPhoto.removeTitle}>
-        <div className="ws-pump-dialog">
-          <Button variant="danger" onClick={() => void handleRemove()} loading={busy?.kind === 'removing'}>
-            {copy.pumpPhoto.removeConfirm}
-          </Button>
-          <Button variant="ghost" onClick={() => setConfirmRemove(false)}>
-            {copy.pumpPhoto.cancel}
-          </Button>
-        </div>
-      </Modal>
+      <ConfirmSheet
+        isOpen={confirmRemove}
+        tone="destructive"
+        icon={<IconTrash size={22} />}
+        title={copy.pumpPhoto.removeTitle}
+        confirmLabel={copy.pumpPhoto.removeConfirm}
+        cancelLabel={copy.pumpPhoto.cancel}
+        isWorking={busy?.kind === 'removing'}
+        onConfirm={() => void handleRemove()}
+        onCancel={() => setConfirmRemove(false)}
+      />
     </section>
   );
 }

@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import axios from 'axios';
 import type { BodyMetric, ProgressPhoto, ProgressPhotoPose } from '@sistem/types';
-import { IconCamera, IconPhoto } from '@tabler/icons-react';
+import { IconCamera, IconPhoto, IconTrash } from '@tabler/icons-react';
 import { fill, formatDateOnly, poseLabel, useCopy, useLanguage } from '@sistem/shared';
 import { Button } from '../../../../components/common/Button/Button';
-import { Modal } from '../../../../components/common/Modal/Modal';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
 import { removeProgressPhoto, uploadProgressPhoto } from '../../../../services/bodyMetrics/bodyMetricsService';
 import { celebrate } from '../../../achievements/celebration';
@@ -181,16 +181,16 @@ export function ProgressPhotoSlot({ date, pose, photo, onDayChange, onLinkExpire
       <input ref={cameraRef} className="progress-photo-slot-input" type="file" accept="image/*" capture onChange={handlePicked} />
       <input ref={galleryRef} className="progress-photo-slot-input" type="file" accept="image/*" onChange={handlePicked} />
 
-      <Modal isOpen={confirmRemove} onClose={() => setConfirmRemove(false)} variant="flat" title={copy.removeTitle}>
-        <div className="progress-photo-slot-dialog">
-          <Button variant="danger" onClick={() => void handleRemove()}>
-            {copy.remove}
-          </Button>
-          <Button variant="ghost" onClick={() => setConfirmRemove(false)}>
-            {copy.cancel}
-          </Button>
-        </div>
-      </Modal>
+      <ConfirmSheet
+        isOpen={confirmRemove}
+        tone="destructive"
+        icon={<IconTrash size={22} />}
+        title={copy.removeTitle}
+        confirmLabel={copy.remove}
+        cancelLabel={copy.cancel}
+        onConfirm={() => void handleRemove()}
+        onCancel={() => setConfirmRemove(false)}
+      />
     </section>
   );
 }

@@ -140,12 +140,7 @@
 }
 
 .wp-sheet-button-danger {
-  color: var(--color-error);
-}
-
-.wp-sheet-button-danger-solid {
-  background-color: var(--color-error);
-  color: var(--color-on-primary);
+  color: var(--color-primary-deep);
 }
 
 .wp-sheet-button:active:not(:disabled) {
@@ -162,7 +157,7 @@
     background-color: var(--color-ink-raised);
   }
 
-  .wp-sheet-button:not(.wp-sheet-button-primary, .wp-sheet-button-danger-solid):hover:not(:disabled) {
+  .wp-sheet-button:not(.wp-sheet-button-primary):hover:not(:disabled) {
     background-color: var(--color-fill-soft-hover);
   }
 }

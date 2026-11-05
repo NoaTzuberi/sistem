@@ -198,16 +198,6 @@ html[data-surface='interval-rest'] body {
   }
 }
 
-.interval-timer-dialog {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.interval-timer-dialog-text {
-  margin: 0 0 var(--space-2);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .interval-timer-control-disc {
     transition: none;

@@ -2,9 +2,8 @@ import type { Language } from '@sistem/types';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { fill, formatDuration, useCopy, useI18n, isolateLtr } from '@sistem/shared';
-import { IconPlayerPauseFilled, IconPlayerPlayFilled, IconPlayerSkipForwardFilled, IconPlayerStopFilled } from '@tabler/icons-react';
-import { Button } from '../../../../components/common/Button/Button';
-import { Modal } from '../../../../components/common/Modal/Modal';
+import { IconClockCheck, IconPlayerPauseFilled, IconPlayerPlayFilled, IconPlayerSkipForwardFilled, IconPlayerStopFilled } from '@tabler/icons-react';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import { countRoundsDone, nextWork } from '../../data/intervalTimeline';
@@ -154,34 +153,32 @@ export function IntervalTimer({
         </>
       )}
 
-      <Modal isOpen={confirmStop} onClose={() => setConfirmStop(false)} variant="flat" title={copy.interval.confirmStopTitle}>
-        <div className="interval-timer-dialog">
-          <p className="interval-timer-dialog-text">{onAgain ? copy.interval.confirmStopFree : copy.interval.confirmStop}</p>
-          <Button
-            variant="danger"
-            onClick={() => {
-              setConfirmStop(false);
-              onClose();
-            }}
-          >
-            {copy.interval.stopConfirm}
-          </Button>
-          <Button variant="ghost" onClick={() => setConfirmStop(false)}>
-            {copy.interval.keepGoing}
-          </Button>
-        </div>
-      </Modal>
+      <ConfirmSheet
+        isOpen={confirmStop}
+        tone="destructive"
+        icon={<IconPlayerStopFilled size={22} />}
+        title={copy.interval.confirmStopTitle}
+        message={onAgain ? copy.interval.confirmStopFree : copy.interval.confirmStop}
+        confirmLabel={copy.interval.stopConfirm}
+        cancelLabel={copy.interval.keepGoing}
+        onConfirm={() => {
+          setConfirmStop(false);
+          onClose();
+        }}
+        onCancel={() => setConfirmStop(false)}
+      />
 
       {/* Closing the sheet without choosing counts as "No": nothing is logged for her. */}
-      <Modal isOpen={catchUpCount > 0} onClose={() => onAnswerCatchUp(false)} variant="flat" title={copy.interval.catchUpTitle}>
-        <div className="interval-timer-dialog">
-          <p className="interval-timer-dialog-text">{plural(copy.interval.catchUp, catchUpCount)}</p>
-          <Button onClick={() => onAnswerCatchUp(true)}>{copy.interval.catchUpYes}</Button>
-          <Button variant="ghost" onClick={() => onAnswerCatchUp(false)}>
-            {copy.interval.catchUpNo}
-          </Button>
-        </div>
-      </Modal>
+      <ConfirmSheet
+        isOpen={catchUpCount > 0}
+        icon={<IconClockCheck size={22} />}
+        title={copy.interval.catchUpTitle}
+        message={plural(copy.interval.catchUp, catchUpCount)}
+        confirmLabel={copy.interval.catchUpYes}
+        cancelLabel={copy.interval.catchUpNo}
+        onConfirm={() => onAnswerCatchUp(true)}
+        onCancel={() => onAnswerCatchUp(false)}
+      />
     </div>,
     document.body,
   );
