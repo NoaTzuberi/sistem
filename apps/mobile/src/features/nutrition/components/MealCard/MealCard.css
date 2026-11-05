@@ -2,14 +2,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3);
-  background-color: var(--color-surface);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary);
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
 }
 
 .meal-card-name {
   margin: 0;
   font-size: var(--text-display-sm);
+  line-height: 0.92;
 }
 
 .meal-card-portions {
@@ -18,43 +20,73 @@
   gap: var(--space-2);
 }
 
+/* A portion: a pill in its group's tint + ink (.tn-group-*); opens the group's swaps. */
 .meal-card-portion {
   display: inline-flex;
   align-items: center;
-  min-height: var(--touch-target-min);
+  min-height: var(--size-filter-chip);
   padding: 0 var(--space-3);
-  background-color: var(--color-bg);
-  border: var(--border-width-thin) solid var(--color-primary-deep);
-  border-radius: var(--radius-none);
-  color: var(--color-primary-deep);
+  border: 0;
+  border-radius: var(--radius-filter-chip);
+  background-color: var(--group-soft, var(--color-coach-soft));
+  color: var(--group-text, var(--color-text-muted));
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
   -webkit-tap-highlight-color: transparent;
 }
 
 .meal-card-portion:active {
-  background-color: var(--color-primary-soft);
+  transform: scale(var(--scale-coach-press));
 }
 
 .meal-card-portion-static {
-  border-color: var(--color-border);
-  color: var(--color-text-muted);
   cursor: default;
+}
+
+.meal-card-portion-static:active {
+  transform: none;
+}
+
+/* The options: pill chips (white with a hairline, ink when picked) — the food list's filter chips. */
+.meal-card-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-filter-chip-gap);
+}
+
+.meal-card-option-chip {
+  min-height: var(--size-filter-chip);
+  padding: 0 var(--space-3);
+  border: var(--border-width-thin) solid var(--color-hairline);
+  border-radius: var(--radius-filter-chip);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-coach-out),
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-card-option-chip:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.meal-card-option-chip[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
 }
 
 .meal-card-option {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-}
-
-.meal-card-option-label {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-deep);
 }
 
 .meal-card-lines {
@@ -65,6 +97,10 @@
   list-style: none;
 }
 
+.meal-card-lines li + li .meal-card-line {
+  border-block-start: var(--border-width-thin) solid var(--color-coach-rule);
+}
+
 .meal-card-line {
   display: flex;
   align-items: center;
@@ -72,15 +108,13 @@
   gap: var(--space-2);
   width: 100%;
   min-height: var(--touch-target-min);
-  padding: var(--space-1) 0;
-  border-bottom: var(--border-width-thin) solid var(--color-border);
+  padding: var(--space-2) 0;
   text-align: start;
 }
 
 .meal-card-line-button {
+  border: 0;
   background: none;
-  border-top: none;
-  border-inline: none;
   color: inherit;
   font: inherit;
   cursor: pointer;
@@ -88,7 +122,7 @@
 }
 
 .meal-card-line-button:active {
-  background-color: var(--color-bg);
+  background-color: var(--color-coach-soft);
 }
 
 /* Full width, so the coach's (Hebrew) text and its portion line up on the same edge. */
@@ -96,19 +130,28 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .meal-card-line-title {
+  font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 
 .meal-card-line-detail {
   color: var(--color-text-muted);
-  font-size: var(--text-sm);
+  font-size: var(--text-coach-caption-lg);
 }
 
 .meal-card-line-icon {
   flex-shrink: 0;
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meal-card-portion,
+  .meal-card-option-chip {
+    transition: none;
+  }
 }

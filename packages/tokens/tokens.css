@@ -1437,6 +1437,31 @@
   --size-coach-quick-text: 110px;                            /* the quick message field */                          /* the message field grows up to this, then scrolls */
   --size-coach-dock-badge: 16px;
   --text-coach-dock-badge: 11px;
+  /* Coach mode, one trainee (design group 3, direction B): tabs on the ink stage, white tiles / rows. */
+  --size-coach-avatar-detail: 56px;
+  --size-coach-status-dot: 7px;                          /* the trainee header avatar (white ring) */
+  --ring-coach-avatar: 0 0 0 3px var(--color-on-primary);
+  --surface-coach-on-stage-track: color-mix(in srgb, var(--color-on-primary) 20%, transparent); /* segmented track on ink */
+  --size-coach-header-action: 48px;                          /* a round icon action on the stage */
+  --radius-coach-tab-track: 18px;
+  --radius-coach-tab-thumb: 14px;
+  --text-coach-tab-label: 15px;
+  --color-coach-attention-soft: var(--color-portion-fat-soft); /* #ffebd6 — the attention card */
+  --color-coach-attention-ink: var(--ink-orange);              /* #c75a00 */
+  --color-coach-missed-soft: var(--tint-pink);                 /* #ffe3ee — the "פוספס" chip */
+  --color-coach-missed-ink: var(--ink-pink);                   /* #a50047 */
+  --color-coach-pr-soft: var(--tint-blue);                     /* a PR chip in a log card */
+  --color-coach-pr-ink: var(--ink-blue);
+  --radius-coach-row: 18px;                                  /* an activity / workout / day row */
+  --radius-coach-icon-tile: 14px;
+  --size-coach-icon-tile: 44px;
+  --radius-coach-thumb: 14px;                                /* a meal / progress photo thumbnail */
+  --text-coach-stat: 32px;                                   /* a stat tile number (Barlow) */
+  --text-coach-caption-lg: 12px;                             /* a stat tile's label */
+  --pad-coach-tile: 14px;                                    /* a stat tile / row's padding */
+  --text-coach-group: 24px;                                  /* a portion group's name (Karantina) */
+  --size-coach-fuel-cell: 28px;                              /* a read-only fuel cell */
+  --radius-coach-fuel: 9px;
 }
 
 /* English: the Latin font pair; a display heading is Barlow Condensed italic 800, uppercase. */

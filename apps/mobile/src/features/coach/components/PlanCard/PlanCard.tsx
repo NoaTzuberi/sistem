@@ -1,29 +1,32 @@
 import type { ReactNode } from 'react';
-import type { CoachPlan } from '@sistem/types';
-import { IconChevronDown } from '@tabler/icons-react';
-import { Badge } from '../../../../components/common/Badge/Badge';
+import type { CoachPlan, WorkoutStatus } from '@sistem/types';
+import { IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { cardioMinutesLabel, cardioTotals, dayName, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { workoutColorClass } from '../../../home/data/homeDisplay';
 import { PlanExerciseList } from '../../../workouts/components/PlanExerciseList/PlanExerciseList';
+import { letterOf, nameScript } from '../../../workouts/data/weekPlanDisplay';
+import { coachCopy } from '../../copy';
 import './PlanCard.css';
 
 interface PlanCardProps {
   plan: CoachPlan;
+  /** This week only: each workout's status from the server (done / missed get a chip, upcoming none). */
+  statuses?: Record<string, WorkoutStatus>;
   /** The light actions for this plan (publish), under the workouts. */
   children?: ReactNode;
 }
 
-/** One weekly plan, read-only: plans are edited on the web dashboard (PRD §6). */
-export function PlanCard({ plan, children }: PlanCardProps) {
+/** One weekly plan, read-only (plans are edited on the web dashboard, PRD §6): status chips, then a card per workout. */
+export function PlanCard({ plan, statuses, children }: PlanCardProps) {
   const shared = useCopy(sharedCopy);
+  const lane = useCopy(coachCopy).detail.lane;
   const copy = shared.coach;
   const { language, plural } = useI18n();
   return (
     <div className="plan-card">
-      <div className="plan-card-badges">
-        <Badge variant={plan.status === 'published' ? 'accent' : 'neutral'}>
-          {copy.planStatus[plan.status]}
-        </Badge>
-        {plan.locked && <Badge variant="neutral">{copy.startedByTrainee}</Badge>}
+      <div className="plan-card-chips">
+        <span className={'plan-card-chip' + (plan.status === 'published' ? ' plan-card-chip-published' : '')}>{copy.planStatus[plan.status]}</span>
+        {plan.locked && <span className="plan-card-chip">{copy.startedByTrainee}</span>}
       </div>
 
       {plan.notes && (
@@ -33,31 +36,44 @@ export function PlanCard({ plan, children }: PlanCardProps) {
       )}
       {plan.workouts.length === 0 && <p className="plan-card-empty">{copy.noWorkoutsInPlan}</p>}
 
-      {plan.workouts.map((workout) => (
-        <details key={workout.id} className="plan-workout">
-          <summary className="plan-workout-summary">
-            <span className="plan-workout-heading">
-              <span className="plan-workout-title" dir="auto">
-                {workout.title}
+      {plan.workouts.map((workout, index) => {
+        const status = statuses?.[workout.id];
+        return (
+          <details key={workout.id} className={`plan-workout ${workoutColorClass(index)}`}>
+            <summary className="plan-workout-summary">
+              <span className="plan-workout-letter" aria-hidden="true">
+                {letterOf(index)}
               </span>
-              <span className="plan-workout-meta">
-                {workout.dayOfWeek !== undefined && `${dayName(workout.dayOfWeek, language)} · `}
-                {workout.kind === 'cardio' && workout.cardio
-                  ? `${shared.cardio.cardioTag} · ${cardioMinutesLabel(cardioTotals(workout.cardio.steps).totalSec, language)}`
-                  : plural(copy.exerciseCount, workout.exercises.length)}
+              <span className="plan-workout-heading">
+                <span className="plan-workout-title">
+                  <bdi {...nameScript(workout.title)}>{workout.title}</bdi>
+                </span>
+                <span className="plan-workout-meta">
+                  {workout.dayOfWeek !== undefined && `${dayName(workout.dayOfWeek, language)} · `}
+                  {workout.kind === 'cardio' && workout.cardio
+                    ? `${shared.cardio.cardioTag} · ${cardioMinutesLabel(cardioTotals(workout.cardio.steps).totalSec, language)}`
+                    : plural(copy.exerciseCount, workout.exercises.length)}
+                </span>
               </span>
-            </span>
-            <IconChevronDown className="plan-workout-chevron" size={20} aria-hidden="true" />
-          </summary>
+              {status === 'done' && (
+                <span className="plan-workout-status plan-workout-status-done">
+                  <IconCheck size={14} stroke={3} aria-hidden="true" />
+                  {lane.done}
+                </span>
+              )}
+              {status === 'missed' && <span className="plan-workout-status plan-workout-status-missed">{lane.missed}</span>}
+              <IconChevronDown className="plan-workout-chevron" size={20} aria-hidden="true" />
+            </summary>
 
-          {workout.notes && (
-            <p className="plan-card-notes" dir="auto">
-              {workout.notes}
-            </p>
-          )}
-          <PlanExerciseList exercises={workout.exercises} />
-        </details>
-      ))}
+            {workout.notes && (
+              <p className="plan-card-notes" dir="auto">
+                {workout.notes}
+              </p>
+            )}
+            <PlanExerciseList exercises={workout.exercises} />
+          </details>
+        );
+      })}
 
       {children}
     </div>

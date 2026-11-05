@@ -10,9 +10,11 @@ import type { TraineeTab } from '../../data/traineeTabs';
 import { useTraineeWorkouts } from '../../hooks/useTraineeWorkouts';
 import { BodyScoreboard } from '../BodyScoreboard/BodyScoreboard';
 import { CoachCard } from '../CoachCard/CoachCard';
+import { CoachSection } from '../CoachSection/CoachSection';
 import { LastWorkouts } from '../LastWorkouts/LastWorkouts';
 import { NutritionDay } from '../NutritionDay/NutritionDay';
 import { TraineeAchievements } from '../TraineeAchievements/TraineeAchievements';
+import { TraineeAttention } from '../TraineeAttention/TraineeAttention';
 import { WeekLanes } from '../WeekLanes/WeekLanes';
 
 const LAST_SHOWN = 3;
@@ -23,7 +25,7 @@ interface TraineeOverviewProps {
   onOpenTab: (tab: TraineeTab) => void;
 }
 
-/** סקירה: this week's lanes, the last 3 workouts, today's portions, the body numbers, her achievements. */
+/** סקירה: the attention card, this week's lanes, her streak + stat tiles, the body tiles, today's portions, the last 3 workouts. */
 export function TraineeOverview({ trainee, today, onOpenTab }: TraineeOverviewProps) {
   const copy = useCopy(coachCopy).detail;
   const shared = useCopy(sharedCopy);
@@ -35,6 +37,8 @@ export function TraineeOverview({ trainee, today, onOpenTab }: TraineeOverviewPr
 
   return (
     <>
+      {trainee.attention && <TraineeAttention trainee={trainee} />}
+
       <CoachCard title={copy.thisWeek} eyebrow={eyebrow.thisWeek}>
         {trainee.thisWeek ? (
           <WeekLanes week={trainee.thisWeek} weekStart={trainee.currentWeekStart} today={today} />
@@ -43,9 +47,18 @@ export function TraineeOverview({ trainee, today, onOpenTab }: TraineeOverviewPr
         )}
       </CoachCard>
 
-      <CoachCard
+      <TraineeAchievements traineeId={trainee.id} compact />
+
+      <CoachSection title={copy.body}>
+        {metrics.isLoading && !metrics.data && <StateMessage>{shared.common.loading}</StateMessage>}
+        {metrics.error && !metrics.data && <StateMessage onRetry={metrics.reload}>{metrics.error}</StateMessage>}
+        {metrics.data && <BodyScoreboard metrics={metrics.data.items} measurementIds={metrics.data.measurementIds} />}
+      </CoachSection>
+
+      <NutritionDay traineeId={trainee.id} compact />
+
+      <CoachSection
         title={copy.lastWorkouts}
-        eyebrow={eyebrow.last}
         action={
           <button type="button" className="coach-link" onClick={() => onOpenTab('workouts')}>
             {copy.all}
@@ -60,19 +73,7 @@ export function TraineeOverview({ trainee, today, onOpenTab }: TraineeOverviewPr
           ) : (
             <p className="coach-card-text">{copy.noWorkouts}</p>
           ))}
-      </CoachCard>
-
-      <NutritionDay traineeId={trainee.id} compact />
-
-      <CoachCard title={copy.body} eyebrow={eyebrow.body}>
-        {metrics.isLoading && !metrics.data && <StateMessage>{shared.common.loading}</StateMessage>}
-        {metrics.error && !metrics.data && <StateMessage onRetry={metrics.reload}>{metrics.error}</StateMessage>}
-        {metrics.data && <BodyScoreboard metrics={metrics.data.items} measurementIds={metrics.data.measurementIds} />}
-      </CoachCard>
-
-      <CoachCard>
-        <TraineeAchievements traineeId={trainee.id} compact />
-      </CoachCard>
+      </CoachSection>
     </>
   );
 }

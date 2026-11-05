@@ -8,18 +8,19 @@ import {
   groupLogSetsByExercise,
   logExerciseNames,
   fill,
+  formatNumber,
   prCountLabel,
   sharedCopy,
   useCopy,
-  useLanguage,
+  useI18n,
   useLoad,
 } from '@sistem/shared';
 import { IconCamera, IconChevronDown } from '@tabler/icons-react';
 import { listTraineeWorkoutLogs } from '../../../../services/coach/coachService';
-import { Badge } from '../../../../components/common/Badge/Badge';
-import { Button } from '../../../../components/common/Button/Button';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { nameScript } from '../../../workouts/data/weekPlanDisplay';
 import './WorkoutLogList.css';
 
 interface WorkoutLogListProps {
@@ -37,7 +38,7 @@ interface WorkoutLogListProps {
 export function WorkoutLogList({ traineeId, pageSize, moreLabel, load: loadLogs }: WorkoutLogListProps) {
   const shared = useCopy(sharedCopy);
   const copy = shared.coach;
-  const language = useLanguage();
+  const { language, plural } = useI18n();
   const load = useCallback(() => (loadLogs ? loadLogs() : listTraineeWorkoutLogs(traineeId)), [loadLogs, traineeId]);
   const { data: logs, error, isLoading, reload } = useLoad(load, copy.logsLoadError);
   const [shown, setShown] = useState(pageSize ?? Infinity);
@@ -57,16 +58,29 @@ export function WorkoutLogList({ traineeId, pageSize, moreLabel, load: loadLogs 
               <details className="workout-log">
                 <summary className="workout-log-summary">
                   <span className="workout-log-heading">
-                    <span className="workout-log-title" dir="auto">{log.workoutTitle}</span>
                     <span className="workout-log-date">{formatDateTime(log.startedAt, language)}</span>
-                    <span className="workout-log-badges">
-                      <Badge variant={log.status === 'completed' ? 'accent' : 'neutral'}>{copy.logStatus[log.status]}</Badge>
-                      {log.rating !== undefined && <Badge variant="neutral">{fill(copy.rating, { rating: log.rating })}</Badge>}
-                      {records.length > 0 && <Badge variant="accent">{prCountLabel(records.length, language)}</Badge>}
+                    <span className="workout-log-title">
+                      <bdi {...nameScript(log.workoutTitle)}>{log.workoutTitle}</bdi>
+                    </span>
+                    {log.stats && (
+                      <span className="workout-log-facts">
+                        <span>{formatDuration(log.stats.durationSec, language)}</span>
+                        {log.stats.totalVolume > 0 && (
+                          <span>
+                            <bdi dir="ltr">{formatNumber(log.stats.totalVolume, language)}</bdi> {shared.units.kg}
+                          </span>
+                        )}
+                        <span>{plural(shared.plan.setCount, log.stats.setsCompleted)}</span>
+                      </span>
+                    )}
+                    <span className="workout-log-chips">
+                      {log.status !== 'completed' && <span className="workout-log-chip">{copy.logStatus[log.status]}</span>}
+                      {records.length > 0 && <span className="workout-log-chip workout-log-chip-pr">{prCountLabel(records.length, language)}</span>}
+                      {log.rating !== undefined && <span className="workout-log-chip">{fill(copy.rating, { rating: log.rating })}</span>}
                       {log.pumpPhoto && (
-                        <Badge variant="neutral" aria-label={copy.hasPumpPhoto}>
+                        <span className="workout-log-chip" aria-label={copy.hasPumpPhoto}>
                           <IconCamera size={14} aria-hidden="true" />
-                        </Badge>
+                        </span>
                       )}
                     </span>
                   </span>
@@ -74,29 +88,6 @@ export function WorkoutLogList({ traineeId, pageSize, moreLabel, load: loadLogs 
                 </summary>
 
                 <div className="workout-log-body">
-                  {log.stats && (
-                    <dl className="workout-log-stats">
-                      <div>
-                        <dt>{copy.duration}</dt>
-                        <dd>{formatDuration(log.stats.durationSec, language)}</dd>
-                      </div>
-                      <div>
-                        <dt>{copy.totalVolume}</dt>
-                        <dd>
-                          {log.stats.totalVolume} {shared.units.kg}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>{copy.setsCompleted}</dt>
-                        <dd>{log.stats.setsCompleted}</dd>
-                      </div>
-                      <div>
-                        <dt>{copy.personalRecords}</dt>
-                        <dd>{log.stats.prCount}</dd>
-                      </div>
-                    </dl>
-                  )}
-
                   {records.length > 0 && (
                     <ul className="workout-log-records">
                       {records.map((record) => (
@@ -140,9 +131,9 @@ export function WorkoutLogList({ traineeId, pageSize, moreLabel, load: loadLogs 
         })}
       </ul>
       {logs.length > shown && pageSize && (
-        <Button variant="secondary" className="workout-logs-more" onClick={() => setShown((count) => count + pageSize)}>
+        <PillButton variant="soft" className="workout-logs-more" onClick={() => setShown((count) => count + pageSize)}>
           {moreLabel}
-        </Button>
+        </PillButton>
       )}
     </>
   );

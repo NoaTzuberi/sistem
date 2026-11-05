@@ -1,6 +1,9 @@
 import type { FoodGroup, PortionCounts } from '@sistem/types';
-import { describePortion, fill, mealPortionList, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { useCopy } from '@sistem/shared';
+import { IconChevronRight } from '@tabler/icons-react';
 import { nutritionCopy } from '../../copy';
+import { PortionCells } from '../PortionCells/PortionCells';
+import { ProteinGoal } from '../ProteinGoal/ProteinGoal';
 import './DayTotals.css';
 
 interface DayTotalsProps {
@@ -8,38 +11,39 @@ interface DayTotalsProps {
   vegetablesFree: boolean;
   hasVegetableSwaps: boolean;
   onOpenSwaps: (group: FoodGroup) => void;
+  /** The coach's daily protein goal in grams, when she set one. */
+  proteinGrams?: number | null;
 }
 
 /**
- * The day's totals per group ("4 protein · 4 carb · 4 fat · vegetables free"), each a
- * button to that group's swaps — read-only, for coach mode (the trainee's tracker shows
- * the same with circles).
+ * Coach mode, read-only: the plan's day as the trainee's fuel cells (every planned cell filled), the free
+ * vegetables line (opens its swaps when there are any) and the protein goal when she set one.
  */
-export function DayTotals({ portions, vegetablesFree, hasVegetableSwaps, onOpenSwaps }: DayTotalsProps) {
-  const language = useLanguage();
-  const shared = useCopy(sharedCopy);
+export function DayTotals({ portions, vegetablesFree, hasVegetableSwaps, onOpenSwaps, proteinGrams }: DayTotalsProps) {
   const copy = useCopy(nutritionCopy);
+  const vegetables = (
+    <>
+      <span className="day-totals-veg-text">
+        <span className="day-totals-veg-title">{copy.vegetablesTitle}</span> · {copy.vegetablesLine}
+      </span>
+      {hasVegetableSwaps && <IconChevronRight className="flip-rtl day-totals-veg-icon" size={18} aria-hidden="true" />}
+    </>
+  );
   return (
-    <section className="day-totals" aria-label={copy.coachDayTitle}>
-      <h2 className="day-totals-title">{copy.coachDayTitle}</h2>
-      <div className="day-totals-list">
-        {mealPortionList(portions).map(({ group, count }) => {
-          const label = describePortion(group, count, language);
-          return (
-            <button key={group} type="button" className="day-totals-group" onClick={() => onOpenSwaps(group)} aria-label={fill(copy.openSwaps, { label })}>
-              {label}
-            </button>
-          );
-        })}
-        {vegetablesFree &&
-          (hasVegetableSwaps ? (
-            <button type="button" className="day-totals-group" onClick={() => onOpenSwaps('vegetable')}>
-              {shared.nutrition.vegetablesFree}
-            </button>
-          ) : (
-            <span className="day-totals-group day-totals-static">{shared.nutrition.vegetablesFree}</span>
-          ))}
-      </div>
+    <section className="day-totals" aria-labelledby="day-totals-title">
+      <h2 className="day-totals-title" id="day-totals-title">
+        {copy.coachDayTitle}
+      </h2>
+      <PortionCells planned={portions} />
+      {proteinGrams ? <ProteinGoal grams={proteinGrams} /> : null}
+      {vegetablesFree &&
+        (hasVegetableSwaps ? (
+          <button type="button" className="day-totals-veg day-totals-veg-button" onClick={() => onOpenSwaps('vegetable')}>
+            {vegetables}
+          </button>
+        ) : (
+          <p className="day-totals-veg">{vegetables}</p>
+        ))}
     </section>
   );
 }

@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import type { CoachPlan, CoachTraineeDetail, PlanIssue } from '@sistem/types';
 import { PlanRequestError } from '@sistem/api-client';
 import { addDaysToDate, describeIssue, fill, formatWeekRange, sharedCopy, useCopy, useLanguage, useLoad } from '@sistem/shared';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconCopy, IconInfoCircle, IconSend } from '@tabler/icons-react';
 import { createPlan, listPlans, publishPlan } from '../../../../services/coach/coachService';
-import { Button } from '../../../../components/common/Button/Button';
+import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
-import { ConfirmSheet } from '../ConfirmSheet/ConfirmSheet';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { SendNoteFields } from '../SendNoteFields/SendNoteFields';
 import { useWorkoutSendNote } from '../../hooks/useWorkoutSendNote';
 import { PlanCard } from '../PlanCard/PlanCard';
@@ -57,6 +57,8 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
     { label: shared.weekRelation.this, start: trainee.currentWeekStart },
     { label: shared.weekRelation.next, start: addDaysToDate(trainee.currentWeekStart, 7) },
   ];
+  // The server's statuses for this week's workouts (done / missed / upcoming in her zone).
+  const thisWeekStatuses = Object.fromEntries((trainee.thisWeek?.workouts ?? []).map((workout) => [workout.id, workout.status]));
   const planFor = (week: string) => plans.find((plan) => plan.weekStartDate === week);
   // "Duplicate last week" fills the first of the two weeks that has no plan, from
   // the most recent earlier plan (the server picks it).
@@ -115,23 +117,20 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
             </h2>
 
             {plan ? (
-              <PlanCard plan={plan}>
+              <PlanCard plan={plan} statuses={week.start === trainee.currentWeekStart ? thisWeekStatuses : undefined}>
                 {plan.status === 'draft' && (
-                  <Button className="trainee-plan-action" onClick={() => ask({ kind: 'publish', plan })}>
+                  <PillButton className="trainee-plan-action" onClick={() => ask({ kind: 'publish', plan })}>
                     {copy.publishPlan}
-                  </Button>
+                  </PillButton>
                 )}
               </PlanCard>
             ) : (
               <>
                 <p className="trainee-plan-none">{copy.noPlanThisWeek}</p>
                 {canDuplicate && week.start === duplicateWeek && (
-                  <Button
-                    className="trainee-plan-action"
-                    onClick={() => ask({ kind: 'duplicate', week: week.start })}
-                  >
+                  <PillButton className="trainee-plan-action" onClick={() => ask({ kind: 'duplicate', week: week.start })}>
                     {copy.duplicateLastWeek}
-                  </Button>
+                  </PillButton>
                 )}
               </>
             )}
@@ -160,6 +159,7 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
 
       <ConfirmSheet
         isOpen={pending !== undefined}
+        icon={pending?.kind === 'duplicate' ? <IconCopy size={22} /> : <IconSend size={22} />}
         title={pending?.kind === 'duplicate' ? copy.confirmDuplicateTitle : copy.confirmPublishTitle}
         message={
           pending?.kind === 'duplicate'

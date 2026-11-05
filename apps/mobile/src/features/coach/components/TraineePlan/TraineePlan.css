@@ -12,23 +12,24 @@
 
 .trainee-plan-week-title {
   margin: 0;
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
 }
 
 .trainee-plan-week-dates {
-  font-size: var(--text-sm);
+  font-size: var(--text-coach-label);
   font-weight: var(--font-weight-regular);
   color: var(--color-text-muted);
 }
 
 .trainee-plan-none {
   margin: 0;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
 .trainee-plan-action {
-  width: 100%;
   margin-top: var(--space-1);
 }
 
@@ -36,11 +37,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--pad-coach-tile);
+  border-radius: var(--radius-coach-row);
   font-size: var(--text-sm);
   color: var(--color-error);
   background-color: var(--color-error-soft);
-  border-inline-start: var(--border-width-thick) solid var(--color-error);
 }
 
 .trainee-plan-failure-message {
@@ -48,21 +49,25 @@
 }
 
 .trainee-plan-issues {
-  padding-inline-start: var(--space-3);
+  margin: 0;
+  padding-inline-start: var(--space-4);
   list-style: disc;
 }
 
 .trainee-plan-hint {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-2);
   margin: 0;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
+  padding: var(--space-3) var(--pad-coach-tile);
+  border-radius: var(--radius-coach-row);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  color: var(--color-text-muted);
+  font-size: var(--text-coach-label);
 }
 
 .trainee-plan-hint-icon {
   flex-shrink: 0;
+  color: var(--ink-purple);
 }

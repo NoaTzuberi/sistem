@@ -1,45 +1,55 @@
+/* White tiles, 2 columns: the number with its trend chip on top, the label under them. A decrease is a cherry
+   tint, an increase soft grey — never good / bad (no green). */
 .body-scoreboard {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
   margin: 0;
 }
 
 .body-scoreboard-cell {
-  display: flex;
-  flex-direction: column;
-}
-
-.body-scoreboard-cell + .body-scoreboard-cell {
-  padding-inline-start: calc(var(--space-2) + var(--space-1));
-  border-inline-start: 1px solid var(--color-coach-rule);
-}
-
-.body-scoreboard dd {
-  margin: 0;
-}
-
-.body-scoreboard-value {
-  font-family: var(--font-num);
-  font-size: var(--text-coach-metric);
-  font-weight: var(--font-weight-bold);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  display: grid;
+  grid-template-areas:
+    'value delta'
+    'label label';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  row-gap: var(--space-1);
+  column-gap: var(--space-2);
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-coach-tile);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
 }
 
 .body-scoreboard-label {
-  order: 1;
-  font-size: var(--text-coach-caption);
-  color: var(--color-coach-muted);
+  grid-area: label;
+  font-size: var(--text-coach-caption-lg);
+  color: var(--color-text-muted);
+}
+
+.body-scoreboard-value {
+  grid-area: value;
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: var(--text-coach-stat);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--color-ink);
 }
 
 .body-scoreboard-delta {
-  order: 2;
-  font-family: var(--font-num);
-  font-size: var(--text-coach-label);
+  grid-area: delta;
+  margin: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font-size: var(--text-coach-caption-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--color-profile-up);
 }
 
 .body-scoreboard-delta-down {
-  color: var(--color-coach-cherry);
+  background-color: var(--tint-pink);
+  color: var(--ink-pink);
 }

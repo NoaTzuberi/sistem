@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { IconBarbell, IconChevronLeft, IconMessageCircle, IconSalad } from '@tabler/icons-react';
-import { fill, formatPlural, sharedCopy, splitLabel, useCopy, useLanguage, useLoad, useServerNow } from '@sistem/shared';
+import { fill, formatPlural, sharedCopy, splitLabel, traineeStatusLabel, useCopy, useLanguage, useLoad, useServerNow } from '@sistem/shared';
 import { ROUTES, coachThreadPath } from '../../../../app/config/routes';
 import { Toast } from '../../../../components/common/Toast/Toast';
 import { useToast } from '../../../../hooks/useToast';
@@ -94,9 +94,13 @@ export function TraineeDetailPage() {
                   <h1 className="coach-trainee-name display-title" id="coach-trainee-name">
                     <bdi>{trainee.name}</bdi>
                   </h1>
-                  <p className="coach-trainee-sub">{sub.join(' · ')}</p>
+                  <span className={`coach-trainee-status coach-trainee-status-${trainee.status}`}>
+                    <span className="coach-trainee-status-dot" aria-hidden="true" />
+                    {traineeStatusLabel(trainee.status, language)}
+                  </span>
                 </div>
               </div>
+              <p className="coach-trainee-sub">{sub.join(' · ')}</p>
               <div className="coach-trainee-actions" role="group" aria-label={copy.detail.actionsLabel}>
                 <button
                   type="button"
@@ -104,17 +108,33 @@ export function TraineeDetailPage() {
                   aria-haspopup="dialog"
                   onClick={() => quick.open({ id: trainee.id, name: trainee.name, avatarUrl: trainee.avatar?.url })}
                 >
-                  <IconMessageCircle size={20} aria-hidden="true" />
-                  {copy.detail.actions.message}
+                  <span className="coach-trainee-action-disc">
+                    <IconMessageCircle size={20} aria-hidden="true" />
+                  </span>
+                  <span className="coach-trainee-action-label">{copy.detail.actions.message}</span>
                 </button>
                 <button type="button" className="coach-trainee-action" aria-haspopup="dialog" onClick={() => edit.open()}>
-                  <IconBarbell size={20} aria-hidden="true" />
-                  {copy.detail.actions.plan}
+                  <span className="coach-trainee-action-disc">
+                    <IconBarbell size={20} aria-hidden="true" />
+                  </span>
+                  <span className="coach-trainee-action-label">{copy.detail.actions.plan}</span>
                 </button>
                 <button type="button" className="coach-trainee-action" onClick={() => selectTab('nutrition')}>
-                  <IconSalad size={20} aria-hidden="true" />
-                  {copy.detail.actions.nutrition}
+                  <span className="coach-trainee-action-disc">
+                    <IconSalad size={20} aria-hidden="true" />
+                  </span>
+                  <span className="coach-trainee-action-label">{copy.detail.actions.nutrition}</span>
                 </button>
+              </div>
+              <div className="coach-trainee-tabs">
+                <SegmentedTabs
+                  className="coach-tabs"
+                  tabs={TRAINEE_TABS.map((id) => ({ id, label: copy.detail.tabs[id] }))}
+                  selected={tab}
+                  onSelect={selectTab}
+                  label={copy.detail.tabsLabel}
+                  panelId={() => 'coach-trainee-panel'}
+                />
               </div>
             </>
           )}
@@ -126,22 +146,11 @@ export function TraineeDetailPage() {
 
       {trainee && (
         <>
-          <div className="coach-trainee-tabs">
-            <SegmentedTabs
-              className="coach-tabs"
-              tabs={TRAINEE_TABS.map((id) => ({ id, label: copy.detail.tabs[id] }))}
-              selected={tab}
-              onSelect={selectTab}
-              label={copy.detail.tabsLabel}
-              panelId={() => 'coach-trainee-panel'}
-            />
-          </div>
           <section role="tabpanel" id="coach-trainee-panel" aria-labelledby={`tab-${tab}`} className="coach-trainee-panel">
             {tab === 'overview' && <TraineeOverview trainee={trainee} today={localDateOf(nowMs, trainee.timezone)} onOpenTab={selectTab} />}
             {tab === 'workouts' && (
               <TraineeWorkouts
                 trainee={trainee}
-                today={localDateOf(nowMs, trainee.timezone)}
                 onPlansChanged={onPlansChanged}
                 plansVersion={plansVersion}
                 onOpenEdit={() => void edit.open()}

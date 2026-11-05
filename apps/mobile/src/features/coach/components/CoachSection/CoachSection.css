@@ -1,0 +1,19 @@
+.coach-section {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + 2px);
+  margin-block-start: var(--space-2);
+}
+
+.coach-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.coach-section-title {
+  margin: 0;
+  font-size: var(--text-qn-section);
+  line-height: 0.92;
+}

@@ -23,7 +23,9 @@ export function ProgressStats({ overview }: ProgressStatsProps) {
       {stats.map((stat) => (
         <div key={stat.label} className="progress-stats-item">
           <dt className="progress-stats-label">{stat.label}</dt>
-          <dd className="progress-stats-value">{stat.value}</dd>
+          <dd className="progress-stats-value">
+            <bdi dir="ltr">{stat.value}</bdi>
+          </dd>
         </div>
       ))}
     </dl>

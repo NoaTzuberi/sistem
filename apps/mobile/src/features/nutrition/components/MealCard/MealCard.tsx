@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { FoodGroup, NutritionViewMeal } from '@sistem/types';
 import { describePortion, describeViewLine, fill, mealPortionList, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { IconChevronRight } from '@tabler/icons-react';
 import { nutritionCopy } from '../../copy';
+import '../../groupColors.css';
 import './MealCard.css';
 
 interface MealCardProps {
@@ -15,12 +16,14 @@ interface MealCardProps {
   footer?: ReactNode;
 }
 
-/** One meal: its portions per group (the focus), then the coach's options, as written. */
+/** One meal: its portions per group (the focus), then the coach's options as pill chips (one shown at a time, like her menu). */
 export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealCardProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(nutritionCopy);
   const portions = mealPortionList(meal.portions);
+  const [optionIndex, setOptionIndex] = useState(0);
+  const option = meal.options[optionIndex] ?? meal.options[0];
 
   return (
     <article className="meal-card">
@@ -36,7 +39,7 @@ export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealC
               <button
                 key={group}
                 type="button"
-                className={`meal-card-portion meal-card-portion-${group}`}
+                className={`meal-card-portion tn-group-${group}`}
                 onClick={() => onOpenSwaps(group)}
                 aria-label={fill(copy.openSwaps, { label })}
               >
@@ -46,7 +49,7 @@ export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealC
           })}
           {meal.vegetablesFree &&
             (hasVegetableSwaps ? (
-              <button type="button" className="meal-card-portion meal-card-portion-vegetable" onClick={() => onOpenSwaps('vegetable')}>
+              <button type="button" className="meal-card-portion tn-group-vegetable" onClick={() => onOpenSwaps('vegetable')}>
                 {shared.nutrition.vegetablesFree}
               </button>
             ) : (
@@ -55,11 +58,25 @@ export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealC
         </div>
       )}
 
-      {meal.options.map((option) => (
+      {meal.options.length > 1 && (
+        <div className="meal-card-options" role="group" aria-label={meal.name}>
+          {meal.options.map((candidate, index) => (
+            <button
+              key={candidate.id}
+              type="button"
+              className="meal-card-option-chip"
+              aria-pressed={candidate === option}
+              onClick={() => setOptionIndex(index)}
+              dir="auto"
+            >
+              {candidate.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {option && (
         <section key={option.id} className="meal-card-option" aria-label={option.label}>
-          <h3 className="meal-card-option-label" dir="auto">
-            <bdi>{option.label}</bdi>
-          </h3>
           <ul className="meal-card-lines">
             {option.lines.map((line) => {
               const { title, detail } = describeViewLine(line, language);
@@ -97,7 +114,7 @@ export function MealCard({ meal, onOpenSwaps, hasVegetableSwaps, footer }: MealC
             })}
           </ul>
         </section>
-      ))}
+      )}
       {footer}
     </article>
   );

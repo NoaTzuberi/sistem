@@ -1,5 +1,4 @@
 import type { CoachTraineeDetail } from '@sistem/types';
-import { CoachCard } from '../CoachCard/CoachCard';
 import { LockLine } from '../LockLine/LockLine';
 import { QuestionnaireCard } from '../QuestionnaireCard/QuestionnaireCard';
 import { TraineeBodyTracking } from '../TraineeBodyTracking/TraineeBodyTracking';
@@ -9,15 +8,11 @@ import { TraineeAchievements } from '../TraineeAchievements/TraineeAchievements'
 export function TraineeBody({ trainee }: { trainee: CoachTraineeDetail }) {
   return (
     <>
-      <CoachCard>
-        <TraineeBodyTracking traineeId={trainee.id} timezone={trainee.timezone} />
-        <LockLine />
-      </CoachCard>
+      <TraineeBodyTracking traineeId={trainee.id} timezone={trainee.timezone} />
+      <LockLine />
       <QuestionnaireCard onboarding={trainee.onboarding} />
       {/* Her full achievement list (the overview shows the streak and numbers only). */}
-      <CoachCard>
-        <TraineeAchievements traineeId={trainee.id} />
-      </CoachCard>
+      <TraineeAchievements traineeId={trainee.id} />
     </>
   );
 }

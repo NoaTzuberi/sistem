@@ -7,7 +7,8 @@ import './WeightHistoryCards.css';
 interface WeightHistoryCardsProps {
   metrics: BodyMetric[];
   unit: WeightUnit;
-  onEdit: (metric: BodyMetric) => void;
+  /** Her own screen: tap a day to edit it. Coach mode passes nothing (read-only rows). */
+  onEdit?: (metric: BodyMetric) => void;
 }
 
 /** "היסטוריה": a white card per weigh-in (newest first) with its change since the one before (cherry = down, grey = up). */
@@ -15,6 +16,7 @@ export function WeightHistoryCards({ metrics, unit, onEdit }: WeightHistoryCards
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
   const days = weighIns(metrics);
+  const Row = onEdit ? 'button' : 'div';
   if (days.length === 0) return null;
 
   return (
@@ -29,7 +31,7 @@ export function WeightHistoryCards({ metrics, unit, onEdit }: WeightHistoryCards
           const change = previous ? roundOneDecimal(value - toDisplayWeight(previous.weight, unit)) : null;
           return (
             <li key={day.date}>
-              <button type="button" className="wt-row" onClick={() => onEdit(day)}>
+              <Row className="wt-row" {...(onEdit ? { type: 'button' as const, onClick: () => onEdit(day) } : {})}>
                 <span className="wt-row-date">{formatDateOnly(day.date, language)}</span>
                 {change !== null && (
                   <span className={change < 0 ? 'wt-row-change wt-row-change-down' : 'wt-row-change'}>
@@ -40,8 +42,8 @@ export function WeightHistoryCards({ metrics, unit, onEdit }: WeightHistoryCards
                   <bdi dir="ltr">{formatNumber(value, language)}</bdi>
                   <small>{unitLabel(unit, language)}</small>
                 </span>
-                <IconChevronRight className="wt-row-chevron flip-rtl" size={18} aria-hidden="true" />
-              </button>
+                {onEdit && <IconChevronRight className="wt-row-chevron flip-rtl" size={18} aria-hidden="true" />}
+              </Row>
             </li>
           );
         })}

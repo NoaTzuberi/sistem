@@ -1,21 +1,18 @@
 import type { CoachTraineeDetail } from '@sistem/types';
 import { useCopy } from '@sistem/shared';
-import { appCopy } from '../../../../copy';
 import { coachCopy } from '../../copy';
 import { dashboardLinks } from '../../data/dashboardLinks';
 import { useTraineeWorkouts } from '../../hooks/useTraineeWorkouts';
-import { CoachCard } from '../CoachCard/CoachCard';
+import { CoachSection } from '../CoachSection/CoachSection';
 import { DeskNote } from '../DeskNote/DeskNote';
 import { LastWorkouts } from '../LastWorkouts/LastWorkouts';
 import { TraineePlan } from '../TraineePlan/TraineePlan';
-import { WeekLanes } from '../WeekLanes/WeekLanes';
 import { WorkoutLogList } from '../WorkoutLogList/WorkoutLogList';
 
 const LOG_PAGE = 10;
 
 interface TraineeWorkoutsProps {
   trainee: CoachTraineeDetail;
-  today: string;
   onPlansChanged: () => void;
   /** Bumped after a light edit: the plans load again. */
   plansVersion: number;
@@ -23,37 +20,34 @@ interface TraineeWorkoutsProps {
   onOpenEdit: () => void;
 }
 
-/** אימונים: the week (+ the light plan actions), the full workout log (paged), her cardio, the dashboard note. */
-export function TraineeWorkouts({ trainee, today, onPlansChanged, plansVersion, onOpenEdit }: TraineeWorkoutsProps) {
+/** אימונים: this + next week's plan (workout cards, the light plan actions), the full workout log (paged), her cardio, the dashboard note. */
+export function TraineeWorkouts({ trainee, onPlansChanged, plansVersion, onOpenEdit }: TraineeWorkoutsProps) {
   const copy = useCopy(coachCopy).detail;
   const edit = useCopy(coachCopy).edit;
-  const eyebrow = useCopy(appCopy).eyebrow;
   const workouts = useTraineeWorkouts(trainee.id);
   const cardio = (workouts.data ?? []).filter((entry) => entry.kind === 'cardio');
 
   return (
     <>
-      <CoachCard
-        title={copy.thisWeek}
-        eyebrow={eyebrow.thisWeek}
+      <CoachSection
+        title={copy.actions.plan}
         action={
           <button type="button" className="coach-link" aria-haspopup="dialog" onClick={onOpenEdit}>
             {edit.open}
           </button>
         }
       >
-        {trainee.thisWeek && <WeekLanes week={trainee.thisWeek} weekStart={trainee.currentWeekStart} today={today} />}
         <TraineePlan trainee={trainee} onPlansChanged={onPlansChanged} refreshKey={plansVersion} />
-      </CoachCard>
+      </CoachSection>
 
-      <CoachCard title={copy.workoutLog} eyebrow={eyebrow.log}>
+      <CoachSection title={copy.workoutLog}>
         <WorkoutLogList traineeId={trainee.id} pageSize={LOG_PAGE} moreLabel={copy.moreWorkouts} />
-      </CoachCard>
+      </CoachSection>
 
       {cardio.length > 0 && (
-        <CoachCard title={copy.cardioLog}>
+        <CoachSection title={copy.cardioLog}>
           <LastWorkouts workouts={cardio} timezone={trainee.timezone} />
-        </CoachCard>
+        </CoachSection>
       )}
 
       <DeskNote text={copy.deskWorkouts} href={dashboardLinks.traineePlans(trainee.id)} />

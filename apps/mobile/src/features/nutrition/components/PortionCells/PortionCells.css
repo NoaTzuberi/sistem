@@ -1,0 +1,115 @@
+/* Read-only fuel cells (the parent's .tn-group-* sets --group-fill / --group-soft / --group-text). */
+.portion-cells {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.portion-cells-group {
+  display: grid;
+  grid-template-areas:
+    'head count'
+    'bar bar';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  row-gap: var(--space-2);
+}
+
+.portion-cells-head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-2) + 2px);
+  min-width: 0;
+}
+
+.portion-cells-badge.tn-badge {
+  width: var(--size-coach-chip);
+  height: var(--size-coach-chip);
+  box-shadow: none;
+}
+
+.portion-cells-badge svg {
+  width: var(--size-filter-chip-icon);
+  height: var(--size-filter-chip-icon);
+}
+
+.portion-cells-name {
+  font-size: var(--text-coach-group);
+  line-height: 1;
+  color: var(--color-ink);
+}
+
+.portion-cells-count {
+  grid-area: count;
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--group-text);
+}
+
+.portion-cells-goal {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.portion-cells-bar {
+  grid-area: bar;
+  display: flex;
+  gap: var(--gap-fuel-capsule);
+  margin: 0;
+}
+
+/* A portion is two shares of the width, a planned half one (like the trainee's FuelBar). */
+.portion-cells-capsule {
+  position: relative;
+  display: flex;
+  flex: 2 1 0;
+  gap: var(--gap-fuel-cell);
+  min-width: 0;
+}
+
+.portion-cells-capsule-half {
+  flex-grow: 1;
+}
+
+.portion-cells-cell {
+  flex: 1 1 0;
+  height: var(--size-coach-fuel-cell);
+  background-color: var(--group-soft);
+}
+
+.portion-cells-cell-on {
+  background-color: var(--group-fill);
+}
+
+.portion-cells-cell:first-of-type {
+  border-start-start-radius: var(--radius-coach-fuel);
+  border-end-start-radius: var(--radius-coach-fuel);
+}
+
+.portion-cells-cell:last-of-type {
+  border-start-end-radius: var(--radius-coach-fuel);
+  border-end-end-radius: var(--radius-coach-fuel);
+}
+
+/* The capsule's number: faint on the tint, white once the capsule is full (decorative, the count is in the head). */
+.portion-cells-number {
+  position: absolute;
+  inset-block-start: var(--space-1);
+  inset-inline-start: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--group-text);
+  opacity: var(--opacity-fuel-number);
+}
+
+.portion-cells-capsule-full .portion-cells-number {
+  color: var(--on-pink); /* contrast-ignore: a decorative capsule number (aria-hidden); the count is in the row header */
+  opacity: var(--opacity-fuel-number-full);
+}

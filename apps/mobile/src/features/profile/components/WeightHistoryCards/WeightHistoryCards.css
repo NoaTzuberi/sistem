@@ -32,12 +32,16 @@
   color: var(--color-ink);
   font: inherit;
   text-align: start;
-  cursor: pointer;
-  transition: transform var(--transition-press) var(--ease-press);
   -webkit-tap-highlight-color: transparent;
 }
 
-.wt-row:active {
+/* Only her own list opens a day (coach mode reads it). */
+button.wt-row {
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+button.wt-row:active {
   transform: scale(var(--press-scale));
 }
 

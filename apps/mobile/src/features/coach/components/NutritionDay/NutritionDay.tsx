@@ -1,16 +1,17 @@
-import { useCallback, useState } from 'react';
-import { addDaysToDate, fill, sharedCopy, useCopy, useLanguage, useLoad, weekdayName } from '@sistem/shared';
+import type { MealLogDay } from '@sistem/types';
+import { fill, formatPortionCount, PORTION_GROUPS, sharedCopy, useCopy, useLanguage, weekdayName } from '@sistem/shared';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import { getTraineeMealLogs } from '../../../../services/coach/coachService';
 import { PrivatePhoto } from '../../../../components/common/PrivatePhoto/PrivatePhoto';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { appCopy } from '../../../../copy';
 import { nutritionCopy } from '../../../nutrition/copy';
+import '../../../nutrition/groupColors.css';
 import { coachCopy } from '../../copy';
 import { dayMonthOf } from '../../data/coachMode';
+import { useTraineeMealWeek } from '../../hooks/useTraineeMealWeek';
 import { CoachCard } from '../CoachCard/CoachCard';
 import { LockLine } from '../LockLine/LockLine';
-import { PortionBars } from '../PortionBars/PortionBars';
+import { PortionCells } from '../../../nutrition/components/PortionCells/PortionCells';
 import './NutritionDay.css';
 
 interface NutritionDayProps {
@@ -19,9 +20,12 @@ interface NutritionDayProps {
   compact?: boolean;
 }
 
+const hasPlan = (day: MealLogDay) => Object.values(day.planned).some((count) => count > 0);
+
 /**
- * Her portion tracking for one day (read-only): marked / planned per group and, outside the overview, a day
- * picker over her Sunday week (with week arrows) and that day's meal photos — unblurred here, with the lock line.
+ * Her portion tracking (read-only). Overview: today's fuel cells. Nutrition tab: a day picker over her Sunday
+ * week (with week arrows) and a white card per day — portion chips per group and that day's meal photos
+ * (unblurred here, with the lock line); the picked day's card also shows the fuel cells.
  */
 export function NutritionDay({ traineeId, compact = false }: NutritionDayProps) {
   const copy = useCopy(coachCopy).detail;
@@ -29,79 +33,104 @@ export function NutritionDay({ traineeId, compact = false }: NutritionDayProps) 
   const shared = useCopy(sharedCopy);
   const eyebrow = useCopy(appCopy).eyebrow;
   const language = useLanguage();
-  // null = her current week (the server knows her zone).
-  const [weekStart, setWeekStart] = useState<string | null>(null);
-  const [picked, setPicked] = useState<string | null>(null);
-  const load = useCallback(() => getTraineeMealLogs(traineeId, weekStart ?? undefined), [traineeId, weekStart]);
-  const { data, error, isLoading, reload } = useLoad(load, nutrition.trackingLoadError);
+  const week = useTraineeMealWeek(traineeId, nutrition.trackingLoadError);
+  const { data } = week;
 
-  if (isLoading && !data) return <StateMessage>{shared.common.loading}</StateMessage>;
-  if (!data) return <StateMessage onRetry={reload}>{error}</StateMessage>;
+  if (week.isLoading && !data) return <StateMessage>{shared.common.loading}</StateMessage>;
+  if (!data) return <StateMessage onRetry={week.reload}>{week.error}</StateMessage>;
 
-  const isCurrentWeek = data.today >= data.weekStart && data.today <= addDaysToDate(data.weekStart, 6);
-  const date = picked && data.days.some((day) => day.date === picked) ? picked : isCurrentWeek ? data.today : data.days[data.days.length - 1]?.date;
-  const day = data.days.find((entry) => entry.date === date);
-  const isToday = date === data.today;
-  const hasPlan = day && Object.values(day.planned).some((count) => count > 0);
+  const dayName = (date: string) => `${weekdayName(new Date(`${date}T00:00:00Z`).getUTCDay(), language, 'short')}, ${dayMonthOf(date)}`;
 
-  function moveWeek(days: number) {
-    setPicked(null);
-    setWeekStart(addDaysToDate(data!.weekStart, days));
+  if (compact) {
+    const day = week.day;
+    return (
+      <CoachCard title={copy.todayPortions} eyebrow={eyebrow.today}>
+        {day && hasPlan(day) ? <PortionCells planned={day.planned} eaten={day.eaten} /> : <p className="coach-card-text">{copy.noPortions}</p>}
+      </CoachCard>
+    );
   }
 
   return (
-    <>
-      <CoachCard title={isToday ? copy.todayPortions : copy.dayPortions} eyebrow={isToday ? eyebrow.today : date ? dayMonthOf(date) : undefined}>
-        {!compact && (
-          <div className="nutrition-day-picker">
-            <button type="button" className="nutrition-day-arrow" onClick={() => moveWeek(-7)} aria-label={nutrition.trackingPreviousWeek}>
-              <IconChevronLeft className="flip-rtl" size={18} aria-hidden="true" />
+    <section className="nutrition-day" aria-label={nutrition.trackingTitle}>
+      <h2 className="nutrition-day-title display-title">{nutrition.trackingTitle}</h2>
+      <div className="nutrition-day-picker">
+        <button type="button" className="nutrition-day-arrow" onClick={week.previousWeek} aria-label={nutrition.trackingPreviousWeek}>
+          <IconChevronLeft className="flip-rtl" size={18} aria-hidden="true" />
+        </button>
+        <div className="nutrition-day-days" role="group" aria-label={copy.pickDay}>
+          {data.days.map((entry, index) => (
+            <button
+              key={entry.date}
+              type="button"
+              className="nutrition-day-day"
+              aria-pressed={entry.date === week.date}
+              disabled={entry.date > data.today}
+              onClick={() => week.pick(entry.date)}
+            >
+              <span className="nutrition-day-weekday">{weekdayName(index, language, 'narrow')}</span>
+              <span className="nutrition-day-date">{Number(entry.date.slice(8))}</span>
             </button>
-            <div className="nutrition-day-days" role="group" aria-label={copy.pickDay}>
-              {data.days.map((entry, index) => (
-                <button
-                  key={entry.date}
-                  type="button"
-                  className="nutrition-day-day"
-                  aria-pressed={entry.date === date}
-                  disabled={entry.date > data.today}
-                  onClick={() => setPicked(entry.date)}
-                >
-                  <span className="nutrition-day-weekday">{weekdayName(index, language, 'narrow')}</span>
-                  <span className="nutrition-day-date">{Number(entry.date.slice(8))}</span>
-                </button>
-              ))}
-            </div>
-            <button type="button" className="nutrition-day-arrow" onClick={() => moveWeek(7)} disabled={isCurrentWeek} aria-label={nutrition.trackingNextWeek}>
-              <IconChevronRight className="flip-rtl" size={18} aria-hidden="true" />
-            </button>
-          </div>
-        )}
-        {day && hasPlan ? <PortionBars planned={day.planned} eaten={day.eaten} /> : <p className="coach-card-text">{copy.noPortions}</p>}
-      </CoachCard>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="nutrition-day-arrow"
+          onClick={week.nextWeek}
+          disabled={week.isCurrentWeek}
+          aria-label={nutrition.trackingNextWeek}
+        >
+          <IconChevronRight className="flip-rtl" size={18} aria-hidden="true" />
+        </button>
+      </div>
 
-      {!compact && day && (
-        <CoachCard title={isToday ? copy.mealPhotosToday : `${copy.mealPhotos} · ${date ? dayMonthOf(date) : ''}`}>
-          {day.photos.length > 0 ? (
-            <div className="nutrition-day-photos">
-              {day.photos.map((photo) => (
-                <PrivatePhoto
-                  key={photo.id}
-                  photo={photo}
-                  alt={fill(nutrition.photoAlt, { meal: photo.mealName })}
-                  openLabel={nutrition.photoOpen}
-                  closeLabel={nutrition.photoClose}
-                  onLinkExpired={reload}
-                  thumbnail
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="coach-card-text">{copy.noPhotos}</p>
-          )}
-          <LockLine />
-        </CoachCard>
-      )}
-    </>
+      <ul className="nutrition-day-list">
+        {week.pastDays.map((entry) => {
+          const isPicked = entry.date === week.date;
+          const title = entry.date === data.today ? copy.todayPortions : dayName(entry.date);
+          return (
+            <li key={entry.date} className={'nutrition-day-card' + (isPicked ? ' nutrition-day-card-picked' : '')}>
+              <button type="button" className="nutrition-day-card-head" aria-pressed={isPicked} onClick={() => week.pick(entry.date)}>
+                <span className="nutrition-day-card-title">{title}</span>
+                {entry.date === data.today && <span className="nutrition-day-card-date">{dayName(entry.date)}</span>}
+              </button>
+              {!hasPlan(entry) ? (
+                <p className="coach-card-text">{copy.noPortions}</p>
+              ) : isPicked ? (
+                <PortionCells planned={entry.planned} eaten={entry.eaten} />
+              ) : (
+                <ul className="nutrition-day-chips">
+                  {PORTION_GROUPS.filter((group) => entry.planned[group] > 0).map((group) => (
+                    <li key={group} className={`nutrition-day-chip tn-group-${group}`}>
+                      {shared.nutrition.groups[group]}{' '}
+                      <bdi dir="ltr">
+                        {formatPortionCount(entry.eaten[group])}/{formatPortionCount(entry.planned[group])}
+                      </bdi>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {entry.photos.length > 0 && (
+                <>
+                  <div className="nutrition-day-photos">
+                    {entry.photos.map((photo) => (
+                      <PrivatePhoto
+                        key={photo.id}
+                        photo={photo}
+                        alt={fill(nutrition.photoAlt, { meal: photo.mealName })}
+                        openLabel={nutrition.photoOpen}
+                        closeLabel={nutrition.photoClose}
+                        onLinkExpired={week.reload}
+                        thumbnail
+                      />
+                    ))}
+                  </div>
+                  <LockLine />
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

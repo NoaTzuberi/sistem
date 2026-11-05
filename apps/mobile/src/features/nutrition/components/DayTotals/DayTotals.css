@@ -1,44 +1,55 @@
 .day-totals {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
 }
 
 .day-totals-title {
   margin: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-coach-ink-2);
 }
 
-.day-totals-list {
+/* "ירקות · חופשי, בכל ארוחה ובכל כמות": a dashed soft row, like the trainee screen. */
+.day-totals-veg {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.day-totals-group {
-  display: inline-flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
   min-height: var(--touch-target-min);
-  padding: 0 var(--space-3);
-  background-color: var(--color-bg);
-  border: var(--border-width-thin) solid var(--color-primary-deep);
-  border-radius: var(--radius-none);
-  color: var(--color-primary-deep);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-}
-
-.day-totals-group:active {
-  background-color: var(--color-primary-soft);
-}
-
-.day-totals-static {
-  border-color: var(--color-border);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-thin) dashed var(--color-hairline);
+  border-radius: var(--radius-coach-thumb);
+  background: none;
   color: var(--color-text-muted);
-  cursor: default;
+  font: inherit;
+  font-size: var(--text-coach-label);
+  text-align: start;
+}
+
+.day-totals-veg-title {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+}
+
+.day-totals-veg-button {
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-totals-veg-button:active {
+  transform: scale(var(--scale-coach-press));
+}
+
+.day-totals-veg-icon {
+  flex: none;
+  color: var(--color-text-faint);
 }

@@ -12,6 +12,6 @@
 
 .trainee-body-tracking-title {
   margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-qn-section);
+  line-height: 0.92;
 }

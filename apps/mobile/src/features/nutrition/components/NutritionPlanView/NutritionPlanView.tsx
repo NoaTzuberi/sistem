@@ -56,6 +56,7 @@ export function NutritionPlanView({ plan, introInitiallyOpen = false, onIntroRea
           vegetablesFree={plan.meals.some((meal) => meal.vegetablesFree)}
           hasVegetableSwaps={hasVegetableSwaps}
           onOpenSwaps={openGroup}
+          proteinGrams={plan.proteinGramsTarget}
         />
       )}
 

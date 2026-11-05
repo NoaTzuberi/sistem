@@ -2,22 +2,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
+/* A log: the white workout log card (group 1) — date, name, duration · volume · sets, chips; opens in place. */
 .workout-log {
-  background-color: var(--color-surface);
-  clip-path: var(--cut-corner);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
 }
 
 .workout-log-summary {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2);
-  min-height: var(--touch-target-min);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-wk-card);
   list-style: none;
   cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .workout-log-summary::-webkit-details-marker {
@@ -25,38 +32,88 @@
 }
 
 .workout-log-summary:active {
-  background-color: var(--color-border);
+  transform: scale(var(--scale-coach-press));
 }
 
 .workout-log-heading {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: calc(var(--space-1) + 2px);
   min-width: 0;
 }
 
-.workout-log-title {
-  font-weight: var(--font-weight-bold);
-  overflow-wrap: anywhere;
-}
-
 .workout-log-date {
-  font-size: var(--text-sm);
+  font-size: var(--text-coach-label);
   color: var(--color-text-muted);
 }
 
-.workout-log-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
+/* Latin names in Barlow italic caps, Hebrew names in Rubik (like her history). */
+.workout-log-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  overflow-wrap: anywhere;
 }
 
-.workout-log-badges .badge {
-  text-transform: none;
+.workout-log-title [data-script='latin'] {
+  font-family: var(--font-num);
+  font-size: var(--text-coach-log);
+  font-style: italic;
+  font-weight: var(--font-weight-extrabold);
+  text-transform: uppercase;
+}
+
+.workout-log-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.workout-log-facts > span + span::before {
+  content: '·';
+  margin-inline-end: var(--space-2);
+  color: var(--color-text-faint);
+}
+
+.workout-log-facts bdi {
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.workout-log-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space-1) + 2px);
+}
+
+.workout-log-chips:empty {
+  display: none;
+}
+
+.workout-log-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-coach-chip);
+  padding-inline: calc(var(--space-2) + 2px);
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font-size: var(--text-coach-caption-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.workout-log-chip-pr {
+  background-color: var(--color-coach-pr-soft);
+  color: var(--color-coach-pr-ink);
 }
 
 .workout-log-chevron {
   flex-shrink: 0;
+  color: var(--color-text-faint);
   transition: transform var(--transition-fast) var(--ease-standard);
 }
 
@@ -67,29 +124,18 @@
 .workout-log-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: 0 var(--space-3) var(--space-3);
+  gap: var(--space-3);
+  padding: 0 var(--pad-coach-tile) var(--pad-coach-tile);
 }
 
-.workout-log-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
-  margin: 0;
-}
-
-.workout-log-stats dt {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-.workout-log-stats dd {
-  margin: 0;
-  font-weight: var(--font-weight-bold);
+.workout-log-body .private-photo {
+  overflow: hidden;
+  border-radius: var(--radius-coach-thumb);
 }
 
 .workout-log-notes {
   margin: 0;
+  font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 
@@ -102,12 +148,11 @@
   list-style: none;
 }
 
-/* "Done" / success uses Cherry Rose, never green. */
 .workout-log-records li {
-  padding: var(--space-1) var(--space-2);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary-deep);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-deep);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-coach-icon-tile);
+  background-color: var(--color-coach-pr-soft);
+  color: var(--color-coach-pr-ink);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   overflow-wrap: anywhere;
@@ -115,17 +160,19 @@
 
 .workout-log-photo-slot {
   margin: 0;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-thin) dashed var(--color-hairline);
+  border-radius: var(--radius-coach-icon-tile);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  border: var(--border-width-thin) dashed var(--color-text-muted);
 }
 
 .workout-log-exercise {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   padding-top: var(--space-2);
-  border-top: var(--border-width-thin) solid var(--color-border);
+  border-top: var(--border-width-thin) solid var(--color-coach-rule);
 }
 
 .workout-log-exercise-name {
@@ -134,9 +181,19 @@
 
 .workout-log-set {
   font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
-.workout-logs-more {
-  width: 100%;
+/* White, not the soft grey: the soft pill nearly vanishes on the soft page (as group 1). */
+.workout-logs-more.pill-button {
   margin-block-start: var(--space-2);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-log-summary,
+  .workout-log-chevron {
+    transition: none;
+  }
 }

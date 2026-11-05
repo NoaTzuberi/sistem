@@ -1,6 +1,23 @@
 .trainee-achievements {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  padding-top: var(--space-4);
+  gap: var(--space-2);
+}
+
+/* Her streak as a white card above the stat tiles. */
+.trainee-achievements .streak-summary {
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+/* Hebrew is never letter-spaced or capitalized. */
+.trainee-achievements .streak-summary-label {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.trainee-achievements .achievement-list {
+  margin-block-start: var(--space-3);
 }

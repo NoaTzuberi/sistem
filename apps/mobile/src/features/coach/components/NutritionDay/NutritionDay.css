@@ -1,8 +1,19 @@
+.nutrition-day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.nutrition-day-title {
+  margin: 0;
+  font-size: var(--text-qn-section);
+  line-height: 0.92;
+}
+
 .nutrition-day-picker {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  margin-block-end: var(--space-3);
 }
 
 .nutrition-day-days {
@@ -12,25 +23,30 @@
   gap: var(--space-1);
 }
 
+/* A day pill: white, ink when picked; future days are faded and can't be picked. */
 .nutrition-day-day {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(var(--touch-target-min) + var(--space-1));
+  gap: 2px;
+  min-height: var(--size-coach-day);
   padding: 0;
   border: 0;
-  border-radius: var(--radius-calendar-day);
-  background-color: var(--color-coach-soft);
-  color: var(--color-ink);
+  border-radius: var(--radius-coach-row);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  color: var(--color-text-muted);
   font: inherit;
   cursor: pointer;
-  transition: transform var(--transition-press) var(--ease-out), background-color var(--transition-fast) ease;
+  transition:
+    transform var(--transition-press) var(--ease-coach-out),
+    background-color var(--transition-fast) ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .nutrition-day-day:active:not(:disabled) {
-  transform: scale(0.94);
+  transform: scale(var(--scale-coach-press));
 }
 
 .nutrition-day-day[aria-pressed='true'] {
@@ -39,6 +55,8 @@
 }
 
 .nutrition-day-day:disabled {
+  box-shadow: none;
+  background-color: transparent;
   color: var(--color-coach-faint);
   cursor: default;
 }
@@ -56,8 +74,13 @@
 
 .nutrition-day-date {
   font-family: var(--font-num);
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
+  color: inherit;
+}
+
+.nutrition-day-day:not([aria-pressed='true']):not(:disabled) .nutrition-day-date {
+  color: var(--color-ink);
 }
 
 .nutrition-day-arrow {
@@ -67,26 +90,124 @@
   justify-content: center;
   width: var(--touch-target-min);
   height: var(--touch-target-min);
-  margin-inline: calc(-1 * var(--space-2));
   padding: 0;
   border: 0;
   border-radius: var(--radius-round);
-  background: none;
-  color: var(--color-coach-ink-2);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  color: var(--color-ink);
   cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-coach-out);
 }
 
 .nutrition-day-arrow:active:not(:disabled) {
-  transform: scale(0.92);
+  transform: scale(var(--scale-coach-press));
 }
 
 .nutrition-day-arrow:disabled {
+  box-shadow: none;
+  background-color: transparent;
   color: var(--color-coach-faint);
   cursor: default;
+}
+
+.nutrition-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A day: a white card; the picked one shows the fuel cells instead of the chips. */
+.nutrition-day-card {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + 2px);
+  padding: var(--pad-coach-tile);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+.nutrition-day-card-picked {
+  box-shadow: var(--shadow-profile-card), inset 0 0 0 var(--border-width-medium) var(--color-ink);
+}
+
+.nutrition-day-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  margin: calc(-1 * var(--space-2)) 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.nutrition-day-card-head[aria-pressed='true'] {
+  cursor: default;
+}
+
+.nutrition-day-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.nutrition-day-card-date {
+  font-size: var(--text-coach-label);
+  color: var(--color-text-muted);
+}
+
+.nutrition-day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space-1) + 2px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A group's chip: its tint + ink (.tn-group-* sets them). */
+.nutrition-day-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-coach-template-chip);
+  padding-inline: calc(var(--space-2) + 2px);
+  border-radius: var(--radius-round);
+  background-color: var(--group-soft);
+  color: var(--group-text);
+  font-size: var(--text-coach-caption-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.nutrition-day-chip bdi {
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
 }
 
 .nutrition-day-photos {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: calc(var(--space-1) + 2px);
+  gap: var(--space-2);
+}
+
+.nutrition-day-photos .private-photo {
+  overflow: hidden;
+  border-radius: var(--radius-coach-thumb);
+  background-color: var(--color-coach-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nutrition-day-day,
+  .nutrition-day-arrow {
+    transition: none;
+  }
 }

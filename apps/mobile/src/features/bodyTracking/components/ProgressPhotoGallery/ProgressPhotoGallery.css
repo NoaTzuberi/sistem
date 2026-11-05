@@ -1,74 +1,56 @@
 .progress-photo-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.progress-photo-gallery-day {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.progress-photo-gallery-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
-.progress-photo-gallery-date {
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.progress-photo-gallery-edit {
-  min-width: var(--touch-target-min);
-  min-height: var(--touch-target-min);
-  padding: 0 var(--space-2);
-  border: 0;
-  background: none;
-  color: var(--color-primary-deep);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-}
-
-.progress-photo-gallery-edit:active {
-  background: var(--color-surface);
-}
-
-.progress-photo-gallery-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-}
-
-.progress-photo-gallery-slot {
+.progress-photo-gallery-item {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   min-width: 0;
-  margin: 0;
 }
 
-.progress-photo-gallery-missing {
-  aspect-ratio: 3 / 4;
-  border: var(--border-width-thin) dashed var(--color-border);
+.progress-photo-gallery-item .private-photo {
+  overflow: hidden;
+  border-radius: var(--radius-coach-thumb);
+  background-color: var(--color-coach-soft);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.progress-photo-gallery-item .private-photo:active {
+  opacity: 1;
+  transform: scale(var(--scale-coach-press));
+}
+
+.progress-photo-gallery-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--text-xs);
+  line-height: 1.3;
+}
+
+.progress-photo-gallery-date {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
 }
 
 .progress-photo-gallery-pose {
-  font-size: var(--text-xs);
   color: var(--color-text-muted);
-  text-align: center;
 }
 
 .progress-photo-gallery-empty {
   margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-photo-gallery-item .private-photo {
+    transition: none;
+  }
 }

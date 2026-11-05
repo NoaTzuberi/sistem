@@ -9,7 +9,8 @@ interface MeasHistoryProps {
   ids: string[];
   unit: LengthUnit;
   selectedId: string;
-  onOpen: (day: BodyMetric) => void;
+  /** Her own screen: tap a day to open it. Coach mode passes nothing (read-only rows). */
+  onOpen?: (day: BodyMetric) => void;
 }
 
 /** "היסטוריה": a white card per day (newest first), its values as soft chips; the chart's measurement in ink. */
@@ -17,6 +18,7 @@ export function MeasHistory({ days, ids, unit, selectedId, onOpen }: MeasHistory
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
   if (days.length === 0) return null;
+  const Row = onOpen ? 'button' : 'div';
 
   return (
     <section className="meas-history" aria-labelledby="meas-history-title">
@@ -26,7 +28,7 @@ export function MeasHistory({ days, ids, unit, selectedId, onOpen }: MeasHistory
       <ul className="meas-history-list">
         {days.map((day) => (
           <li key={day.date}>
-            <button type="button" className="meas-row" onClick={() => onOpen(day)}>
+            <Row className="meas-row" {...(onOpen ? { type: 'button' as const, onClick: () => onOpen(day) } : {})}>
               <span className="meas-row-text">
                 <span className="meas-row-date">{formatDateOnly(day.date, language)}</span>
                 <span className="meas-row-chips">
@@ -39,8 +41,8 @@ export function MeasHistory({ days, ids, unit, selectedId, onOpen }: MeasHistory
                     ))}
                 </span>
               </span>
-              <IconChevronRight className="meas-row-chevron flip-rtl" size={18} aria-hidden="true" />
-            </button>
+              {onOpen && <IconChevronRight className="meas-row-chevron flip-rtl" size={18} aria-hidden="true" />}
+            </Row>
           </li>
         ))}
       </ul>
