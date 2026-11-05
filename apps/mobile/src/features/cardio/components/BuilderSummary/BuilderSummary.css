@@ -1,0 +1,118 @@
+/* Sticky under the header while the timeline scrolls. */
+.cb-summary {
+  position: sticky;
+  inset-block-start: calc(var(--safe-top) + var(--space-2));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-wk-card) var(--space-wk-card) var(--space-3);
+  border-radius: var(--radius-wk-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+.cb-summary-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.cb-summary-total {
+  font-family: var(--font-num);
+  font-size: var(--text-cb-total);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.cb-summary-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.cb-summary-fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: var(--size-cb-fact);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cb-summary-zone {
+  background-color: var(--cp-s);
+  color: var(--cp-t);
+}
+
+.cb-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: var(--size-cb-chart);
+}
+
+/* Width = time, height + color = effort / zone; the width grows on a change. */
+.cb-chart-bar {
+  flex: var(--cb-w) 0 0;
+  min-width: 4px;
+  height: var(--cb-h);
+  padding: 0;
+  border: 0;
+  border-radius: 6px 6px 3px 3px;
+  background-color: var(--cp-c);
+  cursor: pointer;
+  transition:
+    flex-grow var(--transition-cb-expand) var(--ease-out),
+    height var(--transition-cb-expand) var(--ease-out),
+    transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cb-chart-bar:active {
+  transform: scale(var(--press-scale));
+}
+
+.cb-chart-bar-selected {
+  outline: var(--border-width-medium) solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.cb-chart-bar:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cb-chart-labels {
+  display: flex;
+  gap: 2px;
+  margin-block-start: calc(-1 * var(--space-2));
+}
+
+.cb-chart-label {
+  flex: var(--cb-w) 0 0;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: flex-grow var(--transition-cb-expand) var(--ease-out);
+}
+
+.cb-chart-label-repeat {
+  color: var(--color-zone-2-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-chart-bar,
+  .cb-chart-label {
+    transition: none;
+  }
+}
