@@ -28,17 +28,6 @@ export function formatNumber(value: number, language: Language, options: Intl.Nu
   return format.format(value);
 }
 
-const relativeFormats = new Map<Language, Intl.RelativeTimeFormat>();
-
-export function formatRelative(value: number, unit: Intl.RelativeTimeFormatUnit, language: Language): string {
-  let format = relativeFormats.get(language);
-  if (!format) {
-    format = new Intl.RelativeTimeFormat(intlLocale(language), { numeric: 'auto', style: 'short' });
-    relativeFormats.set(language, format);
-  }
-  return format.format(value, unit);
-}
-
 // A known Sunday: weekday names are read from it, so index 0 is always Sunday (PRD: weeks start on Sunday).
 const A_SUNDAY_MS = Date.UTC(2026, 0, 4);
 const DAY_MS = 86_400_000;

@@ -5,7 +5,8 @@
    `AuthSubmitButton` is removed (nothing else used it); variants are `primary` | `soft`.
 2. **Dashboard side bars → rounded soft cards** (radius `--radius-profile-group`, no side border):
    NutritionAiRationale, NutritionAiDraftCard, MealEditor. The 4th grep hit, PortionSplitBar, is the white gap between
-   bar segments (not a side bar) — kept. NutritionAiDraftCard and MealEditor are not used anywhere (dead code).
+   bar segments (not a side bar) — kept. NutritionAiDraftCard and MealEditor were unused — deleted afterwards in a
+   separate cleanup commit (with `formatRelative`), so only NutritionAiRationale's change is in this commit.
 3. **Time ago**: `formatTimeAgo` (@sistem/shared) no longer uses Intl.RelativeTimeFormat — its Hebrew short form reads
    "לפני דק׳ (1)". Own wording in the shared copy (`timeAgo.minutes|hours|days`, plural forms): he "לפני דקה",
    "לפני 5 דק׳", "לפני שעה", "לפני שעתיים", "לפני 3 שע׳", "אתמול", "שלשום", "לפני 3 ימים"; en "5 min ago", "2 hr ago",
@@ -40,14 +41,13 @@
   open in the dashboard shot; the onboarding photo step was not shot (needs a fresh onboarding).
 
 ## Known issues / TODOs
-- `formatRelative` (Intl) is no longer used, but stays exported (listed as a shared helper in CLAUDE.md).
-- NutritionAiDraftCard and MealEditor are unused — delete them?
+- None open (the unused components and `formatRelative` were removed in the cleanup commit).
 
 ## Suggested commits
 ```bash
 git add -A -- apps/mobile/src/features/join/pages/JoinPage/JoinPage.tsx apps/mobile/src/features/auth/components/AuthSubmitButton
 git commit -m "style(mobile): join screen second action is the soft pill, drop the outlined auth button"
-git add -A -- apps/dashboard/src/features/aiDraft/components/NutritionAiRationale apps/dashboard/src/features/aiDraft/components/NutritionAiDraftCard apps/dashboard/src/features/nutrition/components/MealEditor
+git add -A -- apps/dashboard/src/features/aiDraft/components/NutritionAiRationale
 git commit -m "style(dashboard): rounded soft cards instead of side bars"
 git add -A -- packages/shared/src/format.ts packages/shared/src/copy/he.ts packages/shared/src/copy/en.ts
 git commit -m "fix(shared): time ago reads naturally in Hebrew and English, number isolated left to right"
