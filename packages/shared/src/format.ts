@@ -1,7 +1,8 @@
 import type { Language } from '@sistem/types';
 import { sharedCopy } from './copy';
-import { fill } from './i18n/copy';
-import { dateFormat, formatRelative } from './i18n/intl';
+import { fill, formatPlural } from './i18n/copy';
+import { isolateLtr } from './i18n/bidi';
+import { dateFormat, formatNumber } from './i18n/intl';
 
 // Display helpers, in the language on screen (Phase 15). Dates come from Intl; the
 // wording around them from the shared copy (placeholders — the owner decides).
@@ -106,12 +107,20 @@ export function formatTimeLeft(dueAt: string, nowMs: number, language: Language)
     : { text: fill(copy.overdue, { time: formatHoursMinutes(-leftMs, language) }), isOverdue: true };
 }
 
-/** '5 min ago', 'yesterday', '3 days ago' (Intl.RelativeTimeFormat). */
+/**
+ * 'לפני 5 דק׳' / '5 min ago', 'לפני שעה', 'אתמול' / 'yesterday', 'לפני 3 ימים'. The number is isolated left to right
+ * (the text form of <bdi dir="ltr">: the result is also placed inside sentences, so it stays a string).
+ */
 export function formatTimeAgo(iso: string, nowMs: number, language: Language): string {
   const agoMs = Math.max(0, nowMs - new Date(iso).getTime());
-  if (agoMs < HOUR_MS) return formatRelative(-Math.max(1, Math.floor(agoMs / MINUTE_MS)), 'minute', language);
-  if (agoMs < DAY_MS) return formatRelative(-Math.floor(agoMs / HOUR_MS), 'hour', language);
-  return formatRelative(-Math.floor(agoMs / DAY_MS), 'day', language);
+  const copy = sharedCopy[language].timeAgo;
+  const [entry, count] =
+    agoMs < HOUR_MS
+      ? [copy.minutes, Math.max(1, Math.floor(agoMs / MINUTE_MS))]
+      : agoMs < DAY_MS
+        ? [copy.hours, Math.floor(agoMs / HOUR_MS)]
+        : [copy.days, Math.floor(agoMs / DAY_MS)];
+  return formatPlural(language, entry, count, { count: isolateLtr(formatNumber(count, language)) });
 }
 
 /** '45s', '2 min', '1 min 30s' (Hebrew: '45 שנ׳' …). */

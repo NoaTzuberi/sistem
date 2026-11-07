@@ -47,6 +47,12 @@ export const he = {
     minutesSeconds: '{m} דק׳ {s} שנ׳',
     hoursMinutes: '{h} שע׳ {m} דק׳',
   },
+  // "לפני 5 דק׳" (owner 2026-11-07, DRAFT for the rest): our own wording — Intl's Hebrew short form reads "לפני דק׳ (1)".
+  timeAgo: {
+    minutes: plural({ one: 'לפני דקה', two: 'לפני {count} דק׳', other: 'לפני {count} דק׳' }),
+    hours: plural({ one: 'לפני שעה', two: 'לפני שעתיים', other: 'לפני {count} שע׳' }),
+    days: plural({ one: 'אתמול', two: 'שלשום', other: 'לפני {count} ימים' }),
+  },
   time: {
     left: 'נותרו {time}',
     overdue: 'באיחור של {time}',

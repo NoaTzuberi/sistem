@@ -44,6 +44,12 @@ export const en: CopyShape<typeof he> = {
     minutesSeconds: '{m} min {s}s',
     hoursMinutes: '{h}h {m}m',
   },
+  // DRAFT
+  timeAgo: {
+    minutes: plural({ one: '{count} min ago', other: '{count} min ago' }),
+    hours: plural({ one: '{count} hr ago', other: '{count} hr ago' }),
+    days: plural({ one: 'yesterday', other: '{count} days ago' }),
+  },
   time: {
     left: '{time} left',
     overdue: 'Overdue by {time}',
