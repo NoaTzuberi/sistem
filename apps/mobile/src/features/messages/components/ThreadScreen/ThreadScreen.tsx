@@ -4,6 +4,7 @@ import { useCopy } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { useGoBack } from '../../../profile/hooks/useGoBack';
+import { useKeyboardInset } from '../../../../hooks/useKeyboardInset';
 import { CoachAvatar } from '../../../coach/components/CoachAvatar/CoachAvatar';
 import { messagesCopy } from '../../copy';
 import type { useThread } from '../../hooks/useThread';
@@ -26,10 +27,14 @@ interface ThreadScreenProps {
   cannotWriteText?: string;
 }
 
-/** A full-screen conversation (no dock): the header with her name, the bubbles, the composer pinned to the bottom. */
+/**
+ * A full-screen conversation (no dock): the header with her name, the bubbles, the composer pinned to the bottom —
+ * above the home indicator and, on iOS, above the keyboard (--keyboard-inset).
+ */
 export function ThreadScreen({ name, avatarSeed, avatarUrl, fallbackPath, me, timezone, thread, canWrite = true, cannotWriteText }: ThreadScreenProps) {
   const copy = useCopy(messagesCopy);
   const goBack = useGoBack(fallbackPath);
+  useKeyboardInset();
 
   return (
     <AppShell bleed hideTabBar surface="soft">
@@ -55,7 +60,7 @@ export function ThreadScreen({ name, avatarSeed, avatarUrl, fallbackPath, me, ti
               hasOlder={thread.hasOlder}
               isLoadingOlder={thread.isLoadingOlder}
               onLoadOlder={() => void thread.loadOlder()}
-              otherName={name}
+              other={{ name, seed: avatarSeed, avatarUrl }}
             />
           )}
         </div>

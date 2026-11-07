@@ -13,6 +13,8 @@ export const en: CopyShape<typeof he> = {
   older: 'Earlier messages',
   empty: 'No messages yet. You can write here.',
   read: 'Read',
+  today: 'Today',
+  yesterday: 'Yesterday',
   noCoach: "You don't have a coach right now, so there's no one to write to.",
   mine: 'You',
   reply: 'Reply',

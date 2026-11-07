@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  background-color: var(--color-coach-page);
+  background-color: var(--color-subscreen-page);
 }
 
 .cm-screen-head {
@@ -55,16 +55,16 @@
 
 .cm-screen-body {
   flex: 1;
-  padding: var(--space-3);
+  padding: var(--space-3) calc(var(--home-gutter) + var(--safe-inline-start)) var(--space-3) calc(var(--home-gutter) + var(--safe-inline-end));
 }
 
-/* Sticky (not fixed): the page-enter transform on <main> would pin a fixed footer. */
+/* Sticky (not fixed): the page-enter transform on <main> would pin a fixed footer. On iOS the keyboard only
+   shrinks the visual viewport, so the bar lifts by its height (useKeyboardInset; 0 elsewhere). */
 .cm-screen-foot {
   position: sticky;
-  inset-block-end: 0;
-  padding: var(--space-2) var(--space-3) max(var(--space-2), var(--safe-bottom));
-  background-color: var(--color-coach-card);
-  box-shadow: var(--shadow-coach-card);
+  inset-block-end: var(--keyboard-inset, 0px);
+  padding: var(--space-2) calc(var(--home-gutter) + var(--safe-inline-start)) max(var(--space-3), var(--safe-bottom)) calc(var(--home-gutter) + var(--safe-inline-end));
+  background-color: var(--color-subscreen-page);
 }
 
 .cm-screen-cannot {

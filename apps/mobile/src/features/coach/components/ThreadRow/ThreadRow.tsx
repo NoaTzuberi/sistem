@@ -21,10 +21,12 @@ export function ThreadRow({ thread, nowMs }: { thread: CoachThread; nowMs: numbe
           {preview}
         </span>
       </span>
-      <time className="cm-row-time" dateTime={lastMessage.createdAt}>
-        {formatTimeAgo(lastMessage.createdAt, nowMs, language)}
-      </time>
-      {thread.unread > 0 && <span className="cm-row-dot" role="img" aria-label={copy.unread} />}
+      <span className="cm-row-meta">
+        <time className="cm-row-time" dateTime={lastMessage.createdAt}>
+          {formatTimeAgo(lastMessage.createdAt, nowMs, language)}
+        </time>
+        {thread.unread > 0 && <span className="cm-row-dot" role="img" aria-label={copy.unread} />}
+      </span>
     </Link>
   );
 }

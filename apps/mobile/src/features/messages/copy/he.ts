@@ -12,6 +12,8 @@ export const he = {
   older: 'הודעות קודמות', // PLACEHOLDER
   empty: 'עוד אין הודעות. אפשר לכתוב כאן.', // PLACEHOLDER
   read: 'נקראה', // PLACEHOLDER
+  today: 'היום', // owner-approved (design group 4): day separator
+  yesterday: 'אתמול', // owner-approved (design group 4): day separator
   noCoach: 'אין לך מאמנת כרגע, אז אין למי לכתוב.', // PLACEHOLDER
   mine: 'את', // PLACEHOLDER (screen reader: who wrote a bubble)
   // Trainee Home: the coach note area.
