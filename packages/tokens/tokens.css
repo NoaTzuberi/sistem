@@ -293,11 +293,11 @@
     inset 0 0 0 1px color-mix(in srgb, var(--color-card) 70%, transparent),
     0 10px 30px color-mix(in srgb, var(--color-text) 6%, transparent);
   /* Body measurements: which measurement a line / dot / row is. Identity colors, not statuses. */
-  --color-measure-chest: #9a77db;
+  --color-measure-chest: #7c4dff;
   --color-measure-waist: #ff006e;
-  --color-measure-hips: #d46a95;
-  --color-measure-arms: #0070c9;
-  --color-measure-thighs: #e08a5c;
+  --color-measure-hips: #c23bc0;
+  --color-measure-arms: #0094ff;
+  --color-measure-thighs: #ff7a00;
   --gradient-empty-stripes: repeating-linear-gradient(
     135deg,
     color-mix(in srgb, var(--color-fill-soft) 80%, transparent) 0 10px,
@@ -895,7 +895,6 @@
   --confetti-delay: 120ms;         /* The burst waits for the modal to start opening */
   --intro-xp: 900ms;               /* The achievements XP bar growing, once */
   --intro-meter: 900ms;            /* A tile's meter growing */   /* An exercise card's chevron turning as it opens */
-  --loop-slow: 2s;               /* Repeating hints (scroll bounce) */
   /* Trainee Home (direction B) and the tab screens' depth transition. */
   --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);   /* The dock pill opening */
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);            /* A screen leaving */
@@ -1225,8 +1224,7 @@
   --size-meas-chart: 180px;
   --stroke-meas-line: 2.5px;
   --color-meas-chip-border: var(--color-hairline);
-  --color-meas-area-top: color-mix(in srgb, var(--color-primary) 18%, transparent);
-  --color-meas-area-bottom: color-mix(in srgb, var(--color-primary) 0%, transparent);
+  --size-meas-chip-dot: 8px;           /* The measurement's color dot in an unselected chip */
   --transition-meas-draw: 400ms;       /* The line drawing in on a range change (on --ease-out) */
 
   /* ═══ 14. Questionnaire + Settings (Profile sub-screens, direction B — like the Profile) ═════ */

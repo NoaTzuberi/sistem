@@ -29,12 +29,8 @@
   transform: scale(var(--press-scale));
 }
 
-/* Identity colors, the same map as the coach's Body tab. */
-.pf-measure-chest { --pf-measure: var(--color-measure-chest); }
-.pf-measure-waist { --pf-measure: var(--color-measure-waist); }
-.pf-measure-hips { --pf-measure: var(--color-measure-hips); }
-.pf-measure-arms { --pf-measure: var(--color-measure-arms); }
-.pf-measure-thighs { --pf-measure: var(--color-measure-thighs); }
+/* Identity colors: --meas-color from measurementTones.css (ink for the others). */
+.pf-measure[class*='meas-tone-'] { --pf-measure: var(--meas-color); }
 
 .pf-measure-bar {
   flex: none;

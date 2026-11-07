@@ -10,6 +10,8 @@ import { MeasChips } from '../../components/MeasChips/MeasChips';
 import { MeasHero } from '../../components/MeasHero/MeasHero';
 import { MeasHistory } from '../../components/MeasHistory/MeasHistory';
 import { useMeasurementTrend } from '../../hooks/useMeasurementTrend';
+import { measurementTone } from '../../data/profileDisplay';
+import '../../measurementTones.css';
 import './MeasurementsPage.css';
 
 /**
@@ -23,7 +25,7 @@ export function MeasurementsPage() {
   const trend = useMeasurementTrend();
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="meas-screen">
         <SubScreenHeader
           title={copy.measurementsTitle}
@@ -41,7 +43,8 @@ export function MeasurementsPage() {
           {trend.error && !trend.list && <StateMessage onRetry={trend.reload}>{trend.error}</StateMessage>}
 
           {trend.list && (
-            <>
+            // The chosen measurement's color reaches the chart (the chips set their own).
+            <div className={`meas-body ${measurementTone(trend.measurementId)}`}>
               <MeasChips ids={trend.ids} value={trend.measurementId} onChange={trend.selectMeasurement} />
               <MeasHero
                 title={measurementLabel(trend.measurementId, language)}
@@ -63,7 +66,7 @@ export function MeasurementsPage() {
                 selectedId={trend.measurementId}
                 onOpen={(day) => navigate(measurementsLogPath(day.date))}
               />
-            </>
+            </div>
           )}
         </div>
       </div>

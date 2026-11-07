@@ -86,26 +86,13 @@
 .pf-chart-plot {
   position: relative;
   height: var(--size-profile-chart);
-  /* Drawn in from the start side (right in Hebrew). */
-  animation: pf-chart-reveal-rtl var(--transition-profile-draw) var(--ease-press) both;
-}
-
-:root[dir='ltr'] .pf-chart-plot {
-  animation-name: pf-chart-reveal-ltr;
-}
-
-@keyframes pf-chart-reveal-rtl {
-  from {
-    clip-path: inset(0 0 0 100%); /* physical: clip-path has no logical form — reveals from the right (start in Hebrew) */
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
+  /* Drawn in from the oldest point (left — time runs left → right in both languages). */
+  animation: pf-chart-reveal-ltr var(--transition-profile-draw) var(--ease-press) both;
 }
 
 @keyframes pf-chart-reveal-ltr {
   from {
-    clip-path: inset(0 100% 0 0); /* physical: clip-path has no logical form — reveals from the left (start in English) */
+    clip-path: inset(0 100% 0 0); /* physical: clip-path has no logical form — reveals from the left (the oldest point) */
   }
   to {
     clip-path: inset(0 0 0 0);
@@ -134,7 +121,7 @@
 /* The last point: x is computed per direction, so it is placed from the physical left. */
 .pf-chart-dot {
   position: absolute;
-  left: var(--pf-dot-x); /* physical: the chart's x already follows the reading direction */
+  left: var(--pf-dot-x); /* physical: time runs left → right in both languages */
   top: var(--pf-dot-y);
   width: var(--size-profile-chart-dot);
   height: var(--size-profile-chart-dot);

@@ -71,3 +71,8 @@
     transition: none;
   }
 }
+
+/* Only carries the chosen measurement's color: its children stay items of .meas-content's column. */
+.meas-body {
+  display: contents;
+}

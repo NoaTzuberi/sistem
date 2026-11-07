@@ -1,0 +1,7 @@
+/* A measurement's identity color (--color-measure-*, the same map as the coach's Body tab) as --meas-color:
+   the profile row (stripe + sparkline), the chips and the measurements chart. Others fall back per use. */
+.meas-tone-chest { --meas-color: var(--color-measure-chest); }
+.meas-tone-waist { --meas-color: var(--color-measure-waist); }
+.meas-tone-hips { --meas-color: var(--color-measure-hips); }
+.meas-tone-arms { --meas-color: var(--color-measure-arms); }
+.meas-tone-thighs { --meas-color: var(--color-measure-thighs); }

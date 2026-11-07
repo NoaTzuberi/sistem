@@ -1,5 +1,7 @@
 import { measurementLabel, useCopy, useLanguage } from '@sistem/shared';
 import { bodyCopy } from '../../../bodyTracking/copy';
+import { measurementTone } from '../../data/profileDisplay';
+import '../../measurementTones.css';
 import './MeasChips.css';
 
 interface MeasChipsProps {
@@ -8,7 +10,7 @@ interface MeasChipsProps {
   onChange: (id: string) => void;
 }
 
-/** One pill per measurement, in list order; scrolls sideways; the chosen one is solid ink. */
+/** One pill per measurement, in list order; scrolls sideways. Each has its color: a dot, or solid when chosen. */
 export function MeasChips({ ids, value, onChange }: MeasChipsProps) {
   const language = useLanguage();
   const copy = useCopy(bodyCopy);
@@ -18,10 +20,11 @@ export function MeasChips({ ids, value, onChange }: MeasChipsProps) {
         <button
           key={id}
           type="button"
-          className={'meas-chip' + (id === value ? ' meas-chip-selected' : '')}
+          className={`meas-chip ${measurementTone(id)}${id === value ? ' meas-chip-selected' : ''}`}
           aria-pressed={id === value}
           onClick={() => onChange(id)}
         >
+          <span className="meas-chip-dot" aria-hidden="true" />
           {measurementLabel(id, language)}
         </button>
       ))}

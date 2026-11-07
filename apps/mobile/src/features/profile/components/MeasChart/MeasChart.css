@@ -1,4 +1,6 @@
 .meas-chart {
+  /* The selected measurement's color (measurementTones.css on the page), else pink. */
+  --meas-chart-color: var(--meas-color, var(--color-primary));
   position: relative;
   width: 100%;
   height: var(--size-meas-chart);
@@ -33,16 +35,16 @@
 }
 
 .meas-chart-area-top {
-  stop-color: var(--color-meas-area-top);
+  stop-color: color-mix(in srgb, var(--meas-chart-color) 18%, transparent);
 }
 
 .meas-chart-area-bottom {
-  stop-color: var(--color-meas-area-bottom);
+  stop-color: color-mix(in srgb, var(--meas-chart-color) 0%, transparent);
 }
 
 .meas-chart-line {
   fill: none;
-  stroke: var(--color-primary);
+  stroke: var(--meas-chart-color);
   stroke-width: var(--stroke-meas-line);
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -62,7 +64,7 @@
 }
 
 .meas-chart-dot {
-  fill: var(--color-primary);
+  fill: var(--meas-chart-color);
 }
 
 /* The latest point: bigger, with a white ring. */

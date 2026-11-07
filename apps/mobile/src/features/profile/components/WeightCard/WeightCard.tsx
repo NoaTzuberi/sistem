@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { WeightUnit } from '@sistem/types';
 import type { ChartPoint } from '@sistem/shared';
 import { IconPlus } from '@tabler/icons-react';
-import { directionOf, fill, formatDayMonth, roundOneDecimal, unitLabel, useCopy, useLanguage } from '@sistem/shared';
+import { fill, formatDayMonth, roundOneDecimal, unitLabel, useCopy, useLanguage } from '@sistem/shared';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { ROUTES } from '../../../../app/config/routes';
 import { buildMiniChart, memberWeek, padWeek } from '../../data/profileDisplay';
@@ -41,11 +41,10 @@ function signed(value: number): string {
 export function WeightCard({ weight, unit, range, onRangeChange, joinDate, onUpdate }: WeightCardProps) {
   const copy = useCopy(profileCopy);
   const language = useLanguage();
-  const rtl = directionOf(language) === 'rtl';
   const unitText = unitLabel(unit, language);
   const latest = weight?.latest ?? null;
   const visible = weight?.visible ?? [];
-  const chart = buildMiniChart(visible, CHART, rtl, CHART_PAD);
+  const chart = buildMiniChart(visible, CHART, CHART_PAD);
   const startWeek = joinDate && visible[0] ? padWeek(memberWeek(joinDate, visible[0].date)) : null;
 
   return (
@@ -83,18 +82,18 @@ export function WeightCard({ weight, unit, range, onRangeChange, joinDate, onUpd
           role="img"
           aria-label={fill(copy.chartLabel, { from: formatDayMonth(visible[0].date, language), to: formatDayMonth(visible[visible.length - 1].date, language) })}
         >
-          <div className="pf-chart-plot">
-            <svg className="pf-chart-svg" viewBox={`0 0 ${CHART.width} ${CHART.height}`} preserveAspectRatio="none" aria-hidden="true">
+          <div className="pf-chart-plot" dir="ltr">
+            <svg className="pf-chart-svg" direction="ltr" viewBox={`0 0 ${CHART.width} ${CHART.height}`} preserveAspectRatio="none" aria-hidden="true">
               <path className="pf-chart-area" d={chart.area} />
               <path className="pf-chart-line" d={chart.line} vectorEffect="non-scaling-stroke" />
             </svg>
-            {/* An HTML dot: the stretched SVG would draw an ellipse. Physical left: the chart's x is computed per direction. */}
+            {/* An HTML dot: the stretched SVG would draw an ellipse. Physical left: time runs left → right in both languages. */}
             <span
               className="pf-chart-dot"
               style={{ '--pf-dot-x': `${chart.last.x * 100}%`, '--pf-dot-y': `${chart.last.y * 100}%` } as CSSProperties}
             />
           </div>
-          <div className="pf-chart-axis" aria-hidden="true">
+          <div className="pf-chart-axis" dir="ltr" aria-hidden="true">
             <span>{range === 'month' ? copy.eyebrow.chartMonth : fill(copy.eyebrow.chartStart, { week: startWeek ?? '01' })}</span>
             <span>{copy.eyebrow.chartNow}</span>
           </div>

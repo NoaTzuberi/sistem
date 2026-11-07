@@ -3,6 +3,14 @@ import type { ChartPoint } from '@sistem/shared';
 // Pure helpers of the Profile screen (docs/design/trainee-profile.html): initials, her membership
 // week, the weight chart and the sparklines. No React, no copy.
 
+// The measurements with a color of their own (--color-measure-*, measurementTones.css).
+const TONED_MEASUREMENTS = new Set(['chest', 'waist', 'hips', 'arms', 'thighs']);
+
+/** The class that gives a measurement its color (`--meas-color`); '' = the caller's fallback. */
+export function measurementTone(id: string): string {
+  return TONED_MEASUREMENTS.has(id) ? `meas-tone-${id}` : '';
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** 'מאיה כהן' → 'מכ', 'שקד' → 'שק', 'Dev Trainee Two' → 'DT'. */
@@ -49,11 +57,11 @@ export interface MiniChart {
 }
 
 /**
- * Lays out a small line chart over the points' own dates. Right-to-left puts the start on the right
- * and now on the left (the design's time axis); left-to-right mirrors it. null under 2 points.
+ * Lays out a small line chart over the points' own dates. Time always runs left → right (the latest on the
+ * right) in both languages, like every body chart; draw it inside an LTR box. null under 2 points.
  * `pad` = the value room kept above and below the line (in the points' unit).
  */
-export function buildMiniChart(points: ChartPoint[], size: { width: number; height: number }, rtl: boolean, pad = 0): MiniChart | null {
+export function buildMiniChart(points: ChartPoint[], size: { width: number; height: number }, pad = 0): MiniChart | null {
   if (points.length < 2) return null;
   const first = dayNumber(points[0].date);
   const span = Math.max(dayNumber(points[points.length - 1].date) - first, 1);
@@ -64,7 +72,7 @@ export function buildMiniChart(points: ChartPoint[], size: { width: number; heig
   const flat = high === low;
   const plotted = points.map((point) => {
     const fraction = (dayNumber(point.date) - first) / span;
-    const x = (rtl ? 1 - fraction : fraction) * size.width;
+    const x = fraction * size.width;
     const y = flat ? size.height / 2 : size.height - ((point.value - low) / range) * size.height;
     return { x, y };
   });

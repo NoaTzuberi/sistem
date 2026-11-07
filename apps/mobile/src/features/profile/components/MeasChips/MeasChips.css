@@ -15,6 +15,10 @@
 }
 
 .meas-chip {
+  --meas-chip-color: var(--meas-color, var(--color-ink));
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   flex: none;
   min-height: var(--size-meas-chip);
   padding-inline: var(--space-4);
@@ -46,10 +50,23 @@
   position: relative;
 }
 
+.meas-chip-dot {
+  flex: none;
+  width: var(--size-meas-chip-dot);
+  height: var(--size-meas-chip-dot);
+  border-radius: var(--radius-round);
+  background-color: var(--meas-chip-color);
+}
+
+/* Chosen: the measurement's solid color, white text (the dot would vanish into it). */
 .meas-chip-selected {
-  border-color: var(--color-ink);
-  background-color: var(--color-ink);
-  color: var(--color-on-ink);
+  border-color: var(--meas-chip-color);
+  background-color: var(--meas-chip-color);
+  color: var(--color-on-primary);
+}
+
+.meas-chip-selected .meas-chip-dot {
+  display: none;
 }
 
 .meas-chip:active {
