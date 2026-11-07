@@ -55,7 +55,7 @@ export function AuthScreen({ title, switchLabel, switchTo, footer, banner, child
           {footer}
           {/* Before login the device remembers the choice; after login her saved language wins (Phase 15). */}
           <div className="auth-screen-language">
-            <LanguageSwitch />
+            <LanguageSwitch tone="stage" />
           </div>
         </div>
       </main>

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Language } from '@sistem/types';
 import { LANGUAGES, sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import './LanguageSwitch.css';
@@ -6,10 +7,12 @@ interface LanguageSwitchProps {
   /** After the UI switched (Settings saves it on the server); without it only this device remembers. */
   onChange?: (language: Language) => void;
   disabled?: boolean;
+  /** stage = on the pink auth screen (white 20% track); light = on white / soft surfaces. */
+  tone?: 'light' | 'stage';
 }
 
 /** עברית | English — each language by its own name. Switches at once, no reload (Phase 15). */
-export function LanguageSwitch({ onChange, disabled }: LanguageSwitchProps) {
+export function LanguageSwitch({ onChange, disabled, tone = 'light' }: LanguageSwitchProps) {
   const { language, setLanguage } = useI18n();
   const copy = useCopy(sharedCopy);
 
@@ -20,7 +23,14 @@ export function LanguageSwitch({ onChange, disabled }: LanguageSwitchProps) {
   }
 
   return (
-    <div className="language-switch" role="group" aria-label={copy.language}>
+    <div
+      className={'language-switch' + (tone === 'stage' ? ' language-switch-on-stage' : '')}
+      role="group"
+      aria-label={copy.language}
+      // A computed value, not styling: which option the thumb sits under.
+      style={{ '--language-index': LANGUAGES.indexOf(language) } as CSSProperties}
+    >
+      <span className="language-switch-thumb" aria-hidden="true" />
       {LANGUAGES.map((option) => (
         <button
           key={option}

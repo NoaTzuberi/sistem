@@ -1244,6 +1244,25 @@
   --size-qn-pip-width: 28px;
   --size-qn-pip-height: 8px;
   --size-segment-option: 36px;         /* A segmented option's drawn height (the row keeps 44px of hit area) */
+  --size-language-switch-option: 40px; /* עברית | English (design group 4); 4px of track around it = 48px */
+  --size-language-switch-inset: 4px;
+  --size-auth-notice-icon: 56px;       /* The round icon chip of an auth notice (reset link sent / invalid) */
+  /* The achievements page (design group 4): "הבא בתור" rows + the numbers card. */
+  --size-ach-next-dot: 10px;
+  --size-ach-next-bar: 8px;
+  --size-ach-streak-icon: 28px;
+  --text-ach-stat: 28px;
+  /* Messages (design group 4): the day pill, the empty thread's name. */
+  --surface-cm-day: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --text-cm-empty-name: 40px;
+  --size-cm-send: 44px;                /* The composer's send button and the field's single-line height */
+  --size-cm-row: 72px;                 /* A conversation row of the coach Messages list */
+  /* The coach Profile (design group 5): grouped rows on the soft page, the avatar over the stage. */
+  --size-cp-row: 60px;
+  --radius-cp-icon: 12px;
+  --size-cp-avatar: 96px;
+  --text-cp-name: 40px;
+  --size-cp-pill: 36px;
   --size-switch-width: 51px;           /* iOS switch */
   --size-switch-height: 31px;
   --radius-qn-chip: 16px;
@@ -1427,8 +1446,10 @@
   --radius-coach-bubble: 20px;
   --radius-coach-bubble-tail: 6px;
   --size-coach-bubble-max: 80%;
-  --color-coach-bubble-mine: var(--color-ink);
-  --color-coach-bubble-mine-text: var(--color-on-ink);
+  /* Own bubbles (design group 4, owner 2026-11-07): the stage's deep pink #e0005f, ~4.8:1 with white. */
+  --color-coach-bubble-mine: var(--color-profile-stage-to);
+  --color-coach-bubble-mine-text: var(--color-on-primary);
+  --color-coach-bubble-mine-muted: color-mix(in srgb, var(--color-on-primary) 85%, transparent); /* its time */
   --color-coach-bubble-theirs: var(--color-coach-card);
   --size-coach-unread-dot: 10px;
   --size-coach-composer-max: 140px;

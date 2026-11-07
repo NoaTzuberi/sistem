@@ -136,13 +136,6 @@ html[data-surface='auth'] body {
   justify-content: center;
 }
 
-/* The shared switch, rounded to sit with the pills on this screen. */
-.auth-screen-language .language-switch {
-  overflow: hidden;
-  border-color: var(--glass-border);
-  border-radius: var(--radius-round);
-}
-
 /* On the pink background the default pink focus ring disappears. */
 .auth-screen :focus-visible {
   outline-color: var(--color-text);

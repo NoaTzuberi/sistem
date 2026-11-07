@@ -1,36 +1,67 @@
+/* A segmented control: a soft track and a white thumb that slides under the chosen language.
+   On light surfaces the track is soft grey; on a stage (the pink auth screen) it is white 20%. */
 .language-switch {
+  position: relative;
   display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(var(--touch-target-min), auto);
-  border: var(--border-width-thin) solid var(--color-border);
+  grid-auto-columns: 1fr;
+  padding: var(--size-language-switch-inset);
+  border-radius: var(--radius-round);
+  background-color: var(--color-segment-track);
+}
+
+.language-switch-on-stage {
+  background-color: var(--surface-coach-on-stage-track);
+}
+
+.language-switch-thumb {
+  position: absolute;
+  inset-block: var(--size-language-switch-inset);
+  inset-inline-start: var(--size-language-switch-inset);
+  width: calc(50% - var(--size-language-switch-inset));
+  border-radius: var(--radius-round);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-segment);
+  transform: translateX(calc(var(--language-index) * 100%));
+  transition: transform var(--transition-segment) var(--ease-out);
+}
+
+:root[dir='rtl'] .language-switch-thumb {
+  transform: translateX(calc(var(--language-index) * -100%));
 }
 
 .language-switch-option {
-  min-height: var(--touch-target-min);
-  padding-inline: var(--space-3);
+  position: relative;
+  min-width: var(--touch-target-min);
+  min-height: var(--size-language-switch-option);
+  padding-inline: var(--space-4);
   border: 0;
-  border-inline-start: var(--border-width-thin) solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text);
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-ink);
   font: inherit;
+  font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.language-switch-option:first-child {
-  border-inline-start: 0;
-}
-
-.language-switch-option:active {
-  background: var(--color-surface);
+.language-switch-option:active:not(:disabled) {
+  transform: scale(var(--press-scale));
 }
 
 .language-switch-option:disabled {
   opacity: var(--opacity-disabled);
 }
 
-.language-switch-option-active,
-.language-switch-option-active:active {
-  background: var(--color-primary-deep);
-  color: var(--color-on-primary);
+.language-switch-option-active {
+  font-weight: var(--font-weight-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .language-switch-thumb,
+  .language-switch-option {
+    transition: none;
+  }
 }

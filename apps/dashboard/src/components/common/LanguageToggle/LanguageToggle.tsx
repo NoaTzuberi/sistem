@@ -15,7 +15,7 @@ interface LanguageToggleProps {
 const OPTIONS: Language[] = ['en', 'he'];
 
 /**
- * The compact language toggle: a glass pill with EN | עב, the active one on a pink pill that
+ * The compact language toggle: a soft grey pill with EN | עב, the active one on a white thumb that
  * slides between them. Switches at once, no reload (Phase 15).
  *
  * Depends only on @sistem/shared + the design tokens, so the mobile app can take this folder
