@@ -21,6 +21,7 @@ export const he = {
   statWorkouts: 'אימונים',
   statVolume: 'נפח כולל',
   statPrs: 'שיאים אישיים',
+  achievementCount: '{progress} הישגים', // the chip on the coach's numbers card ('8 / 28 הישגים')
   back: 'חזרה',
   // Profile → Achievements (the dashboard's achievements look). Wording from the brief / the coach dashboard.
   board: {

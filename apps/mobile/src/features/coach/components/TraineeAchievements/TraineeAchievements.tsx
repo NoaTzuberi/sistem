@@ -25,7 +25,7 @@ export function TraineeAchievements({ traineeId, compact = false }: TraineeAchie
   return (
     <div className="trainee-achievements">
       <StreakSummary streak={data.streak} />
-      <ProgressStats overview={data} showStreak={false} />
+      <ProgressStats overview={data} showStreak={false} showAchievementCount={compact} />
       {!compact && <AchievementsTab overview={data} showHero={false} />}
     </div>
   );

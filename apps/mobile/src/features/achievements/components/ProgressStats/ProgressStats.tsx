@@ -1,6 +1,6 @@
 import type { AchievementOverview } from '@sistem/types';
 import { IconFlame } from '@tabler/icons-react';
-import { fill, formatNumber, sharedCopy, streakWeekLabel, useCopy, useI18n } from '@sistem/shared';
+import { fill, formatNumber, isolateLtr, sharedCopy, streakWeekLabel, useCopy, useI18n } from '@sistem/shared';
 import { achievementCopy } from '../../copy';
 import '../NextUpCard/NextUpCard.css';
 import './ProgressStats.css';
@@ -9,14 +9,20 @@ interface ProgressStatsProps {
   overview: AchievementOverview;
   /** Her best streak + this week under the numbers (her page); the coach overview shows the streak card instead. */
   showStreak?: boolean;
+  /** "8 / 28 הישגים" as a small chip under the numbers (the coach overview). */
+  showAchievementCount?: boolean;
 }
 
 /** Her lifetime numbers in one white card (her achievements page, the coach's view) — all computed by the server. */
-export function ProgressStats({ overview, showStreak = true }: ProgressStatsProps) {
+export function ProgressStats({ overview, showStreak = true, showAchievementCount = false }: ProgressStatsProps) {
   const { language, plural } = useI18n();
   const copy = useCopy(achievementCopy);
   const kg = useCopy(sharedCopy).units.kg;
   const { stats, streak } = overview;
+  const unlocked = overview.progress.filter((entry) => entry.count > 0).length;
+  const achievementCount = fill(copy.achievementCount, {
+    progress: isolateLtr(`${formatNumber(unlocked, language)} / ${formatNumber(overview.progress.length, language)}`),
+  });
 
   return (
     <section className="ach-page-card" aria-label={copy.statsTitle}>
@@ -40,6 +46,11 @@ export function ProgressStats({ overview, showStreak = true }: ProgressStatsProp
           </dd>
         </div>
       </dl>
+      {showAchievementCount && (
+        <p className="ach-count-chip-row">
+          <span className="ach-count-chip">{achievementCount}</span>
+        </p>
+      )}
       {showStreak && (
         <p className="ach-streak-line">
           <span className="ach-streak-icon" aria-hidden="true">

@@ -19,6 +19,7 @@ export const en: CopyShape<typeof he> = {
   statsTitle: 'Your progress',
   statWorkouts: 'Workouts',
   statVolume: 'Total volume',
+  achievementCount: '{progress} achievements',
   statPrs: 'PRs',
   back: 'Back',
   board: {
