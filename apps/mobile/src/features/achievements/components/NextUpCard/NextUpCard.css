@@ -1,0 +1,74 @@
+/* The white cards of the achievements page (this one + ProgressStats). */
+.ach-page-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+}
+
+.ach-page-card-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.ach-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ach-next-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ach-next-dot {
+  flex: none;
+  width: var(--size-ach-next-dot);
+  height: var(--size-ach-next-dot);
+  border-radius: var(--radius-round);
+  background-color: var(--ach-color);
+}
+
+.ach-next-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.ach-next-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ach-next-bar {
+  position: relative;
+  height: var(--size-ach-next-bar);
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background-color: color-mix(in srgb, var(--ach-color) 14%, transparent);
+}
+
+.ach-next-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--progress) * 100%);
+  border-radius: inherit;
+  background-color: var(--ach-color);
+}
+
+.ach-next-count {
+  flex: none;
+  color: var(--ach-text);
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}

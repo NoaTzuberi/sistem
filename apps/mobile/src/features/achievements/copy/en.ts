@@ -11,10 +11,6 @@ export const en: CopyShape<typeof he> = {
   none: 'No achievements yet.',
   seeAll: 'See all',
   allTitle: 'Achievements',
-  unlockedTitle: 'Unlocked',
-  lockedTitle: 'Still to unlock',
-  unlockedOn: 'Unlocked {date}',
-  times: '×{count}',
   loading: 'Loading…',
   loadError: "Couldn't load your achievements.",
   unlockedThisWorkout: 'Achievements unlocked',
@@ -24,7 +20,6 @@ export const en: CopyShape<typeof he> = {
   statWorkouts: 'Workouts',
   statVolume: 'Total volume',
   statPrs: 'PRs',
-  statAchievements: 'Achievements',
   back: 'Back',
   board: {
     unlockedOf: 'of {total} unlocked',

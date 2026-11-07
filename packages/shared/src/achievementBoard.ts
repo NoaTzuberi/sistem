@@ -63,3 +63,20 @@ export function groupBadges(badges: BadgeEntry[]): { category: AchievementCatego
     return inGroup.length > 0 ? [{ category, badges: inGroup, unlocked: inGroup.filter((badge) => badge.unlocked).length }] : [];
   });
 }
+
+/**
+ * "הבא בתור" on the achievements page: the closest locked badge of each category (only ones with a target),
+ * the closest categories first (ties: the config order), at most `limit`.
+ */
+export function closestBadges(board: AchievementBoard, limit = 3): BadgeEntry[] {
+  const bestPerCategory = ACHIEVEMENT_CATEGORIES.flatMap((category) => {
+    const candidates = board.badges.filter((badge) => badge.category === category && !badge.unlocked && badge.progress.threshold !== undefined);
+    const best = candidates.reduce<BadgeEntry | null>((top, badge) => (top === null || badge.fraction > top.fraction ? badge : top), null);
+    return best ? [best] : [];
+  });
+  return bestPerCategory
+    .map((badge, order) => ({ badge, order }))
+    .sort((a, b) => b.badge.fraction - a.badge.fraction || a.order - b.order)
+    .slice(0, limit)
+    .map(({ badge }) => badge);
+}

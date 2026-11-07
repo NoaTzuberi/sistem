@@ -4,7 +4,7 @@ import { getTraineeAchievements } from '../../../../services/coach/coachService'
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { StreakSummary } from '../../../achievements/components/StreakSummary/StreakSummary';
 import { ProgressStats } from '../../../achievements/components/ProgressStats/ProgressStats';
-import { AchievementList } from '../../../achievements/components/AchievementList/AchievementList';
+import { AchievementsTab } from '../../../achievements/components/AchievementsTab/AchievementsTab';
 import { achievementCopy } from '../../../achievements/copy';
 import './TraineeAchievements.css';
 
@@ -14,7 +14,7 @@ interface TraineeAchievementsProps {
   compact?: boolean;
 }
 
-/** The Achievements tab (coach mode): her streak, numbers and achievements — her own views, read-only. */
+/** Her achievements (coach mode): her streak, numbers and badge board — her own views, read-only. */
 export function TraineeAchievements({ traineeId, compact = false }: TraineeAchievementsProps) {
   const copy = useCopy(achievementCopy);
   const load = useCallback(() => getTraineeAchievements(traineeId), [traineeId]);
@@ -25,8 +25,8 @@ export function TraineeAchievements({ traineeId, compact = false }: TraineeAchie
   return (
     <div className="trainee-achievements">
       <StreakSummary streak={data.streak} />
-      <ProgressStats overview={data} />
-      {!compact && <AchievementList progress={data.progress} />}
+      <ProgressStats overview={data} showStreak={false} />
+      {!compact && <AchievementsTab overview={data} showHero={false} />}
     </div>
   );
 }

@@ -12,10 +12,6 @@ export const he = {
   none: 'עדיין אין הישגים.',
   seeAll: 'לכל ההישגים',
   allTitle: 'הישגים',
-  unlockedTitle: 'נפתחו',
-  lockedTitle: 'עוד לפתוח',
-  unlockedOn: 'נפתח ב־{date}',
-  times: '×{count}',
   loading: 'טוען…',
   loadError: 'לא הצלחנו לטעון את ההישגים שלך.',
   unlockedThisWorkout: 'הישגים שנפתחו',
@@ -25,7 +21,6 @@ export const he = {
   statWorkouts: 'אימונים',
   statVolume: 'נפח כולל',
   statPrs: 'שיאים אישיים',
-  statAchievements: 'הישגים',
   back: 'חזרה',
   // Profile → Achievements (the dashboard's achievements look). Wording from the brief / the coach dashboard.
   board: {

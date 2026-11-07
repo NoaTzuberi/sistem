@@ -1,32 +1,67 @@
-/* White stat tiles, 2 columns: the number on top (Barlow), the label under it. */
-.progress-stats {
+/* Three numbers side by side (Barlow), each label under its number, hairlines between them. */
+.ach-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
 }
 
-.progress-stats-item {
+.ach-stats div {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
+  align-items: center;
   gap: var(--space-1);
-  padding: var(--pad-coach-tile);
-  border-radius: var(--radius-coach-tile);
-  background-color: var(--color-card);
-  box-shadow: var(--shadow-profile-card);
+  padding-inline: var(--space-1);
+  text-align: center;
 }
 
-.progress-stats-label {
-  order: 1;
-  font-size: var(--text-coach-caption-lg);
+.ach-stats div + div {
+  border-inline-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.ach-stats dt {
   color: var(--color-text-muted);
+  font-size: var(--text-xs);
 }
 
-.progress-stats-value {
+.ach-stats dd {
   margin: 0;
   font-family: var(--font-num);
-  font-size: var(--text-coach-stat);
+  font-size: var(--text-ach-stat);
   font-weight: var(--font-weight-bold);
   line-height: 1;
   overflow-wrap: anywhere;
+}
+
+.ach-stats small {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ach-streak-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding-block-start: var(--space-3);
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+}
+
+.ach-streak-icon {
+  display: grid;
+  place-items: center;
+  width: var(--size-ach-streak-icon);
+  height: var(--size-ach-streak-icon);
+  border-radius: var(--radius-round);
+  /* The streak's orange as ink on its tint (white on the streak orange is too faint). */
+  background-color: var(--tint-orange);
+  color: var(--ink-orange);
+}
+
+.ach-streak-sep {
+  color: var(--color-text-faint);
 }

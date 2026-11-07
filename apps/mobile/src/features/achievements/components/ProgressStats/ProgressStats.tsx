@@ -1,33 +1,57 @@
 import type { AchievementOverview } from '@sistem/types';
-import { formatVolume, useCopy, useLanguage } from '@sistem/shared';
+import { IconFlame } from '@tabler/icons-react';
+import { fill, formatNumber, sharedCopy, streakWeekLabel, useCopy, useI18n } from '@sistem/shared';
 import { achievementCopy } from '../../copy';
+import '../NextUpCard/NextUpCard.css';
 import './ProgressStats.css';
 
 interface ProgressStatsProps {
   overview: AchievementOverview;
+  /** Her best streak + this week under the numbers (her page); the coach overview shows the streak card instead. */
+  showStreak?: boolean;
 }
 
-/** Her lifetime numbers (Profile, coach view) — all computed by the server. */
-export function ProgressStats({ overview }: ProgressStatsProps) {
-  const language = useLanguage();
+/** Her lifetime numbers in one white card (her achievements page, the coach's view) — all computed by the server. */
+export function ProgressStats({ overview, showStreak = true }: ProgressStatsProps) {
+  const { language, plural } = useI18n();
   const copy = useCopy(achievementCopy);
-  const unlocked = overview.progress.filter((entry) => entry.count > 0).length;
-  const stats = [
-    { label: copy.statWorkouts, value: String(overview.stats.completedWorkouts) },
-    { label: copy.statVolume, value: formatVolume(overview.stats.totalVolume, language) },
-    { label: copy.statPrs, value: String(overview.stats.personalRecords) },
-    { label: copy.statAchievements, value: `${unlocked} / ${overview.progress.length}` },
-  ];
+  const kg = useCopy(sharedCopy).units.kg;
+  const { stats, streak } = overview;
+
   return (
-    <dl className="progress-stats">
-      {stats.map((stat) => (
-        <div key={stat.label} className="progress-stats-item">
-          <dt className="progress-stats-label">{stat.label}</dt>
-          <dd className="progress-stats-value">
-            <bdi dir="ltr">{stat.value}</bdi>
+    <section className="ach-page-card" aria-label={copy.statsTitle}>
+      <dl className="ach-stats">
+        <div>
+          <dt>{copy.statWorkouts}</dt>
+          <dd>
+            <bdi dir="ltr">{formatNumber(stats.completedWorkouts, language)}</bdi>
           </dd>
         </div>
-      ))}
-    </dl>
+        <div>
+          <dt>{copy.statVolume}</dt>
+          <dd>
+            <bdi dir="ltr">{formatNumber(Math.round(stats.totalVolume), language)}</bdi> <small>{kg}</small>
+          </dd>
+        </div>
+        <div>
+          <dt>{copy.statPrs}</dt>
+          <dd>
+            <bdi dir="ltr">{formatNumber(stats.personalRecords, language)}</bdi>
+          </dd>
+        </div>
+      </dl>
+      {showStreak && (
+        <p className="ach-streak-line">
+          <span className="ach-streak-icon" aria-hidden="true">
+            <IconFlame size={16} />
+          </span>
+          <span>{fill(copy.bestStreak, { label: plural(copy.streakValue, streak.best) })}</span>
+          <span className="ach-streak-sep" aria-hidden="true">
+            ·
+          </span>
+          <span>{streakWeekLabel(streak, language) ?? copy.noPlanThisWeek}</span>
+        </p>
+      )}
+    </section>
   );
 }
