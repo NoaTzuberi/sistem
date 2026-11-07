@@ -1,0 +1,20 @@
+/* Semantic · states — hover, warning, flag ("look here"), disabled. Done / success is Cherry Rose
+   (palette) — never green. Focus rings are in base/elevation.css. */
+
+:root {
+  /* Pink under a fine pointer. */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 91%, var(--color-text));
+
+  /* A warning (library issues): the orange text tone on a light orange tint (no amber / brown — owner, 2026-10-22). */
+  --color-warning-text: var(--ink-orange);
+  --color-warning-soft: #fff4e5;
+
+  /* A reported injury / limitation on a trainee's profile: "look here", not an error and not a status. */
+  --color-flag: var(--ink-orange);
+  --color-flag-soft: #fff0dc;
+  --surface-on-flag: color-mix(in srgb, var(--color-card) 75%, transparent);   /* a row on the amber "before you build" card */
+
+  /* A disabled pink button: soft pink with Cherry text — never a faded white label. */
+  --disabled-bg: var(--tint-pink);
+  --disabled-ink: var(--ink-pink);
+}

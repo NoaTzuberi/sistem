@@ -1,0 +1,24 @@
+/* Components · slide to start — the shared slide control (Home, cardio): trail colors, shadows, motion,
+   sizes. */
+
+:root {
+  /* Slide to start + cardio (docs/design/trainee-home-b.html, trainee-cardio.html,
+     coach-cardio-builder.html) */
+  /* The shared slide: a white track; its trail runs pink → purple toward the reading end. */
+  --color-slide-trail-start: #ff006e;
+  --color-slide-trail-mid: #c23bc0;
+  --color-slide-trail-end: #7c4dff;
+  --color-slide-hairline: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --shadow-slide-float: 0 12px 30px color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --shadow-slide-knob: 0 4px 14px color-mix(in srgb, var(--color-ink) 16%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  --ease-slide-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-slide-snap: 420ms;  /* The knob springing back, or snapping to the end */
+  --transition-knob-pop: 460ms;    /* The knob popping when the slide completes */
+  --transition-knob-icon: 220ms;   /* Play → check */
+  --slide-float-offset: 28px;      /* The floating slide's distance from the bottom … */
+  --slide-float-gutter: 20px;      /* … and from the sides */
+  --slide-label-pad: 40px;         /* The label's start padding (clears the knob) */
+  --text-slide-label: 15px;
+  --text-slide-go: 10px;
+  --opacity-slide-go: 0.45;
+}

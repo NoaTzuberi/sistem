@@ -1,0 +1,61 @@
+/* Domain · cardio — intensity zones Z1–Z5 (fill, soft, text, stage), the live player, her own run
+   builder. */
+
+:root {
+  /* Cardio intensity zones (1–3 Z1 · 4–5 Z2 · 6 Z3 · 7–8 Z4 · 9–10 Z5): the bright fill, its tint, and its
+     readable ink on the tint. -stage = the live player's full-screen ground: the exact zone color
+     (owner, 2026-10-21 — -text tones like #c75a00 are never a fill). */
+  --color-zone-1: #0094ff;
+  --color-zone-1-soft: #e1f1ff;
+  --color-zone-1-text: #0068bb;      /* the design's #0070C9 is 4.38:1 on its tint; a hair darker passes 4.5:1 */
+  --color-zone-1-stage: var(--color-zone-1);
+  --color-zone-2: #7c4dff;
+  --color-zone-2-soft: #efe7ff;
+  --color-zone-2-text: #5b2fd6;
+  --color-zone-2-stage: var(--color-zone-2);
+  --color-zone-3: #ff7a00;
+  --color-zone-3-soft: #ffebd6;
+  --color-zone-3-text: var(--ink-orange);
+  --color-zone-3-stage: var(--color-zone-3);
+  --color-zone-4: #ff006e;
+  --color-zone-4-soft: #ffe3ee;
+  --color-zone-4-text: #c80058;
+  --color-zone-4-stage: var(--color-zone-4);
+  --color-zone-5: #a50047;
+  --color-zone-5-soft: #fbe3ec;
+  --color-zone-5-text: #a50047;
+  --color-zone-5-stage: var(--color-zone-5);
+  --color-cardio-strength: #5b2fd6;     /* "כוח" on a day tile that already has a strength workout */
+  --color-cardio-preview: var(--color-ink);
+  --color-on-zone-soft: color-mix(in srgb, var(--color-on-primary) 18%, transparent); /* Buttons / cards on a zone ground */
+  --color-on-zone-raised: color-mix(in srgb, var(--color-on-primary) 28%, transparent);
+  --color-on-zone-track: color-mix(in srgb, var(--color-on-primary) 25%, transparent);
+  --color-on-zone-upcoming: color-mix(in srgb, var(--color-on-primary) 35%, transparent);
+  --color-on-zone-done: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+  --color-on-zone-muted: color-mix(in srgb, var(--color-on-primary) 75%, transparent);
+  --color-cardio-grid: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  --transition-zone: 450ms;        /* The live player's ground changing zone */
+  --transition-graph-grow: 520ms;  /* A graph bar growing in (one every --graph-grow-step) */
+  --graph-grow-step: 22ms;
+  --transition-countdown: 900ms;   /* One 3-2-1 number */
+  --transition-beat: 600ms;        /* The clock's beat on the last 3 seconds */
+  --text-cardio-title: 64px;       /* The session detail's Karantina title */
+  --text-cardio-kind: 84px;        /* The live block name */
+  --text-cardio-kind-long: 64px;
+  --text-cardio-clock: 150px;
+  --text-cardio-clock-sm: 120px;   /* Under 440px wide (tokens can't sit in @media: repeat it there) */
+  --text-cardio-countdown: 220px;
+  --text-cardio-done: 56px;
+  --size-cardio-control: 56px;
+  --size-cardio-control-main: 84px;
+  --size-cardio-save: 58px;
+
+  /* Her own run builder (cardio/OwnCardioBuilderPage, redesign 2026-11-03). */
+  --text-cb-total: 40px;               /* The total in the summary (Barlow) */
+  --size-cb-fact: 26px;                /* A summary chip */
+  --size-cb-chart: 76px;               /* The profile chart */
+  --size-cb-row: 60px;                 /* A collapsed block row */
+  --size-cb-icon: 36px;                /* Drag handle / ⋯ (the hit area stays 44px) */
+  --width-cb-stripe: 4px;              /* A block's zone stripe */
+  --transition-cb-expand: 240ms;       /* A block opening / closing; a chart bar's width (on --ease-out) */
+}

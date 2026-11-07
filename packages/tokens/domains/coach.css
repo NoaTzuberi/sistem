@@ -1,0 +1,168 @@
+/* Domain · coach — coach mode on the phone (ink stage, accent bar, attention / missed / PR aliases,
+   messages, coach profile) and the default plan messages. English overrides at the end. */
+
+:root {
+  /* Default messages sent with a plan (coach Settings + the send sheet, 2026-10-29). */
+  --color-defaults-field: #f5f3f6;                              /* A message box's soft fill */
+  --color-defaults-nutrition-tile: var(--tint-purple);          /* The nutrition card's icon tile … */
+  --color-defaults-nutrition-icon: var(--ink-purple);           /* … and its bowl */
+  --color-defaults-workouts-tile: var(--tint-pink);             /* The workouts card's icon tile … */
+  --color-defaults-workouts-icon: var(--color-portion-protein-deep); /* … and its dumbbell (#c80058, icon only) */
+  --radius-defaults-card: 24px;
+  --radius-defaults-field: 16px;
+  --space-defaults-card: 22px;
+  --size-defaults-tile: 40px;
+  --size-defaults-field-min: 52px;
+  --shadow-defaults-card: 0 10px 30px color-mix(in srgb, var(--color-ink) 6%, transparent);
+
+  /* Messages (design group 4): the day pill, the empty thread's name. */
+  --surface-cm-day: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --text-cm-empty-name: 40px;
+  --size-cm-send: 44px;                /* The composer's send button and the field's single-line height */
+  --size-cm-row: 72px;                 /* A conversation row of the coach Messages list */
+  /* The coach Profile (design group 5): grouped rows on the soft page, the avatar over the stage. */
+  --size-cp-row: 60px;
+  --radius-cp-icon: 12px;
+  --size-cp-avatar: 96px;
+  --text-cp-name: 40px;
+  --size-cp-pill: 36px;
+
+  /* Coach mode (mobile, docs/design/coach-app.html): a work tool — an INK stage with faint vertical
+     grid lines and a pink → purple accent bar instead of the trainee pink; the page surface under white
+     cards; pink stays the action color. Light only by design. */
+  --color-coach-page: var(--color-subscreen-page);           /* #f6f4f7 */
+  --color-coach-card: var(--color-card);
+  --color-coach-stage: var(--color-ink);                     /* #141116 */
+  --color-coach-stage-grid: color-mix(in srgb, var(--color-on-primary) 7%, transparent);
+  --size-coach-stage-grid: 44px;
+  --gradient-coach-accent: linear-gradient(to left, var(--color-primary), var(--color-stat-purple));  /* the 3px bar under the stage */
+  --size-coach-accent: 3px;
+  --radius-coach-stage: 36px;                                /* the stage's bottom corners */
+  --color-coach-on-stage: var(--color-on-ink);
+  --color-coach-on-stage-muted: color-mix(in srgb, var(--color-on-primary) 65%, transparent);  /* captions on ink */
+  --color-coach-on-stage-faint: color-mix(in srgb, var(--color-on-primary) 50%, transparent);  /* the mono eyebrow */
+  --color-coach-stage-rule: color-mix(in srgb, var(--color-on-primary) 14%, transparent);      /* hairlines on ink */
+  --surface-coach-on-stage: color-mix(in srgb, var(--color-on-primary) 10%, transparent);       /* round buttons, quick actions */
+  --surface-coach-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  --color-coach-pink-on-ink: #ff5c9e;                        /* "waiting" number on the stage */
+  --color-coach-amber-on-ink: #ffb066;                       /* "attention" number on the stage */
+  --color-coach-primary-hover: #e8005f;                      /* the pink pill / action under a fine pointer */
+  /* Amber = waiting / attention. Text uses THE orange ink (no brown — the spec's #8a4a00 swapped for it). */
+  --color-coach-amber-soft: var(--color-warning-soft);       /* #fff4e5 */
+  --color-coach-amber-ink: var(--ink-orange);                /* #c75a00 */
+  --color-coach-blush: var(--color-workout-1-soft);          /* #ffe3ef — the PR chip, an attention tag */
+  --color-coach-cherry: var(--color-primary-deep);           /* #a50047 — its text; a decrease */
+  --color-coach-ink-2: var(--color-ink-raised);              /* #2a2530 — section labels */
+  --color-coach-muted: var(--color-fr-muted);                /* #7a7380 */
+  --color-coach-faint: #9a929f;                              /* times under a feed item (3:1 on white — secondary only) */
+  --color-coach-rule: var(--color-subscreen-rule);           /* #ece9ee */
+  --color-coach-soft: var(--color-fr-soft);                  /* #f5f3f6 — chips, the empty lane, soft tiles */
+  --color-coach-soft-hover: var(--color-fill-soft-hover);    /* #ece8ee */
+  --color-coach-segment-track: var(--color-segment-track);
+  --surface-coach-tabs: color-mix(in srgb, var(--color-coach-page) 92%, transparent);  /* the sticky segmented tabs */
+  --shadow-coach-card: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  --shadow-coach-thumb: 0 2px 8px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --radius-coach-card: 22px;
+  --radius-coach-pill: 20px;
+  --radius-coach-chip: 12px;
+  --radius-coach-lane: 12px;
+  --radius-coach-tile: 18px;
+  --size-coach-round: 40px;                                  /* avatar / bell / back on the stage (44px hit area) */
+  --size-coach-avatar: 40px;
+  --size-coach-avatar-lg: 46px;                              /* a list row */
+  --size-coach-avatar-xl: 64px;                              /* the trainee detail header */
+  --size-coach-type-badge: 20px;                             /* a feed item's type badge */
+  --size-coach-wait-card: 150px;
+  --size-coach-chip: 24px;
+  --size-coach-action: 32px;                                 /* a feed item's message button (its hit area stays 44px) */
+  --size-coach-quick-action: 64px;
+  --size-coach-lane: 64px;
+  --size-coach-pip-width: 14px;
+  --size-coach-pip-height: 6px;
+  --size-coach-thumb-width: 64px;                            /* a blurred feed photo */
+  --size-coach-thumb-height: 80px;
+  --size-coach-bar: 10px;                                    /* a portion bar */
+  --blur-coach-thumb: blur(6px);                             /* feed photos stay blurred; the trainee screen shows them */
+  --text-coach-greeting: 50px;                               /* "בוקר טוב, …" (Karantina) */
+  --text-coach-title: 54px;                                  /* "מתאמנות" */
+  --text-coach-score: 36px;                                  /* a stage scoreboard number (Barlow) */
+  --text-coach-score-sup: 18px;
+  --text-coach-name-lg: 42px;                                /* the trainee's name on her stage */
+  --text-coach-name: 26px;                                   /* a list row / waiting card name */
+  --text-coach-tab: 20px;                                    /* a segmented tab */
+  --text-coach-log: 19px;                                    /* a workout name in "last workouts" (Barlow italic) */
+  --text-coach-metric: 28px;                                 /* a body scoreboard number */
+  --text-coach-body: 14px;
+  --text-coach-label: 13px;
+  --text-coach-caption: 11px;
+  --opacity-coach-score-sup: 0.5;
+  /* A feed item's type badge (icon on its color). */
+  --color-coach-type-workout: var(--color-workout-2);
+  --color-coach-type-cardio: var(--color-workout-4);
+  --color-coach-type-photo: var(--color-primary-deep);
+  --color-coach-type-measurements: #c23bc0;
+  --color-coach-type-joined: var(--color-primary);
+  /* Coach mode Phase B: reactions, messages, the invite / quick message / light edit sheets. */
+  --ease-coach-out: cubic-bezier(0.23, 1, 0.32, 1);          /* presses and small entrances */
+  --scale-coach-press: 0.97;
+  --scale-coach-reaction-press: 0.9;                         /* a reaction gives more, then springs back */
+  --size-coach-reaction: 32px;                               /* drawn height (44px hit area around it) */
+  --size-coach-reaction-min-width: 40px;
+  --text-coach-reaction: 15px;
+  --text-coach-sheet-title: 42px;                            /* "הזמנת מתאמנת" (Karantina) */
+  --size-coach-qr: 220px;
+  --radius-coach-qr: 26px;
+  --size-coach-link-row: 50px;                               /* the invite link row */
+  --size-coach-sheet-button: 52px;
+  --size-coach-template-chip: 32px;
+  --size-coach-day: 50px;                                    /* the 7-day picker */
+  --size-coach-option-icon: 36px;
+  --radius-coach-bubble: 20px;
+  --radius-coach-bubble-tail: 6px;
+  --size-coach-bubble-max: 80%;
+  /* Own bubbles (design group 4, owner 2026-11-07): the stage's deep pink #e0005f, ~4.8:1 with white. */
+  --color-coach-bubble-mine: var(--color-profile-stage-to);
+  --color-coach-bubble-mine-text: var(--color-on-primary);
+  --color-coach-bubble-mine-muted: color-mix(in srgb, var(--color-on-primary) 85%, transparent); /* its time */
+  --color-coach-bubble-theirs: var(--color-coach-card);
+  --size-coach-unread-dot: 10px;
+  --size-coach-composer-max: 140px;
+  --size-coach-quick-text: 110px;                            /* the quick message field */                          /* the message field grows up to this, then scrolls */
+  --size-coach-dock-badge: 16px;
+  --text-coach-dock-badge: 11px;
+  /* Coach mode, one trainee (design group 3, direction B): tabs on the ink stage, white tiles / rows. */
+  --size-coach-avatar-detail: 56px;
+  --size-coach-status-dot: 7px;                          /* the trainee header avatar (white ring) */
+  --ring-coach-avatar: 0 0 0 3px var(--color-on-primary);
+  --surface-coach-on-stage-track: color-mix(in srgb, var(--color-on-primary) 20%, transparent); /* segmented track on ink */
+  --size-coach-header-action: 48px;                          /* a round icon action on the stage */
+  --radius-coach-tab-track: 18px;
+  --radius-coach-tab-thumb: 14px;
+  --text-coach-tab-label: 15px;
+  --color-coach-attention-soft: var(--color-portion-fat-soft); /* #ffebd6 — the attention card */
+  --color-coach-attention-ink: var(--ink-orange);              /* #c75a00 */
+  --color-coach-missed-soft: var(--tint-pink);                 /* #ffe3ee — the "פוספס" chip */
+  --color-coach-missed-ink: var(--ink-pink);                   /* #a50047 */
+  --color-coach-pr-soft: var(--tint-blue);                     /* a PR chip in a log card */
+  --color-coach-pr-ink: var(--ink-blue);
+  --radius-coach-row: 18px;                                  /* an activity / workout / day row */
+  --radius-coach-icon-tile: 14px;
+  --size-coach-icon-tile: 44px;
+  --radius-coach-thumb: 14px;                                /* a meal / progress photo thumbnail */
+  --text-coach-stat: 32px;                                   /* a stat tile number (Barlow) */
+  --text-coach-caption-lg: 12px;                             /* a stat tile's label */
+  --pad-coach-tile: 14px;                                    /* a stat tile / row's padding */
+  --text-coach-group: 24px;                                  /* a portion group's name (Karantina) */
+  --size-coach-fuel-cell: 28px;                              /* a read-only fuel cell */
+  --radius-coach-fuel: 9px;
+}
+
+/* English: the Latin display face reads larger — smaller sizes. */
+:root:lang(en) {
+  --text-coach-greeting: 40px;
+  --text-coach-title: 42px;
+  --text-coach-name-lg: 34px;
+  --text-coach-name: 20px;
+  --text-coach-tab: 16px;
+  --text-coach-sheet-title: 34px;
+}

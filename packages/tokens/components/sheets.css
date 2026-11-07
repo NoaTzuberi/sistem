@@ -1,0 +1,27 @@
+/* Components · sheets — bottom sheets and the confirm sheet: scrim, handle, sizes, radius. */
+
+:root {
+  /* Sheet scrim and handle. */
+  --color-sheet-scrim: color-mix(in srgb, var(--color-ink) 35%, transparent);        /* Behind a bottom sheet */
+  --color-sheet-handle: #d8d3db;                                                     /* A bottom sheet's grab pill */
+
+  --shadow-sheet: 0 -20px 50px color-mix(in srgb, var(--color-ink) 25%, transparent);
+
+  /* Sheet sizes. */
+  --sheet-max-height: 86dvh;
+  --sheet-handle-width: 40px;
+  --sheet-handle-height: 5px;
+
+  /* The confirm sheet (components/common/ConfirmSheet, direction B). */
+  --radius-confirm-sheet: 28px;
+  --space-confirm-sheet: 22px;
+  --size-confirm-handle-width: 36px;
+  --color-confirm-handle: #e4e0e6;
+  --color-confirm-scrim: color-mix(in srgb, var(--color-ink) 40%, transparent);
+  --size-confirm-close: 36px;
+  --size-confirm-icon: 48px;
+  --radius-confirm-icon: 16px;
+  --text-confirm-title: 30px;          /* Karantina */
+  --text-confirm-body: 15px;
+  --size-confirm-button: 54px;
+}

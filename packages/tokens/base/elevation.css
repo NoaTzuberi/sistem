@@ -1,0 +1,104 @@
+/* Base · elevation — shadows, focus / selection rings, blurs, opacity levels and the z-index layers.
+   No colors defined here: shadows mix the palette. */
+
+:root {
+  /* Shadows
+     The design uses flat surfaces and sharp cuts — no shadows yet. Add them here first. */
+  --shadow-none: none;
+  --shadow-glass: 0 24px 60px color-mix(in srgb, var(--color-primary-deep) 22%, transparent); /* glass card */
+  --shadow-primary: 0 10px 24px color-mix(in srgb, var(--color-primary) 32%, transparent);     /* pink CTA on glass */
+  /* Neutral shadow under a floating 3D object (waiting screen) — used with filter: drop-shadow(). */
+  --shadow-object: 0 16px 18px color-mix(in srgb, var(--color-text) 18%, transparent);
+
+  /* The onboarding deck: the card's soft pink shadow, the ghost cards, the pink "Next" pill's shadow. */
+  --shadow-card:
+    0 24px 60px color-mix(in srgb, var(--color-primary-deep) 12%, transparent),
+    0 2px 8px color-mix(in srgb, var(--color-text) 4%, transparent);
+  --shadow-ghost: 0 10px 30px color-mix(in srgb, var(--color-text) 5%, transparent);
+  --shadow-button: 0 8px 20px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  /* The coach dashboard: a very soft shadow under every white widget, a deep one under what floats. */
+  --shadow-panel:
+    0 1px 2px color-mix(in srgb, var(--color-text) 4%, transparent),
+    0 12px 32px color-mix(in srgb, var(--color-text) 5%, transparent);
+  --shadow-float: 0 30px 80px color-mix(in srgb, var(--color-text) 20%, transparent);   /* drawer, palette */
+  --shadow-photo: 0 8px 20px color-mix(in srgb, var(--color-text) 12%, transparent);    /* stacked Daily Pump photos */
+  --shadow-side-sheet: 0 0 60px color-mix(in srgb, var(--color-text) 16%, transparent); /* the off-canvas sidebar */
+  --shadow-avatar: 0 10px 26px color-mix(in srgb, var(--color-primary) 25%, transparent);   /* the profile avatar */
+  --shadow-row-hover:
+    0 2px 4px color-mix(in srgb, var(--color-text) 4%, transparent),
+    0 16px 34px color-mix(in srgb, var(--color-text) 9%, transparent);                              /* a family row under the pointer */
+  --shadow-row-selected: 0 0 0 2px var(--color-primary), 0 12px 28px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --shadow-tile: 0 12px 28px color-mix(in srgb, var(--color-text) 14%, transparent);              /* the family tile in the detail hero */
+  --shadow-variant-hover: 0 14px 30px color-mix(in srgb, var(--color-text) 10%, transparent);
+  --ring-search: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);             /* the library search in focus */
+  --shadow-notice-panel:
+    0 0 0 0.5px color-mix(in srgb, var(--color-text) 8%, transparent),
+    0 30px 80px color-mix(in srgb, var(--color-text) 22%, transparent),
+    0 8px 20px color-mix(in srgb, var(--color-text) 6%, transparent);
+  --shadow-notice-card:
+    0 1px 2px color-mix(in srgb, var(--color-text) 5%, transparent),
+    0 8px 22px color-mix(in srgb, var(--color-text) 6%, transparent);
+  --shadow-notice-icon: 0 2px 8px color-mix(in srgb, var(--color-text) 8%, transparent);
+  --shadow-segment-thumb:
+    0 3px 8px color-mix(in srgb, var(--color-text) 12%, transparent),
+    0 3px 1px color-mix(in srgb, var(--color-text) 4%, transparent);
+  --shadow-pill-hover: 0 10px 24px color-mix(in srgb, var(--color-text) 10%, transparent);       /* a toolbar pill under the pointer */
+  --shadow-button-hover: 0 12px 26px color-mix(in srgb, var(--color-primary) 32%, transparent);  /* … the pink one */
+  --shadow-selected: 0 6px 16px color-mix(in srgb, var(--color-primary) 14%, transparent);       /* a selected week tile */
+  --shadow-exercise: 0 1px 2px color-mix(in srgb, var(--color-text) 4%, transparent);          /* an exercise card in its slot */
+  --shadow-exercise-hover: 0 6px 18px color-mix(in srgb, var(--color-text) 7%, transparent);  /* … under a fine pointer */
+  --shadow-tile-lift:
+    0 2px 4px color-mix(in srgb, var(--color-text) 4%, transparent),
+    0 20px 44px color-mix(in srgb, var(--color-text) 10%, transparent);                  /* a statistics tile under the pointer */
+  --shadow-cell-lift: 0 10px 26px color-mix(in srgb, var(--color-text) 8%, transparent); /* a retention tile under the pointer */
+  --shadow-chart-tip:
+    0 10px 30px color-mix(in srgb, var(--color-text) 16%, transparent),
+    0 0 0 0.5px color-mix(in srgb, var(--color-text) 6%, transparent);
+  --shadow-qv-lift: 0 12px 26px color-mix(in srgb, var(--color-text) 8%, transparent);  /* a quick-view fact tile under the pointer */
+  --shadow-qv-late: 0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent);  /* the late spotlight's pink hairline */
+  --shadow-menu: 0 20px 50px color-mix(in srgb, var(--color-text) 16%, transparent);    /* a small menu under its button */
+  /* Trainee Home (direction B). */
+  --shadow-dock:
+    0 16px 36px color-mix(in srgb, var(--color-ink) 35%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-on-primary) 8%, transparent);
+  --shadow-dock-active: 0 6px 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --ring-hairline: 0 0 0 1px var(--color-hairline);
+  --ring-on-pink: 0 0 0 2px var(--color-primary);
+  --ring-on-card: 0 0 0 2px var(--color-card);
+  --ring-pulse: 0 0 0 4px var(--color-pulse-ring);
+  --ring-pulse-out: 0 0 0 7px var(--color-pulse-ring-out);
+  --ring-panel: 0 0 0 2px var(--color-card);            /* The notification dot on its round button */
+  --ring-center: 0 0 0 1.5px var(--color-primary);      /* The centered wheel item */
+  --ring-field: 0 0 0 1.5px var(--color-primary);       /* A focused field / a selected card in a sheet */
+  --ring-badge: 0 0 0 2px var(--color-card);            /* Around the wheel's check badge */
+  --ring-focus: 0 0 0 3px var(--color-primary);
+  --blur-soft: blur(10px);
+  --blur-modal-scrim: blur(12px);
+  --blur-qv-glass: blur(12px);     /* The quick view's close button */
+  --blur-qv-footer: blur(20px);
+  --blur-qv-cloud: blur(30px);     /* The cloud behind the quick view's hero */
+  --blur-qv-tile: blur(22px);      /* A fact tile's corner cloud */
+  --blur-chart-tip: blur(16px);
+  --blur-stat-cloud: blur(34px);   /* The colored cloud in a statistics tile's corner */
+  --blur-rating-cloud: blur(24px);
+
+  /* Opacity */
+  --opacity-disabled: 0.5;
+  --opacity-disabled-strong: 0.35; /* The onboarding "Next" while a step is not valid */
+  --opacity-muted: 0.6;      /* Locked / secondary items */
+  --opacity-faint: 0.4;      /* Empty placeholders */
+
+  /* Layers (z-index)
+     Local layers inside one component, then the app-wide ones. */
+  --z-base: 0;
+  --z-raised: 1;     /* A badge / control over its own card */
+  --z-overlay: 2;    /* Sticky bars and overlays inside a page */
+  --z-top: 3;        /* The topmost element inside a component */
+  --z-tab-bar: 100;
+  --z-side-sheet: 200;  /* The dashboard's off-canvas sidebar */
+  --z-drawer: 300;      /* The trainee drawer and its scrim */
+  --z-notifications: 350; /* The notifications panel and its scrim (above the drawer, under ⌘K) */
+  --z-palette: 400;     /* The command palette */
+  --z-toast: 500;       /* A toast, above everything but a modal */
+  --z-modal: 1000;
+}

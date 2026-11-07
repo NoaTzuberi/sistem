@@ -1,0 +1,111 @@
+/* Base · typography — font families (per language), the type scale, weights, line heights, letter
+   spacing. Screen-specific display sizes belong in their domain file. */
+
+:root {
+  /* Fonts — one pair per language, chosen automatically by <html lang>
+     PLACEHOLDERS: the owner picks the fonts in the design phase (see the phase-15 report for
+     suggestions). English keeps the current Latin fonts; Hebrew uses a system stack that has
+     Hebrew glyphs on every platform. Components only read --font-family-display / -body. */
+  --font-heading-en: "Cabinet Grotesk", system-ui, sans-serif;
+  --font-body-en: "Satoshi", system-ui, sans-serif;
+  --font-heading-he: system-ui, -apple-system, "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", Arial, sans-serif;
+  --font-body-he: system-ui, -apple-system, "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", Arial, sans-serif;
+
+  /* Small technical labels (the onboarding "Q.01"; the dashboard). System monospace — no font file. */
+  --font-family-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ── Trainee type system (the mobile app) ──
+     Self-hosted with @fontsource in apps/mobile (src/styles/fonts.css): the Capacitor build works offline.
+     Each face has a size-adjusted local fallback ("… Fallback", same file) so the swap doesn't shift layout.
+       Karantina 700        Hebrew display: screen / section / card / sheet titles, achievement names, Hebrew workout names
+       Barlow Condensed     numbers, Latin workout / exercise names at display sizes (italic 700 / 800)
+       JetBrains Mono 700   the small Latin "eyebrows" (WEEK, COACH, …) — decoration, never the only label
+       Rubik                running text, buttons, chips, form labels (both languages) */
+  --font-display-he: "Karantina", "Karantina Fallback", "Rubik", system-ui, sans-serif;
+  --font-num: "Barlow Condensed", "Barlow Condensed Fallback", "Rubik", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, Menlo, monospace;
+  --font-body: "Rubik", "Rubik Fallback", var(--font-body-he);
+
+  /* A display heading, by language (Hebrew here; English below): the face, its style and case. Read
+     through the .display-title class (typography.css), never one by one. */
+  --font-display: var(--font-display-he);
+  --font-display-style: normal;
+  --font-display-weight: 700;
+  --font-display-case: none;
+  /* Karantina is tall and tight. Its descenders (ק ך ן ף ץ) reach 0.1em under the baseline: below 0.92
+     a clamped (overflow: hidden) heading cuts them. */
+  --line-height-display: 0.92;
+  --line-height-display-num: 0.9;
+
+  /* Eyebrow: a 10px uppercase mono label next to a Hebrew section label. */
+  --text-eyebrow: 10px;
+  --letter-spacing-eyebrow: 1.2px;
+
+  /* The legacy names, kept for the dashboard / old CSS. */
+  --font-family-display: var(--font-heading-he);
+  --font-family-body: var(--font-body-he);
+
+  /* Type scale — mobile-first. Inputs stay >= 16px (no zoom on focus). */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 34px;
+  /* Trainee display sizes (Karantina / Barlow headings). Karantina reads small for its size: a Hebrew
+     title needs about 1.5× the Rubik size it replaces. */
+  --text-display-xs: 22px;     /* Card titles, coach name, a log week title */
+  --text-display-sm: 26px;     /* Timer title, segmented tabs, sheet options */
+  --text-display-md: 30px;     /* Greeting, calendar month, free-workout card */
+  --text-display-lg: 38px;     /* Week header */
+  --text-display-xl: 48px;     /* Next achievement, a sheet title */
+  --text-display-2xl: 54px;    /* Screen titles (large title) */
+  --text-display-3xl: 62px;    /* A Hebrew workout name on the Home stage */
+  /* Dashboard display sizes: thin, large numbers and page titles. */
+  --text-2xs: 11px;
+  --text-4xl: 40px;
+  --text-5xl: 44px;
+  --text-hero: 76px;
+  --text-goal: 54px;              /* "68 → 62": her weight goal on its gradient card */
+  --text-panel-title: 24px;       /* The notifications panel's title */
+  --text-profile-name: 36px;      /* A trainee's name on her profile header */
+  --text-hero-title: 30px;        /* The selected workout's title on its hero band (plan builder) */
+
+  /* Numbers, weights, line heights, letter spacing. */
+  --line-height-numeric: 0.9;     /* Condensed display numbers sit tight */
+
+  --font-weight-light: 300;      /* The dashboard's large numbers */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;  /* Barlow Condensed italic display (Trainee Home) */
+
+  --line-height-tight: 1.15;
+  --line-height-snug: 1.35;      /* A question on the onboarding card */
+  --line-height-base: 1.5;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-display: -0.03em;  /* Large light titles and numbers (dashboard) */
+  --letter-spacing-wide: 0.08em;   /* Uppercase labels (Latin only — Hebrew has no case) */
+}
+
+/* English: the Latin display face reads larger — smaller sizes. */
+:root:lang(en) {
+  --font-family-display: var(--font-heading-en);
+  --font-family-body: var(--font-body-en);
+  --font-display: var(--font-num);
+  --font-display-style: italic;
+  --font-display-weight: 800;
+  --font-display-case: uppercase;
+  --line-height-display: var(--line-height-display-num);
+  /* Barlow Condensed fills more of its size than Karantina: the same heading, about 0.8×. */
+  --text-display-xs: 18px;
+  --text-display-sm: 20px;
+  --text-display-md: 24px;
+  --text-display-lg: 30px;
+  --text-display-xl: 36px;
+  --text-display-2xl: 42px;
+  --text-display-3xl: 48px;
+}

@@ -1,0 +1,76 @@
+/* Domain · achievements — one identity color per category (+ text tone), the hero, medals, the modal,
+   the achievements page. */
+
+:root {
+  /* Achievements: one identity color per category (ink + lighter shade). Kinds, not statuses. */
+  --color-ach-workouts: #ff006e;
+  --color-ach-workouts-light: #ff8fc0;
+  --color-ach-streaks: #ff7a00;
+  --color-ach-streaks-light: #ffc48a;
+  --color-ach-perfect: #7c4dff;
+  --color-ach-perfect-light: #c9a6ff;
+  --color-ach-records: #0094ff;
+  --color-ach-records-light: #9ed3ff;
+  --color-ach-volume: #a50047;
+  --color-ach-volume-light: #ff8fb8;
+  --color-ach-tracking: #c23bc0;       /* Body & measurements (owner, 2026-10-22) */
+  --color-ach-tracking-light: #f0b3ea;
+  /* An achievement category's color as TEXT (the unlock date, the modal's category pill) — the
+     category's darker tone, never brown. Fills always take --color-ach-<category> itself. */
+  --color-ach-workouts-text: var(--ink-pink);
+  --color-ach-streaks-text: var(--ink-orange);
+  --color-ach-perfect-text: var(--ink-purple);
+  --color-ach-records-text: var(--ink-blue);
+  --color-ach-volume-text: var(--color-ach-volume);
+  --color-ach-tracking-text: #a62da4;  /* 5.9:1 on white */
+  /* The achievements hero (owner, 2026-10-22): Cherry Rose → Neon Pink → light pink. */
+  --gradient-ach-hero: linear-gradient(125deg, var(--color-primary-deep) 0%, var(--color-primary) 55%, #ff7a9f 100%);
+  --gradient-ach-hero-glow:
+    radial-gradient(30% 35% at 80% 20%, color-mix(in srgb, #ffc48a 20%, transparent), transparent 70%),
+    radial-gradient(30% 40% at 15% 90%, color-mix(in srgb, #c9a6ff 20%, transparent), transparent 70%);
+  --color-ach-hero-dots: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+  --shadow-ach-hero: 0 20px 50px color-mix(in srgb, var(--color-primary-deep) 28%, transparent);
+  --shadow-ach-hero-trainee: 0 18px 40px color-mix(in srgb, var(--color-primary-deep) 28%, transparent);
+  /* A badge card / medal (both apps — the medal set is mirrored). */
+  --radius-ach-badge: 22px;
+  /* (The medal's face / rings and the earned card's shadow read the category's --ach-color, so they live in
+     Medal.css / BadgeCard.css: a token here would resolve at :root, where no category is set.) */
+  --perspective-ach-grid: 700px;   /* the badges lean in it (useTilt: ±8°) */
+  --surface-on-hero: color-mix(in srgb, var(--color-on-primary) 16%, transparent);       /* the streak card */
+  --surface-on-hero-strong: color-mix(in srgb, var(--color-on-primary) 95%, transparent); /* the latest-unlock card */
+  --surface-on-hero-track: color-mix(in srgb, var(--color-on-primary) 25%, transparent); /* the XP bar's track, a cold flame */
+  /* Its own name: it once reused --color-on-hero-muted, and as the later line it turned every light
+     hero card's captions white. */
+  --color-on-ach-hero-muted: var(--on-pink); /* full white: any alpha drops small captions under 4.5:1 */
+  --gradient-xp: linear-gradient(to left, var(--color-on-primary), #ffd6e6);
+  --shadow-xp: 0 0 12px color-mix(in srgb, var(--color-on-primary) 70%, transparent);
+  --gradient-flame: linear-gradient(160deg, #ffc48a, #ff7a00);
+  --shadow-flame: 0 6px 18px color-mix(in srgb, #ff7a00 50%, transparent);
+  --gradient-medal-locked: linear-gradient(160deg, var(--color-fill-soft), #e6e1e7);
+  --shadow-medal-locked:
+    inset 0 2px 4px color-mix(in srgb, var(--color-card) 90%, transparent),
+    inset 0 -3px 6px color-mix(in srgb, var(--color-text) 6%, transparent);
+  --gradient-medal-gloss: radial-gradient(80% 80% at 30% 20%, color-mix(in srgb, var(--color-card) 55%, transparent), transparent 50%);
+  --gradient-medal-sweep: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-card) 70%, transparent), transparent);
+  --shadow-medal-lock: 0 2px 6px color-mix(in srgb, var(--color-text) 15%, transparent);
+  --color-ach-scrim: color-mix(in srgb, var(--color-text) 24%, transparent);
+  --blur-ach-scrim: blur(10px);
+  --blur-ach-glow: blur(40px);     /* the hero's and the modal's soft color glow */
+  --surface-ach-modal: color-mix(in srgb, var(--color-card) 92%, transparent);
+  --shadow-ach-modal: 0 40px 100px color-mix(in srgb, var(--color-text) 30%, transparent);
+
+  /* Achievements sizes (Home / Profile). */
+  --text-ach-target: 34px;        /* The next achievement's target */
+  --text-ach-hero-count: 64px;    /* Trainee Profile → Achievements: the unlocked count (Barlow italic 800) */
+  --text-ach-modal-title: 40px;   /* … the achievement modal's title (Karantina) */
+  --text-medal-number: 30px;      /* A count badge's number on a regular medal (5 / 10 / 25) */
+  --text-medal-number-large: 54px;
+  --radius-ach-hero: 28px;
+  --size-ach-hero-dots: 16px;     /* The hero's dot pattern pitch */
+
+  /* The achievements page (design group 4): "הבא בתור" rows + the numbers card. */
+  --size-ach-next-dot: 10px;
+  --size-ach-next-bar: 8px;
+  --size-ach-streak-icon: 28px;
+  --text-ach-stat: 28px;
+}

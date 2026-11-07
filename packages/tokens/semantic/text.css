@@ -1,0 +1,21 @@
+/* Semantic · text — text colors that are not part of the palette: faint text, text and rules on ink.
+   Body text / muted / on-primary are palette values (base/palette.css). */
+
+:root {
+  /* Faint text. */
+  --color-text-faint: #a9a2ac;           /* Group labels, axis text, empty cells */
+
+  /* Text on ink (the later definition below wins — kept as it was). */
+  --color-on-ink-muted: color-mix(in srgb, var(--color-on-primary) 65%, transparent);   /* small text on an ink tile */
+
+  /* Text on ink. */
+  --color-on-ink: var(--color-on-primary);
+  --color-on-ink-faint: color-mix(in srgb, var(--color-on-primary) 55%, transparent);  /* an inactive dock icon */
+  --color-pink-on-ink: #ff8fc0;         /* Pink numbers on ink (the timer's last interval) — 7.9:1 */
+
+  /* Rules and text on ink. */
+  --color-on-ink-rule: color-mix(in srgb, var(--color-on-primary) 12%, transparent);  /* Hairlines / a round button on ink */
+  --color-on-ink-rule-hover: color-mix(in srgb, var(--color-on-primary) 20%, transparent);
+  --color-on-ink-muted: color-mix(in srgb, var(--color-on-primary) 72%, transparent); /* Captions on the up-next card */
+  --color-ink-grid: color-mix(in srgb, var(--color-on-primary) 12%, transparent);     /* Its faint vertical grid */
+}

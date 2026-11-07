@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // DEV ONLY color check — `node scripts/check-colors.mjs`. No dependency. Lists:
 //   1. hex colors in apps/ and packages/ source that are not in the token palette
-//      (packages/tokens/tokens.css) — every color must come from a token;
+//      (packages/tokens/, tokens.css + the files it imports) — every color must come from a token;
 //   2. palette tokens in the brown / gold / amber / ochre / tan family (and darkened orange), with
 //      every file that reads them. The owner's rule: none of these anywhere. The orange TEXT tone
 //      #c75a00 (on light orange tints, never a fill) is the one allowed exception.
@@ -56,8 +56,15 @@ function walk(dir, files = []) {
   return files;
 }
 
-// The palette: every hex in tokens.css, with the token(s) that hold it.
-const tokensText = fs.readFileSync(path.join(ROOT, TOKENS_FILE), 'utf8');
+/** The token files in cascade order: the entry's @imports (packages/tokens/tokens.css only imports). */
+function tokenFiles() {
+  const entry = path.join(ROOT, TOKENS_FILE);
+  const imports = [...fs.readFileSync(entry, 'utf8').matchAll(/@import\s+['"]([^'"]+)['"]\s*;/g)];
+  return [entry, ...imports.map((match) => path.resolve(path.dirname(entry), match[1]))];
+}
+
+// The palette: every hex in the token files, with the token(s) that hold it.
+const tokensText = tokenFiles().map((file) => fs.readFileSync(file, 'utf8')).join('\n');
 const palette = new Map();
 for (const line of tokensText.split('\n')) {
   const name = line.match(/^\s*(--[\w-]+)\s*:/)?.[1];
@@ -68,7 +75,7 @@ for (const line of tokensText.split('\n')) {
   }
 }
 
-const files = SOURCES.flatMap((dir) => walk(path.join(ROOT, dir))).filter((file) => path.relative(ROOT, file) !== TOKENS_FILE);
+const files = SOURCES.flatMap((dir) => walk(path.join(ROOT, dir))).filter((file) => !path.relative(ROOT, file).startsWith(path.dirname(TOKENS_FILE) + path.sep));
 
 // 1. Hex colors outside the palette.
 const offPalette = [];

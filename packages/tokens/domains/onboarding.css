@@ -1,0 +1,45 @@
+/* Domain · onboarding — the question deck: its gradient, ghost cards, wheel, video veil and progress.
+   Onboarding is protected: change values here only with the owner. */
+
+:root {
+  /* The onboarding deck (design: docs/design/onboarding-deck.html). The screen gradient runs
+     Bright Snow → light pink → pink, with soft Neon Pink glows in the corners; these are its stops. */
+  --color-pink-mist: #fdedf4;
+  --color-pink-light: #fbcfe1;
+  --color-pink-mid: #f9a6c8;
+  --color-pink-bright: #ff5ca2;
+  --color-pink-glow: #ffd6e8;
+  --gradient-onboarding:
+    radial-gradient(70% 40% at 85% 30%, color-mix(in srgb, var(--color-pink-glow) 70%, transparent), transparent 70%),
+    radial-gradient(90% 45% at 10% 105%, color-mix(in srgb, var(--color-primary) 42%, transparent), transparent 62%),
+    radial-gradient(80% 40% at 100% 100%, color-mix(in srgb, var(--color-pink-bright) 45%, transparent), transparent 65%),
+    linear-gradient(
+      to bottom,
+      var(--color-bg) 0%,
+      var(--color-bg) 30%,
+      var(--color-pink-mist) 60%,
+      var(--color-pink-light) 85%,
+      var(--color-pink-mid) 100%
+    );
+  /* The see-through veil over an activity video: light on top (the header stays readable), pink below. */
+  --gradient-video-veil: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-bg) 88%, transparent),
+    color-mix(in srgb, var(--color-bg) 45%, transparent) 45%,
+    color-mix(in srgb, var(--color-primary) 30%, transparent)
+  );
+  --text-glow-on-video: 0 1px 12px color-mix(in srgb, var(--color-on-primary) 60%, transparent);
+  /* A reached progress segment. `to left` on purpose: the reference draws it the same way in both directions. */
+  --gradient-progress: linear-gradient(to left, var(--color-pink-bright), var(--color-primary));
+
+  --color-ghost: color-mix(in srgb, #f4f2f3 92%, transparent);       /* The deck cards behind it */
+  --color-ghost-light: color-mix(in srgb, #faf9f9 96%, transparent);
+  --color-ghost-border: #e9e6e8;
+  --color-control-border: #cfcfcf;       /* An empty radio / checkbox */
+  --color-placeholder: #c9c9c9;          /* Placeholder in an underline field */
+  --color-wheel-icon: #8a8590;           /* Wheel items away from the center */
+  --color-wheel-label: #9b979e;
+  --color-wheel-line: #d9d4d8;           /* The wheel's arc line */
+  --color-wheel-pill: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  --surface-chip-on-video: color-mix(in srgb, var(--color-on-primary) 85%, transparent);
+}

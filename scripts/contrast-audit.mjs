@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Contrast check (WCAG AA) — runs with `npm run lint`. No dependency.
 //
-// Reads packages/tokens/tokens.css, then every CSS file in apps/mobile/src and apps/dashboard/src, and
+// Reads packages/tokens/tokens.css (and the files it imports), then every CSS file in apps/mobile/src and apps/dashboard/src, and
 // fails when a rule:
 //   1. sets white text (or a white-at-an-alpha token) on a background lighter than 3:1 against white —
 //      the "known light tokens" (tints, clouds, light identity colors);
@@ -131,7 +131,14 @@ function walk(dir, files = []) {
   return files;
 }
 
-const tokenRules = readRules(path.join(ROOT, TOKENS_FILE)).filter((rule) => rule.selector === ':root');
+/** The token files in cascade order: the entry's @imports (packages/tokens/tokens.css only imports). */
+function tokenFiles() {
+  const entry = path.join(ROOT, TOKENS_FILE);
+  const imports = [...fs.readFileSync(entry, 'utf8').matchAll(/@import\s+['"]([^'"]+)['"]\s*;/g)];
+  return [entry, ...imports.map((match) => path.resolve(path.dirname(entry), match[1]))];
+}
+
+const tokenRules = tokenFiles().flatMap(readRules).filter((rule) => rule.selector === ':root');
 const vars = Object.assign({}, ...tokenRules.map((rule) => rule.declarations));
 
 const files = SOURCES.flatMap((dir) => walk(path.join(ROOT, dir)));

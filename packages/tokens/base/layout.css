@@ -1,0 +1,50 @@
+/* Base · layout — breakpoints (repeated by hand in @media), touch target, app chrome (sidebar,
+   drawer, dock, app column) and the safe-area insets (mirrored for RTL). */
+
+:root {
+  /* Breakpoints
+     CSS can't read a variable inside @media, so each media query repeats the number and names
+     the token next to it — change both together. JS (matchMedia) can read these. */
+  --breakpoint-sm: 600px;    /* Phone → wider: sheets become centered dialogs */
+  --breakpoint-md: 640px;
+  --breakpoint-lg: 768px;
+  --breakpoint-xl: 900px;
+  --breakpoint-2xl: 960px;
+  --breakpoint-3xl: 1024px;
+  --breakpoint-dash-nav: 860px;    /* Dashboard: the sidebar becomes an off-canvas drawer */
+  --breakpoint-dash-grid: 1180px;
+  --breakpoint-stats-fold: 1100px; /* Statistics: tiles 2 × 2, cards stack */
+  --breakpoint-stats-phone: 640px; /* Statistics: the retention rings share one row */  /* Dashboard: the 12-column widget grid folds */
+  --breakpoint-builder-rows: 720px; /* Plan builder: an exercise's four fields become 2 × 2 */
+
+  /* App chrome & touch */
+  --touch-target-min: 44px;
+  --sidebar-width: 248px;            /* Dashboard sidebar: open, icon rail, off-canvas */
+  --sidebar-width-rail:90px;
+  --sidebar-width-sheet: 272px;
+  --drawer-width: 460px;
+  --tab-bar-height: 64px;
+  /* The floating ink dock (replaces the tab bar): 54px items + 6px padding, above the home indicator. */
+  --dock-item: 54px;
+  --dock-padding: 6px;
+  --dock-height: calc(var(--dock-item) + 2 * var(--dock-padding));
+  --dock-offset: 14px;
+  --dock-label-max: 96px;
+  --app-column-max: 480px;       /* Wider screens: the app column is centered at this width */
+  --home-gutter: 20px;           /* Trainee Home's side margin */
+
+  /* Safe areas. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  /* The safe-area insets on the reading-direction sides (notch / home bar in landscape). */
+  --safe-inline-start: var(--safe-left);
+  --safe-inline-end: var(--safe-right);
+}
+
+/* Right-to-left: the same shapes / sides, mirrored. */
+:root[dir='rtl'] {
+  --safe-inline-start: var(--safe-right);
+  --safe-inline-end: var(--safe-left);
+}

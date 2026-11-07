@@ -1,0 +1,129 @@
+/* Domain · nutrition — the portion groups (fill / text / soft / glow), the trainee Nutrition tab, the
+   dashboard builder and library. Identity colors, never statuses. */
+
+:root {
+  /* Nutrition plan builder: THE portion-group map (fill, text, soft) — identity colors, never statuses.
+     Missing = solid pink, over = amber (--color-warning-*), complete = Cherry Rose. */
+  --color-portion-protein: #ff006e;
+  --color-portion-protein-text: var(--ink-pink);   /* the -text inks keep 4.5:1 on their soft */
+  --color-portion-protein-soft: #ffe3ee;
+  --color-portion-protein-deep: #c80058;           /* the daily protein grams line (owner, 2026-10-28) */
+  --color-portion-carb: #7c4dff;
+  --color-portion-carb-text: #5b2fd6;
+  --color-portion-carb-soft: #efe7ff;
+  --color-portion-fat: #ff7a00;
+  --color-portion-fat-text: var(--ink-orange);
+  --color-portion-fat-soft: #ffebd6;
+  --color-portion-snack: #0094ff;
+  --color-portion-snack-text: var(--ink-blue);
+  --color-portion-snack-soft: #e1f1ff;
+  --color-portion-vegetable: var(--color-primary-deep); /* Vegetables are free: Cherry Rose on a blush */
+  --color-portion-vegetable-text: var(--ink-pink);
+  --color-portion-vegetable-soft: #fbe3ec;
+  /* A group badge's glow at 35% (the fallback where color-mix is missing; otherwise it is mixed from the fill). */
+  --color-portion-protein-glow: rgb(255 0 110 / 35%);
+  --color-portion-carb-glow: rgb(124 77 255 / 35%);
+  --color-portion-fat-glow: rgb(255 122 0 / 35%);
+  --color-portion-snack-glow: rgb(0 148 255 / 35%);
+  --color-portion-vegetable-glow: rgb(165 0 71 / 35%);
+  /* A food-group filter chip (both apps: food list, food picker, the trainee's food sheet): a pill, the group's
+     tint + ink when off, its solid color + white when on; "All" = soft fill, ink when on. */
+  --size-filter-chip: 36px;
+  --radius-filter-chip: 18px;
+  --space-filter-chip-gap: 8px;
+  --size-filter-chip-icon: 16px;
+  --color-filter-chip-all: #f5f3f6;
+  /* Trainee Nutrition (docs/design/trainee-nutrition.html — "training OS", like Home B / Workouts).
+     Fills (cells, badges, the MIX bar) take the bright group color; text on a tint or white takes the
+     group's -text ink (the reference's fat / snack text colors miss 4.5:1 on their tints). */
+  --size-portion-badge: 38px;        /* A group's round icon badge */
+  --size-portion-badge-sm: 22px;     /* A menu item's portion count badge */
+  --radius-portion-badge-sm: 7px;
+  --size-fuel-cell: 40px;            /* A fuel cell's drawn height (its button stays 44px tall) */
+  --radius-fuel-capsule: 13px;
+  --gap-fuel-capsule: 5px;           /* Between two portions */
+  --gap-fuel-cell: 2px;              /* Between a portion's two halves */
+  --size-fuel-handle: 3px;           /* The white handle on the last filled cell */
+  --inset-fuel-handle: 11px;         /* … its distance from the cell's top and bottom */
+  --color-fuel-handle: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+  --opacity-fuel-number: 0.45;       /* A capsule's number on its tint */
+  --opacity-fuel-number-full: 0.85;  /* … in white on a full capsule */
+  --text-nutrition-title: 58px;      /* "תזונה" */
+  --line-height-nutrition-title: 0.8;
+  --text-portion-total: 64px;        /* The day's "eaten / total" */
+  --text-portion-total-goal: 26px;
+  --text-group-name: 32px;           /* A group row's name (Karantina) */
+  --text-group-count: 30px;          /* … its "eaten/goal" (Barlow) */
+  --text-group-goal: 18px;
+  --text-meal-name: 28px;            /* A menu meal's name */
+  --text-food-sheet-title: 44px;
+  --text-coach-name: 20px;
+  --text-vegetables: 22px;
+  --text-day-number: 18px;           /* A day number in the week strip */
+  --size-day-circle: 34px;
+  --size-day-bar-width: 26px;        /* A day's portion progress bar */
+  --size-day-bar-height: 4px;
+  --size-coach-avatar: 32px;
+  --size-coach-dot: 9px;
+  --size-mix-width: 150px;           /* The MIX bar */
+  --size-mix-height: 10px;
+  --size-photo-tile-width: 110px;
+  --size-photo-tile-height: 130px;
+  --size-photo-add: 40px;            /* The ink circle on the "add photo" tile */
+  --radius-meal-card: 24px;
+  --color-vegetables-dash: #e2dde3;  /* The free-vegetables row's dashed edge */
+  --border-width-dash: 1.5px;
+  --sheet-food-height: 82dvh;
+  --surface-photo-chip: color-mix(in srgb, var(--color-card) 90%, transparent);
+  /* Nutrition library (food list · templates · settings). */
+  --color-food-warn-ring: #ffd2a0;     /* A food card with a missing kcal / over its group's cap */
+  --gradient-template-tile: linear-gradient(140deg, #ff8fc0, var(--color-lilac));
+  --gradient-goal-deficit: linear-gradient(to right, var(--color-portion-snack), #9ed3ff);   /* the goal scale's minus side */
+  --gradient-goal-surplus: linear-gradient(to right, #ffb3d1, var(--color-primary));          /* … and its plus side */
+  --color-goal-deficit-row: #eef6ff;
+  --color-goal-surplus-row: #fff0f6;
+  --gradient-split-gap: repeating-linear-gradient(135deg, var(--tint-pink) 0 6px, var(--color-card) 6px 12px); /* the split's missing % */
+  --gradient-activity-bar: linear-gradient(to top, var(--color-portion-carb), var(--color-lilac));
+  --gradient-settings-preview:
+    radial-gradient(40% 40% at 60% 40%, #ff8fc0, transparent 70%),
+    radial-gradient(35% 35% at 30% 70%, var(--color-lilac), transparent 70%);
+  --color-nb-goal-loss: #0070c9;     /* Goal buttons: losing, keeping, gaining */
+  --color-nb-goal-keep: #7c4dff;
+  --color-nb-goal-gain: #ff006e;
+  --color-nb-recommended-from: #d4005c; /* The recommended-kcal card's gradient — dark enough for white captions */
+  --color-nb-recommended-to: #a50047;
+  --color-nb-target-tint: #fff0f6;   /* The daily target panel */
+  --color-nb-tip: #fff8e9;           /* A coach tip row */
+  --color-nb-meal-ground: #fbfafb;   /* A meal card at rest */
+  --color-nb-dash: #d9d2d8;          /* The "+ meal" tile's dashed edge */
+  --color-nb-switch-off: color-mix(in srgb, var(--color-text-muted) 70%, var(--color-card)); /* ~3:1 on white: an off switch stays visible */
+  --color-nb-delete: #d70015;        /* A destructive tool (the meal's delete) */
+  --color-nb-delete-soft: #ffe5e7;
+  --surface-nb-header: color-mix(in srgb, var(--color-card) 78%, transparent);
+  --blur-nb-header: blur(24px) saturate(170%);
+  --shadow-nb-header:
+    0 0 0 0.5px color-mix(in srgb, var(--color-text) 6%, transparent),
+    0 10px 30px color-mix(in srgb, var(--color-text) 8%, transparent);
+  --shadow-nb-recommended: 0 10px 24px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --shadow-nb-alert: 0 10px 24px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  --shadow-nb-meal-hover: 0 10px 26px color-mix(in srgb, var(--color-text) 7%, transparent);
+  --nb-header-offset: 140px;         /* scroll-margin under the sticky header + steps nav */
+  --nb-steps-top: 87px;              /* The steps nav sticks right under the header (8 + 71 + 8) */
+  --nb-side-top: 131px;              /* … and the side column under both */
+  /* Nutrition: the portion groups' share of the day (donut, bars) — identity colors. */
+  --color-macro-protein: var(--color-primary);
+  --color-macro-carb: #7c4dff;
+  --color-macro-fat: #ff7a00;
+  --color-macro-snack: #0094ff;
+  --gradient-nutrition-cloud:
+    radial-gradient(40% 40% at 60% 40%, #ffc48a, transparent 70%),
+    radial-gradient(35% 35% at 30% 60%, #ff8fc0, transparent 70%);
+  --gradient-nutrition-empty:
+    radial-gradient(30% 30% at 30% 30%, #ffc48a, transparent 70%),
+    radial-gradient(30% 30% at 70% 40%, #ff8fc0, transparent 70%),
+    radial-gradient(30% 30% at 50% 80%, #c9a6ff, transparent 70%);
+  --gradient-blob-pink: linear-gradient(150deg, var(--color-primary-tint), #ffc2da);
+  --gradient-blob-peach: linear-gradient(150deg, #ffebd6, #ffc48a);
+  --gradient-blob-lilac: linear-gradient(150deg, #efe7ff, #c9a6ff);
+  --surface-meal: color-mix(in srgb, var(--color-fill-soft) 85%, transparent);
+}

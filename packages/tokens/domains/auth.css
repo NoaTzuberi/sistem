@@ -1,0 +1,31 @@
+/* Domain · auth — the login / sign-up / join / password screens: glass on the brand gradient, the
+   running track, the auth stage edges, social buttons. */
+
+:root {
+  /* Glass surfaces on the brand gradient (login / sign-up / join): white at an alpha, no new colors. */
+  --glass-bg: color-mix(in srgb, var(--color-on-primary) 55%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--color-on-primary) 78%, transparent); /* fields on the glass card */
+  --glass-border: color-mix(in srgb, var(--color-on-primary) 80%, transparent);
+  --glass-blur: blur(22px) saturate(140%);
+  --glass-divider: color-mix(in srgb, var(--color-text) 15%, transparent);
+  --glass-outline: color-mix(in srgb, var(--color-text) 25%, transparent);     /* outlined pill on glass */
+
+  /* The running track drawn on the gradient (TrackBackground): white (--color-on-primary) at these alphas. */
+  --track-lane-alpha: 0.32;        /* inner lane lines */
+  --track-lane-edge-alpha: 0.5;    /* the innermost and outermost line */
+  --track-trail-alpha: 0.7;        /* the head of a runner's trail, fading to 0 */
+  --track-glow-alpha: 0.2;         /* the halo around a runner */
+
+  /* Third-party button colors fixed by the provider's guidelines (social sign-in, Phase 5c). */
+  --color-apple-button: #000000;
+
+  /* Auth notice (reset link sent / invalid). */
+  --size-auth-notice-icon: 56px;       /* The round icon chip of an auth notice (reset link sent / invalid) */
+
+  /* Auth screens (join / login / sign-up / password): the glass card design stays as it was; these
+     only paint the browser edges pink (iOS Safari's bars, overscroll) and size the join screen's coach block. */
+  --color-auth-stage-top: var(--color-primary);             /* theme-color: the gradient's top */
+  --color-auth-stage: var(--color-primary-deep);            /* html / body behind the track: the gradient's bottom edge */
+  --size-join-avatar: 56px;
+  --ring-join-avatar: 0 0 0 3px var(--color-on-primary);    /* white ring on the glass card */
+}

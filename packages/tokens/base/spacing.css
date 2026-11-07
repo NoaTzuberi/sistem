@@ -1,0 +1,85 @@
+/* Base · spacing & shape — the 8px space scale, the radius list, the corner cuts (mirrored for RTL)
+   and border widths. A radius used by one screen only can live in its domain file instead. */
+
+:root {
+  /* Spacing (8px base scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+  --space-8: 96px;
+
+  /* Shape — sharp cuts, not rounded cards
+     --radius-round is only for truly circular things (avatars, dots). The cut shapes are
+     clip-path polygons; their side follows the reading direction (see the RTL block below). */
+  --radius-none: 0;
+  --radius-round: 999px;
+  --radius-glass: 20px;         /* The glass card on the brand gradient (login / sign-up) */
+  --radius-block: 20px;         /* A soft block on a white screen (the waiting countdown) */
+  --radius-card: 22px;          /* The onboarding question card and its deck */
+  --radius-button: 14px;        /* The onboarding buttons */
+  --radius-check: 6px;          /* A rounded-square checkbox */
+  --radius-chip: 16px;          /* The centered wheel label */
+  /* The coach dashboard is rounded (owner-approved design), unlike the app's sharp cuts. */
+  --radius-panel: 26px;         /* A white widget on the canvas */
+  --radius-drawer: 28px;        /* The floating trainee drawer */
+  --radius-notice-panel: 30px;  /* The notifications panel */
+  --radius-notice-icon: 13px;   /* A notification's icon tile */
+  --radius-segment: 9px;        /* The thumb of an iOS-style segmented control */
+  --radius-dialog: 24px;        /* The command palette */
+  --radius-tile: 18px;          /* Fact tiles and glass rows inside a widget */
+  --radius-row: 16px;           /* A hover row, a photo */
+  --radius-logo-tile: 12px;     /* The pink tile behind the sidebar logo */
+  --radius-tooltip: 10px;
+  --radius-square: 5px;         /* The week squares in the trainees table */
+  --radius-bar: 4px;            /* Bar tops in a chart */
+  --radius-chart-tip: 14px;
+  --radius-qv-card: 24px;       /* The quick view's spotlight card */
+  --radius-qv-tile: 20px;       /* Its fact tiles, notes and grouped list */
+  --radius-qv-icon: 9px;        /* A small colored icon square */     /* The glass tooltip on a chart */
+  --radius-field: 12px;         /* A field of an open exercise row, a menu item */
+  --radius-stage: 40px;         /* Trainee Home: the pink stage's bottom corners */
+  --radius-lane: 14px;          /* … a day column of the week track */
+  --radius-dock: 34px;          /* … the floating ink dock */
+  --radius-pip: 4px;            /* … a portion pip, a tick */
+  --radius-up-next: 30px;       /* Trainee Workouts: the up-next card */
+  --radius-ticket: 22px;        /* … a workout ticket */
+  --radius-entry: 24px;         /* … the free-workout card, the preview header */
+  --radius-sheet: 32px;         /* A bottom sheet's top corners */
+  --radius-calendar-day: 12px;  /* A calendar day */
+  --radius-option-icon: 15px;   /* An option's icon tile in a sheet */
+  --cut-size: 12px;
+  /* One corner cut at the top-end (the card / tile pattern). */
+  --cut-corner: polygon(0 0, calc(100% - var(--cut-size)) 0, 100% var(--cut-size), 100% 100%, 0 100%);
+  /* Top-end and bottom-start corners cut (the countdown). */
+  --cut-corners-diagonal: polygon(
+    0 0,
+    calc(100% - var(--cut-size)) 0,
+    100% var(--cut-size),
+    100% 100%,
+    var(--cut-size) 100%,
+    0 calc(100% - var(--cut-size))
+  );
+
+  --border-width-thin: 1px;     /* Dividers, inputs, cards */
+  --border-width-medium: 2px;   /* Focus rings, selected states */
+  --border-width-thick: 3px;    /* The bracket buttons, accents */
+  --border-width-heavy: 4px;    /* Emphasis bars */
+  --focus-ring-offset: 2px;     /* Space between an element and its focus outline */
+}
+
+/* Right-to-left: the same shapes / sides, mirrored. */
+:root[dir='rtl'] {
+  --cut-corner: polygon(0 var(--cut-size), var(--cut-size) 0, 100% 0, 100% 100%, 0 100%);
+  --cut-corners-diagonal: polygon(
+    0 var(--cut-size),
+    var(--cut-size) 0,
+    100% 0,
+    100% calc(100% - var(--cut-size)),
+    calc(100% - var(--cut-size)) 100%,
+    0 100%
+  );
+}

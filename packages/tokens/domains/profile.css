@@ -1,0 +1,145 @@
+/* Domain · trainee profile — the profile stage and card, sub-screens (questionnaire, settings) and
+   their section tints. English display overrides at the end. */
+
+:root {
+  /* Trainee Profile (docs/design/trainee-profile.html — "training OS", like Home B) */
+  --text-profile-hero-name: 42px;      /* Her name on the profile card (Karantina) */
+  --text-profile-score: 32px;          /* A scoreboard number (Barlow) */
+  --text-profile-weight: 58px;         /* The current weight on the ink card (Barlow italic 800) */
+  --text-profile-row-name: 26px;       /* A measurement / the coach's name (Karantina) */
+  --text-profile-row-value: 24px;      /* A measurement's current value (Barlow) */
+  --text-profile-goal: 40px;           /* The next goal's name */
+  --text-profile-sheet-title: 42px;    /* The measurement sheet's title */
+  --text-profile-stepper: 48px;        /* The sheet's big weight (Barlow italic 800) */
+  --text-profile-stepper-sm: 20px;     /* A measurement stepper's value */
+  --text-profile-avatar: 40px;         /* Initials in the 96px avatar */
+  --text-profile-badge: 22px;          /* The number on a badge disc */
+  --size-profile-avatar: 96px;
+  --size-profile-camera: 32px;         /* The pink camera badge on the avatar */
+  --size-profile-stage: 200px;         /* The pink stage behind the top */
+  --size-profile-card-offset: 56px;    /* The profile card starts this far below the header row */
+  --size-profile-crop: 280px;          /* The photo crop square … */
+  --size-profile-crop-circle: 236px;   /* … and its circular mask */
+  --size-profile-coach-avatar: 46px;
+  --size-profile-chip-avatar: 20px;
+  --size-profile-badge: 54px;          /* A badge disc */
+  --size-profile-icon-tile: 36px;      /* A settings row's soft icon tile */
+  --size-profile-tab: 40px;            /* A segmented tab's height (the bar keeps 44px of hit area) */
+  --size-profile-measure-bar: 34px;    /* A measurement row's color bar … */
+  --size-profile-measure-bar-width: 6px;
+  --size-profile-spark-width: 64px;    /* … and its sparkline */
+  --size-profile-spark-height: 26px;
+  --size-profile-chart: 100px;         /* The weight chart's height */
+  --size-profile-chart-dot: 12px;      /* … its last point */
+  --size-profile-delta: 26px;          /* The delta pill's height */
+  --size-profile-compare: 360px;       /* The before / after frame */
+  --size-profile-handle: 44px;         /* Its round drag handle */
+  --size-profile-divider: 3px;         /* … and the line through it */
+  --size-profile-tick: 18px;           /* A next-goal tick */
+  --size-profile-stepper: 76px;        /* The sheet's big weight stepper */
+  --size-profile-step-button: 54px;
+  --size-profile-stepper-value: 84px;  /* A measurement stepper's value + unit */
+  --size-profile-step-button-sm: 34px; /* A measurement stepper's ± (its row stays 44px tall) */
+  --size-profile-logout: 50px;         /* The outlined log-out button */
+  --size-profile-row-gap: 2px;         /* Under a settings row's title */
+  --size-profile-track-inset: 3px;     /* The language switch's track */
+  --radius-profile-stage: 40px;        /* The stage's bottom corners */
+  --radius-profile-hero-card: 30px;    /* The white profile card */
+  --radius-profile-group: 22px;        /* A white grouped card (settings, measurements, photo options) */
+  --space-profile-group-gap: 10px;     /* Between two grouped settings cards */
+  --radius-profile-crop: 24px;
+  --radius-profile-card: 26px;         /* The weight card, the compare frame, the next goal */
+  --radius-profile-tile: 16px;         /* A photo tile */
+  --radius-profile-badge: 20px;        /* A badge cell */
+  --radius-profile-icon-tile: 12px;
+  --radius-profile-segment: 18px;      /* The segmented track (the thumb: --radius-profile-thumb) */
+  --radius-profile-thumb: 14px;
+  /* 4px white + 2px pink ring, a soft pink glow */
+  --ring-profile-avatar: 0 0 0 4px var(--color-card), 0 0 0 6px var(--color-primary), 0 12px 26px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  --ring-profile-camera: 0 0 0 3px var(--color-card);
+  /* The page surface: content sits on white cards over it. */
+  --color-profile-surface: #f6f4f7;
+  --surface-profile-tabs: color-mix(in srgb, var(--color-profile-surface) 92%, transparent);
+  --color-profile-segment-track: var(--color-fill-soft-hover);
+  /* The pink stage: brand pinks only — no glows, circles or stripes; a fine film grain on top. */
+  --color-profile-stage-from: #ff2e86;
+  --color-profile-stage-to: #e0005f;
+  --surface-profile-stage: linear-gradient(160deg, var(--color-profile-stage-from) 0%, var(--color-primary) 55%, var(--color-profile-stage-to) 100%);
+  --texture-profile-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.2 0 0 0 0 0.35 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --opacity-profile-grain: 0.25;
+  --surface-profile-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  /* The same stage as a whole screen's background (StageBackground — the workout player). */
+  --color-stage-full-top: var(--color-profile-stage-from);     /* theme-color */
+  --color-stage-full-bottom: var(--color-profile-stage-to);    /* html / body: iOS Safari's bars + overscroll */
+  --surface-stage-full-frost: color-mix(in srgb, var(--color-profile-stage-from) 80%, transparent); /* a sticky bar over it */
+  --shadow-profile-card: 0 1px 2px color-mix(in srgb, var(--color-ink) 4%, transparent), 0 18px 40px color-mix(in srgb, var(--color-stat-purple) 10%, transparent);
+  --shadow-profile-edit: 0 10px 22px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  /* The crop square: ink, the outside of the circle dimmed, a white ring. */
+  --surface-profile-crop-dim: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  --ring-profile-crop: 0 0 0 2px color-mix(in srgb, var(--color-card) 90%, transparent);
+  --surface-profile-avatar-busy: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  --ring-profile-selected: 0 0 0 3px var(--color-primary);                           /* The photo picked for the compare */
+  --surface-profile-delta: color-mix(in srgb, var(--color-primary) 22%, transparent);  /* The delta pill on the ink card */
+  --surface-profile-chip-on-ink: color-mix(in srgb, var(--color-on-primary) 10%, transparent);
+  --surface-profile-chip-on-ink-hover: color-mix(in srgb, var(--color-on-primary) 18%, transparent);
+  --surface-profile-photo-label: color-mix(in srgb, var(--color-card) 92%, transparent);
+  --color-profile-chart-fill: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --color-profile-axis: color-mix(in srgb, var(--color-on-primary) 55%, transparent);   /* Mono axis labels on ink (decoration) */
+  --color-profile-tick-rest: color-mix(in srgb, var(--color-primary-deep) 15%, transparent);
+  --color-profile-switch-off: color-mix(in srgb, var(--color-text-muted) 45%, transparent);
+  /* A measurement's change since the start: identity colors, NEVER good / bad (no green). */
+  --color-profile-down: var(--color-primary-deep);
+  --color-profile-up: var(--color-stat-purple);
+  --shadow-profile-cta: 0 10px 24px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --shadow-profile-handle: 0 6px 16px color-mix(in srgb, var(--color-ink) 25%, transparent);
+  --shadow-profile-divider: 0 0 12px color-mix(in srgb, var(--color-ink) 20%, transparent);
+  --shadow-profile-badge: inset 0 -4px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --transition-profile-thumb: 320ms;   /* The segmented thumb's spring (on --ease-slide-snap) */
+  --transition-profile-draw: 1s;       /* The weight line drawing itself */
+
+  /* Questionnaire + Settings (Profile sub-screens, direction B — like the Profile) */
+  --color-subscreen-page: #f6f4f7;     /* The page surface under the white cards */
+  --surface-subscreen-bar: color-mix(in srgb, var(--color-subscreen-page) 92%, transparent);  /* The sticky top bar */
+  --color-subscreen-rule: #ece9ee;     /* Hairlines between a card's rows */
+
+  --text-subscreen-title: 44px;        /* "השאלון שלי" / "הגדרות" (Karantina) */
+  --text-qn-section: 26px;             /* A questionnaire card's title (Karantina) */
+  --text-qn-score: 32px;               /* A single value in the mini scoreboard (Barlow) */
+  --text-qn-pip-count: 20px;           /* The days number under the pips (Barlow) */
+  --text-subscreen-label: 13px;        /* A section label / subtitle (13px / 600) */
+  --text-qn-body: 15px;                /* Free-text answers */
+  --size-subscreen-back: 40px;         /* The round back button (its hit area stays 44px) */
+  --size-qn-tile: 36px;                /* A card's icon tile / its round edit button */
+  --size-qn-chip: 32px;                /* An answer chip (display only) */
+  --size-qn-pip-width: 28px;
+  --size-qn-pip-height: 8px;
+
+  /* Questionnaire chips and pips. */
+  --radius-qn-chip: 16px;
+  --radius-qn-pip: 4px;
+
+  /* Section tints: soft fill + its text color (no green, no brown / gold). */
+  --color-qn-goals-soft: var(--tint-pink);                 /* #ffe3ee */
+  --color-qn-goals-ink: #c80058;
+  --color-qn-schedule-soft: var(--tint-purple);            /* #efe7ff */
+  --color-qn-schedule-ink: var(--ink-purple);              /* #5b2fd6 */
+  --color-qn-activities-soft: var(--color-stat-orange-mist); /* #ffebd6 */
+  --color-qn-activities-ink: var(--ink-orange);            /* #c75a00 — text only, never a fill */
+  --color-qn-equipment-soft: var(--tint-blue);             /* #e1f1ff */
+  --color-qn-equipment-ink: var(--solid-blue);             /* #0070c9 */
+  --color-qn-nutrition-soft: #fbe3ec;
+  --color-qn-nutrition-ink: var(--color-primary-deep);     /* #a50047 */
+  --color-qn-health-soft: var(--color-fill-soft);
+  --color-qn-health-ink: var(--color-ink);
+  --color-qn-pip-rest: var(--color-segment-track);
+}
+
+/* English: the Latin display face reads larger — smaller sizes. */
+:root:lang(en) {
+  --text-profile-hero-name: 34px;
+  --text-profile-row-name: 20px;
+  --text-profile-goal: 32px;
+  --text-profile-sheet-title: 34px;
+  --text-subscreen-title: 36px;
+  --text-qn-section: 20px;
+}

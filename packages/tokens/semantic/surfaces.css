@@ -1,0 +1,33 @@
+/* Semantic · surfaces — what things sit on: the white card, soft fills, hairlines, the pink stage,
+   frosted headers, hover fills. Built from the palette; no new raw colors unless the design needs one. */
+
+:root {
+  /* The brand gradient: Neon Pink (top-end corner in the design) → Cherry Rose. The login /
+     sign-up background; TrackBackground paints the same two colors on its canvas. */
+  --gradient-brand: linear-gradient(to bottom left, var(--color-primary), var(--color-primary-deep));
+
+  /* The white card. */
+  --color-card: #ffffff;                 /* The question card */
+
+  /* Soft fill inside a white card, hairlines. */
+  --color-fill-soft: #f6f4f6;            /* Fills inside a white widget (fact tiles, tracks, tab rails) */
+  --color-hairline: #ece8eb;             /* Row dividers and chart grid lines */
+
+  /* The pink stage (Home). */
+  --color-stage: var(--color-primary);  /* The full-bleed pink stage at the top of Home */
+  --color-on-stage: var(--color-on-primary);
+  --color-on-stage-muted: color-mix(in srgb, var(--color-on-primary) 85%, transparent);
+  --color-stage-rule: color-mix(in srgb, var(--color-on-primary) 30%, transparent);     /* hairlines on the stage */
+  --color-stage-grid: color-mix(in srgb, var(--color-on-primary) 16%, transparent);     /* the faint grid lines */
+  --surface-on-stage: color-mix(in srgb, var(--color-on-primary) 18%, transparent);     /* the bell, the slider fill */
+  --surface-on-stage-hover: color-mix(in srgb, var(--color-on-primary) 28%, transparent);
+
+  /* Hover fills, the stage shadow. */
+  --color-fill-soft-hover: #ece8ee;
+  --color-tint-pink-hover: #ffd3e5;
+  --color-stage-shadow: #46001e;        /* Shadows cast on the pink stage (the slider knob) */
+
+  /* Trainee Workouts (docs/design/trainee-workouts.html), same "training OS" language as Home B. */
+  --surface-header-frost: color-mix(in srgb, var(--color-card) 88%, transparent);   /* The sticky large title */
+  --blur-header: blur(20px) saturate(180%);
+}

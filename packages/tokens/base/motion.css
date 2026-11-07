@@ -1,0 +1,72 @@
+/* Base · motion — durations, easings, press scales and loops. CSS transitions read these; the
+   reduced-motion overrides live in each app (styles/animations.css), not here. Never `transition: all`. */
+
+:root {
+  /* Motion
+     GSAP animations read their own durations in code; CSS transitions use these. */
+  --transition-fast: 150ms;
+  --transition-base: 250ms;
+  --transition-slow: 400ms;
+  --transition-progress: 1s;     /* Rings / bars filling to a new value */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slide: 300ms;     /* A selection pill sliding between options (LanguageToggle) */
+  --ease-slide: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-fade: 600ms;      /* The onboarding background: gradient ↔ activity video */
+  --ease-pop: cubic-bezier(0.2, 0.8, 0.2, 1.4);  /* A check mark popping in */
+  --transition-press: 140ms;     /* A pill button giving under the finger (onboarding) */
+  --ease-press: cubic-bezier(0.23, 1, 0.32, 1);
+  /* The dashboard drawer: in on the drawer curve, out faster on a plain ease-out. Pressables
+     use --transition-press + --ease-press (the same ease-out curve). */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-drawer-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-drawer-in: 300ms;
+  --transition-drawer-out: 200ms;
+  --transition-toast: 200ms;     /* A toast rising in / fading out */
+  --transition-menu: 150ms;      /* A menu growing from its button */
+  --transition-notice-panel: 240ms; /* The notifications panel settling under the bell */
+  --transition-notice: 200ms;       /* Its scrim, a card changing state, a card leaving */
+  --transition-segment: 220ms;      /* The segmented control's thumb sliding */
+  --transition-popover: 180ms;   /* The "new plan" popover growing from its corner */
+  --transition-hover: 180ms;     /* A pill lifting / changing shade under a fine pointer */
+  --transition-chevron: 200ms;
+  --transition-modal-in: 360ms;  /* A modal settling in (on --ease-drawer) */
+  --transition-qv-ring: 900ms;     /* The quick view's spotlight ring filling as it opens */
+  /* Statistics page. Hover / thumb motion, then the once-per-session intro. */
+  --transition-range-thumb: 260ms; /* The range control's thumb sliding */
+  --transition-lift: 220ms;        /* A tile rising under a fine pointer */
+  --transition-cloud: 500ms;       /* Its cloud swelling */
+  --transition-chart-tip: 120ms;   /* The tooltip following the pointer */
+  --intro-line: 1100ms;            /* The area chart's line drawing itself */
+  --intro-area: 900ms;             /* … and its fill fading in, after --intro-area-delay */
+  --intro-area-delay: 250ms;
+  --intro-bar: 700ms;              /* A weekly bar growing; one every --intro-bar-step */
+  --intro-bar-step: 45ms;
+  --intro-goal: 800ms;             /* A goal bar growing; one every --intro-goal-step */
+  --intro-goal-step: 60ms;
+  --intro-ring: 1000ms;            /* A retention ring filling */
+  --transition-medal-sweep: 700ms; /* The light crossing an unlocked medal under the pointer */
+  --transition-medal-flip: 700ms;  /* The medal turning to face her as its modal opens */
+  --transition-confetti: 1100ms;   /* A confetti piece flying out (each adds up to --confetti-spread) */
+  --confetti-spread: 500ms;
+  --confetti-delay: 120ms;         /* The burst waits for the modal to start opening */
+  --intro-xp: 900ms;               /* The achievements XP bar growing, once */
+  --intro-meter: 900ms;            /* A tile's meter growing */   /* An exercise card's chevron turning as it opens */
+  /* Trainee Home (direction B) and the tab screens' depth transition. */
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);   /* The dock pill opening */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);            /* A screen leaving */
+  --transition-screen-in: 440ms;
+  --transition-screen-out: 300ms;
+  --transition-screen-fade: 160ms;                    /* Reduced motion: opacity only */
+  --transition-dock: 420ms;
+  --transition-snap: 380ms;
+  --transition-lane: 200ms;
+  --press-scale: 0.97;
+  --press-scale-strong: 0.96;
+  --transition-fuel-cell: 300ms; /* A portion tracker cell filling / emptying (on --ease-out) … */
+  --fuel-cell-step: 45ms;        /* … one cell after the other */
+  --transition-badge-pop: 520ms; /* A group's badge popping when she completes it (on --ease-spring) */
+  --loop-pulse: 1.8s;            /* Today's dot */
+  --loop-tick: 1.4s;             /* The next achievement tick */
+}

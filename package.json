@@ -32,7 +32,8 @@
     "backfill:achievements": "npm run backfill:achievements -w @sistem/server --",
     "test:i18n": "vitest run --config vitest.i18n.config.mts",
     "lint:i18n": "node scripts/i18n-audit.mjs",
-    "lint:contrast": "node scripts/contrast-audit.mjs"
+    "lint:contrast": "node scripts/contrast-audit.mjs",
+    "check:tokens": "node scripts/check-tokens.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

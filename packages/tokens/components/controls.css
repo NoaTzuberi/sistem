@@ -1,0 +1,26 @@
+/* Components · controls — tokens owned by one shared control: the pill button, the segmented control,
+   the language switch, the iOS switch. Colors come from semantic tokens. */
+
+:root {
+  /* The segmented control. */
+  --shadow-segment: 0 3px 8px color-mix(in srgb, var(--color-ink) 8%, transparent), 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 4%, transparent);
+
+  /* The full-width pill button. */
+  --size-pill-button: 56px;            /* The full-width pill (components/common/PillButton) */
+
+  --color-segment-track: var(--color-fill-soft-hover);  /* #ece8ee — a segmented control's track */
+
+  /* Segmented options, the language switch. */
+  --size-segment-option: 36px;         /* A segmented option's drawn height (the row keeps 44px of hit area) */
+  --size-language-switch-option: 40px; /* עברית | English (design group 4); 4px of track around it = 48px */
+  --size-language-switch-inset: 4px;
+
+  /* iOS switch. */
+  --size-switch-width: 51px;           /* iOS switch */
+  --size-switch-height: 31px;
+
+  /* Segmented track and thumb. */
+  --radius-segment-track: 14px;
+  --radius-segment-thumb: 11px;
+  --shadow-segment-soft: 0 2px 8px color-mix(in srgb, var(--color-ink) 10%, transparent);
+}

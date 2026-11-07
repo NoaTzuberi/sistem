@@ -1,0 +1,50 @@
+/* Domain · trainee Home (direction B) — the stage's lanes and pulse, the 3D object of the day and its
+   studio, Home sizes. */
+
+:root {
+  /* The slide track, lanes, today's pulse. */
+  --surface-slide-track: color-mix(in srgb, var(--color-ink) 22%, transparent);         /* the rest day's next-workout card */
+  --color-lane-line: color-mix(in srgb, var(--color-ink) 5%, transparent);              /* lane lines in a week column */
+  --color-lane-line-on-fill: color-mix(in srgb, var(--color-on-primary) 6%, transparent); /* … on a filled / ink lane (never tints it) */
+  --color-pulse-ring: color-mix(in srgb, var(--color-primary) 30%, transparent);        /* today's pulsing dot */
+  --color-pulse-ring-out: color-mix(in srgb, var(--color-primary) 0%, transparent);
+
+  /* The Home stage's 3D "object of the day" (read by JS — plain hex only, three.js parses them).
+     Soft-touch palette. The values are the design's look as rendered (its three.js r128 treated these
+     colors as linear), so the app matches docs/design/trainee-home-b.html. */
+  --color-object-matte: #fbfafb;        /* Soft-touch matte white */
+  --color-object-blush: #ffe2ee;
+  --color-object-ink: #716a78;          /* The stopwatch face, the dumbbell grip */
+  --color-object-chrome: #f5f3f6;       /* Satin chrome details */
+  --color-object-accent: #ff71bf;       /* Pink accents */
+  --color-object-shadow: #5a0028;       /* The contact shadow under the object */
+  /* The studio the objects reflect (PMREM) and its lights. */
+  --color-studio-room: #837d89;
+  --color-studio-softbox: #ffffff;
+  --color-studio-bounce: #ff86c4;       /* The pink bounce card below */
+  --color-studio-warm: #ffeee2;         /* The warm card behind */
+  --color-studio-rim: #ffeae1;          /* The warm rim light */
+
+  /* Trainee Home (direction B) — Barlow Condensed sizes. */
+  --text-home-title: 64px;        /* Today's workout name on the stage */
+  --text-score: 44px;             /* A scoreboard number */
+  --text-fact: 30px;              /* A fact on the stage (exercises, this week) */
+
+  --text-lane-date: 22px;         /* A day's date in its lane; the selected day's workout name */
+  --text-coach-note: 15px;        /* Home: the coach's note (4 lines, then "more") */
+  --text-score-sup: 18px;         /* "/4" next to a scoreboard number */
+
+  /* Home sizes. */
+  --daily-object-height: 210px;   /* The Home stage's 3D object of the day */
+  --slide-height: 62px;
+  --slide-knob: 52px;
+  --lane-height: 92px;
+  --size-home-coach-avatar: 42px; /* Home: the coach's initials */
+  --tick-height: 26px;           /* A tick of the next achievement */
+  --tick-gap: 3px;
+  --pip-height: 12px;            /* A portion pip (Nutrition today) */
+  --fuel-label-width: 60px;
+  --fuel-count-width: 40px;
+  --ring-mini: 28px;             /* A close achievement's conic ring … */
+  --ring-mini-hole: 20px;        /* … and its hole */
+}

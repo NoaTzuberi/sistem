@@ -1,0 +1,160 @@
+/* Domain · dashboard — the coach web dashboard: canvas, login flow lines, hero clouds, statistics,
+   the trainee quick view, notifications, the publish modal, a trainee's profile tabs. */
+
+:root {
+  /* The flow lines drawn on Bright Snow (dashboard login, FlowBackground): Neon Pink
+     (--color-primary) at these alphas. */
+  --flow-glow-top-alpha: 0.1;       /* soft radial glow, top-right corner */
+  --flow-glow-bottom-alpha: 0.07;   /* soft radial glow, bottom-left corner */
+  --flow-line-alpha: 0.12;          /* the lines */
+  --flow-line-strong-alpha: 0.26;   /* every 5th line */
+
+  /* Frosted white over the flow lines (the login card, the language toggle), and the light
+     Platinum of the card's fields. */
+  --surface-frosted: color-mix(in srgb, var(--color-on-primary) 82%, transparent);
+  --surface-frosted-light: color-mix(in srgb, var(--color-on-primary) 70%, transparent);
+  --color-surface-soft: color-mix(in srgb, var(--color-surface) 55%, var(--color-bg));
+
+  /* The coach dashboard (design: docs/design/coach-dashboard.html): a soft pink-biased grey canvas
+     with faint pink glows in two corners; white rounded widgets float on it. */
+  --color-canvas: #efedf0;               /* The page ground */
+
+  --color-icon-quiet: #8f8892;           /* A sidebar icon that is not the current page */
+  --color-dash-outline: #d8d1d7;         /* The dashed "planned" pill */
+  --color-bar-rest: #ffb3d1;             /* Chart bars that are not the current week */
+  --color-square-missed: #f6c9d9;        /* A missed workout square (trainees table) */
+  --color-lilac: #c9a6ff;
+  --color-lilac-mist: #f4e9ff;
+  --color-peach: #ffb59e;
+  /* Avatar tints: a soft fill + its readable text. The first pair is the brand's own. */
+  --color-avatar-lilac: #eee6ff;
+  --color-avatar-lilac-text: #6a3fb5;
+  --color-avatar-peach: #ffebdf;
+  --color-avatar-peach-text: var(--ink-orange);
+  --color-avatar-sky: #e2f1f6;
+  --color-avatar-sky-text: #1e6a85;
+  --gradient-canvas:
+    radial-gradient(60% 50% at 0% 100%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 70%),
+    radial-gradient(40% 35% at 100% 0%, color-mix(in srgb, var(--color-pink-glow) 55%, transparent), transparent 70%);
+  /* The two hero cards: blurred color clouds (the card blurs this layer). */
+  --gradient-hero-pink:
+    radial-gradient(40% 45% at 35% 70%, var(--color-pink-bright) 0%, transparent 70%),
+    radial-gradient(45% 45% at 70% 35%, var(--color-peach) 0%, transparent 70%),
+    radial-gradient(60% 60% at 50% 50%, var(--color-primary-tint) 0%, var(--color-pink-mist) 100%);
+  --gradient-hero-lilac:
+    radial-gradient(40% 45% at 65% 70%, var(--color-lilac) 0%, transparent 70%),
+    radial-gradient(45% 45% at 30% 35%, var(--color-pink-mid) 0%, transparent 70%),
+    radial-gradient(60% 60% at 50% 50%, var(--color-lilac-mist) 0%, var(--color-bg) 100%);
+  --blur-hero: blur(28px);
+  /* White at an alpha, on the canvas or on a hero cloud. */
+  --surface-pill: color-mix(in srgb, var(--color-card) 65%, transparent);        /* chips, segmented rails */
+  --surface-pill-hover: color-mix(in srgb, var(--color-card) 55%, transparent);  /* a sidebar item under the pointer */
+  --surface-glass-row: color-mix(in srgb, var(--color-card) 62%, transparent);   /* rows on a hero card */
+  --surface-glass-chip: color-mix(in srgb, var(--color-card) 90%, transparent);
+  --color-on-hero-muted: color-mix(in srgb, var(--color-text) 70%, transparent); /* captions on a hero card */
+  --color-tick-rest: color-mix(in srgb, var(--color-text) 18%, transparent);     /* hero mini columns */
+  --color-scrim: color-mix(in srgb, var(--color-text) 22%, transparent);         /* behind the drawer / palette */
+
+  /* The trainee's Plans tab: the pink pill under the pointer, and the quiet "AI draft" pill. */
+  /* Statistics identity colors (dashboard): which NUMBER a tile is — not statuses, no green.
+     Each has the ink shade (its text, line and meter), a lighter cloud and a mist. */
+  --color-stat-pink: #ff006e;
+  --color-stat-pink-cloud: #ffb3d1;
+  --color-stat-pink-mist: #ffe3ee;
+  --color-stat-purple: #7c4dff;
+  --color-stat-purple-cloud: #c9b2ff;
+  --color-stat-purple-mist: #efe7ff;
+  --color-stat-orange: #ff7a00;                 /* a fill (sparkline, meter, icon square) */
+  --color-stat-orange-text: var(--ink-orange);  /* … as text */
+  --color-stat-orange-cloud: #ffc48a;
+  --color-stat-orange-mist: #ffebd6;
+  --color-stat-blue: #0070c9;
+  --color-stat-blue-cloud: #9ed3ff;
+  --color-stat-blue-mist: #e1f1ff;
+  --color-chart-line-start: #ff8fc0;   /* The light end of the area chart's line, the top of a resting bar */
+  --color-chart-bar-end: #ffd1e3;      /* The bottom of a resting bar */
+  --color-ring-mid: #d4005c;           /* The middle retention ring, between Neon Pink and Cherry Rose */
+  --color-rating-cloud: #ff4e9a;       /* The rating tile's cloud: pink and peach on a pink mist */
+  --color-rating-cloud-warm: #ffb59e;
+  --color-meter-track: color-mix(in srgb, var(--color-text) 7%, transparent);   /* a meter / ring track on a colored tile */
+  --color-star-rest: color-mix(in srgb, var(--color-primary-deep) 20%, transparent); /* the empty part of a star */
+  --surface-chart-tip: color-mix(in srgb, var(--color-card) 92%, transparent);  /* the glass tooltip on a chart */
+  --surface-delta-pill: color-mix(in srgb, var(--color-card) 80%, transparent); /* the change pill on a statistics tile */
+  /* Trainee quick view (dashboard drawer): its ground, and the status colors of its hero —
+     the cloud behind the name, the avatar's gradient and shadow, the status pill's ink. No green. */
+  --color-quick-view-bg: #f7f5f7;
+  --color-qv-waiting-cloud: #ff8fc0;
+  --color-qv-waiting-cloud-warm: #ffb59e;
+  --color-qv-waiting-avatar-from: #ff006e;      /* Avatar gradients keep ≥ 3:1 under the white initials (22px) */
+  --color-qv-waiting-avatar-to: #a50047;
+  --color-qv-active-cloud: #c9a6ff;
+  --color-qv-active-avatar-from: #7c4dff;
+  --color-qv-active-avatar-to: #5b2fd6;
+  --color-qv-active-ink: #5b2fd6;
+  --color-qv-attention-cloud: #ffc48a;
+  --color-qv-attention-cloud-light: #ffd9a8;
+  --color-qv-attention-avatar-from: #ff7a00;   /* brand orange → Neon Pink: no darkened orange (owner, 2026-10-22) */
+  --color-qv-attention-avatar-to: #ff006e;
+  --color-qv-inactive-cloud: #e2dde3;
+  --color-qv-inactive-cloud-dark: #d9d2d8;
+  --color-qv-inactive-avatar-from: #8f8792;
+  --color-qv-inactive-avatar-to: #6b6470;
+  --color-qv-late-tint: #fff0f5;          /* The spotlight card when the 48h window has passed */
+  --color-qv-hairline: color-mix(in srgb, var(--color-text) 12%, transparent); /* the grouped list's separators */
+  --color-qv-row-hover: #faf8fa;
+  --color-qv-skip-stripe: #ece8eb;        /* The second stripe of a skipped workout tile */
+  --color-qv-achievements: #c23bc0;       /* The achievements row's icon square (no gold — owner, 2026-10-22) */
+  --surface-qv-close: color-mix(in srgb, var(--color-card) 75%, transparent);   /* the floating close button */
+  --surface-qv-pill: color-mix(in srgb, var(--color-card) 85%, transparent);    /* the status pill and the AI strip's icon tile */
+  --surface-qv-footer: color-mix(in srgb, var(--color-quick-view-bg) 85%, transparent);
+  /* The publish modal: its scrim and glass card, and the confetti's brand colors. */
+  --color-modal-scrim: color-mix(in srgb, var(--color-text) 28%, transparent);
+  --surface-modal: color-mix(in srgb, var(--color-card) 94%, transparent);
+  --color-confetti-1: var(--color-primary);
+  --color-confetti-2: var(--color-stat-purple-cloud);
+  --color-confetti-3: var(--color-workout-3);
+  --color-confetti-4: var(--color-workout-4);
+
+  --gradient-ai-soft: linear-gradient(120deg, var(--color-primary-tint), var(--color-lilac-mist));
+  --gradient-ai-soft-hover: linear-gradient(120deg, color-mix(in srgb, var(--color-primary) 18%, var(--color-card)), color-mix(in srgb, var(--color-lilac) 40%, var(--color-card)));
+  --gradient-week-cloud:
+    radial-gradient(40% 40% at 60% 40%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 70%),
+    radial-gradient(35% 35% at 30% 70%, color-mix(in srgb, var(--color-peach) 35%, transparent), transparent 70%);
+  --surface-timeline: color-mix(in srgb, var(--color-card) 55%, transparent);   /* the past-weeks timeline */
+
+  /* Notification types (the bell's panel): icon, unread dot and action take the color; the unread
+     card's glow is the same color at a low alpha. Kinds of news, not statuses — no green.
+     "late" is the only red: a 48h window that has passed. */
+  --color-notice-warn: var(--ink-orange);           /* the icon / text */
+  --color-notice-warn-fill: #ff7a00;                /* the dot, the action button */
+  --color-notice-late: #d70015;
+  --color-notice-new: var(--color-workout-2);
+  --color-notice-done: var(--color-primary-deep);
+  --surface-notice-panel: color-mix(in srgb, var(--color-bg) 86%, transparent);       /* the frosted panel */
+  --surface-notice-read: color-mix(in srgb, var(--color-card) 45%, transparent);      /* a read notification */
+  --surface-notice-quiet: color-mix(in srgb, var(--color-text-muted) 12%, transparent); /* segmented track, read icon tile, dismiss */
+  --color-notice-scrim: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --blur-notice-scrim: blur(6px) saturate(120%);
+  --blur-notice-panel: blur(30px) saturate(180%);
+  /* Section identity on a trainee's questionnaire: which part of her answers this is (icon chip,
+     pills). Not statuses. Training and the orange soft reuse the workout identity values. */
+  --color-section-training: var(--color-workout-2);
+  --color-section-training-soft: var(--color-workout-2-soft);
+  --color-section-exercises: var(--ink-orange);
+  --color-section-exercises-soft: var(--color-workout-3-soft);
+  --color-section-personal: #0070c9;
+  --color-section-personal-soft: #e2f0fb;
+
+  /* The trainee profile: the initials avatar, and the soft pink / lilac cloud in the header card's corner. */
+  --gradient-avatar: linear-gradient(140deg, var(--color-primary), var(--color-primary-deep)); /* ≥ 3:1 under the white initials */
+  --gradient-profile-cloud:
+    radial-gradient(40% 40% at 60% 40%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 70%),
+    radial-gradient(35% 35% at 30% 60%, color-mix(in srgb, var(--color-lilac) 22%, transparent), transparent 70%);
+  --color-ring-track: color-mix(in srgb, var(--color-text) 8%, transparent);   /* the empty part of a progress ring */
+  /* Glass cards on a trainee's Body / Achievements / Nutrition tabs: white 78 %, blur, inner hairline. */
+  --surface-glass-card: color-mix(in srgb, var(--color-card) 78%, transparent);
+  --blur-glass-card: blur(20px) saturate(160%);
+  --shadow-glass-card:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-card) 70%, transparent),
+    0 10px 30px color-mix(in srgb, var(--color-text) 6%, transparent);
+}

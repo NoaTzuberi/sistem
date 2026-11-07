@@ -1,0 +1,88 @@
+/* Domain · workouts — workout identity colors (a fill is always the exact --color-workout-N), the
+   Workouts tab, workout detail / log, the interval timer. */
+
+:root {
+  /* Workout identity colors (plan builder): which workout of the week this is, by its place in
+     the plan, cycling through five. NOT status colors — done / success stays Cherry Rose. Each has
+     a soft background of its own. */
+  --color-workout-1: #ff006e;
+  --color-workout-1-soft: #ffe3ef;
+  --color-workout-2: #7c4dff;
+  --color-workout-2-soft: #eee7ff;
+  --color-workout-3: #ff7a00;
+  --color-workout-3-soft: #ffeedd;
+  --color-workout-4: #0094ff;
+  --color-workout-4-soft: #e0f1ff;
+  --color-workout-5: #a50047;
+  --color-workout-5-soft: #f8e1ea;
+  --surface-on-workout: color-mix(in srgb, var(--color-card) 80%, transparent);          /* chips on a workout's hero band */
+  --surface-on-workout-strong: color-mix(in srgb, var(--color-card) 85%, transparent);   /* the notes field on the band */
+
+  /* Muted white on a workout color. */
+  --color-on-workout-muted: color-mix(in srgb, var(--color-on-primary) 80%, transparent); /* small text on a filled workout pill */
+
+  /* Workout identity colors: a FILL is always the exact --color-workout-N (owner, 2026-10-21 — never a
+     darker shade, a mix with ink, an overlay or a filter). -text = the color as TEXT on its -soft tint or
+     on white (orange: #c75a00 — text only, never a fill). */
+  --color-workout-1-text: var(--ink-pink);
+  --color-workout-2-text: var(--ink-purple);
+  --color-workout-3-text: var(--ink-orange);
+  --color-workout-4-text: var(--ink-blue);
+  --color-workout-5-text: var(--color-workout-5);
+
+  /* Rating dots. */
+  --color-rating-on: #ff7a00;           /* A filled rating dot (not text) */
+  --color-rating-off: #e2dee5;
+
+  /* The selected day, the up-next glow. */
+  --shadow-day-selected: 0 6px 14px color-mix(in srgb, var(--workout-color, var(--color-ink)) 40%, transparent);
+  --blur-glow: blur(60px);              /* The workout-color glow on the up-next card */
+
+  /* Trainee Workouts — Barlow Condensed sizes. */
+  --text-workouts-title: 34px;    /* The sticky large title (Rubik) */
+  --text-up-next: 54px;           /* The next workout's name on the up-next card */
+  --text-ticket: 24px;            /* A workout ticket's name */
+  --text-ticket-letter: 120px;    /* The faint letter behind a ticket */
+  --text-preview-title: 40px;     /* The preview sheet's header */
+  --text-history-stat: 40px;      /* A history summary number */
+  --text-log-name: 22px;          /* A log row's workout name */
+  --text-week-label: 26px;        /* "This week" next to the pips */
+
+  /* Trainee Workouts. */
+  --ticket-width: 148px;
+  --ticket-height: 170px;
+  --week-pip-width: 22px;
+  --week-pip-height: 8px;
+  --up-next-glow: 220px;
+  --up-next-grid-step: 40px;
+  --cta-height: 54px;            /* The pink start button */
+  --log-bar-width: 6px;          /* A log row's color bar */
+  --log-bar-height: 40px;
+  --rating-dot: 5px;
+
+  /* Workout detail, workout log, interval timer (direction B, design group 1). */
+
+  --radius-wk-hero: 28px;              /* The white hero card */
+  --radius-wk-card: 20px;              /* An exercise card */
+  --radius-wk-tile: 18px;              /* A stat tile */
+  --radius-wk-letter: 16px;            /* The workout's letter tile */
+  --space-wk-card: 14px;               /* An exercise card's padding */
+  --size-wk-letter: 56px;
+  --size-wk-set: 30px;                 /* A set's number circle (as in the player) */
+  --size-wk-done: 28px;                /* A done set's check */
+  --text-wk-name: 40px;                /* The workout name in the hero */
+  --text-wk-letter: 34px;
+  --text-wk-index: 20px;               /* 01, 02… (Barlow) */
+  --text-wk-exercise: 16px;
+  --text-wk-stat: 28px;                /* A stat tile's number (Barlow) */
+  --text-wk-stat-label: 12px;
+  --size-it-step: 44px;                /* The timer's round ± buttons */
+  --size-it-control: 56px;             /* Stop / pause / skip */
+  --size-it-ring: 264px;
+  --stroke-it-ring: 12px;
+  --text-it-setting: 32px;             /* A setting's value (Barlow) */
+  --text-it-clock: 88px;               /* The running clock (Barlow) */
+  --text-it-phase: 56px;               /* עבודה / מנוחה (Karantina) */
+  --surface-it-on-stage: color-mix(in srgb, var(--color-on-primary) 20%, transparent);   /* Round buttons + ring track on pink / ink */
+  --color-it-rest: var(--color-ink);   /* The rest phase's background (and its theme-color) */
+}

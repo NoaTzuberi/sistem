@@ -1,0 +1,49 @@
+/* Base · palette — the raw brand colors (Neon Pink, Cherry Rose, ink, neutrals) and the contrast-safe
+   solid / tint / ink pairs. Raw hex lives here; components read semantic or domain tokens, not these
+   directly when a better-named one exists. No component- or screen-specific colors. */
+
+:root {
+  /* Brand colors, the two temporary values, tints mixed from them. */
+  --color-primary: #ff006e;       /* Neon Pink — actions, highlights, active states */
+  --color-primary-deep: #a50047;  /* Cherry Rose — pressed states, small pink text */
+  --color-bg: #fcfcfc;            /* Bright Snow — app background */
+  --color-surface: #eeeeee;       /* Platinum — cards, inputs, sections */
+  --color-border: #e2e2e2;        /* Alabaster Grey — dividers, borders, disabled */
+  --color-text: #26222a;          /* Body copy — the charcoal from the logo */
+  --color-on-primary: #ffffff;    /* Text / icons placed on a Neon Pink fill */
+
+  /* TEMPORARY — owner will finalize these two values. */
+  --color-error: #d92d20;         /* Form errors, destructive actions */
+  --color-text-muted: #6b6b6b;    /* Captions, helper text, secondary copy */
+
+  /* Tints mixed from the palette above (no new colors). Success / "done" states
+     use Cherry Rose + --color-primary-soft — no green (owner decision). */
+  --color-primary-soft: color-mix(in srgb, var(--color-primary) 12%, var(--color-bg));
+  --color-primary-tint: #ffe6f0;  /* Soft pink block on a white screen (the waiting countdown) */
+  --color-error-soft: color-mix(in srgb, var(--color-error) 10%, var(--color-bg));
+  --color-overlay: color-mix(in srgb, var(--color-text) 55%, transparent); /* behind sheets / modals */
+
+  /* Contrast-safe pairs (WCAG AA: 4.5:1 for text, 3:1 for 18px+ / bold 14px+ text and icons).
+     White text sits only on a --solid-* fill, or on Neon Pink when the text is 18px+ or bold 14px+
+     (white on Neon Pink is 3.8:1). On a light tint, text takes that tint's --ink-*. Identity colors
+     that are too light for white text (sky blue) use their --solid-* under it. Orange has no solid: its
+     fill is always #ff7a00 (owner, 2026-10-22).
+     `npm run lint` checks this (scripts/contrast-audit.mjs). */
+  --on-pink: var(--color-on-primary);       /* White on Neon Pink / Cherry Rose / a --solid-* fill */
+  --solid-pink: #d4005c;                    /* 5.3:1 — small white text on pink (badges, tags, marks) */
+  --solid-blue: #0070c9;                    /* 5.1:1 */
+  --solid-purple: #7c4dff;                  /* 4.8:1 */
+  --tint-pink: #ffe3ee;
+  --ink-pink: #a50047;                      /* 6.5:1 on its tint */
+  --tint-orange: #fff4e5;
+  --ink-orange: #c75a00;                    /* THE orange text tone on light orange tints — never a fill. 3.7–4.3:1 (owner's choice, 2026-10-22: no brown) */
+  --tint-purple: #efe7ff;
+  --ink-purple: #5b2fd6;                    /* 6.2:1 */
+  --tint-blue: #e1f1ff;
+  --ink-blue: #0066b8;                      /* 5.1:1 */
+
+  /* Trainee Home, direction B ("training OS", docs/design/trainee-home-b.html): white screen, ink type,
+     one hot-pink stage, the ink dock. Light only by design. */
+  --color-ink: #141116;                 /* The dock, today's lane, the timer bar, the coach avatar */
+  --color-ink-raised: #2a2530;          /* … under a fine pointer */
+}

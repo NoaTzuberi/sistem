@@ -1,0 +1,26 @@
+/* Domain · exercises — movement-pattern colors (THE one map for the library and the plan builder).
+   Identity colors, never statuses. */
+
+:root {
+  /* Movement-pattern colors: THE one map (exercise library now, the plan builder later). Seven
+     body-area groups; every pattern belongs to one (patternGroups.ts). --c strong, --s soft.
+     Identity colors — which kind of movement this is — never statuses; no green. */
+  --color-pattern-knee: #e08a5c;
+  --color-pattern-knee-soft: #ffd3b8;
+  --color-pattern-hip: #d46a95;
+  --color-pattern-hip-soft: #f7c6da;
+  --color-pattern-chest: #9a77db;
+  --color-pattern-chest-soft: #e6d8ff;
+  --color-pattern-back: #5e9cc4;
+  --color-pattern-back-soft: #cfe6f5;
+  --color-pattern-shoulders: #c23bc0;
+  --color-pattern-shoulders-soft: #f0b3ea;
+  --color-pattern-core: var(--color-primary);
+  --color-pattern-core-soft: #ffc2da;
+  --color-pattern-full: var(--color-primary-deep);
+  --color-pattern-full-soft: var(--color-square-missed);
+  /* No pattern: a striped grey tile. */
+  --color-pattern-none: var(--color-text-faint);
+  --color-pattern-none-soft: var(--color-hairline);
+  --gradient-pattern-none: repeating-linear-gradient(135deg, var(--color-fill-soft) 0 6px, var(--color-hairline) 6px 12px);
+}

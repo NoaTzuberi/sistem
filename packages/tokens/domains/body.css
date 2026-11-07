@@ -1,0 +1,38 @@
+/* Domain · body — measurement identity colors, the measurements screens and their charts. */
+
+:root {
+  /* Body measurements: which measurement a line / dot / row is. Identity colors, not statuses. */
+  --color-measure-chest: #7c4dff;
+  --color-measure-waist: #ff006e;
+  --color-measure-hips: #c23bc0;
+  --color-measure-arms: #0094ff;
+  --color-measure-thighs: #ff7a00;
+  --gradient-empty-stripes: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-fill-soft) 80%, transparent) 0 10px,
+    color-mix(in srgb, var(--color-hairline) 60%, transparent) 10px 20px
+  );
+  --color-compare-handle: var(--color-card);
+  --shadow-compare-handle: 0 4px 14px color-mix(in srgb, var(--color-text) 18%, transparent);
+
+  /* Log measurements (profile/MeasurementsLogPage, direction B). */
+  --size-ml-input: 52px;
+  --size-ml-input-width: 88px;
+  --radius-ml-input: 14px;
+  --text-ml-input: 24px;               /* The typed number (Barlow) */
+
+  /* Body measurements screen ("מידות", direction B): chips, the hero card + chart, history cards. */
+  --size-meas-action: 40px;            /* The "+ תיעוד" pill's drawn height (its hit area stays 44px) */
+  --size-meas-chip: 36px;
+  --radius-meas-chip: 18px;
+  --radius-meas-hero: 24px;
+  --radius-meas-row: 18px;
+  --space-meas-row: 14px;              /* A history card's padding */
+  --text-meas-value: 56px;             /* The latest value (Barlow Condensed) */
+  --text-meas-axis: 12px;
+  --size-meas-chart: 180px;
+  --stroke-meas-line: 2.5px;
+  --color-meas-chip-border: var(--color-hairline);
+  --size-meas-chip-dot: 8px;           /* The measurement's color dot in an unselected chip */
+  --transition-meas-draw: 400ms;       /* The line drawing in on a range change (on --ease-out) */
+}
