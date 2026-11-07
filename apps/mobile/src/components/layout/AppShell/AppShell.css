@@ -54,3 +54,9 @@
   --dock-scrim-color: var(--color-card);
   background-color: var(--color-card);
 }
+
+/* Sub-screens on the soft surface: the shell and the band behind the dock take the page color (no white band). */
+.app-shell[data-surface='soft'] {
+  --dock-scrim-color: var(--color-subscreen-page);
+  background-color: var(--color-subscreen-page);
+}

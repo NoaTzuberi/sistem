@@ -47,7 +47,7 @@ export function WorkoutDetailPage() {
     ) : null;
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="wk-detail">
         <div className="wk-detail-top">
           <BackButton variant="disc" />

@@ -32,7 +32,7 @@ export function ThreadScreen({ name, avatarSeed, avatarUrl, fallbackPath, me, ti
   const goBack = useGoBack(fallbackPath);
 
   return (
-    <AppShell bleed hideTabBar>
+    <AppShell bleed hideTabBar surface="soft">
       <div className="cm-screen">
         <header className="cm-screen-head">
           <button type="button" className="cm-screen-back" onClick={goBack} aria-label={copy.back}>

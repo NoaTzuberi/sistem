@@ -11,7 +11,7 @@ interface CoachScreenProps {
 /** A coach mode screen: full bleed on the soft page surface; content sits on white cards inside the gutter. */
 export function CoachScreen({ top, children }: CoachScreenProps) {
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="coach-screen">
         {top}
         <div className="coach-screen-body">{children}</div>

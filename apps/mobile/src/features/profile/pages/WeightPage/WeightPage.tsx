@@ -22,7 +22,7 @@ export function WeightPage() {
   const [sheet, setSheet] = useState<WeightSheetTarget | null>(null);
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="wt-screen">
         <SubScreenHeader
           title={copy.weightTitle}

@@ -65,7 +65,7 @@ export function SettingsPage() {
   }
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="st-screen">
         <SubScreenHeader title={copy.settingsTitle} fallbackPath={ROUTES.PROFILE} />
 

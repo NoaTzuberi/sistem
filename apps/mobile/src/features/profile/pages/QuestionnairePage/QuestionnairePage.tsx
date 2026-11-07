@@ -184,7 +184,7 @@ export function QuestionnairePage() {
   const lastTint = QUESTIONNAIRE_SECTIONS.find((section) => section.step === lastEdited)?.tint ?? 'goals';
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="qn-screen">
         <SubScreenHeader title={copy.questionnaireTitle} fallbackPath={ROUTES.PROFILE} subtitle={copy.questionnaire.intro} />
 

@@ -20,7 +20,7 @@ export function MeasurementsLogPage() {
   const unit = unitLabel(log.unit, language);
 
   return (
-    <AppShell hideTabBar bleed>
+    <AppShell hideTabBar bleed surface="soft">
       <div className="ml-screen">
         <SubScreenHeader title={log.hasSaved ? copy.editMeasurements : copy.logMeasurements} fallbackPath={ROUTES.PROFILE_MEASUREMENTS} />
 

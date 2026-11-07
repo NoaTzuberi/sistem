@@ -35,7 +35,7 @@ export function WorkoutLogPage() {
   }
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="wk-log">
         <div className="wk-log-top">
           <BackButton variant="disc" />

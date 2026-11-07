@@ -45,7 +45,7 @@ export function ProgressPhotosPage() {
   const viewerIndex = viewerItems.findIndex((item) => item.id === screen.viewerKey);
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="pp-screen">
         <SubScreenHeader
           title={body.photosTitle}

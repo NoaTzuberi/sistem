@@ -17,7 +17,7 @@ export function PhotoComparePage() {
   const { units } = useMyUnits();
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="pcp-screen">
         <SubScreenHeader title={copy.compareTitle} fallbackPath={ROUTES.PROFILE_PHOTOS} />
         <div className="pcp-content">

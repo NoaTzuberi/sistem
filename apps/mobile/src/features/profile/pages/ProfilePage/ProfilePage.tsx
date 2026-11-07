@@ -113,7 +113,7 @@ export function ProfilePage() {
   const overview = profile.overview;
 
   return (
-    <AppShell bleed>
+    <AppShell bleed surface="soft">
       <div className="pf-screen">
         <ProfileHero
           name={profile.name}
