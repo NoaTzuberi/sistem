@@ -4,7 +4,8 @@ import { useCopy } from '@sistem/shared';
 import { COACH_DASHBOARD_URL } from '../../../../app/config/env';
 import { openExternal } from '../../../../services/external/openExternal';
 import { authCopy } from '../../copy';
-import './CoachDashboardLink.css';
+// The same quiet line as the other auth footer links.
+import '../AuthFooterLink/AuthFooterLink.css';
 
 /** The quiet link under the login card that takes the coach to her web dashboard. Hidden when no address is set. */
 export function CoachDashboardLink() {
@@ -18,7 +19,7 @@ export function CoachDashboardLink() {
   }
 
   return (
-    <a className="coach-dashboard-link" href={url} target="_blank" rel="noopener noreferrer" onClick={handleClick}>
+    <a className="auth-footer-link" href={url} target="_blank" rel="noopener noreferrer" onClick={handleClick}>
       <span>{copy.coachDashboardLink}</span>
       <IconArrowRight className="flip-rtl" size={18} stroke={2.4} aria-hidden="true" />
     </a>

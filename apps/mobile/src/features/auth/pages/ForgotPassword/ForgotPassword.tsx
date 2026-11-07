@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { PageLayout } from '../../../../components/layout/PageLayout/PageLayout';
-import { Container } from '../../../../components/layout/Container/Container';
-import { Section } from '../../../../components/layout/Section/Section';
-import { Input } from '../../../../components/common/Input/Input';
-import { Button } from '../../../../components/common/Button/Button';
-import { AuthCard } from '../../components/AuthCard/AuthCard';
+import { useLocation } from 'react-router-dom';
+import { IconAt, IconMail } from '@tabler/icons-react';
+import { useCopy } from '@sistem/shared';
+import { AuthScreen } from '../../components/AuthScreen/AuthScreen';
+import { AuthField } from '../../components/AuthField/AuthField';
+import { AuthSubmitButton } from '../../components/AuthSubmitButton/AuthSubmitButton';
+import { AuthNotice } from '../../components/AuthNotice/AuthNotice';
+import { AuthFooterLink } from '../../components/AuthFooterLink/AuthFooterLink';
 import { requestPasswordReset } from '../../../../services/auth/authService';
 import { authErrorText, validateEmail, type AuthErrorKey } from '../../validation';
-import { useCopy } from '@sistem/shared';
 import { authCopy } from '../../copy';
 import { ROUTES } from '../../../../app/config/routes';
 import './ForgotPassword.css';
 
+/** "שכחתי סיסמה" on the login screen's stage: her email → the server sends a reset link. */
 export function ForgotPassword() {
   const location = useLocation();
   const copy = useCopy(authCopy);
@@ -22,7 +23,7 @@ export function ForgotPassword() {
   const [emailError, setEmailError] = useState<AuthErrorKey>();
   const [formError, setFormError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>();
+  const [sentMessage, setSentMessage] = useState<string>();
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -34,8 +35,7 @@ export function ForgotPassword() {
 
     setIsSubmitting(true);
     try {
-      const message = await requestPasswordReset(email);
-      setSuccessMessage(message);
+      setSentMessage(await requestPasswordReset(email));
     } catch (error) {
       setFormError((error instanceof Error && error.message) || copy.somethingWrong);
     } finally {
@@ -43,42 +43,41 @@ export function ForgotPassword() {
     }
   }
 
+  // Sent: the server's line (it never says whether the account exists) and the way back.
+  if (sentMessage) {
+    return (
+      <AuthScreen>
+        <AuthNotice icon={<IconMail size={24} />} title={copy.resetSentTitle} text={sentMessage}>
+          <AuthSubmitButton variant="soft" to={ROUTES.LOGIN}>
+            {copy.backToLogin}
+          </AuthSubmitButton>
+        </AuthNotice>
+      </AuthScreen>
+    );
+  }
+
   return (
-    <PageLayout>
-      <Section className="auth-page">
-        <Container>
-          <AuthCard title={copy.forgotTitle}>
-            {successMessage ? (
-              <p className="forgot-password-success">{successMessage}</p>
-            ) : (
-              <form className="auth-form" onSubmit={handleSubmit} noValidate>
-                <p className="text-body forgot-password-copy">{copy.forgotIntro}</p>
-                <Input
-                  type="email"
-                  label={copy.email}
-                  inputMode="email"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  enterKeyHint="send"
-                  placeholder={copy.emailPlaceholder}
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  error={authErrorText(copy, emailError)}
-                  autoComplete="email"
-                />
-                {formError && <p className="auth-form-error">{formError}</p>}
-                <Button type="submit" variant="primary" loading={isSubmitting}>
-                  {copy.sendResetLink}
-                </Button>
-              </form>
-            )}
-            <p className="auth-switch">
-              <Link to={ROUTES.LOGIN}>{copy.backToLogin}</Link>
-            </p>
-          </AuthCard>
-        </Container>
-      </Section>
-    </PageLayout>
+    <AuthScreen title={copy.forgotTitle} footer={<AuthFooterLink to={ROUTES.LOGIN}>{copy.backToLogin}</AuthFooterLink>}>
+      <form className="auth-glass-form" onSubmit={handleSubmit} noValidate>
+        <p className="forgot-password-intro">{copy.forgotIntro}</p>
+        <AuthField
+          type="email"
+          label={copy.email}
+          icon={<IconAt size={20} />}
+          inputMode="email"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          enterKeyHint="send"
+          placeholder={copy.email}
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          error={authErrorText(copy, emailError)}
+          autoComplete="email"
+        />
+        {formError && <p className="auth-glass-error">{formError}</p>}
+        <AuthSubmitButton loading={isSubmitting}>{copy.sendResetLink}</AuthSubmitButton>
+      </form>
+    </AuthScreen>
   );
 }

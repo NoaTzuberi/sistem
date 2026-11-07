@@ -68,3 +68,27 @@
     background: var(--glass-bg-strong);
   }
 }
+
+/* The soft pill (a notice's way back): white on the glass card, ink text. */
+.auth-submit-soft {
+  background: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.auth-submit-soft:active:not(:disabled) {
+  background: var(--color-fill-soft);
+}
+
+@media (hover: hover) {
+  .auth-submit-soft:hover:not(:disabled) {
+    background: var(--color-fill-soft);
+  }
+}
+
+/* As a link (a notice's action): no underline. */
+a.auth-submit {
+  text-decoration: none;
+}

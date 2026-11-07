@@ -1,5 +1,6 @@
-/* Plain text, no fill: bold enough to be found, still second to the pink submit button. */
-.coach-dashboard-link {
+/* The quiet line under the auth card (the coach dashboard, back to log in): plain text, no fill — bold
+   enough to be found, still second to the pink submit button. */
+.auth-footer-link {
   display: inline-flex;
   align-items: center;
   align-self: center;
@@ -12,7 +13,7 @@
   text-decoration: none;
 }
 
-.coach-dashboard-link:active,
-.coach-dashboard-link:focus-visible {
+.auth-footer-link:active,
+.auth-footer-link:focus-visible {
   text-decoration: underline;
 }

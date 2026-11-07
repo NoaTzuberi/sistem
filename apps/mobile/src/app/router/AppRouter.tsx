@@ -65,6 +65,7 @@ import { MessagesPage as CoachMessagesPage } from '../../features/coach/pages/Me
 import { ThreadPage as CoachThreadPage } from '../../features/coach/pages/ThreadPage/ThreadPage';
 import { MessagesPage } from '../../features/messages/pages/MessagesPage/MessagesPage';
 import { ScreenTransition } from '../../components/layout/ScreenTransition/ScreenTransition';
+import { AppToast } from '../../components/common/AppToast/AppToast';
 
 /** Every route, for one location: a screen leaving in a tab transition keeps rendering its own. */
 function AppRoutes({ location }: { location: Location }) {
@@ -155,6 +156,7 @@ export function AppRouter() {
     <>
       {/* One celebration sheet for the whole app (Phase 11) — trainees only. */}
       <AchievementCelebration />
+      <AppToast />
       {/* The screens + the one dock; tab changes get the depth transition. */}
       <ScreenTransition renderScreen={(location) => <AppRoutes location={location} />} />
     </>

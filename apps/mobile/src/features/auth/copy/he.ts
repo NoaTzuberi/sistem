@@ -9,7 +9,6 @@ export const he = {
   name: 'שם',
   namePlaceholder: 'השם המלא שלך',
   email: 'אימייל',
-  emailPlaceholder: 'you@example.com',
   password: 'סיסמה',
   passwordPlaceholder: 'הזיני את הסיסמה שלך',
   newPasswordPlaceholder: 'לפחות 8 תווים',
@@ -36,10 +35,11 @@ export const he = {
   forgotIntro: 'הזיני את האימייל של החשבון ונשלח לך קישור לאיפוס הסיסמה.',
   sendResetLink: 'שליחת קישור לאיפוס',
   backToLogin: 'חזרה להתחברות',
+  resetSentTitle: 'נשלח אלייך מייל', // owner's wording (design group 4); the line under it is the server's text
+  passwordUpdated: 'הסיסמה עודכנה', // DRAFT (owner 2026-11-07): the toast after a reset, in the app
   resetLinkInvalid: 'הקישור לאיפוס חסר או לא תקין. בקשי קישור חדש כדי להמשיך.',
   requestNewLink: 'בקשת קישור חדש',
   newPassword: 'סיסמה חדשה',
-  newPasswordInputPlaceholder: 'הזיני סיסמה חדשה',
   resetButton: 'איפוס סיסמה',
   loginFailed: 'ההתחברות נכשלה. נסי שוב.',
   registerFailed: 'ההרשמה נכשלה. נסי שוב.',

@@ -11,7 +11,6 @@ export const en: CopyShape<typeof he> = {
   name: 'Name',
   namePlaceholder: 'Your full name',
   email: 'Email',
-  emailPlaceholder: 'you@example.com',
   password: 'Password',
   passwordPlaceholder: 'Enter your password',
   newPasswordPlaceholder: 'At least 8 characters',
@@ -37,10 +36,11 @@ export const en: CopyShape<typeof he> = {
   forgotIntro: "Enter the email on your account and we'll send you a link to reset your password.",
   sendResetLink: 'Send Reset Link',
   backToLogin: 'Back to Log In',
+  resetSentTitle: 'Check your email', // DRAFT
+  passwordUpdated: 'Password updated', // DRAFT
   resetLinkInvalid: 'This reset link is missing or invalid. Request a new one to continue.',
   requestNewLink: 'Request a new link',
   newPassword: 'New Password',
-  newPasswordInputPlaceholder: 'Enter a new password',
   resetButton: 'Reset Password',
   loginFailed: 'Login failed. Please try again.',
   registerFailed: 'Registration failed. Please try again.',
