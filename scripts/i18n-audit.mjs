@@ -22,9 +22,8 @@ const ts = require('typescript');
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const SOURCES = ['apps/mobile/src', 'apps/dashboard/src', 'packages/shared/src'];
 
-// Kept ATLAS code that is never routed or shown (the trainee exercise library — no trainee
-// library screen, PRD §5). Listed in the phase-15 report; translate it if it is ever routed.
-const SKIPPED = ['apps/mobile/src/features/exercises/', 'apps/mobile/src/services/exercises/'];
+// Paths never audited (none since the dead trainee exercise library was deleted, 2026-11-05).
+const SKIPPED = [];
 
 const USER_FACING_ATTRIBUTES = new Set([
   'aria-label',

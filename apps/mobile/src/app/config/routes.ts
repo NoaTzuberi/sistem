@@ -24,7 +24,6 @@ export const ROUTES = {
   ONBOARDING: '/onboarding',
   // "Your plan is being built" — onboarding done, no published plan yet (PRD §4.1).
   WAITING: '/waiting',
-  EXERCISES: '/exercises',
   // Trainee Home — only reachable once a plan is published (PRD §4.2).
   TRAINEE_HOME: '/home',
   // The free interval timer (Phase 8): logs nothing.
@@ -84,15 +83,6 @@ export function ownCardioEditPath(id: string): string {
 
 export function ownCardioRunPath(id: string): string {
   return `/workouts/own-cardio/${id}/run`;
-}
-
-// The exercise library pages are not routed in the mobile app (no trainee library
-// screen). The paths stay for the kept page code, which moves into the coach
-// dashboard plan builder in Phase 6.
-export const EXERCISE_DETAIL_PATH = '/exercises/:slug';
-
-export function exercisePath(slug: string): string {
-  return `/exercises/${slug}`;
 }
 
 // Coach mode: one trainee (PRD §6). A "new trainee" notification opens this screen.
