@@ -43,7 +43,6 @@
   font-size: var(--text-lg);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--letter-spacing-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

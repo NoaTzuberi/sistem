@@ -16,12 +16,10 @@ h6 {
 
 h1 {
   font-size: var(--text-3xl);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 h2 {
   font-size: var(--text-2xl);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 h3 {
@@ -41,7 +39,6 @@ h6 {
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
 }
 
 p {
@@ -66,7 +63,6 @@ p {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
 }
 
 .text-caption {

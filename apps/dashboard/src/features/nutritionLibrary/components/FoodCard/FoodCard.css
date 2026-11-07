@@ -127,7 +127,6 @@
   margin: 2px 0 0;
   font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
   overflow-wrap: anywhere;
 }
 

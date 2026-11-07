@@ -27,7 +27,6 @@
 .settings-preview-eyebrow {
   font-size: var(--text-2xs);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.04em;
   color: var(--color-primary-deep);
 }
 

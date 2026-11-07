@@ -70,7 +70,6 @@
   font-family: var(--font-mono);
   font-size: var(--text-eyebrow);
   font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;

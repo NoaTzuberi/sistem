@@ -78,7 +78,6 @@
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-medium);
   line-height: 1.1;
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .tqv-hero-sub {

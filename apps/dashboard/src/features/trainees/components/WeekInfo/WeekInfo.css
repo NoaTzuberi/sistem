@@ -48,7 +48,6 @@
   font-size: var(--text-hero-title);
   font-weight: var(--font-weight-light);
   line-height: 1.15;
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .pw-info-sub {

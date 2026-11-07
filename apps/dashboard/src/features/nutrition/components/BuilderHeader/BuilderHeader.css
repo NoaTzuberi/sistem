@@ -56,7 +56,6 @@
   overflow: hidden;
   font-size: var(--text-lg);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -22,7 +22,6 @@
   font-style: italic;
   font-weight: var(--font-weight-extrabold);
   line-height: var(--line-height-numeric);
-  letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
   overflow-wrap: anywhere;
   -webkit-line-clamp: 2;

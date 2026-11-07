@@ -16,7 +16,6 @@
   font-family: var(--font-family-display);
   font-size: var(--text-4xl);
   font-weight: var(--font-weight-regular);
-  letter-spacing: var(--letter-spacing-display);
 }
 
 .library-header-intro {

@@ -10,7 +10,6 @@
   border-bottom: var(--border-width-thin) solid var(--color-border);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
 }
 

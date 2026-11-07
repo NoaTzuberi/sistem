@@ -8,7 +8,6 @@
   border-radius: var(--radius-row);
   font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
   /* Dark letters on a gradient that stays light: white on its light end was under 2:1. */
   color: var(--color-text);
   background:

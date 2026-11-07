@@ -78,7 +78,6 @@
   font-family: var(--font-family-display);
   font-size: var(--text-hero-title);
   font-weight: var(--font-weight-regular);
-  letter-spacing: var(--letter-spacing-display);
   color: var(--color-text);
   background: none;
 }

@@ -132,7 +132,6 @@
   margin: 4px 0 0;
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .ach-modal-rule {

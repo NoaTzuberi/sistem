@@ -53,7 +53,6 @@
   font-weight: var(--font-weight-light);
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  letter-spacing: var(--letter-spacing-display);
 }
 
 /* Where she is now steps back; where she is going leads. */

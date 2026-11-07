@@ -48,7 +48,6 @@
   margin: 6px 0 4px;
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-regular);
-  letter-spacing: var(--letter-spacing-display);
 }
 
 .nutrition-plan-meta {

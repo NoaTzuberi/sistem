@@ -59,7 +59,6 @@
   font-size: var(--text-profile-name);
   font-weight: var(--font-weight-regular);
   line-height: 1.05;
-  letter-spacing: var(--letter-spacing-display);
 }
 
 /* The status pills keep their own letter spacing next to the large name. */
