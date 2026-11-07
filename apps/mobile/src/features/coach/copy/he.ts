@@ -144,7 +144,6 @@ export const he = {
     qr: 'QR',
     linkError: 'לא הצלחנו לטעון את הקישור.', // DRAFT
     payments: 'תשלומים',
-    paymentsText: 'PayBox ו-Bit מוצגים למתאמנות שלך בכרטיס המאמנת.',
     paymentsSet: '{methods} מוגדרים', // DRAFT
     paymentsNone: 'עוד לא הוגדרו פרטי תשלום.', // DRAFT
     edit: 'עריכה',
@@ -154,6 +153,10 @@ export const he = {
     modeTrainee: 'מצב מתאמנת',
     modeError: 'לא הצלחנו להחליף מצב. נסי שוב.', // DRAFT
     settings: 'הגדרות',
+    // Design group 5 (owner-approved preview, 2026-11-07).
+    linkRow: 'קוד הזמנה / QR',
+    paymentsRow: 'קישורי תשלום',
+    dashboardTitle: 'בדשבורד',
   },
   // ── Phase B (all PLACEHOLDER unless the spec has the line: spec lines are marked SPEC). ──
   reactions: {

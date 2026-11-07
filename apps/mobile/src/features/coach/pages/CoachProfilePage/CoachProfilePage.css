@@ -1,19 +1,118 @@
-.coach-profile-settings {
+/* The coach Profile (design group 5): the trainee Profile's structure — a stage with a white card over it —
+   on the soft page, then white grouped lists. */
+.cp-screen {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 100dvh;
+  padding-block-end: var(--space-6);
+  background-color: var(--color-subscreen-page);
+  color: var(--color-ink);
 }
 
-.coach-profile-settings-label {
+.cp-hero {
+  position: relative;
+  padding: calc(var(--space-8) + var(--safe-top)) calc(var(--home-gutter) + var(--safe-inline-end)) 0 calc(var(--home-gutter) + var(--safe-inline-start));
+}
+
+.cp-stage {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: calc(var(--size-profile-stage) - var(--space-6) + var(--safe-top));
+  padding: 0;
+}
+
+.cp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cp-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block-start: calc(var(--size-cp-avatar) / 2);
+  padding: calc(var(--size-cp-avatar) / 2 + var(--space-2)) var(--space-4) var(--space-5);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  text-align: center;
+}
+
+.cp-avatar {
+  position: absolute;
+  inset-block-start: calc(var(--size-cp-avatar) / -2);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: var(--size-cp-avatar);
+  height: var(--size-cp-avatar);
+  border: var(--border-width-thick) solid var(--color-card);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-cp-name);
+  line-height: 1;
+  box-shadow: var(--shadow-profile-card);
+}
+
+.cp-card .eyebrow {
+  color: var(--color-text-muted);
+}
+
+.cp-name {
+  margin: var(--space-1) 0 0;
+  max-width: 100%;
+  font-size: var(--text-cp-name);
+  line-height: var(--line-height-display);
+  overflow-wrap: anywhere;
+}
+
+.cp-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-inline: calc(var(--home-gutter) + var(--safe-inline-start)) calc(var(--home-gutter) + var(--safe-inline-end));
+}
+
+.cp-group-title {
+  margin: 0;
+  padding-inline: var(--space-1);
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
 }
 
-.coach-profile-logout {
+.cp-list {
+  margin: 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-profile-group);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-profile-card);
+  list-style: none;
+}
+
+.cp-trail-icon {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.cp-note {
+  margin: 0;
+  padding-inline: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  line-height: var(--line-height-base);
+}
+
+.cp-delete {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-block: var(--space-4) var(--space-3);
+  justify-content: center;
 }

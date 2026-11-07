@@ -142,7 +142,6 @@ export const en: CopyShape<typeof he> = {
     qr: 'QR',
     linkError: "Couldn't load your link.",
     payments: 'Payments',
-    paymentsText: 'PayBox and Bit are shown to your trainees on your coach card.',
     paymentsSet: '{methods} set',
     paymentsNone: 'No payment details yet.',
     edit: 'Edit',
@@ -152,6 +151,9 @@ export const en: CopyShape<typeof he> = {
     modeTrainee: 'Trainee mode',
     modeError: "Couldn't switch modes. Try again.",
     settings: 'Settings',
+    linkRow: 'Invite code / QR', // DRAFT
+    paymentsRow: 'Payment links', // DRAFT
+    dashboardTitle: 'On the dashboard', // DRAFT
   },
   // ── Phase B (PLACEHOLDER English). ──
   reactions: {

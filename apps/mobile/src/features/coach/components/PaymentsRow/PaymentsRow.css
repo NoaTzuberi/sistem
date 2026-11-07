@@ -1,0 +1,10 @@
+/* "עריכה ›" at the end of a row that opens somewhere else. */
+.cp-trail {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  color: var(--color-primary-deep);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}

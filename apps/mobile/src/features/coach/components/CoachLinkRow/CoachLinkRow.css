@@ -1,0 +1,37 @@
+/* The link: mono, left to right in both languages (a web address). */
+.cp-link-url {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.cp-pills {
+  display: flex;
+  flex: none;
+  gap: var(--space-1);
+}
+
+/* 36px drawn; the row's padding keeps the 44px hit area around it. */
+.cp-pill {
+  min-width: var(--touch-target-min);
+  min-height: var(--size-cp-pill);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.cp-pill:active {
+  transform: scale(var(--press-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cp-pill:hover {
+    background-color: var(--color-fill-soft-hover);
+  }
+}
