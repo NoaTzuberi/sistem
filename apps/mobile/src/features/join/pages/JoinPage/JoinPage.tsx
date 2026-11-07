@@ -41,7 +41,7 @@ function JoinContent({ view, join }: { view: JoinView; join: Join }) {
 
   function secondary(label: string, onClick: () => void) {
     return (
-      <AuthSubmitButton type="button" variant="secondary" onClick={onClick}>
+      <AuthSubmitButton type="button" variant="soft" onClick={onClick}>
         {label}
       </AuthSubmitButton>
     );

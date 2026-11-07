@@ -5,11 +5,8 @@ import { Spinner } from '../../../../components/common/Spinner/Spinner';
 import './AuthSubmitButton.css';
 
 interface AuthSubmitButtonProps {
-  /**
-   * primary = the pink pill (one per card); secondary = the outlined pill, like the card's log in ↔ sign up
-   * switch; soft = the white pill of a notice (a quiet way back).
-   */
-  variant?: 'primary' | 'secondary' | 'soft';
+  /** primary = the pink pill (one per card); soft = the white pill (a quiet second action, a way back). */
+  variant?: 'primary' | 'soft';
   /** submit inside the login / sign-up form; button for the join screen's actions. */
   type?: 'submit' | 'button';
   /** A route: drawn as a link with the same look (no loading state). */
@@ -20,7 +17,7 @@ interface AuthSubmitButtonProps {
   children: ReactNode;
 }
 
-const VARIANT_CLASS = { primary: '', secondary: ' auth-submit-secondary', soft: ' auth-submit-soft' } as const;
+const VARIANT_CLASS = { primary: '', soft: ' auth-submit-soft' } as const;
 
 /** The full-width pill of the glass card; the pink one's arrow points along the reading direction. */
 export function AuthSubmitButton({ variant = 'primary', type = 'submit', to, loading = false, disabled = false, onClick, children }: AuthSubmitButtonProps) {

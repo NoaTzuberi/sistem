@@ -48,28 +48,7 @@
   border-top-color: var(--color-on-primary);
 }
 
-/* The secondary pill: the same outline as the card's log in ↔ sign up switch, full width. */
-.auth-submit-secondary {
-  margin-block-start: 0;
-  border: var(--border-width-thin) solid var(--glass-outline);
-  background: transparent;
-  box-shadow: none;
-  color: var(--color-text);
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-semibold);
-}
-
-.auth-submit-secondary:active:not(:disabled) {
-  background: var(--glass-bg-strong);
-}
-
-@media (hover: hover) {
-  .auth-submit-secondary:hover:not(:disabled) {
-    background: var(--glass-bg-strong);
-  }
-}
-
-/* The soft pill (a notice's way back): white on the glass card, ink text. */
+/* The soft pill (a quiet second action, a way back): white on the glass card, ink text. */
 .auth-submit-soft {
   background: var(--color-card);
   box-shadow: var(--shadow-profile-card);
