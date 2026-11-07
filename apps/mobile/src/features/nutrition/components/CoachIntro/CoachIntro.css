@@ -1,6 +1,8 @@
+/* A soft pink card (design group 5: no side bars). */
 .coach-intro {
+  overflow: hidden;
+  border-radius: var(--radius-profile-group);
   background-color: var(--color-primary-soft);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary);
 }
 
 .coach-intro-header {

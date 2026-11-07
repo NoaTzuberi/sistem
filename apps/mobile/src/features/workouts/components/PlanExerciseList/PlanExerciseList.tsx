@@ -15,7 +15,7 @@ export function PlanExerciseList({ exercises }: PlanExerciseListProps) {
   return (
     <ul className="plan-exercises">
       {exercises.map((exercise) => (
-        <li key={exercise.id} className={exercise.supersetGroup ? 'plan-exercise plan-exercise-superset' : 'plan-exercise'}>
+        <li key={exercise.id} className="plan-exercise">
           <span className="plan-exercise-name">
             {/* Exercise names are the imported English facts for now (known issue). */}
             <bdi>{exercise.exercise?.name ?? shared.log.exercise}</bdi>

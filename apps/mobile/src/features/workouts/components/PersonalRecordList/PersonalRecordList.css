@@ -21,7 +21,7 @@
 /* "Done" / success uses Cherry Rose, never green (CLAUDE.md). */
 .personal-record-list-item {
   padding: var(--space-2) var(--space-3);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary-deep);
+  border-radius: var(--radius-profile-group);
   background-color: var(--color-primary-soft);
   color: var(--color-primary-deep);
   font-weight: var(--font-weight-semibold);

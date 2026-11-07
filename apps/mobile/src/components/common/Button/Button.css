@@ -1,11 +1,13 @@
+/* A pill (design group 5): primary = the pink pill, secondary = the soft pill (PillButton's look) —
+   no side brackets, no outline. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   min-height: var(--touch-target-min);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-none);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-round);
   border: var(--border-width-thin) solid transparent;
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -14,16 +16,17 @@
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background-color var(--transition-fast) var(--ease-standard),
     border-color var(--transition-fast) var(--ease-standard),
     color var(--transition-fast) var(--ease-standard),
-    transform var(--transition-fast) var(--ease-standard),
+    transform var(--transition-press) var(--ease-press),
     opacity var(--transition-fast) var(--ease-standard);
 }
 
 .btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 
 .btn:disabled {
@@ -31,75 +34,33 @@
   opacity: var(--opacity-disabled);
 }
 
-/* ATLAS bracket pattern (PRD §12 "sharp cuts" basis): side brackets, and corner
-   segments that close in on press (and on hover where a mouse exists). */
+.btn:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .btn-primary {
-  position: relative;
-  /* ATLAS used a fixed 9.9em width; padding keeps that feel but lets the button
-     shrink in tight phone rows (e.g. Back · Cancel · Save). */
-  min-height: max(var(--touch-target-min), 3.2em);
-  padding-inline: var(--space-5);
-  border: none;
-  border-inline-start: var(--border-width-thick) solid var(--color-primary);
-  border-inline-end: var(--border-width-thick) solid var(--color-primary);
-  background-color: transparent;
-  color: var(--color-primary-deep);
+  border-color: transparent;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
   font-weight: var(--font-weight-bold);
-
-  background-image:
-    linear-gradient(var(--color-primary), var(--color-primary)),
-    linear-gradient(var(--color-primary), var(--color-primary)),
-    linear-gradient(var(--color-primary), var(--color-primary)),
-    linear-gradient(var(--color-primary), var(--color-primary));
-  background-repeat: no-repeat;
-  background-position:
-    left top,
-    right top,
-    left bottom,
-    right bottom;
-  background-size:
-    0 3px,
-    0 3px,
-    0 3px,
-    0 3px;
-  transition:
-    background-size var(--transition-slow) ease,
-    transform var(--transition-fast) var(--ease-standard),
-    opacity var(--transition-fast) var(--ease-standard);
+  box-shadow: var(--shadow-profile-cta);
 }
 
-.btn-primary:active:not(:disabled) {
-  background-size:
-    54% 3px,
-    54% 3px,
-    54% 3px,
-    54% 3px;
+.btn-primary:disabled {
+  box-shadow: none;
 }
 
-@media (hover: hover) {
-  .btn-primary:hover:not(:disabled) {
-    background-size:
-      54% 3px,
-      54% 3px,
-      54% 3px,
-      54% 3px;
-  }
-}
-
-.btn-primary .btn-label {
-  position: relative;
-  z-index: var(--z-raised);
+/* The default spinner is pink on grey — on the pink pill it is white. */
+.btn-primary .spinner {
+  border-color: color-mix(in srgb, var(--color-on-primary) 40%, transparent);
+  border-top-color: var(--color-on-primary);
 }
 
 .btn-secondary {
-  background-color: transparent;
-  border-color: var(--color-border);
-  color: var(--color-text);
-}
-
-.btn-secondary:active:not(:disabled) {
-  border-color: var(--color-primary);
-  color: var(--color-primary-deep);
+  border-color: transparent;
+  background-color: var(--color-fill-soft);
+  color: var(--color-ink);
 }
 
 .btn-ghost {
@@ -125,9 +86,12 @@
 }
 
 @media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+
   .btn-secondary:hover:not(:disabled) {
-    border-color: var(--color-primary);
-    color: var(--color-primary-deep);
+    background-color: var(--color-fill-soft-hover);
   }
 
   .btn-ghost:hover:not(:disabled) {
