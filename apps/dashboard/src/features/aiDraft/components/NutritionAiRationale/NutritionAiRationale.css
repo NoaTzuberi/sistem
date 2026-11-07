@@ -1,7 +1,8 @@
 .nutrition-ai-rationale {
   padding: var(--space-2) var(--space-3);
+  /* A rounded soft card (design group 5: no side bars). */
+  border-radius: var(--radius-profile-group);
   background-color: var(--color-surface);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary);
 }
 
 .nutrition-ai-rationale-summary {
