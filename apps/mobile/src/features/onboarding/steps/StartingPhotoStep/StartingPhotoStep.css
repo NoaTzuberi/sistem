@@ -9,7 +9,7 @@
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
-  line-height: var(--line-height-normal);
+  line-height: var(--line-height-base);
 }
 
 .starting-photo-step .deck-button {
