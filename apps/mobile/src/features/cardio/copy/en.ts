@@ -98,6 +98,10 @@ export const en: CopyShape<typeof he> = {
     duplicate: 'Duplicate',
     deleteBlock: 'Delete',
     drag: 'Drag to reorder',
+    replaceTitle: 'Replace the workout structure?',
+    replaceMessage: 'The current structure will be replaced with the {type} template',
+    replaceYes: 'Replace',
+    replaceKeep: 'Keep the structure',
   },
   own: {
     runs: plural({ one: '1 run', two: '2 runs', other: '{count} runs' }),

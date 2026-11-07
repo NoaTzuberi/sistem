@@ -13,6 +13,7 @@ import {
 import { cardioCopy } from '../copy';
 import {
   CARDIO_TEMPLATES,
+  SPORT_PRESETS,
   MAX_STEPS,
   addBlockToRepeat,
   duplicateStep,
@@ -43,6 +44,10 @@ export function useOwnCardioBuilder(id: string | null) {
   // The open block — the first one of a new workout, nothing of a loaded one.
   const [selectedId, setSelectedId] = useState<string | null>(() => (id || !steps[0] ? null : firstBlockId(steps[0])));
   const [isDirty, setIsDirty] = useState(false);
+  // Her blocks differ from the type's starter (any block edit, or a loaded workout): changing the type then asks first.
+  const [blocksEdited, setBlocksEdited] = useState(id !== null);
+  // The type she picked while waiting for "replace the structure?".
+  const [pendingSport, setPendingSport] = useState<CardioSport | null>(null);
   const [isLoading, setIsLoading] = useState(id !== null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +107,33 @@ export function useOwnCardioBuilder(id: string | null) {
   function edit(next: (current: CardioStep[]) => CardioStep[]) {
     setSteps(next);
     setIsDirty(true);
+    setBlocksEdited(true);
+  }
+
+  // Loads a type's starter blocks (the summary + chart follow the steps).
+  function loadPreset(value: CardioSport) {
+    setSport(value);
+    setSteps(SPORT_PRESETS[value]());
+    setSelectedId(null);
+    setIsDirty(true);
+    setBlocksEdited(false);
+  }
+
+  function chooseSport(value: CardioSport) {
+    if (value === sport) return;
+    if (blocksEdited) setPendingSport(value);
+    else loadPreset(value);
+  }
+
+  /** The answer to "replace the structure?": replace = the type's starter, keep = only the type changes. */
+  function resolveSportChange(replace: boolean) {
+    if (!pendingSport) return;
+    if (replace) loadPreset(pendingSport);
+    else {
+      setSport(pendingSport);
+      setIsDirty(true);
+    }
+    setPendingSport(null);
   }
 
   function addPreset(preset: BlockPresetId) {
@@ -121,7 +153,9 @@ export function useOwnCardioBuilder(id: string | null) {
   function applyTemplate(template: CardioTemplateId) {
     const built = CARDIO_TEMPLATES[template].build();
     setSport(CARDIO_TEMPLATES[template].sport);
-    edit(() => built);
+    setSteps(built);
+    setIsDirty(true);
+    setBlocksEdited(false);
     setSelectedId(null);
   }
 
@@ -155,10 +189,12 @@ export function useOwnCardioBuilder(id: string | null) {
       setTitle(value);
       setIsDirty(true);
     },
-    setSport: (value: CardioSport) => {
-      setSport(value);
-      setIsDirty(true);
-    },
+    /** Picks a type: loads its starter blocks, or asks first when she already changed the blocks. */
+    setSport: chooseSport,
+    pendingSport,
+    replaceStructure: () => resolveSportChange(true),
+    keepStructure: () => resolveSportChange(false),
+    cancelSportChange: () => setPendingSport(null),
     addPreset,
     addRepeat,
     applyTemplate,

@@ -101,6 +101,11 @@ export const he = {
     duplicate: 'שכפול',
     deleteBlock: 'מחיקה',
     drag: 'גרירה לשינוי הסדר',
+    // Changing the type after editing the blocks (owner, 2026-11-05).
+    replaceTitle: 'להחליף את מבנה האימון?',
+    replaceMessage: 'המבנה הנוכחי יוחלף בתבנית של {type}',
+    replaceYes: 'החלפה',
+    replaceKeep: 'להשאיר את המבנה',
   },
   own: {
     runs: plural({ one: 'ריצה אחת', two: '2 ריצות', other: '{count} ריצות' }), // PLACEHOLDER

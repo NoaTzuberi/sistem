@@ -30,9 +30,21 @@ export function newRepeat(): CardioRepeatSet {
   return { type: 'repeat', id: newId(), times: 4, blocks: [newBlock('work', 60, 8), newBlock('recovery', 90, 3)] };
 }
 
-/** A new workout: one warm-up block to start from. */
+/**
+ * The starter structure of each type (owner, 2026-11-05). Picking a type loads it; a new workout starts on
+ * "run". Effort → zone follows intensityZone (Z1 = 1–3, Z2 = 4–5, Z3 = 6, Z4 = 7–8): a single block has one
+ * effort, so "Z1–2" walking = 3 and "Z2–3" riding = 5 (the softer end).
+ */
+export const SPORT_PRESETS: Record<CardioSport, () => CardioStep[]> = {
+  run: () => [newBlock('warmup', 300, 3), newBlock('steady', 1200, 4), newBlock('cooldown', 300, 2)],
+  intervals: () => [newBlock('warmup', 300, 3), repeat(6, [newBlock('work', 60, 8), newBlock('recovery', 60, 3)]), newBlock('cooldown', 300, 2)],
+  walk: () => [newBlock('steady', 1800, 3)],
+  bike: () => [newBlock('warmup', 300, 3), newBlock('steady', 1500, 5), newBlock('cooldown', 300, 2)],
+};
+
+/** A new workout: the "run" starter. */
 export function initialSteps(): CardioStep[] {
-  return [newBlock('warmup', 300, 3)];
+  return SPORT_PRESETS.run();
 }
 
 /** Duration steps: 15 s up to 5 min, then whole minutes. */
@@ -181,11 +193,8 @@ function repeat(times: number, blocks: CardioBlock[]): CardioRepeatSet {
 
 /** "התחלה מתבנית" — three starters (a new workout only); she edits them like any blocks. */
 export const CARDIO_TEMPLATES = {
-  easy: { sport: 'run', build: (): CardioStep[] => [newBlock('warmup', 300, 3), newBlock('steady', 1200, 4), newBlock('cooldown', 300, 2)] },
-  intervals: {
-    sport: 'intervals',
-    build: (): CardioStep[] => [newBlock('warmup', 300, 3), repeat(6, [newBlock('work', 60, 8), newBlock('recovery', 60, 3)]), newBlock('cooldown', 300, 2)],
-  },
+  easy: { sport: 'run', build: SPORT_PRESETS.run },
+  intervals: { sport: 'intervals', build: SPORT_PRESETS.intervals },
   tempo: {
     sport: 'run',
     build: (): CardioStep[] => [newBlock('warmup', 300, 3), repeat(3, [newBlock('work', 480, 7), newBlock('recovery', 120, 3)]), newBlock('cooldown', 300, 2)],

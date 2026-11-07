@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import type { CollisionDetection, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { IconPlus, IconRepeat, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconRepeat, IconRoute, IconTrash } from '@tabler/icons-react';
 import { cardioKindLabel, cardioSportLabel, fill, useCopy, useI18n } from '@sistem/shared';
 import { ROUTES } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
@@ -212,6 +212,17 @@ export function OwnCardioBuilderPage() {
         isWorking={builder.isSaving}
         onConfirm={() => void builder.deleteWorkout()}
         onCancel={() => setConfirmDelete(false)}
+      />
+      <ConfirmSheet
+        isOpen={builder.pendingSport !== null}
+        icon={<IconRoute size={22} />}
+        title={copy.builder.replaceTitle}
+        message={builder.pendingSport ? fill(copy.builder.replaceMessage, { type: cardioSportLabel(builder.pendingSport, language) }) : undefined}
+        confirmLabel={copy.builder.replaceYes}
+        secondary={{ label: copy.builder.replaceKeep, onClick: builder.keepStructure }}
+        hideCancel
+        onConfirm={builder.replaceStructure}
+        onCancel={builder.cancelSportChange}
       />
     </main>
   );
