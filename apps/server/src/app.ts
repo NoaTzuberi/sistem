@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config/env';
+import { isAllowedOrigin } from './config/clientOrigins';
 import { securityHeaders } from './middleware/securityHeaders.middleware';
 import { errorHandler } from './middleware/errorHandler.middleware';
 import { healthRouter } from './features/health/health.routes';
@@ -20,7 +21,7 @@ import { cardioRouter } from './features/cardio/cardio.routes';
 import { tabUpdatesRouter } from './features/tabUpdates/tabUpdates.routes';
 import { adminRouter } from './features/admin/admin.routes';
 import { joinRouter } from './features/invites/invite.routes';
-import { coachingsRouter, communitiesRouter } from './features/coachings/coaching.routes';
+import { coachingsRouter, communitiesRouter, meRouter } from './features/coachings/coaching.routes';
 import { reactionsRouter } from './features/reactions/reaction.routes';
 import { messagesRouter } from './features/messages/message.routes';
 import { accountRouter } from './features/account/account.routes';
@@ -34,8 +35,9 @@ app.disable('x-powered-by');
 // visitor shares the proxy's address — one rate-limit bucket for everyone (config/trustProxy.ts).
 app.set('trust proxy', config.trustProxy);
 app.use(securityHeaders);
-// Only the listed origins get CORS headers. No `credentials`: auth is a Bearer header, not a cookie.
-app.use(cors({ origin: config.clientOrigins }));
+// Only the listed origins get CORS headers (in development also the apps' LAN addresses — clientOrigins.ts).
+// No `credentials`: auth is a Bearer header, not a cookie.
+app.use(cors({ origin: (origin, done) => done(null, isAllowedOrigin(origin, config.clientOrigins, config.nodeEnv)) }));
 app.use(express.json());
 
 app.use('/api', healthRouter);
@@ -57,6 +59,7 @@ app.use('/api/tab-updates', tabUpdatesRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/join', joinRouter);
 app.use('/api/coachings', coachingsRouter);
+app.use('/api/me', meRouter);
 app.use('/api/communities', communitiesRouter);
 app.use('/api/reactions', reactionsRouter);
 app.use('/api/messages', messagesRouter);

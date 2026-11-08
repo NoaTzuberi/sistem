@@ -135,4 +135,45 @@ describe('end coaching + archive', () => {
     await logWorkout();
     expect((await api.request<{ items: PublicWorkoutLog[] }>('GET', `/coach/trainees/${trainee.id}/workout-logs`, { token: coach.token })).body.items).toHaveLength(0);
   });
+
+  describe('the trainee ends it herself (PATCH /me/coaching/end)', () => {
+    const endMine = (token = trainee.token, query = '') => api.request('PATCH', `/me/coaching/end${query}`, { token });
+
+    it('only a trainee, only her own live coaching', async () => {
+      expect((await endMine(coach.token)).status).toBe(403);
+      const other = await createTestUser('other@example.com', { coachId: coach.user._id, coachingStatus: 'active' });
+      // Another trainee's coaching id is not hers.
+      expect((await endMine(other.token, `?coachingId=${trainee.coachingId}`)).status).toBe(404);
+      expect((await Coaching.findById(trainee.coachingId).lean())!.live).toBe(true);
+      const alone = await createTestUser('alone@example.com');
+      expect((await endMine(alone.token)).status).toBe(404);
+    });
+
+    it('ends it, she is self-guided, the coach is told and cut off (photos too)', async () => {
+      await logWorkout();
+      const res = await endMine();
+      expect(res.status).toBe(200);
+      expect(res.body.endedAt).toBeTruthy();
+      expect((await Coaching.findById(trainee.coachingId).lean())!).toMatchObject({ status: 'ended', live: false });
+      expect((await api.request('GET', '/auth/me', { token: trainee.token })).body.user.coachingStatus).toBeNull();
+      expect(await WorkoutLog.countDocuments({ traineeId: trainee.user._id })).toBe(1);
+
+      const coachNotes = await api.request<{ items: AppNotification[] }>('GET', '/notifications', { token: coach.token });
+      expect(coachNotes.body.items.find((item) => item.type === 'trainee_ended_coaching')).toMatchObject({
+        data: { traineeId: trainee.id, traineeName: trainee.user.name, coachingId: String(trainee.coachingId) },
+      });
+      // She ended it, so she is not told "your coach ended it".
+      const herNotes = await api.request<{ items: AppNotification[] }>('GET', '/notifications', { token: trainee.token });
+      expect(herNotes.body.items.some((item) => item.type === 'coaching_ended')).toBe(false);
+
+      for (const path of ['', '/workout-logs', '/body-metrics', '/meal-logs']) {
+        expect((await api.request('GET', `/coach/trainees/${trainee.id}${path}`, { token: coach.token })).status).toBe(404);
+      }
+      const logs = await api.request<{ items: PublicWorkoutLog[] }>('GET', `/coach/archive/${trainee.id}/workout-logs`, { token: coach.token });
+      expect(logs.body.items[0].pumpPhoto).toBeNull();
+
+      // A second tap: nothing live to end.
+      expect((await endMine()).status).toBe(404);
+    });
+  });
 });

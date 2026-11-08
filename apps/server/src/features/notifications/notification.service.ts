@@ -27,6 +27,8 @@ function dedupeKeyFor(payload: NotificationPayload): string {
     case 'coaching_ended':
       // Per coaching: a coaching ends once.
       return `coaching_ended:${payload.data.coachingId}`;
+    case 'trainee_ended_coaching':
+      return `trainee_ended_coaching:${payload.data.coachingId}`;
   }
 }
 

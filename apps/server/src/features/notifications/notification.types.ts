@@ -14,7 +14,9 @@ export type NotificationPayload =
   // noteId = the plan id (plan notes) or the nutrition version id (its intro): one thanks per note.
   | { type: 'coach_note_thanks'; data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string } }
   // coachName is a snapshot taken when the coaching ended.
-  | { type: 'coaching_ended'; data: { coachingId: string; coachName: string } };
+  | { type: 'coaching_ended'; data: { coachingId: string; coachName: string } }
+  // traineeName is a snapshot taken when she ended the coaching herself.
+  | { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } };
 
 export interface NotificationDocument {
   userId: Types.ObjectId;

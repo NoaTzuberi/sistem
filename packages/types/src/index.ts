@@ -1246,7 +1246,8 @@ export type NotificationType =
   | 'workout_completed'
   | 'nutrition_plan_published'
   | 'coach_note_thanks'
-  | 'coaching_ended';
+  | 'coaching_ended'
+  | 'trainee_ended_coaching';
 
 /** A coach note the trainee can thank for on Home: this week's plan notes / her nutrition intro. */
 export type CoachNoteId = 'plan' | 'nutrition';
@@ -1284,7 +1285,14 @@ export type AppNotification =
       data: { traineeId: string; traineeName: string; note: CoachNoteId; noteId: string };
     })
   /** To the trainee: her coach ended the coaching. coachName is a snapshot from that moment. */
-  | (NotificationBase & { type: 'coaching_ended'; data: { coachingId: string; coachName: string } });
+  | (NotificationBase & { type: 'coaching_ended'; data: { coachingId: string; coachName: string } })
+  /** To the coach: the trainee ended the coaching herself. traineeName is a snapshot from that moment. */
+  | (NotificationBase & { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } });
+
+/** PATCH /me/coaching/end (trainee) → she ended her own coaching. */
+export interface EndMyCoachingResponse {
+  endedAt: string;
+}
 
 /** GET /notifications — newest first. */
 export interface NotificationList {

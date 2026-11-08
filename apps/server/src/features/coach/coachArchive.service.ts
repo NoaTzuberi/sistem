@@ -22,7 +22,7 @@ type LeanLog = Parameters<typeof toPublicWorkoutLog>[0];
  */
 export async function endCoachingByCoach(coachId: string, traineeId: string, coachingId: string, now: Date = new Date()): Promise<Date | null> {
   if (!(await endCoaching(coachingId, now))) return null;
-  emitAppEvent('coaching.ended', { coachingId, traineeId, coachId, endedAt: now });
+  emitAppEvent('coaching.ended', { coachingId, traineeId, coachId, endedAt: now, endedBy: 'coach' });
   return now;
 }
 

@@ -21,6 +21,7 @@ import type {
   WorkoutSummaryPayload,
   MyCoaching,
   MyCoachingsResponse,
+  EndMyCoachingResponse,
   MyCommunity,
   MyCommunitiesResponse,
   AuthUser,
@@ -55,6 +56,12 @@ export function createTraineeApi(client: AxiosInstance) {
   async function listMyCoachings(): Promise<MyCoaching[]> {
     const { data } = await client.get<MyCoachingsResponse>('/coachings');
     return data.coachings;
+  }
+
+  /** She ends her own coaching (default: her current one) — she becomes self-guided. */
+  async function endMyCoaching(coachingId?: string): Promise<EndMyCoachingResponse> {
+    const { data } = await client.patch<EndMyCoachingResponse>('/me/coaching/end', undefined, { params: coachingId ? { coachingId } : undefined });
+    return data;
   }
 
   /** Her communities — names only. */
@@ -297,6 +304,7 @@ export function createTraineeApi(client: AxiosInstance) {
   return {
     getWeek,
     listMyCoachings,
+    endMyCoaching,
     listMyCommunities,
     listPlans,
     getPlan,

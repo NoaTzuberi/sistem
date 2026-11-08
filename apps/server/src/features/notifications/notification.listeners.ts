@@ -62,8 +62,20 @@ export async function onNutritionPlanPublished(event: NutritionPlanPublishedEven
   });
 }
 
-/** To the trainee — her Home shows "<coach> ended the coaching" until she dismisses it. */
+/**
+ * To the other side: the coach ended it → the trainee (her Home shows "<coach> ended the coaching" until
+ * she dismisses it); the trainee ended it → the coach (her inbox / bell, tap → the archive).
+ */
 export async function onCoachingEnded(event: CoachingEndedEvent): Promise<void> {
+  if (event.endedBy === 'trainee') {
+    const trainee = await User.findById(event.traineeId).select('name').lean();
+    if (!trainee) return;
+    await notify(event.coachId, {
+      type: 'trainee_ended_coaching',
+      data: { coachingId: event.coachingId, traineeId: event.traineeId, traineeName: trainee.name },
+    });
+    return;
+  }
   await notify(event.traineeId, {
     type: 'coaching_ended',
     data: { coachingId: event.coachingId, coachName: await getCoachName(event.coachId) },

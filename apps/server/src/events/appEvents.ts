@@ -48,6 +48,8 @@ export interface CoachingEndedEvent {
   traineeId: string;
   coachId: string;
   endedAt: Date;
+  /** Who ended it: the coach (she is told) or the trainee herself (the coach is told). */
+  endedBy: 'coach' | 'trainee';
 }
 
 interface AppEventMap {

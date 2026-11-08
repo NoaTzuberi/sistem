@@ -6,6 +6,7 @@ import type { CoachingDocument } from './coaching.model';
 import { isMultiCoachEnabled } from './coaching.config';
 import { getCoachCards, getCoachName } from '../coachProfiles/coachProfile.service';
 import { myCommunityNamesByCoach } from '../communities/community.service';
+import { emitAppEvent } from '../../events/appEvents';
 
 // THE place that answers "which coach(es) does this trainee have" — nothing reads a coach id from
 // the User any more. Every coach-owned record carries the coachingId it belongs to.
@@ -92,6 +93,27 @@ export async function markCoachingActive(coachingId: Id): Promise<void> {
 export async function endCoaching(coachingId: Id, now: Date = new Date()): Promise<boolean> {
   const result = await Coaching.updateOne({ _id: coachingId, live: true }, { $set: { status: 'ended', live: false, endedAt: now } });
   return result.modifiedCount === 1;
+}
+
+/**
+ * The trainee ends her own live coaching (the same end as the coach's): her account and history stay,
+ * she becomes self-guided, the coach loses access (every coach route needs a LIVE coaching) and is told.
+ * `coachingId` = one of hers (multi-coach UI); null = her current one. A coaching that is not live any
+ * more (ended by the coach, a double tap) → CoachingNotFoundError.
+ */
+export async function endCoachingByTrainee(traineeId: Id, coachingId: string | null, now: Date = new Date()): Promise<Date> {
+  const coaching = coachingId
+    ? await Coaching.findOne({ _id: coachingId, traineeId, live: true }).lean<LeanCoaching>()
+    : await getCurrentCoaching(traineeId);
+  if (!coaching || !(await endCoaching(coaching._id, now))) throw new CoachingNotFoundError('coaching_not_live');
+  emitAppEvent('coaching.ended', {
+    coachingId: String(coaching._id),
+    traineeId: String(traineeId),
+    coachId: String(coaching.coachId),
+    endedAt: now,
+    endedBy: 'trainee',
+  });
+  return now;
 }
 
 /**

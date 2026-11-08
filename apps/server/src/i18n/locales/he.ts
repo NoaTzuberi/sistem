@@ -41,6 +41,7 @@ export const he = {
   message_text_required: 'יש לכתוב הודעה.',
   message_text_too_long: 'ההודעה ארוכה מדי (עד {max} תווים).',
   message_no_coach: 'אין לך מאמנת לשלוח אליה הודעה.',
+  coaching_not_live: 'אין לך ליווי פעיל לסיים.',
   app_mode_invalid: "מצב האפליקציה חייב להיות 'coach' או 'trainee'.",
   app_mode_not_allowed: 'אין לחשבון הזה גישה למצב הזה.',
   preferences_units_not_object: 'היחידות חייבות להיות אובייקט.',

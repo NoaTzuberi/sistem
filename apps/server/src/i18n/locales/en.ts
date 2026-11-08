@@ -42,6 +42,7 @@ export const en: Record<keyof typeof he, string> = {
   message_text_required: 'Write a message.',
   message_text_too_long: 'The message is too long (up to {max} characters).',
   message_no_coach: 'You have no coach to message.',
+  coaching_not_live: 'You have no active coaching to end.',
   app_mode_invalid: "App mode must be 'coach' or 'trainee'.",
   app_mode_not_allowed: 'This account cannot use that mode.',
   preferences_units_not_object: 'units must be an object.',
