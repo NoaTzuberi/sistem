@@ -78,6 +78,17 @@ export const he = {
   questionnaireHint: 'התשובות שהמאמנת רואה',
   logoutConfirm: 'להתנתק מהחשבון?', // PLACEHOLDER
   cancel: 'ביטול',
+  // Settings → "my coach": her coach's card + ending the coaching herself. DRAFT — the owner finalizes.
+  myCoach: {
+    eyebrow: 'Coach',
+    title: 'המאמנת שלי',
+    sheetTitle: 'המאמנת שלי',
+    end: 'סיום הליווי',
+    confirmTitle: 'לסיים את הליווי עם {coach}?',
+    confirmMessage: 'החשבון וכל ההיסטוריה שלך נשארים. תמשיכי להתאמן לבד, ואפשר להצטרף למאמנת בהמשך עם קוד.',
+    confirm: 'סיום הליווי',
+    error: 'לא הצלחנו לסיים את הליווי. אפשר לנסות שוב.',
+  },
   // The measurement sheet
   sheetTitle: 'עדכון מדידה',
   sheetHint: 'מספיק משקל. את ההיקפים אפשר לעדכן פעם בשבועיים.',

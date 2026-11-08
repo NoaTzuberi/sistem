@@ -70,6 +70,17 @@ export const en: CopyShape<typeof he> = {
   questionnaireHint: 'The answers your coach sees',
   logoutConfirm: 'Log out of your account?',
   cancel: 'Cancel',
+  // Settings → "my coach": her coach's card + ending the coaching herself. DRAFT — the owner finalizes.
+  myCoach: {
+    eyebrow: 'Coach',
+    title: 'My coach',
+    sheetTitle: 'My coach',
+    end: 'End coaching',
+    confirmTitle: 'End the coaching with {coach}?',
+    confirmMessage: 'Your account and all your history stay. You’ll keep training on your own, and you can join a coach later with a code.',
+    confirm: 'End coaching',
+    error: 'Couldn’t end the coaching. Try again.',
+  },
   sheetTitle: 'Log a measurement',
   sheetHint: 'Weight is enough. Measurements every two weeks or so.',
   sheetMeasurements: 'Measurements',

@@ -1,0 +1,44 @@
+/* Settings → "המאמנת שלי": the coach card sits on the sheet's soft fill. */
+.my-coach-sheet .pf-coach {
+  margin-block-start: var(--space-3);
+  background-color: var(--color-subscreen-page);
+}
+
+/* The end action: Cherry text, no fill — a quiet, deliberate step (the confirm sheet is the loud one). */
+.my-coach-end {
+  display: block;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  margin-block-start: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: transparent;
+  color: var(--color-primary-deep);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.my-coach-end:active {
+  transform: scale(var(--press-scale));
+}
+
+.my-coach-end:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .my-coach-end:hover {
+    background-color: var(--tint-pink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-coach-end {
+    transition: none;
+  }
+}

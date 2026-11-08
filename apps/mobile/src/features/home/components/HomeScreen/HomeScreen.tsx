@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconCalendarEvent, IconMessageCircle } from '@tabler/icons-react';
-import { fill, formatWeekRange, useCopy, useLanguage } from '@sistem/shared';
+import { fill, formatWeekRange, isolateAuto, useCopy, useLanguage } from '@sistem/shared';
 import { ROUTES, workoutSessionPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { Toast } from '../../../../components/common/Toast/Toast';
@@ -61,14 +61,20 @@ export function HomeScreen() {
   const joinCard = useJoinCardDismissal(home.user?.id);
   const { toastMessage, showToast } = useToast();
   const location = useLocation();
-  const joinedCoach = (location.state as { joinedCoach?: string } | null)?.joinedCoach;
+  const navState = location.state as { joinedCoach?: string; endedCoach?: string } | null;
+  const joinedCoach = navState?.joinedCoach;
+  const endedCoach = navState?.endedCoach;
 
-  // Back from joining a coach (Profile / this card): say so once, then forget it.
+  // Back from joining a coach (Profile / this card) or ending it herself (Settings): say so once, then forget it.
   useEffect(() => {
-    if (!joinedCoach) return;
-    showToast(fill(copy.selfGuided.joined, { coach: joinedCoach }));
+    if (!joinedCoach && endedCoach === undefined) return;
+    showToast(
+      joinedCoach
+        ? fill(copy.selfGuided.joined, { coach: joinedCoach })
+        : fill(copy.selfGuided.ended, { coach: isolateAuto(endedCoach ?? '') }),
+    );
     navigate(location.pathname, { replace: true, state: null });
-  }, [copy.selfGuided.joined, joinedCoach, location.pathname, navigate, showToast]);
+  }, [copy.selfGuided.ended, copy.selfGuided.joined, endedCoach, joinedCoach, location.pathname, navigate, showToast]);
 
   function openFree() {
     free.reset();

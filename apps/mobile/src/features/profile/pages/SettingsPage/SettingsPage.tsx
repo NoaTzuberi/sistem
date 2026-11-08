@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconClock, IconRuler2, IconScale } from '@tabler/icons-react';
-import { LANGUAGES, fill, sharedCopy, unitLabel, useCopy } from '@sistem/shared';
+import { IconChevronLeft, IconClock, IconRuler2, IconScale, IconUserHeart } from '@tabler/icons-react';
+import { LANGUAGES, fill, isolateAuto, sharedCopy, unitLabel, useCopy } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
 import { ROUTES } from '../../../../app/config/routes';
@@ -12,6 +12,12 @@ import { SegmentedControl } from '../../components/SegmentedControl/SegmentedCon
 import { ModeSwitch } from '../../../coach/components/ModeSwitch/ModeSwitch';
 import { coachCopy } from '../../../coach/copy';
 import { LogoutSheet } from '../../components/LogoutSheet/LogoutSheet';
+import { MyCoachSheet } from '../../components/MyCoachSheet/MyCoachSheet';
+import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { useToast } from '../../../../hooks/useToast';
+import { useActiveCoachings } from '../../../../hooks/useActiveCoachings';
+import { useEndMyCoaching } from '../../hooks/useEndMyCoaching';
 import { DeleteAccountButton } from '../../../account/components/DeleteAccountButton/DeleteAccountButton';
 import { useLanguagePreference } from '../../hooks/useLanguagePreference';
 import { useUnitPreferences } from '../../hooks/useUnitPreferences';
@@ -45,7 +51,8 @@ function SectionTitle({ eyebrow, id, children }: { eyebrow: string; id: string; 
 }
 
 /**
- * Settings (PRD §5.5, direction B): units, language, account (time zone), log out, delete account, the app version.
+ * Settings (PRD §5.5, direction B): units, language, her coach (card + end the coaching), account (time zone),
+ * log out, delete account, the app version.
  * Notification switches, personal details and privacy screens don't exist yet (push is Phase 5b) — not shown.
  */
 export function SettingsPage() {
@@ -58,6 +65,17 @@ export function SettingsPage() {
   const language = useLanguagePreference();
   const [confirmLogout, setConfirmLogout] = useState(false);
   const busy = units.isSaving || language.isSaving;
+  const { toastMessage, showToast } = useToast();
+  // Her current coaching (the server sends only her own); self-guided = no row.
+  const { coachings } = useActiveCoachings(user?.coachingStatus != null);
+  const coaching = user?.coachingStatus != null ? coachings[0] ?? null : null;
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
+  const endCoaching = useEndMyCoaching(coaching?.id ?? null, coaching?.coachName ?? '');
+
+  function askToEnd() {
+    setIsCoachOpen(false);
+    endCoaching.ask();
+  }
 
   function handleLogout() {
     logout();
@@ -124,6 +142,25 @@ export function SettingsPage() {
             )}
           </section>
 
+          {coaching && (
+            <section className="st-section" aria-labelledby="st-coach">
+              <SectionTitle eyebrow={copy.myCoach.eyebrow} id="st-coach">
+                {copy.myCoach.title}
+              </SectionTitle>
+              <div className="st-card">
+                <button type="button" className="st-row st-row-button" onClick={() => setIsCoachOpen(true)}>
+                  <span className="st-row-icon" aria-hidden="true">
+                    <IconUserHeart size={18} />
+                  </span>
+                  <bdi className="st-row-label" dir="auto">
+                    {coaching.coachName}
+                  </bdi>
+                  <IconChevronLeft className="st-row-chevron flip-rtl" size={18} aria-hidden="true" />
+                </button>
+              </div>
+            </section>
+          )}
+
           {/* Someone who is also a coach switches back to coach mode here (the coach Profile has the same switch). */}
           {user?.canSwitchAppMode && (
             <section className="st-section" aria-labelledby="st-mode">
@@ -162,6 +199,32 @@ export function SettingsPage() {
         </div>
 
         <LogoutSheet isOpen={confirmLogout} onClose={() => setConfirmLogout(false)} onConfirm={handleLogout} />
+        {coaching && (
+          <>
+            <MyCoachSheet coaching={coaching} isOpen={isCoachOpen} onClose={() => setIsCoachOpen(false)} onEnd={askToEnd} onToast={showToast} />
+            <ConfirmSheet
+              isOpen={endCoaching.isConfirming}
+              tone="destructive"
+              title={fill(copy.myCoach.confirmTitle, { coach: isolateAuto(coaching.coachName) })}
+              message={
+                <>
+                  {copy.myCoach.confirmMessage}
+                  {endCoaching.error && (
+                    <span className="st-confirm-error" role="alert">
+                      {endCoaching.error}
+                    </span>
+                  )}
+                </>
+              }
+              confirmLabel={copy.myCoach.confirm}
+              cancelLabel={copy.cancel}
+              isWorking={endCoaching.isEnding}
+              onConfirm={() => void endCoaching.confirm()}
+              onCancel={endCoaching.cancel}
+            />
+          </>
+        )}
+        <Toast message={toastMessage} />
       </div>
     </AppShell>
   );

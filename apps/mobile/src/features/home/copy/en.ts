@@ -74,6 +74,7 @@ export const en: CopyShape<typeof he> = {
     waitingNoName: 'Your coach is building your plan. Meanwhile, you can train on your own.',
     action: 'Free workout',
     joined: "You joined {coach}'s coaching",
+    ended: 'Your coaching with {coach} ended', // DRAFT
   },
   joinCoach: {
     label: 'Join a coach',

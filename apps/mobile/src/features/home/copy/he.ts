@@ -74,6 +74,7 @@ export const he = {
     waitingNoName: 'המאמנת שלך בונה לך תוכנית. בינתיים אפשר להתאמן לבד.',
     action: 'אימון חופשי',
     joined: 'הצטרפת לליווי של {coach}',
+    ended: 'הליווי עם {coach} הסתיים', // DRAFT toast after she ended it herself
   },
   joinCoach: {
     label: 'הצטרפות למאמנת',

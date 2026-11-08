@@ -79,6 +79,38 @@
   color: var(--color-ink);
 }
 
+/* A row that opens something (her coach): the whole row is the button. */
+.st-row-button {
+  width: 100%;
+  border: 0;
+  background-color: transparent;
+  font-family: var(--font-body);
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.st-row-button:active {
+  transform: scale(var(--press-scale));
+}
+
+.st-row-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.st-row-chevron {
+  flex: none;
+  color: var(--color-text-faint);
+}
+
+.st-confirm-error {
+  display: block;
+  margin-block-start: var(--space-2);
+  color: var(--color-error);
+}
+
 .st-row-control {
   display: flex;
   flex: none;
@@ -145,6 +177,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .st-row-button,
   .st-logout {
     transition: none;
   }
