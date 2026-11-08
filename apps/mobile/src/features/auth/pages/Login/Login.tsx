@@ -11,6 +11,8 @@ import { CoachDashboardLink } from '../../components/CoachDashboardLink/CoachDas
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { authErrorText, validateEmail, validateLoginPassword, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
+import { readAuthFailure, type AuthFailure } from '../../data/authFailure';
+import { AuthFormError } from '../../components/AuthFormError/AuthFormError';
 import { authCopy } from '../../copy';
 import { ROUTES, joinPath } from '../../../../app/config/routes';
 import { clearPendingInvite, getPendingInvite } from '../../../../services/invites/pendingInvite';
@@ -24,7 +26,7 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<AuthErrorKey>();
   const [passwordError, setPasswordError] = useState<AuthErrorKey>();
-  const [formError, setFormError] = useState<string>();
+  const [formError, setFormError] = useState<AuthFailure>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -48,8 +50,14 @@ export function Login() {
       clearPendingInvite();
       navigate(pendingInvite ? joinPath(pendingInvite) : ROUTES.HOME);
     } catch (error) {
-      // The server's message is already in the language on screen; '' = no answer.
-      setFormError((error instanceof Error && error.message) || copy.loginFailed);
+      // From the server's code: a field's problem shows under that field; wrong password etc. = the
+      // server's sentence (already in the language on screen); no answer = "no connection to the server".
+      const failure = readAuthFailure(error);
+      if (failure.kind === 'field') {
+        if (failure.field === 'email') setEmailError(failure.key);
+        else setPasswordError(failure.key);
+      }
+      setFormError(failure);
     } finally {
       setIsSubmitting(false);
     }
@@ -98,7 +106,7 @@ export function Login() {
             </>
           }
         />
-        {formError && <p className="auth-glass-error">{formError}</p>}
+        <AuthFormError failure={formError} fallback={copy.loginFailed} />
         <AuthSubmitButton loading={isSubmitting}>{copy.loginButton}</AuthSubmitButton>
         <SocialButtons />
       </form>

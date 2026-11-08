@@ -9,6 +9,9 @@
   --glass-blur: blur(22px) saturate(140%);
   --glass-divider: color-mix(in srgb, var(--color-text) 15%, transparent);
   --glass-outline: color-mix(in srgb, var(--color-text) 25%, transparent);     /* outlined pill on glass */
+  /* Errors on the glass card (field + form lines, the field's error ring): cherry, never red / orange.
+     Cherry Rose is ~3.6:1 on the card over Neon Pink, so the darker cherry (4.9–5.9:1 along the gradient). */
+  --color-auth-error: var(--color-primary-deeper);
 
   /* The running track drawn on the gradient (TrackBackground): white (--color-on-primary) at these alphas. */
   --track-lane-alpha: 0.32;        /* inner lane lines */

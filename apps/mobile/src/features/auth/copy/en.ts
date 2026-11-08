@@ -45,6 +45,8 @@ export const en: CopyShape<typeof he> = {
   loginFailed: 'Login failed. Please try again.',
   registerFailed: 'Registration failed. Please try again.',
   somethingWrong: 'Something went wrong. Please try again.',
+  emailTaken: 'There is already an account with this email', // DRAFT
+  emailTakenLogin: 'Log in', // DRAFT
   errors: {
     nameRequired: 'Name is required.',
     emailInvalid: 'Enter a valid email address.',

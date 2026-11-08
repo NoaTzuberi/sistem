@@ -32,3 +32,34 @@ export function parseClientOrigins(value: string | undefined, nodeEnv: string): 
   // Unset: the local apps in development; nothing in production (set CLIENT_ORIGINS there).
   return nodeEnv === 'production' ? [] : DEV_CLIENT_ORIGINS;
 }
+
+/** A private (RFC 1918) IPv4 address: 10.*, 172.16–31.*, 192.168.* — a computer on the same Wi-Fi. */
+function isPrivateLanHost(hostname: string): boolean {
+  const parts = hostname.split('.');
+  if (parts.length !== 4 || !parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255)) return false;
+  const [a, b] = parts.map(Number);
+  return a === 10 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
+}
+
+/**
+ * Development only: one of the apps opened by its LAN address (Vite's "Network" URL, a phone on the same
+ * Wi-Fi), on a dev port — http, or https for `npm run dev:phone`. Never used in production.
+ */
+export function isPrivateLanDevOrigin(origin: string): boolean {
+  try {
+    const { protocol, hostname, port } = new URL(origin);
+    return (protocol === 'http:' || protocol === 'https:') && DEV_PORTS.includes(Number(port)) && isPrivateLanHost(hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * THE CORS check: the exact allow-list; in development also the private LAN dev origins. Production
+ * never widens it. Not allowed = no CORS headers (the browser blocks the answer), as with a plain list.
+ */
+export function isAllowedOrigin(origin: string | undefined, allowed: string[], nodeEnv: string): boolean {
+  if (!origin) return false;
+  if (allowed.includes(origin)) return true;
+  return nodeEnv !== 'production' && isPrivateLanDevOrigin(origin);
+}

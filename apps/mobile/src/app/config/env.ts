@@ -19,3 +19,10 @@ export const COACH_DASHBOARD_URL = readHttpUrl(import.meta.env.VITE_COACH_DASHBO
  * after a "#", so a refresh never asks the host for a page it does not have.
  */
 export const USES_HASH_ROUTER = import.meta.env.VITE_HASH_ROUTER === 'true';
+
+/**
+ * The API base URL. Dev server: always the same-origin `/api`, which the Vite proxy forwards to the local
+ * server, so the app works from any address (localhost, the LAN IP, a phone on the same Wi-Fi) without
+ * CORS. Builds (production, GitHub Pages, Capacitor): VITE_API_URL, unchanged.
+ */
+export const API_BASE_URL: string = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL;

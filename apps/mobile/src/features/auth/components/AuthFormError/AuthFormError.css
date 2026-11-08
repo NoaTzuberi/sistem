@@ -1,0 +1,27 @@
+/* The form-level error on the glass card: the darker cherry (contrast on the translucent pink). */
+.auth-form-error {
+  margin: 0;
+  padding-inline: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-auth-error);
+}
+
+.auth-form-error-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  color: inherit;
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.auth-form-error-link:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-form-error-link {
+    transition: none;
+  }
+}

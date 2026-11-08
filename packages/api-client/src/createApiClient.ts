@@ -64,6 +64,19 @@ export function createApiClient({ baseURL, getToken, onUnauthorized, getLanguage
   return client;
 }
 
+/**
+ * The API never answered — offline, wrong address, blocked by CORS, or a proxy in front of it (the Vite
+ * dev proxy, a host's gateway) answering 5xx without the API's JSON (`code` / `message`). An error the
+ * API itself sent, or a request the app cancelled, does not count.
+ */
+export function isNoConnectionError(error: unknown): boolean {
+  if (!axios.isAxiosError(error) || error.code === 'ERR_CANCELED') return false;
+  if (!error.response) return true;
+  const data: unknown = error.response.data;
+  const fromApi = typeof data === 'object' && data !== null && ('code' in data || 'message' in data);
+  return error.response.status >= 500 && !fromApi;
+}
+
 /** The server's message (already in the language on screen), else `fallback` (e.g. no connection). */
 /** The field an error is about, when the server names one (e.g. a body measurement's id). */
 export function extractErrorField(error: unknown): string | null {

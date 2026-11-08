@@ -8,7 +8,8 @@ import { FlowBackground } from '../../../../components/common/FlowBackground/Flo
 import { Logo } from '../../../../components/common/Logo/Logo';
 import { LanguageToggle } from '../../../../components/common/LanguageToggle/LanguageToggle';
 import { Switch } from '../../../../components/common/Switch/Switch';
-import { useCopy } from '@sistem/shared';
+import { authErrorCode, isAuthNoConnection } from '@sistem/api-client';
+import { sharedCopy, useCopy } from '@sistem/shared';
 import { appCopy } from '../../../../copy';
 import { LoginField } from '../../components/LoginField/LoginField';
 import { ArrowIcon, MailIcon } from '../../components/LoginIcons/LoginIcons';
@@ -25,6 +26,7 @@ const FEATURES = ['trainees', 'plans', 'nutrition'] as const;
 export function Login() {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
+  const shared = useCopy(sharedCopy);
   const copy = useCopy(appCopy);
   const { brandRef, cardRef, intro } = useLoginEntrance<HTMLElement, HTMLDivElement>();
   const [email, setEmail] = useState('');
@@ -57,7 +59,9 @@ export function Login() {
       passwordVisibility.hide();
       navigate(home, { replace: true });
     } catch (loginError) {
-      setError((loginError instanceof Error && loginError.message) || copy.loginFailed);
+      if (isAuthNoConnection(loginError)) setError(shared.common.noConnection);
+      else if (authErrorCode(loginError) === 'too_many_requests') setError(shared.common.tooManyAttempts);
+      else setError((loginError instanceof Error && loginError.message) || copy.loginFailed);
     } finally {
       setIsSubmitting(false);
     }

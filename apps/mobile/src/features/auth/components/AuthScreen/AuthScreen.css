@@ -128,7 +128,7 @@ html[data-surface='auth'] body {
   margin: 0;
   padding-inline: var(--space-3);
   font-size: var(--text-sm);
-  color: var(--color-error);
+  color: var(--color-auth-error);
 }
 
 .auth-screen-language {

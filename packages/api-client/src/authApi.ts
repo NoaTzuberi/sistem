@@ -11,7 +11,7 @@ import type {
   UpdatePreferencesPayload,
 } from '@sistem/types';
 import axios from 'axios';
-import { extractErrorMessage } from './createApiClient';
+import { extractErrorMessage, isNoConnectionError } from './createApiClient';
 
 /** An auth call's error with the server's code (e.g. 'reset_token_invalid'), when it sent one. */
 export class AuthApiError extends Error {
@@ -23,22 +23,35 @@ export class AuthApiError extends Error {
   }
 }
 
+/** AuthApiError.code when the server never answered (pages show "no connection to the server"). */
+export const NO_CONNECTION_CODE = 'no_connection';
+
+/** A register / login error where the server never answered. */
+export function isAuthNoConnection(error: unknown): boolean {
+  return error instanceof AuthApiError && error.code === NO_CONNECTION_CODE;
+}
+
+/** The server's stable code of a register / login error (e.g. 'email_taken', 'too_many_requests'), or NO_CONNECTION_CODE. */
+export function authErrorCode(error: unknown): string | undefined {
+  return error instanceof AuthApiError ? error.code : undefined;
+}
+
 function toAuthApiError(error: unknown): AuthApiError {
+  if (isNoConnectionError(error)) return new AuthApiError('', NO_CONNECTION_CODE);
   const code = axios.isAxiosError(error) ? error.response?.data?.code : undefined;
   return new AuthApiError(extractErrorMessage(error, ''), typeof code === 'string' ? code : undefined);
 }
 
-// Auth calls shared by the mobile app and the coach dashboard. Errors are rethrown
-// as plain Error with the server's message (in the language on screen), so pages can show
-// it directly; the message is '' when the server never answered — pages then show their
-// own text.
+// Auth calls shared by the mobile app and the coach dashboard. Errors are rethrown as an Error with
+// the server's message (in the language on screen), so pages can show it directly; when the server
+// never answered the message is '' — register / login then carry code NO_CONNECTION_CODE.
 export function createAuthApi(client: AxiosInstance) {
   async function register(payload: RegisterPayload): Promise<AuthResponse> {
     try {
       const { data } = await client.post<AuthResponse>('/auth/register', payload);
       return data;
     } catch (error) {
-      throw new Error(extractErrorMessage(error, ''));
+      throw toAuthApiError(error);
     }
   }
 
@@ -47,7 +60,7 @@ export function createAuthApi(client: AxiosInstance) {
       const { data } = await client.post<AuthResponse>('/auth/login', payload);
       return data;
     } catch (error) {
-      throw new Error(extractErrorMessage(error, ''));
+      throw toAuthApiError(error);
     }
   }
 

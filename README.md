@@ -58,12 +58,17 @@ npm run dev:phone
 
 What it does, and why:
 
-- **Same-origin API.** The app calls `/api` on its own address and the Vite dev server
-  forwards it to the local server (`http://localhost:<PORT from apps/server/.env>`). The phone
-  only needs the Vite address — `localhost` on the phone would be the phone itself. For this run
-  only, `VITE_API_URL` is set to `/api` (it overrides `apps/mobile/.env`; no file changes).
-- **Network.** The Vite dev server listens on all interfaces (`server.host: true`), also with
-  plain `npm run dev`.
+- **Same-origin API.** In dev, both apps (mobile + dashboard) always call `/api` on their own
+  address and the Vite dev server forwards it to the local server (the origin of `VITE_API_URL`
+  in the app's `.env`, else `http://localhost:5002`; `dev:phone` points it at
+  `http://localhost:<PORT from apps/server/.env>`). Any device only needs the Vite address —
+  `localhost` on a phone would be the phone itself.
+- **Network.** Both Vite dev servers listen on all interfaces (`server.host: true`), also with
+  plain `npm run dev` / `dev:all`: the `Network:` URL (e.g. `http://192.168.1.23:5173`) works on
+  the computer and on a phone on the same Wi-Fi (HTTP — Screen Wake Lock needs `dev:phone`).
+- **CORS (development only).** Besides `CLIENT_ORIGINS`, the server also accepts the apps by a
+  private LAN address (192.168.*, 10.*, 172.16–31.*) on ports 5173 / 5174. Production accepts
+  exactly `CLIENT_ORIGINS`.
 - **HTTPS.** The app is served over HTTPS with a self-signed certificate
   (`@vitejs/plugin-basic-ssl`), because the Screen Wake Lock API (screen stays on during a
   workout) only works in a secure context. Only `dev:phone` turns it on; `npm run dev` stays HTTP.
@@ -84,7 +89,7 @@ office Wi-Fi often blocks devices from seeing each other; the iPhone's own hotsp
 and that the macOS firewall allows `node`.
 
 None of this touches production: the proxy, `host` and HTTPS settings only apply to the Vite
-dev server, and `npm run build` still uses `VITE_API_URL` from `apps/mobile/.env`.
+dev server, and `npm run build` still uses `VITE_API_URL` from each app's `.env`.
 
 ### Optional data
 

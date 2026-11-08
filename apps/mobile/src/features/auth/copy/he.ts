@@ -44,6 +44,9 @@ export const he = {
   loginFailed: 'ההתחברות נכשלה. נסי שוב.',
   registerFailed: 'ההרשמה נכשלה. נסי שוב.',
   somethingWrong: 'משהו השתבש. נסי שוב.',
+  // Owner's wording (2026-11-08), DRAFT: sign-up with an address that already has an account.
+  emailTaken: 'כבר יש חשבון עם המייל הזה',
+  emailTakenLogin: 'להתחברות',
   errors: {
     nameRequired: 'יש להזין שם.',
     emailInvalid: 'הזיני כתובת אימייל תקינה.',

@@ -6,6 +6,7 @@
   /* Brand colors, the two temporary values, tints mixed from them. */
   --color-primary: #ff006e;       /* Neon Pink — actions, highlights, active states */
   --color-primary-deep: #a50047;  /* Cherry Rose — pressed states, small pink text */
+  --color-primary-deeper: #6b002e; /* Darker Cherry Rose — small text on translucent pink glass, where Cherry Rose is under 4.5:1 */
   --color-bg: #fcfcfc;            /* Bright Snow — app background */
   --color-surface: #eeeeee;       /* Platinum — cards, inputs, sections */
   --color-border: #e2e2e2;        /* Alabaster Grey — dividers, borders, disabled */

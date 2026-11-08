@@ -2,10 +2,10 @@ import { createApiClient } from '@sistem/api-client';
 import { getActiveLanguage } from '@sistem/shared';
 import { getToken, clearToken } from '../auth/tokenStorage';
 import { ROUTES } from '../../app/config/routes';
-import { USES_HASH_ROUTER } from '../../app/config/env';
+import { API_BASE_URL, USES_HASH_ROUTER } from '../../app/config/env';
 
 export const apiClient = createApiClient({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: API_BASE_URL,
   getToken,
   // Server messages come back in the language on screen (Phase 15).
   getLanguage: getActiveLanguage,

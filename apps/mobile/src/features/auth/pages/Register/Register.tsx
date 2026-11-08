@@ -12,6 +12,8 @@ import { SocialButtons } from '../../components/SocialButtons/SocialButtons';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { authErrorText, validateName, validateEmail, validatePassword, type AuthErrorKey } from '../../validation';
 import { useCopy } from '@sistem/shared';
+import { readAuthFailure, type AuthFailure } from '../../data/authFailure';
+import { AuthFormError } from '../../components/AuthFormError/AuthFormError';
 import { authCopy } from '../../copy';
 import { PasswordVisibilityToggle } from '../../components/PasswordVisibilityToggle/PasswordVisibilityToggle';
 import { ROUTES, joinPath } from '../../../../app/config/routes';
@@ -33,7 +35,7 @@ export function Register() {
   const [nameError, setNameError] = useState<AuthErrorKey>();
   const [emailError, setEmailError] = useState<AuthErrorKey>();
   const [passwordError, setPasswordError] = useState<AuthErrorKey>();
-  const [formError, setFormError] = useState<string>();
+  const [formError, setFormError] = useState<AuthFailure>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordsMatch = confirmPassword === password;
   const showConfirmStatus = confirmTouched;
@@ -86,7 +88,15 @@ export function Register() {
       // server's state: the "how do you want to train" choice, or straight into the questionnaire (a link).
       navigate(inviteCode && inviteError ? joinPath(inviteCode) : landingPath(user.appState));
     } catch (error) {
-      setFormError((error instanceof Error && error.message) || copy.registerFailed);
+      // From the server's code: a field's problem shows under that field; the rest on the form line.
+      const failure = readAuthFailure(error);
+      if (failure.kind === 'field') {
+        if (failure.field === 'name') setNameError(failure.key);
+        else if (failure.field === 'email') setEmailError(failure.key);
+        else if (failure.field === 'password') setPasswordError(failure.key);
+        else setConfirmTouched(true);
+      }
+      setFormError(failure);
     } finally {
       setIsSubmitting(false);
     }
@@ -171,7 +181,7 @@ export function Register() {
             />
           }
         />
-        {formError && <p className="auth-glass-error">{formError}</p>}
+        <AuthFormError failure={formError} fallback={copy.registerFailed} />
         <AuthSubmitButton loading={isSubmitting} disabled={isFormInvalid}>{copy.registerButton}</AuthSubmitButton>
         <SocialButtons />
       </form>

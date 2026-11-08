@@ -30,10 +30,20 @@ function limiter(limit: number, windowMinutes: number, keyGenerator?: (req: Requ
   });
 }
 
+/**
+ * Local development only (NODE_ENV unset / 'development'): 10× the sign-in / join limits. Through the
+ * Vite proxy every device (computer, phone, LAN URL) shares one address = one bucket, so testing sign-ups
+ * hit 20 in a few minutes. Production and tests keep the real numbers.
+ */
+const DEV_LIMIT_FACTOR = 10;
+function accountLimit(limit: number): number {
+  return config.nodeEnv === 'development' ? limit * DEV_LIMIT_FACTOR : limit;
+}
+
 /** Login, register, forgot / reset / set password. */
-export const authRateLimit = limiter(20, 15);
+export const authRateLimit = limiter(accountLimit(20), 15);
 /** Looking up and accepting /join codes. */
-export const joinRateLimit = limiter(60, 15);
+export const joinRateLimit = limiter(accountLimit(60), 15);
 /**
  * Reset-link requests per email address (on top of the per-IP limit). The same answer for every
  * address, so it reveals nothing; without an email it falls back to the IP.

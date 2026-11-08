@@ -21,7 +21,7 @@
 
 .auth-field-invalid,
 .auth-field-invalid:focus-within {
-  box-shadow: 0 0 0 var(--border-width-medium) var(--color-error);
+  box-shadow: 0 0 0 var(--border-width-medium) var(--color-auth-error);
 }
 
 .auth-field-icon {
@@ -81,7 +81,7 @@
 }
 
 .auth-field-error {
-  color: var(--color-error);
+  color: var(--color-auth-error);
 }
 
 .auth-field-status {
