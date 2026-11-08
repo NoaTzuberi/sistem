@@ -208,7 +208,7 @@ export const he = {
     repeat: 'חזרה על אימון קודם',
     repeatText: 'בחרי אימון מההיסטוריה, עם המשקלים מהפעם שעברה',
     muscle: 'לפי שריר',
-    muscleText: 'בחרי אזורים ונציע 4–6 תרגילים מתאימים',
+    muscleText: 'בחרי אזורים ונציע עד 5 תרגילים מתאימים', // matches FREE_WORKOUT_MUSCLE_EXERCISES (server)
     musclesLabel: 'אזורים',
     pickLog: 'בחרי אימון',
     noLogs: 'עדיין אין אימונים שהושלמו.',

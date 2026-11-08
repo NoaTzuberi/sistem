@@ -203,7 +203,7 @@ export const en: CopyShape<typeof he> = {
     repeat: 'Repeat a past workout',
     repeatText: 'Pick a workout from your history, with last time’s weights',
     muscle: 'By muscle',
-    muscleText: 'Pick areas and we’ll suggest 4–6 matching exercises',
+    muscleText: 'Pick areas and we’ll suggest up to 5 matching exercises', // matches FREE_WORKOUT_MUSCLE_EXERCISES (server)
     musclesLabel: 'Areas',
     pickLog: 'Pick a workout',
     noLogs: 'No completed workouts yet.',
