@@ -111,7 +111,11 @@ export const he = {
   startingPhoto: {
     title: 'תמונת התחלה',
     explanation: 'התמונה פרטית, גלויה רק לך ולמאמנת שלך, ותעזור לכן להשוות את ההתקדמות שלך.',
-    upload: 'צילום / העלאת תמונה',
+    // The same source words as the progress photos (profile copy).
+    camera: 'צילום',
+    cameraHint: 'פותח את המצלמה',
+    gallery: 'גלריה',
+    galleryHint: 'תמונה קיימת',
     skip: 'אדלג בינתיים',
   },
 } as const;

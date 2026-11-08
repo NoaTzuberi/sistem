@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { ChangeEvent } from 'react';
 import axios from 'axios';
 import type { BodyMetric } from '@sistem/types';
 import { fill, useCopy } from '@sistem/shared';
@@ -54,10 +53,8 @@ export function useStartingPhotoUpload(date: string, onSaved: (metric: BodyMetri
     }
   }
 
-  async function handlePicked(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
+  /** A photo from the camera or the gallery (PhotoSourceTiles). */
+  async function pickFile(file: File) {
     setError(undefined);
     setPending(undefined);
     setSaved(false);
@@ -81,7 +78,7 @@ export function useStartingPhotoUpload(date: string, onSaved: (metric: BodyMetri
     error,
     localSrc,
     saved,
-    handlePicked,
+    pickFile,
     canRetry: Boolean(pending),
     retry: () => pending && void upload(pending),
     status: statusText(),

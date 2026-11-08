@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { IconCamera } from '@tabler/icons-react';
+import { useEffect } from 'react';
+import { PhotoSourceTiles } from '../../../../components/common/PhotoSourceTiles/PhotoSourceTiles';
 import { DeckButton } from '../../components/DeckButton/DeckButton';
 import { useStartingPhotoUpload } from '../../../bodyTracking/hooks/useStartingPhotoUpload';
 import { onboardingCopy } from '../../copy';
@@ -16,7 +16,6 @@ interface StartingPhotoStepProps {
 export function StartingPhotoStep({ date, onPhotoSaved, onBusyChange }: StartingPhotoStepProps) {
   const copy = useCopy(onboardingCopy);
   const bodyText = useCopy(bodyCopy);
-  const inputRef = useRef<HTMLInputElement>(null);
   const upload = useStartingPhotoUpload(date, onPhotoSavedMetric);
 
   function onPhotoSavedMetric() {
@@ -28,10 +27,17 @@ export function StartingPhotoStep({ date, onPhotoSaved, onBusyChange }: Starting
   return (
     <div className="starting-photo-step">
       <p className="starting-photo-step-explanation">{copy.startingPhoto.explanation}</p>
-      <DeckButton onClick={() => inputRef.current?.click()} disabled={upload.busy !== null}>
-        <IconCamera size={19} aria-hidden="true" />
-        {copy.startingPhoto.upload}
-      </DeckButton>
+      {/* Camera or gallery, like every other photo in the app (no forced camera). */}
+      <PhotoSourceTiles
+        labels={{
+          camera: copy.startingPhoto.camera,
+          cameraHint: copy.startingPhoto.cameraHint,
+          gallery: copy.startingPhoto.gallery,
+          galleryHint: copy.startingPhoto.galleryHint,
+        }}
+        onPick={(file) => void upload.pickFile(file)}
+        disabled={upload.busy !== null}
+      />
       {upload.status && (
         <p className="starting-photo-step-status" role="status">
           {upload.status}
@@ -46,14 +52,6 @@ export function StartingPhotoStep({ date, onPhotoSaved, onBusyChange }: Starting
           </DeckButton>}
         </div>
       )}
-      <input
-        ref={inputRef}
-        className="starting-photo-step-input"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={upload.handlePicked}
-      />
     </div>
   );
 }

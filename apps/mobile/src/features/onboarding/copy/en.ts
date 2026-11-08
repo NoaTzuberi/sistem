@@ -110,7 +110,11 @@ export const en: CopyShape<typeof he> = {
   startingPhoto: {
     title: 'Starting photo',
     explanation: 'Your photo is private, visible only to you and your coach, and helps you compare your progress.',
-    upload: 'Take / upload a photo',
+    // The same source words as the progress photos (profile copy).
+    camera: 'Camera',
+    cameraHint: 'Opens the camera',
+    gallery: 'Gallery',
+    galleryHint: 'An existing photo',
     skip: 'Skip for now',
   },
 };
