@@ -34,7 +34,17 @@ export const en: CopyShape<typeof he> = {
   skip: 'Skip',
   progress: 'Step {step} of {total}',
   dialogLabel: 'Dashboard tour',
-  replayTitle: 'Dashboard tour',
-  replayHint: 'The short tour of the dashboard, from the start.',
-  replayButton: 'Start the tour',
+  finishedToast: "That's it! The guide is always waiting in Settings → Help", // DRAFT
+  welcome: {
+    title: 'Hi {name}, welcome!',
+    titleNoName: 'Hi, welcome!',
+    intro: "So glad you're here. This is where you manage your trainees, build workout and nutrition plans, and follow their progress.",
+    offer: 'Want a quick tour of the dashboard? It takes about a minute.',
+    start: "Let's start the tour",
+    later: 'Maybe later',
+    note: 'You can always come back to the guide from Settings → Help',
+    close: 'Close',
+  },
+  helpTitle: 'Help',
+  guideRow: 'Dashboard guide',
 };

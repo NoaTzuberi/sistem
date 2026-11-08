@@ -3,6 +3,8 @@ import type { CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { fill, useCopy, useI18n } from '@sistem/shared';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { Toast } from '../../../../components/common/Toast/Toast';
+import { useToast } from '../../../../hooks/useToast';
 import { useDrawerTransition } from '../../../../hooks/useDrawerTransition';
 import { useMediaQuery } from '../../../../hooks/useMediaQuery';
 import { tourCopy } from '../../copy';
@@ -32,6 +34,12 @@ export function TourOverlay() {
   const { direction } = useI18n();
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isOpen = tour.step !== null;
+  // "סיום" on the last step (not "skip"): closes it and says where the guide lives now.
+  const { toastMessage, showToast } = useToast();
+  const finish = () => {
+    tour.end();
+    showToast(copy.finishedToast);
+  };
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   // The closing fade still shows the last step.
   const [shownStep, setShownStep] = useState<TourStep | null>(tour.step);
@@ -63,19 +71,20 @@ export function TourOverlay() {
     isActive: isOpen,
     isCardMounted: isMounted && shownStep !== null,
     isRtl: direction === 'rtl',
-    onNext: () => (tour.index + 1 < tour.total ? tour.next() : tour.end()),
+    onNext: () => (tour.index + 1 < tour.total ? tour.next() : finish()),
     onBack: tour.back,
     onSkip: tour.end,
   });
 
-  if (!isMounted || !shownStep) return null;
+  // The toast outlives the tour, in the same place in the tree (its live region stays mounted).
+  if (!isMounted || !shownStep) return <>{null}<Toast message={toastMessage} /></>;
 
   const cut = spot ? spotWithPad(spot, readPx('--space-tour-spot-pad')) : null;
   const position = placeCard(cut, cardSize, viewport, readPx('--space-tour-gap'), VIEWPORT_MARGIN);
   const isLast = tour.index + 1 === tour.total;
   const text = copy.steps[shownStep.id];
 
-  return createPortal(
+  const overlay = createPortal(
     <div className="tour" data-shown={isShown} data-centered={cut === null}>
       {/* Blocks the page; the cutout is only a window onto it. */}
       <div className="tour-blocker" aria-hidden="true" />
@@ -115,12 +124,18 @@ export function TourOverlay() {
           <button type="button" className="tour-skip" onClick={tour.end}>
             {copy.skip}
           </button>
-          <PillButton variant="primary" size="sm" data-tour-primary onClick={isLast ? tour.end : tour.next}>
+          <PillButton variant="primary" size="sm" data-tour-primary onClick={isLast ? finish : tour.next}>
             {isLast ? copy.finish : copy.next}
           </PillButton>
         </div>
       </div>
     </div>,
     document.body,
+  );
+  return (
+    <>
+      {overlay}
+      <Toast message={toastMessage} />
+    </>
   );
 }

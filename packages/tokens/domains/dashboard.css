@@ -167,4 +167,17 @@
   --text-tour-title: 30px;       /* Karantina */
   --size-tour-dot: 6px;
   --size-tour-dot-active: 18px;
+  /* The welcome before the tour (first visit): a centered white card over the tour's scrim, lightly blurred. */
+  --blur-tour-welcome-scrim: blur(6px);
+  --radius-tour-welcome: 28px;
+  --space-tour-welcome: 32px;               /* The card's padding */
+  --size-tour-welcome: 440px;               /* max width */
+  --size-tour-welcome-mark: 64px;           /* The logo mark / her photo */
+  --text-tour-welcome-title: var(--text-5xl); /* 44px Karantina */
+  --size-tour-welcome-button: 52px;
+  --color-tour-welcome-body: var(--color-ink-raised);   /* ink2 */
+  --color-tour-welcome-soft: var(--color-object-chrome); /* #f5f3f6 — the "later" pill */
+  --text-tour-welcome-note: 13px;
+  --scale-tour-welcome-from: 0.96;
+  --transition-tour-welcome: 300ms;
 }

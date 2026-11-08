@@ -1,0 +1,169 @@
+/* The first-visit welcome: the tour's scrim (lightly blurred) and a centered white card. Opens with a
+   small scale + fade, closes with a fade; reduced motion = fade only. */
+.tour-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-tour);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  opacity: 0;
+  transition: opacity var(--transition-drawer-out) ease;
+}
+
+.tour-welcome[data-shown='true'] {
+  opacity: 1;
+  transition: opacity var(--transition-tour-welcome) var(--ease-out);
+}
+
+/* Takes every click on the page: only the buttons close it. */
+.tour-welcome-scrim {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-tour-scrim);
+  backdrop-filter: var(--blur-tour-welcome-scrim);
+  -webkit-backdrop-filter: var(--blur-tour-welcome-scrim);
+}
+
+.tour-welcome-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: var(--size-tour-welcome);
+  max-height: calc(100dvh - var(--space-4) * 2);
+  overflow-y: auto;
+  padding: var(--space-tour-welcome);
+  border-radius: var(--radius-tour-welcome);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-float);
+  color: var(--color-text);
+  text-align: center;
+  transform: scale(var(--scale-tour-welcome-from));
+  transition: transform var(--transition-tour-welcome) var(--ease-out);
+}
+
+.tour-welcome[data-shown='true'] .tour-welcome-card {
+  transform: scale(1);
+}
+
+.tour-welcome-close {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-round);
+  color: var(--color-text-muted);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.tour-welcome-close:active {
+  transform: scale(0.97);
+}
+
+.tour-welcome-mark,
+.tour-welcome-photo {
+  flex: none;
+  height: var(--size-tour-welcome-mark);
+}
+
+.tour-welcome-photo {
+  width: var(--size-tour-welcome-mark);
+  border-radius: var(--radius-round);
+  object-fit: cover;
+}
+
+.tour-welcome-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-tour-welcome-title);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+  letter-spacing: 0; /* Hebrew is never letter-spaced */
+}
+
+.tour-welcome-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-tour-welcome-body);
+}
+
+.tour-welcome-body p {
+  margin: 0;
+}
+
+.tour-welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin-block-start: var(--space-2);
+}
+
+.tour-welcome-start,
+.tour-welcome-later {
+  width: 100%;
+  height: var(--size-tour-welcome-button);
+  border-radius: var(--radius-round);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.tour-welcome-start {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-button);
+}
+
+.tour-welcome-later {
+  color: var(--color-text);
+  background-color: var(--color-tour-welcome-soft);
+}
+
+.tour-welcome-start:active,
+.tour-welcome-later:active {
+  transform: scale(0.97);
+}
+
+.tour-welcome-start:focus-visible,
+.tour-welcome-later:focus-visible,
+.tour-welcome-close:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.tour-welcome-note {
+  margin: 0;
+  font-size: var(--text-tour-welcome-note);
+  color: var(--color-text-muted);
+}
+
+@media (hover: hover) {
+  .tour-welcome-close:hover {
+    color: var(--color-text);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-welcome-card,
+  .tour-welcome-close,
+  .tour-welcome-start,
+  .tour-welcome-later {
+    transition: none;
+  }
+
+  .tour-welcome-card {
+    transform: none;
+  }
+}

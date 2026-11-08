@@ -16,6 +16,7 @@ import { Sidebar } from '../Sidebar/Sidebar';
 import { TopLine } from '../TopLine/TopLine';
 import { TourProvider } from '../../../features/tour/hooks/useTour';
 import { TourOverlay } from '../../../features/tour/components/TourOverlay/TourOverlay';
+import { TourWelcome } from '../../../features/tour/components/TourWelcome/TourWelcome';
 import './AppShell.css';
 
 // = --breakpoint-dash-nav (CSS can't read a variable inside a media query).
@@ -106,6 +107,7 @@ function ShellFrame() {
 
       <TraineeQuickView />
       {palette && <CommandPalette mode={palette} onClose={closePalette} onModeChange={setPalette} />}
+      <TourWelcome />
       <TourOverlay />
     </div>
   );

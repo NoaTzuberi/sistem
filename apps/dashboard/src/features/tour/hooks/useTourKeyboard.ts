@@ -6,8 +6,9 @@ interface TourKeys {
   /** The card is in the page (it mounts a frame after the tour opens). */
   isCardMounted: boolean;
   isRtl: boolean;
-  onNext: () => void;
-  onBack: () => void;
+  /** Arrow keys between steps; left out (the welcome) = the arrows do nothing. */
+  onNext?: () => void;
+  onBack?: () => void;
   onSkip: () => void;
 }
 
@@ -42,7 +43,7 @@ export function useTourKeyboard(
         onSkip();
         return;
       }
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && onNext && onBack) {
         event.preventDefault();
         const forward = (event.key === 'ArrowLeft') === isRtl;
         if (forward) onNext();
