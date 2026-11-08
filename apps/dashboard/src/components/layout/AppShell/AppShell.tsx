@@ -14,6 +14,8 @@ import { CoachDataProvider, useCoachData } from '../../../services/coach/CoachDa
 import { CommandPalette } from '../CommandPalette/CommandPalette';
 import { Sidebar } from '../Sidebar/Sidebar';
 import { TopLine } from '../TopLine/TopLine';
+import { TourProvider } from '../../../features/tour/hooks/useTour';
+import { TourOverlay } from '../../../features/tour/components/TourOverlay/TourOverlay';
 import './AppShell.css';
 
 // = --breakpoint-dash-nav (CSS can't read a variable inside a media query).
@@ -24,7 +26,9 @@ export function AppShell() {
   return (
     <CoachDataProvider>
       <TraineeDrawerProvider>
-        <ShellFrame />
+        <TourProvider>
+          <ShellFrame />
+        </TourProvider>
       </TraineeDrawerProvider>
     </CoachDataProvider>
   );
@@ -102,6 +106,7 @@ function ShellFrame() {
 
       <TraineeQuickView />
       {palette && <CommandPalette mode={palette} onClose={closePalette} onModeChange={setPalette} />}
+      <TourOverlay />
     </div>
   );
 }

@@ -99,6 +99,7 @@
   --z-drawer: 300;      /* The trainee drawer and its scrim */
   --z-notifications: 350; /* The notifications panel and its scrim (above the drawer, under ⌘K) */
   --z-palette: 400;     /* The command palette */
+  --z-tour: 450;        /* The dashboard tour's spotlight + card (above ⌘K, under a toast) */
   --z-toast: 500;       /* A toast, above everything but a modal */
   --z-modal: 1000;
 }

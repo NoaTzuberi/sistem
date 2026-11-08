@@ -40,7 +40,7 @@ export function ActivityFeed({ recentPrs, nowMs, onOpen, className }: ActivityFe
     .slice(0, MAX_ROWS);
 
   return (
-    <WidgetCard className={className} title={copy.activity.title} subtitle={copy.activity.subtitle}>
+    <WidgetCard className={className} title={copy.activity.title} subtitle={copy.activity.subtitle} tourId="activity">
       {!items && !hasError && <StateLine />}
       {hasError && !items && <StateLine error={shared.coach.inbox.bellLoadError} onRetry={reload} />}
       {items && rows.length === 0 && <p className="activity-empty">{shared.coach.inbox.empty}</p>}

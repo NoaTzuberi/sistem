@@ -18,6 +18,8 @@ export interface CoachProfileDocument {
   defaults?: { nutrition?: SendDefaultFields | null; workouts?: SendDefaultFields | null } | null;
   /** System food-bank items she hid from her lists (her library's "hidden" filter brings them back). */
   hiddenSystemFoods?: Types.ObjectId[];
+  /** When she finished or skipped the dashboard tour; null = it opens on her next dashboard visit. */
+  tourCompletedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -65,6 +67,7 @@ const coachProfileSchema = new Schema<CoachProfileDocument>(
       default: null,
     },
     hiddenSystemFoods: { type: [{ type: Schema.Types.ObjectId, ref: 'FoodItem' }], default: [] },
+    tourCompletedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

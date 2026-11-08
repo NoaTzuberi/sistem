@@ -8,6 +8,7 @@ import type {
   CoachPaymentResponse,
   CoachSendDefaults,
   CoachSendDefaultsResponse,
+  CoachTourResponse,
   UpdateCoachSendDefaultsPayload,
   CoachInvitesResponse,
   CoachPasswordLinkResponse,
@@ -140,6 +141,21 @@ export function createCoachDefaultsApi(client: AxiosInstance) {
   }
 
   return { getSendDefaults, saveSendDefaults };
+}
+
+/** The dashboard tour: shown until she finishes or skips it once (completing again keeps the first date). */
+export function createCoachTourApi(client: AxiosInstance) {
+  async function getTour(): Promise<CoachTourResponse> {
+    const { data } = await client.get<CoachTourResponse>('/coach/profile/tour');
+    return data;
+  }
+
+  async function completeTour(): Promise<CoachTourResponse> {
+    const { data } = await client.post<CoachTourResponse>('/coach/profile/tour/complete');
+    return data;
+  }
+
+  return { getTour, completeTour };
 }
 
 /** The platform admin (dashboard): coach accounts only. */

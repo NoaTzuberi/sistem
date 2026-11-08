@@ -9,14 +9,17 @@ interface WidgetCardProps {
   /** bare = no white panel: the header sits on the canvas above its own cards. */
   variant?: 'panel' | 'bare';
   className?: string;
-  children: ReactNode;
+  /** Marks the card for the dashboard tour (data-tour). */
+  tourId?: string;
+  /** None = a header-only card (title, subtitle, action). */
+  children?: ReactNode;
 }
 
 /** A white rounded widget on the canvas: a small header, then the content. */
-export function WidgetCard({ title, subtitle, action, variant = 'panel', className, children }: WidgetCardProps) {
+export function WidgetCard({ title, subtitle, action, variant = 'panel', className, tourId, children }: WidgetCardProps) {
   const classNames = ['widget-card', `widget-card-${variant}`, className].filter(Boolean).join(' ');
   return (
-    <section className={classNames}>
+    <section className={classNames} data-tour={tourId}>
       <header className="widget-header">
         <div className="widget-heading">
           <h2 className="widget-title">{title}</h2>

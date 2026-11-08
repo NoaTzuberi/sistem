@@ -65,7 +65,7 @@ export function TopLine({ pageName, pageTo, detail, showMenu, isMenuOpen, onOpen
         <kbd className="top-line-key">{paletteShortcutLabel()}</kbd>
       </button>
       <NotificationBell />
-      <button className="top-line-cta" type="button" aria-label={trainees.newPlan} onClick={onNewPlan}>
+      <button className="top-line-cta" type="button" aria-label={trainees.newPlan} onClick={onNewPlan} data-tour="new-plan">
         <Icon name="plus" size="sm" />
         <span className="top-line-cta-text">{trainees.newPlan}</span>
       </button>

@@ -32,6 +32,7 @@ export function NotificationBell() {
       <button
         ref={panel.bellRef}
         className="bell-button"
+        data-tour="notifications"
         type="button"
         aria-haspopup="dialog"
         aria-expanded={panel.isOpen}

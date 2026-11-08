@@ -1,0 +1,152 @@
+/* The dashboard tour: a dimmed page with a cutout around the real element, a white card beside it.
+   Positions come in as --tour-* (px, viewport); everything moves on transform only. */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-tour);
+  opacity: 0;
+  transition: opacity var(--transition-drawer-out) ease;
+}
+
+.tour[data-shown='true'] {
+  opacity: 1;
+  transition-duration: var(--transition-drawer-in);
+}
+
+/* Takes every click on the page while the tour is open (the cutout is only a window). */
+.tour-blocker {
+  position: absolute;
+  inset: 0;
+}
+
+/* The cutout: an empty box whose huge shadow is the scrim. */
+.tour-spot {
+  position: absolute;
+  inset-block-start: 0;
+  /* physical: the box is placed from measured viewport x (getBoundingClientRect), not from the reading side */
+  left: 0;
+  width: var(--tour-spot-w);
+  height: var(--tour-spot-h);
+  border-radius: var(--radius-tour-spot);
+  box-shadow: 0 0 0 200vmax var(--color-tour-scrim);
+  transform: translate(var(--tour-spot-x), var(--tour-spot-y));
+  transition:
+    transform var(--transition-drawer-in) var(--ease-drawer),
+    width var(--transition-drawer-in) var(--ease-drawer),
+    height var(--transition-drawer-in) var(--ease-drawer);
+  pointer-events: none;
+}
+
+.tour-card {
+  position: absolute;
+  inset-block-start: 0;
+  /* physical: placed from measured viewport x, like the cutout */
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(var(--size-tour-card), calc(100vw - var(--space-4) * 2));
+  padding: var(--space-4);
+  border-radius: var(--radius-tour-card);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-float);
+  color: var(--color-text);
+  transform: translate(var(--tour-card-x), var(--tour-card-y));
+  transition: transform var(--transition-drawer-in) var(--ease-drawer);
+  outline: none;
+}
+
+.tour-progress {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tour-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
+  font-weight: var(--font-display-weight);
+  font-size: var(--text-tour-title);
+  line-height: var(--line-height-display);
+  text-transform: var(--font-display-case);
+  letter-spacing: 0; /* Hebrew is never letter-spaced */
+}
+
+.tour-body {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text-muted);
+}
+
+.tour-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-2);
+}
+
+.tour-dots {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tour-dot {
+  width: var(--size-tour-dot);
+  height: var(--size-tour-dot);
+  border-radius: var(--radius-round);
+  background-color: var(--color-ring-track);
+  transition:
+    width var(--transition-drawer-in) var(--ease-drawer),
+    background-color var(--transition-fast) ease;
+}
+
+.tour-dot[data-current='true'] {
+  width: var(--size-tour-dot-active);
+  background-color: var(--color-primary);
+}
+
+.tour-skip {
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.tour-skip:active {
+  transform: scale(var(--press-scale));
+}
+
+.tour-skip:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tour-skip:hover {
+    color: var(--color-text);
+  }
+}
+
+/* Reduced motion: no movement — the cutout and the card jump to each step; only the fade stays. */
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot,
+  .tour-card,
+  .tour-dot,
+  .tour-skip {
+    transition: none;
+  }
+}

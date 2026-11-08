@@ -75,7 +75,7 @@ export function TraineesPage() {
         title={shared.coach.traineesTitle}
         subtitle={hasTrainees ? fill(copy.listSubtitle, { active: countFor('active'), waiting: countFor('waiting') }) : undefined}
       >
-        <PillButton variant="primary" onClick={() => setIsInviting(true)}>
+        <PillButton variant="primary" onClick={() => setIsInviting(true)} data-tour="invite">
           {invites.button}
         </PillButton>
       </PageHeader>

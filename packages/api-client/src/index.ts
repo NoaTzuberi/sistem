@@ -1,6 +1,6 @@
-export { createApiClient, extractErrorField, extractErrorMessage } from './createApiClient';
+export { createApiClient, extractErrorField, extractErrorMessage, isNoConnectionError } from './createApiClient';
 export type { ApiClientOptions } from './createApiClient';
-export { createAuthApi, AuthApiError } from './authApi';
+export { createAuthApi, AuthApiError, NO_CONNECTION_CODE, authErrorCode, isAuthNoConnection } from './authApi';
 export type { AuthApi } from './authApi';
 export { createNotificationsApi } from './notificationsApi';
 export type { NotificationsApi } from './notificationsApi';
@@ -10,7 +10,7 @@ export { createTraineeApi } from './traineeApi';
 export type { TraineeApi } from './traineeApi';
 export { createCardioApi, createCoachCardioApi } from './cardioApi';
 export type { CardioApi, CoachCardioApi } from './cardioApi';
-export { createJoinApi, createInvitesApi, createAdminApi, createCoachPaymentApi, createCoachDefaultsApi, JoinRequestError } from './accountsApi';
+export { createJoinApi, createInvitesApi, createAdminApi, createCoachPaymentApi, createCoachDefaultsApi, createCoachTourApi, JoinRequestError } from './accountsApi';
 export type { JoinApi, InvitesApi, AdminApi } from './accountsApi';
 export { createAdminFoodsApi } from './foodBankApi';
 export type { AdminFoodsApi } from './foodBankApi';

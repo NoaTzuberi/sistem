@@ -151,3 +151,15 @@ export async function getCoachCards(coachIds: Id[]): Promise<Map<string, CoachCa
   }
   return cards;
 }
+
+/** The dashboard tour: when she finished (or skipped) it; null = show it. */
+export async function getCoachTourCompletedAt(coachId: Id): Promise<Date | null> {
+  const profile = await CoachProfile.findOne({ userId: coachId }).select('tourCompletedAt').lean();
+  return profile?.tourCompletedAt ?? null;
+}
+
+/** Finished or skipped (a replay from Settings ends the same way): the first time is kept. */
+export async function completeCoachTour(coachId: Id, now: Date = new Date()): Promise<Date> {
+  await CoachProfile.updateOne({ userId: coachId, tourCompletedAt: null }, { $set: { tourCompletedAt: now } });
+  return (await getCoachTourCompletedAt(coachId)) ?? now;
+}

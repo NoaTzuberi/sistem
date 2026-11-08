@@ -1,0 +1,4 @@
+/* Settings → the tour replay: a header-only card (title, hint, the pill). */
+.tour-replay .widget-header {
+  margin-block-end: 0;
+}

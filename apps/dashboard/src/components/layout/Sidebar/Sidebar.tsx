@@ -63,6 +63,7 @@ export function Sidebar({ groups, isRail, onToggleRail, isSheet, isSheetOpen }: 
                 key={item.id}
                 className="sidebar-item"
                 to={item.to}
+                data-tour={item.tourId}
                 aria-current={item.isCurrent ? 'page' : undefined}
                 aria-label={item.badge ? fill(copy.shell.badge, { label: item.label, count: item.badge.count }) : item.label}
                 title={isRail ? item.label : undefined}

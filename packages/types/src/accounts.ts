@@ -209,3 +209,8 @@ export interface SetPasswordPayload {
   token: string;
   password: string;
 }
+
+/** GET /coach/profile/tour, POST /coach/profile/tour/complete — the dashboard tour; null = not done yet. */
+export interface CoachTourResponse {
+  completedAt: string | null;
+}

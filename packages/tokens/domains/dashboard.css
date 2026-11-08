@@ -157,4 +157,14 @@
   --shadow-glass-card:
     inset 0 0 0 1px color-mix(in srgb, var(--color-card) 70%, transparent),
     0 10px 30px color-mix(in srgb, var(--color-text) 6%, transparent);
+  /* The coach's first-visit tour: a dimmed page with a cutout around the real element, a white card beside it. */
+  --color-tour-scrim: color-mix(in srgb, var(--color-ink) 56%, transparent);
+  --radius-tour-card: 20px;
+  --radius-tour-spot: 14px;
+  --size-tour-card: 340px;
+  --space-tour-spot-pad: 6px;    /* Room between the element and the cutout's edge */
+  --space-tour-gap: 14px;        /* Cutout ↔ card */
+  --text-tour-title: 30px;       /* Karantina */
+  --size-tour-dot: 6px;
+  --size-tour-dot-active: 18px;
 }

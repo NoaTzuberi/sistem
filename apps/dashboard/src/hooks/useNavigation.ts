@@ -20,6 +20,8 @@ export interface NavItem {
   /** hot = it needs her action (pink); otherwise a plain grey count. */
   badge?: { count: number; isHot: boolean };
   isCurrent: boolean;
+  /** Marks the link for the dashboard tour (data-tour). */
+  tourId?: string;
 }
 
 export interface NavGroup {
@@ -65,6 +67,7 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
         items: [
           {
             id: 'all-trainees',
+            tourId: 'trainees',
             to: ROUTES.TRAINEES,
             label: copy.nav.allTrainees,
             icon: 'trainees',
@@ -90,7 +93,7 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
         id: 'nutrition',
         label: copy.nav.nutrition,
         items: [
-          { id: 'foods', to: ROUTES.NUTRITION_FOODS, label: nutrition.foodsTab, icon: 'foods', isCurrent: under(ROUTES.NUTRITION_FOODS) },
+          { id: 'foods', tourId: 'nutrition', to: ROUTES.NUTRITION_FOODS, label: nutrition.foodsTab, icon: 'foods', isCurrent: under(ROUTES.NUTRITION_FOODS) },
           {
             id: 'nutrition-templates',
             to: ROUTES.NUTRITION_TEMPLATES,
@@ -110,7 +113,7 @@ export function useNavigation(): { groups: NavGroup[]; current: NavItem | undefi
       {
         id: 'account',
         label: settings.navGroup,
-        items: [{ id: 'settings', to: ROUTES.SETTINGS, label: settings.navLabel, icon: 'settings', isCurrent: under(ROUTES.SETTINGS) }],
+        items: [{ id: 'settings', tourId: 'settings', to: ROUTES.SETTINGS, label: settings.navLabel, icon: 'settings', isCurrent: under(ROUTES.SETTINGS) }],
       },
     ];
     // The platform admin also manages coach accounts (a page of its own).
