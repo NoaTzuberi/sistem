@@ -1,0 +1,34 @@
+OK  login                /login                             surface=auth          html=#a50047 theme=#ff006e | top=#f7006a bottom=#a50047 end=#a50047
+OK  register             /register                          surface=auth          html=#a50047 theme=#ff006e | top=#f7006a bottom=#a50047 end=#a50047
+OK  forgot               /forgot-password                   surface=auth          html=#a50047 theme=#ff006e | top=#f7006a bottom=#a50047 end=#a50047
+OK  join (bad code)      /join/ZZZZZZ                       surface=auth          html=#a50047 theme=#ff006e | top=#f7006a bottom=#a50047 end=#a50047
+OK  first run            /start                             surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  first run code       /start/code                        surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+BAD onboarding           /onboarding                        surface=null          html=#fcfcfc theme=- | top=#fcfcfc bottom=#fb72ac end=#fb72ac  <top  <bottom
+OK  waiting              /waiting                           surface=page          html=#fcfcfc theme=#fcfcfc | top=#fcfcfc bottom=#fcfcfc end=#fcfcfc
+OK  home                 /home                              surface=card          html=#ffffff theme=#ff006e | top=#ff006e bottom=#ffffff end=#ffffff
+OK  workouts             /workouts                          surface=card          html=#ffffff theme=#ffffff | top=#ffffff bottom=#ffffff end=#ffffff
+OK  nutrition            /nutrition                         surface=card          html=#ffffff theme=#ffffff | top=#ffffff bottom=#ffffff end=#ffffff
+OK  profile              /profile                           surface=soft          html=#f6f4f7 theme=#ff2e86 | top=#fe1c7d bottom=#f6f4f7 end=#f6f4f7
+OK  settings             /profile/settings                  surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  weight               /profile/weight                    surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  measurements         /profile/measurements              surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  measurements log     /profile/measurements/log          surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  photos               /profile/photos                    surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  photos day           /profile/photos/day                surface=page          html=#fcfcfc theme=#fcfcfc | top=#fcfcfc bottom=#fcfcfc end=#fcfcfc
+OK  photos compare       /profile/photos/compare            surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  questionnaire        /profile/questionnaire             surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  achievements         /profile/achievements              surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  timer                /timer                             surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  coach code (later)   /profile/coach-code                surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  messages             /home/messages                     surface=soft          html=#f6f4f7 theme=#141116 | top=#141116 bottom=#f6f4f7 end=#f6f4f7
+OK  own cardio new       /workouts/own-cardio/new           surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f5f3f6 bottom=#f6f4f7 end=#f6f4f7
+OK  workout detail       /workouts/plan/6af0497d8094a37f12188e61/6af0497d8094a37f12188e62 surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  workout session      /workouts/session/6af04babd7f97fd365bcd2d5 surface=stage         html=#e0005f theme=#ff2e86 | top=#f9257e bottom=#e0005f end=#e0005f
+OK  coach today          /coach/today                       surface=soft          html=#f6f4f7 theme=#141116 | top=#141116 bottom=#f6f4f7 end=#f6f4f7
+OK  coach inbox          /coach/today/inbox                 surface=page          html=#fcfcfc theme=#fcfcfc | top=#fcfcfc bottom=#fcfcfc end=#fcfcfc
+OK  coach trainees       /coach/trainees                    surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  coach trainee        /coach/trainees/6af0497d8094a37f12188e51 surface=soft          html=#f6f4f7 theme=#141116 | top=#141116 bottom=#f6f4f7 end=#f6f4f7
+OK  coach profile        /coach/profile                     surface=soft          html=#f6f4f7 theme=#141116 | top=#141116 bottom=#f6f4f7 end=#f6f4f7
+OK  coach messages       /coach/messages                    surface=soft          html=#f6f4f7 theme=#f6f4f7 | top=#f6f4f7 bottom=#f6f4f7 end=#f6f4f7
+OK  coach thread         /coach/messages/6af0497d8094a37f12188e51 surface=soft          html=#f6f4f7 theme=#141116 | top=#141116 bottom=#f6f4f7 end=#f6f4f7
