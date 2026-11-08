@@ -79,7 +79,7 @@ export function IntervalTimerPage() {
   }
 
   return (
-    <AppShell hideTabBar>
+    <AppShell hideTabBar bottom="soft">
       <div className="interval-setup">
         <header className="interval-setup-header">
           <BackButton variant="disc" />

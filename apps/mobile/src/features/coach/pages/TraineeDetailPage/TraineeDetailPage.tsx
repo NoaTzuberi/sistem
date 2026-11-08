@@ -74,6 +74,7 @@ export function TraineeDetailPage() {
 
   return (
     <CoachScreen
+      inkTop
       top={
         <CoachStage labelledBy="coach-trainee-name">
           <div className="coach-stage-bar">

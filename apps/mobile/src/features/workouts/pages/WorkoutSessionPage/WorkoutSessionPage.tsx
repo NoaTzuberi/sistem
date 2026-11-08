@@ -257,7 +257,7 @@ export function WorkoutSessionPage() {
   const restNext = rest && currentSet ? describeNext(model, values, currentSet) : null;
 
   return (
-    <AppShell hideTabBar bleed>
+    <AppShell hideTabBar bleed bottom="stage">
       <StageBackground />
       <div className="wp">
         <h1 className="wp-visually-hidden">{session.log.workoutTitle}</h1>

@@ -5,5 +5,5 @@ import { useDocumentSurface } from '../../../hooks/useDocumentSurface';
  * the theme-color is the stage's top pink.
  */
 export function useAuthSurface() {
-  useDocumentSurface('auth', '--color-auth-stage-top');
+  useDocumentSurface('auth');
 }

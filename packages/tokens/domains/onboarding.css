@@ -9,6 +9,8 @@
   --color-pink-mid: #f9a6c8;
   --color-pink-bright: #ff5ca2;
   --color-pink-glow: #ffd6e8;
+  /* The browser's bottom edge (iOS Safari's toolbar area, overscroll): the gradient's pink corners, averaged. */
+  --color-onboarding-edge: color-mix(in srgb, var(--color-pink-mid) 60%, var(--color-pink-bright));
   --gradient-onboarding:
     radial-gradient(70% 40% at 85% 30%, color-mix(in srgb, var(--color-pink-glow) 70%, transparent), transparent 70%),
     radial-gradient(90% 45% at 10% 105%, color-mix(in srgb, var(--color-primary) 42%, transparent), transparent 62%),

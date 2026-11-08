@@ -6,6 +6,7 @@ import type { TraineeCardioWorkoutResponse } from '@sistem/types';
 import { fill, getActiveLanguage, useCopy, useLoad } from '@sistem/shared';
 import { cardioDetailPath, ownCardioPath } from '../../../../app/config/routes';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import { getCardioWorkout, getOwnCardioWorkout, saveCardioLog } from '../../../../services/cardio/cardioService';
 import { BackButton } from '../../../workouts/components/BackButton/BackButton';
 import { CardioFinish, type CardioFinishValues } from '../../components/CardioFinish/CardioFinish';
@@ -25,6 +26,8 @@ export function CardioRunPage({ own = false }: { own?: boolean }) {
   const workoutId = own ? (params.id ?? '') : (params.workoutId ?? '');
   const load = useCallback(() => (own ? getOwnCardioWorkout(workoutId) : getCardioWorkout(planId, workoutId)), [own, planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
+  // The plain page ground (loading, the finish log); the player paints its zone over it.
+  useDocumentSurface('page');
 
   if (!data) {
     return (

@@ -49,7 +49,7 @@ export function CoachProfilePage() {
   }
 
   return (
-    <AppShell bleed surface="soft">
+    <AppShell bleed surface="soft" top="ink">
       <div className="cp-screen">
         <header className="cp-hero">
           <div className="coach-stage cp-stage" aria-hidden="true" />

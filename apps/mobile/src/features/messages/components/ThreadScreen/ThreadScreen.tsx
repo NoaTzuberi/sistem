@@ -37,7 +37,7 @@ export function ThreadScreen({ name, avatarSeed, avatarUrl, fallbackPath, me, ti
   useKeyboardInset();
 
   return (
-    <AppShell bleed hideTabBar surface="soft">
+    <AppShell bleed hideTabBar surface="soft" top="ink">
       <div className="cm-screen">
         <header className="cm-screen-head">
           <button type="button" className="cm-screen-back" onClick={goBack} aria-label={copy.back}>

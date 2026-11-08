@@ -1,0 +1,57 @@
+/* The page's own ground behind iOS Safari's bars, the area under its floating toolbar and the overscroll:
+   html / body take the screen's BOTTOM color (data-surface is set by useDocumentSurface). The auth, stage
+   and interval-rest surfaces keep their rules next to the screens that draw them. */
+html[data-surface='page'],
+html[data-surface='page'] body {
+  background-color: var(--color-bg);
+}
+
+html[data-surface='card'],
+html[data-surface='card'] body {
+  background-color: var(--color-card);
+}
+
+html[data-surface='soft'],
+html[data-surface='soft'] body {
+  background-color: var(--color-subscreen-page);
+}
+
+html[data-surface='ink'],
+html[data-surface='ink'] body {
+  background-color: var(--color-coach-stage);
+}
+
+html[data-surface='pink'],
+html[data-surface='pink'] body {
+  background-color: var(--color-stage);
+}
+
+html[data-surface='onboarding'],
+html[data-surface='onboarding'] body {
+  background-color: var(--color-onboarding-edge);
+}
+
+html[data-surface='zone-1'],
+html[data-surface='zone-1'] body {
+  background-color: var(--color-zone-1-stage);
+}
+
+html[data-surface='zone-2'],
+html[data-surface='zone-2'] body {
+  background-color: var(--color-zone-2-stage);
+}
+
+html[data-surface='zone-3'],
+html[data-surface='zone-3'] body {
+  background-color: var(--color-zone-3-stage);
+}
+
+html[data-surface='zone-4'],
+html[data-surface='zone-4'] body {
+  background-color: var(--color-zone-4-stage);
+}
+
+html[data-surface='zone-5'],
+html[data-surface='zone-5'] body {
+  background-color: var(--color-zone-5-stage);
+}

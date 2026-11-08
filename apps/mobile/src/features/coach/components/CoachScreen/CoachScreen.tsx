@@ -6,12 +6,14 @@ interface CoachScreenProps {
   children: ReactNode;
   /** The screen's top (the ink stage, or a large title) — drawn edge to edge. */
   top: ReactNode;
+  /** The top is the ink CoachStage: the browser's top edge goes ink too (useDocumentSurface). */
+  inkTop?: boolean;
 }
 
 /** A coach mode screen: full bleed on the soft page surface; content sits on white cards inside the gutter. */
-export function CoachScreen({ top, children }: CoachScreenProps) {
+export function CoachScreen({ top, inkTop = false, children }: CoachScreenProps) {
   return (
-    <AppShell bleed surface="soft">
+    <AppShell bleed surface="soft" top={inkTop ? 'ink' : undefined}>
       <div className="coach-screen">
         {top}
         <div className="coach-screen-body">{children}</div>

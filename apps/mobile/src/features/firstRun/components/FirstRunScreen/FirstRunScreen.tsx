@@ -3,6 +3,7 @@ import { IconChevronLeft } from '@tabler/icons-react';
 import { useCopy } from '@sistem/shared';
 import { StepBar } from '../StepBar/StepBar';
 import { firstRunCopy } from '../../copy';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import './FirstRunScreen.css';
 
 interface FirstRunScreenProps {
@@ -19,6 +20,7 @@ interface FirstRunScreenProps {
 /** The first-run screens' frame: the page surface, a round back button, the step bar, the Karantina title. */
 export function FirstRunScreen({ title, sub, step, onBack, banner, children }: FirstRunScreenProps) {
   const copy = useCopy(firstRunCopy);
+  useDocumentSurface('soft');
   return (
     <main className="fr-screen">
       {banner}

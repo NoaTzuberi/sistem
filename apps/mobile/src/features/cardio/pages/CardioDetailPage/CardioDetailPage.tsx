@@ -18,6 +18,7 @@ import { cardioCopy } from '../../copy';
 import { canSpeak, canVibrate } from '../../data/cardioCues';
 import { detailEyebrow } from '../../data/cardioText';
 import { useCardioPrefs } from '../../hooks/useCardioPrefs';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import '../../cardioZones.css';
 import './CardioDetailPage.css';
 
@@ -36,6 +37,7 @@ export function CardioDetailPage({ own = false }: { own?: boolean }) {
   const savedMessage = (useLocation().state as { saved?: string } | null)?.saved;
   const load = useCallback(() => (own ? getOwnCardioWorkout(id) : getCardioWorkout(planId, workoutId)), [own, id, planId, workoutId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.loadError);
+  useDocumentSurface('card');
   const { prefs, change } = useCardioPrefs();
   const startTimer = useRef<number | undefined>(undefined);
   // A full-screen page opens at its top (the list it came from may have been scrolled).

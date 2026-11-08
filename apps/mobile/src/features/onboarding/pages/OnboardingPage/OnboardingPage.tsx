@@ -44,6 +44,7 @@ import { ACTIVITIES } from '../../data/activities';
 import { useDeckTransition } from '../../hooks/useDeckTransition';
 import { useDebouncedValue } from '../../../../hooks/useDebouncedValue';
 import { useKeyboardInset } from '../../../../hooks/useKeyboardInset';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import './OnboardingPage.css';
 
 const STEP_COUNT = 11;
@@ -173,6 +174,8 @@ interface OnboardingScreenProps {
 // top, and the step — a card on its deck, or the wheel — on the stage.
 function OnboardingScreen({ media, preload, isWheel = false, isMoving = false, stageRef, children }: OnboardingScreenProps) {
   useKeyboardInset();
+  // Browser edges only (iOS Safari's bars): white top, the gradient's pink bottom.
+  useDocumentSurface('onboarding', 'page');
 
   return (
     <div

@@ -5,7 +5,7 @@ import { HomeScreen } from '../../components/HomeScreen/HomeScreen';
 // computes them in the trainee's time zone — nothing here reads the device clock.
 export function HomePage() {
   return (
-    <AppShell bleed>
+    <AppShell bleed top="pink">
       <HomeScreen />
     </AppShell>
   );

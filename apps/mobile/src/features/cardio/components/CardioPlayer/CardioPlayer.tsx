@@ -5,6 +5,7 @@ import { type CardioFrame, cardioKindLabel, cardioTip, describeCardioTarget, fil
 import { cardioCopy } from '../../copy';
 import { LONG_BLOCK_NAME, liveEyebrow } from '../../data/cardioText';
 import { CardioCountdown } from '../CardioCountdown/CardioCountdown';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import './CardioPlayer.css';
 
 interface CardioPlayerProps {
@@ -35,9 +36,12 @@ export function CardioPlayer(props: CardioPlayerProps) {
   const blockProgress = frame.block.durationSec > 0 ? 1 - frameLeft / frame.block.durationSec : 1;
   const eyebrow = liveEyebrow(frame.block.kind, frame.round, frame.rounds);
   const beat = countdown === 0 && !isPaused && secondsLeft <= 3 && secondsLeft > 0;
+  const zone = intensityZone(frame.block.intensity);
+  // Full screen on the zone color: the browser edges follow each block.
+  useDocumentSurface(`zone-${zone}`, undefined, 'overlay');
 
   return (
-    <div className="cp-live cp-zone" data-zone={intensityZone(frame.block.intensity)}>
+    <div className="cp-live cp-zone" data-zone={zone}>
       <div className="cp-live-top">
         <button className="cp-live-icon" type="button" aria-label={copy.endEarly} onClick={onEnd}>
           <IconX size={22} aria-hidden="true" />

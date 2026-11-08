@@ -20,6 +20,7 @@ import { cardioCopy } from '../../copy';
 import { builderSummary } from '../../data/builderSummary';
 import { CARDIO_SPORTS, MAX_TITLE_LENGTH, inSameList, removeStep } from '../../data/ownCardioDraft';
 import { useOwnCardioBuilder } from '../../hooks/useOwnCardioBuilder';
+import { useDocumentSurface } from '../../../../hooks/useDocumentSurface';
 import '../../cardioZones.css';
 import './OwnCardioBuilderPage.css';
 
@@ -34,6 +35,7 @@ function prefersReducedMotion(): boolean {
  * Saved as HER workout (no coach, no plan); the same player runs it.
  */
 export function OwnCardioBuilderPage() {
+  useDocumentSurface('soft');
   const { id = null } = useParams();
   const copy = useCopy(cardioCopy);
   const { language } = useI18n();

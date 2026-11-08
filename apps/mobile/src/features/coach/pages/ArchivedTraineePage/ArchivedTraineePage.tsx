@@ -33,6 +33,7 @@ export function ArchivedTraineePage() {
 
   return (
     <CoachScreen
+      inkTop
       top={
         <CoachStage labelledBy="coach-archived-name">
           <div className="coach-stage-bar">

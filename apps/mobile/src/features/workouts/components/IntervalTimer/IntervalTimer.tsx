@@ -72,7 +72,7 @@ export function IntervalTimer({
   const durationMs = phase.durationSec * 1000;
   const showDone = run.finished && catchUpCount === 0;
   const onStage = showDone || phase.kind === 'work';
-  useDocumentSurface(onStage ? 'stage' : 'interval-rest', onStage ? '--color-stage-full-top' : '--color-it-rest');
+  useDocumentSurface(onStage ? 'stage' : 'interval-rest', undefined, 'overlay');
 
   const subtitle =
     phase.kind === 'work'

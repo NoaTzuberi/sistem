@@ -73,6 +73,7 @@ export function TodayPage() {
 
   return (
     <CoachScreen
+      inkTop
       top={
         <CoachStage labelledBy="coach-today-greeting">
           <div className="coach-stage-bar">
