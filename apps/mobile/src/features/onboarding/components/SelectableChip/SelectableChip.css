@@ -1,4 +1,5 @@
-/* A round pill; the chosen one is filled with Neon Pink. */
+/* A round pill; the chosen one is filled with Neon Pink — the same selected color as the questionnaire's
+   check marks (OptionList). White on Neon Pink needs 18px+ or bold text (3.8:1), so the selected label is bold. */
 .selectable-chip {
   display: inline-flex;
   align-items: center;
@@ -26,7 +27,7 @@
 }
 
 .selectable-chip:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
   border-color: var(--color-primary);
 }
 
@@ -43,9 +44,25 @@
 
 .selectable-chip-selected,
 .selectable-chip-selected:active {
-  border-color: var(--solid-pink);
-  background-color: var(--solid-pink); /* 16px medium white text: Neon Pink is only 3.8:1 */
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
   color: var(--color-on-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+/* The label is as wide as its bold copy, so selecting never shifts the row. */
+.selectable-chip-label {
+  display: inline-grid;
+}
+
+.selectable-chip-label::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+  user-select: none;
 }
 
 .selectable-chip-emoji {

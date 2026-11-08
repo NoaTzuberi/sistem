@@ -15,7 +15,10 @@ export function SelectableChip({ label, emoji, selected, className, ...rest }: S
   return (
     <button type="button" className={classNames} aria-pressed={selected} {...rest}>
       {emoji && <span className="selectable-chip-emoji">{emoji}</span>}
-      <span className="selectable-chip-label">{label}</span>
+      {/* data-label: a hidden bold copy keeps the width when the selected label turns bold. */}
+      <span className="selectable-chip-label" data-label={label}>
+        {label}
+      </span>
     </button>
   );
 }
