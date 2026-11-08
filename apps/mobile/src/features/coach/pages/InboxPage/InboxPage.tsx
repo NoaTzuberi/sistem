@@ -7,7 +7,7 @@ import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Button } from '../../../../components/common/Button/Button';
 import { listNotifications, markAllRead, markRead } from '../../../../services/notifications/notificationsService';
 import { refreshUnreadCount, setUnreadCount, useUnreadCount } from '../../../notifications/unreadCount';
-import { ROUTES, coachTraineePath } from '../../../../app/config/routes';
+import { ROUTES, coachArchivedTraineePath, coachTraineePath } from '../../../../app/config/routes';
 import { traineeTabOf } from '../../data/traineeTabs';
 import { coachCopy } from '../../copy';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
@@ -64,8 +64,12 @@ export function InboxPage() {
     }
   }
 
-  function handleOpen(notification: AppNotification, traineeId: string, section: 'logs' | null) {
-    navigate(coachTraineePath(traineeId, section ? traineeTabOf(section) : null));
+  function handleOpen(notification: AppNotification, traineeId: string, section: 'logs' | 'archive' | null) {
+    navigate(
+      section === 'archive'
+        ? coachArchivedTraineePath(traineeId)
+        : coachTraineePath(traineeId, section ? traineeTabOf(section) : null),
+    );
     if (notification.readAt) return;
     markRead(notification.id)
       .catch(() => undefined)

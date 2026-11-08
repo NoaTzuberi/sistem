@@ -7,8 +7,11 @@ export interface CoachNotificationView {
   text: string;
   /** The trainee the notification opens; each app builds its own path to her. */
   traineeId: string;
-  /** The trainee section to open; null = her default section. Both apps call it 'logs'. */
-  section: 'logs' | null;
+  /**
+   * The trainee section to open; null = her default section. Both apps call it 'logs'.
+   * 'archive' = her coaching ended: open her read-only archived page instead.
+   */
+  section: 'logs' | 'archive' | null;
 }
 
 /**
@@ -42,6 +45,13 @@ export function describeCoachNotification(notification: AppNotification, languag
       text: fill(copy.noteThanks, { name: isolateAuto(notification.data.traineeName) }),
       traineeId: notification.data.traineeId,
       section: null,
+    };
+  }
+  if (notification.type === 'trainee_ended_coaching') {
+    return {
+      text: fill(copy.traineeEndedCoaching, { name: isolateAuto(notification.data.traineeName) }),
+      traineeId: notification.data.traineeId,
+      section: 'archive',
     };
   }
   return null;

@@ -6,6 +6,8 @@ import { plural } from '../i18n/copy';
 // the user use feminine forms (owner decision, 2026-10-08).
 export const he = {
   common: {
+    noConnection: 'אין חיבור לשרת. בדקי את החיבור ונסי שוב.', // owner's wording (2026-11-08), DRAFT
+    tooManyAttempts: 'יותר מדי ניסיונות. נסי שוב בעוד כמה דקות', // owner's wording (2026-11-08), DRAFT
     none: '—',
     yes: 'כן',
     no: 'לא',
@@ -170,6 +172,7 @@ export const he = {
     workoutCompleted: '{name} סיימה את {workout}',
     // PLACEHOLDER — the owner sends the final text.
     noteThanks: '{name} אמרה תודה על ההערה שלך',
+    traineeEndedCoaching: '{name} סיימה את הליווי',
   },
   onboardingSections: {
     basicProfile: 'פרטים בסיסיים',

@@ -1,6 +1,6 @@
 import type { AppNotification, CoachTraineeSummary, CoachTraineeWeek, Language } from '@sistem/types';
 import { dateFormat, describeCoachNotification, fill, formatTimeAgo, formatTimeLeft, isolateAuto } from '@sistem/shared';
-import { NEW_PLAN_STATE, traineePath } from '../../../app/config/routes';
+import { NEW_PLAN_STATE, archivedTraineePath, traineePath } from '../../../app/config/routes';
 import type { IconName } from '../../../components/common/Icon/iconPaths';
 import { traineesCopy } from '../../trainees/copy';
 import { isPlanWindowUrgent } from '../../trainees/data/traineeFacts';
@@ -107,9 +107,8 @@ interface ServerNoticeContext {
 export function buildServerNotice(notification: AppNotification, { nowMs, language, isWaiting, weekOf }: ServerNoticeContext): NoticeItem | null {
   // The sentence and the target are shared with the mobile Inbox.
   const described = describeCoachNotification(notification, language);
-  if (!described || (notification.type !== 'trainee_onboarded' && notification.type !== 'workout_completed' && notification.type !== 'coach_note_thanks')) {
-    return null;
-  }
+  const shown = ['trainee_onboarded', 'workout_completed', 'coach_note_thanks', 'trainee_ended_coaching'];
+  if (!described || !shown.includes(notification.type)) return null;
   const copy = notificationsCopy[language];
   const createdAt = new Date(notification.createdAt);
   const isToday = isSameLocalDay(createdAt, new Date(nowMs));
@@ -127,12 +126,16 @@ export function buildServerNotice(notification: AppNotification, { nowMs, langua
     id: notification.id,
     serverId: notification.id,
     type: notification.type === 'workout_completed' ? 'done' : 'new',
-    icon: notification.type === 'trainee_onboarded' ? 'person' : notification.type === 'coach_note_thanks' ? 'heart' : 'check',
+    icon: notification.type === 'trainee_onboarded' || notification.type === 'trainee_ended_coaching'
+      ? 'person'
+      : notification.type === 'coach_note_thanks' ? 'heart' : 'check',
     title: described.text,
     body,
     time: noticeTime(notification.createdAt, nowMs, language),
     isUnread: notification.readAt === null,
-    to: traineePath(described.traineeId, described.section ?? undefined),
+    to: described.section === 'archive'
+      ? archivedTraineePath(described.traineeId)
+      : traineePath(described.traineeId, described.section ?? undefined),
     canDismiss: true,
     group: isToday ? 'today' : 'earlier',
   };

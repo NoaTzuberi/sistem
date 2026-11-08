@@ -4,6 +4,8 @@ import type { he } from './he';
 // English — the earlier placeholder wording, unchanged. Must match he.ts key for key.
 export const en: CopyShape<typeof he> = {
   common: {
+    noConnection: 'No connection to the server. Check your connection and try again.', // DRAFT
+    tooManyAttempts: 'Too many attempts. Try again in a few minutes.', // DRAFT
     none: '—',
     yes: 'Yes',
     no: 'No',
@@ -165,6 +167,7 @@ export const en: CopyShape<typeof he> = {
     workoutCompleted: '{name} finished {workout}',
     // PLACEHOLDER — the owner sends the final text.
     noteThanks: '{name} said thanks for your note',
+    traineeEndedCoaching: '{name} ended the coaching',
   },
   onboardingSections: {
     basicProfile: 'Basic profile',
