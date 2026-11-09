@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { WORKOUT_KIND_IDS, SET_TYPE_IDS, DEFAULT_SET_TYPE, MIN_DAY_OF_WEEK, MAX_DAY_OF_WEEK, SUPERSET_GROUP_PATTERN } from './plan.constants';
+import { WORKOUT_KIND_IDS, SET_TYPE_IDS, DEFAULT_SET_TYPE, MIN_DAY_OF_WEEK, MAX_DAY_OF_WEEK, SUPERSET_GROUP_PATTERN, PROGRESSION_IDS } from './plan.constants';
 import { deriveSetCount, validatePlanExerciseTargets } from './planSets';
 import { translate } from '../../i18n';
 import { CARDIO_METRIC_IDS, CARDIO_SPORT_IDS } from '../cardio/cardio.constants';
@@ -43,6 +43,8 @@ const planExerciseSchema = new Schema<PlanExerciseFields>({
   // Phase 12b (coach-only): the slot of the workout's type it fills — the picker and the AI know
   // what it is for. Checked against the coach's training config on save.
   slotId: { type: String, trim: true },
+  // Coach-only: '+2.5 kg' / '+1 rep' per week when its week is copied forward in a block.
+  progression: { type: String, enum: PROGRESSION_IDS },
 });
 
 planExerciseSchema.pre('validate', function derivePlanExerciseSets() {

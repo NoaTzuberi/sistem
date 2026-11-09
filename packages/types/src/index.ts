@@ -328,8 +328,13 @@ export interface PlanExercise {
   interval?: boolean;
   /** Phase 12b, coach-only: the workout-type slot it fills (trainee APIs leave it out). */
   slotId?: string;
+  /** Coach-only: how it grows when its week is copied forward in a multi-week plan. */
+  progression?: PlanProgression;
   resolvedSets: ResolvedPlanSet[];
 }
+
+/** A per-exercise progression rule of a multi-week plan: +2.5 kg or +1 rep per week. */
+export type PlanProgression = 'weight' | 'reps';
 
 export interface PlanWorkout {
   id: string;
@@ -401,6 +406,27 @@ export type PlanPeriod = 'past' | 'current' | 'upcoming';
 export interface TraineePlan extends Plan {
   period: PlanPeriod;
   workouts: TraineePlanWorkout[];
+  /** A week of a multi-week plan ("שבוע 2 מתוך 4"); absent for a weekly plan. */
+  block?: TraineePlanBlock;
+}
+
+export interface TraineePlanBlock {
+  /** 1-based. */
+  week: number;
+  lengthWeeks: number;
+  /** This week is the block's "שבוע קל". */
+  isDeload: boolean;
+  /** Exercises whose target weight went up vs the week before ("משקלים עולים ב־3 תרגילים"). */
+  weightIncreases: number;
+}
+
+/** A later week of one of her multi-week plans: hidden until its Sunday, shown locked. */
+export interface TraineeLockedWeek {
+  weekStartDate: string;
+  week: number;
+  lengthWeeks: number;
+  workoutCount: number;
+  isDeload: boolean;
 }
 
 /** GET /plans — the trainee's published plans, newest week first. */
@@ -410,6 +436,8 @@ export interface TraineePlanList {
   today: string;
   /** The Sunday that starts next week, so the app can pick next week's plan without date math. */
   nextWeekStartDate: string;
+  /** Later weeks of her multi-week plans (not in `items` until their week starts), earliest first. */
+  lockedWeeks: TraineeLockedWeek[];
   serverTime: string;
 }
 
@@ -456,6 +484,49 @@ export interface CoachPlan extends Plan {
   splitId?: string;
   /** The plan list only (the Plans tab's week rail): a published plan's workout statuses; absent for a draft. */
   progress?: CoachPlanProgress;
+  /** A week of a multi-week plan; absent for a weekly plan. */
+  block?: PlanBlockInfo;
+  /** One plan's read (the builder's block ribbon): every week of its block, in order. */
+  blockWeeks?: PlanBlockWeek[];
+}
+
+export interface PlanBlockInfo {
+  id: string;
+  /** This plan's week, 1-based. */
+  week: number;
+  lengthWeeks: number;
+  /** 'YYYY-MM-DD' Sunday of week 1. */
+  startWeek: string;
+  status: PlanStatus;
+  deloadLastWeek: boolean;
+}
+
+export interface PlanBlockWeek {
+  planId: string;
+  week: number;
+  weekStartDate: string;
+  status: PlanStatus;
+  workoutCount: number;
+  /** Σ sets × reps × kg of its strength sets; a week without weights counts its sets ('sets'). */
+  volume: { value: number; unit: 'kg' | 'sets' };
+  /** She logged a workout of this week. */
+  locked: boolean;
+  /** The block's last week while "שבוע קל" is on. */
+  isDeload: boolean;
+}
+
+/** PATCH …/plans/:planId/block — a draft block's length, or the "שבוע קל" switch. */
+export interface UpdatePlanBlockPayload {
+  /** 2–8; only while the block is a draft. Shorter removes the last weeks (never one she started). */
+  lengthWeeks?: number;
+  deloadLastWeek?: boolean;
+}
+
+/** POST …/plans/:planId/copy-forward → this week copied into every later week of its block. */
+export interface CopyForwardResponse {
+  plan: CoachPlan;
+  /** The weeks (1-based) that were filled. */
+  copiedWeeks: number[];
 }
 
 export interface PlanExerciseInput {
@@ -476,6 +547,8 @@ export interface PlanExerciseInput {
   interval?: boolean;
   /** A slot of the workout's type (Phase 12b). */
   slotId?: string;
+  /** Multi-week plans: +2.5 kg / +1 rep per week when copied forward; omitted = none. */
+  progression?: PlanProgression;
 }
 
 export interface PlanWorkoutInput {
@@ -514,6 +587,10 @@ export interface CreatePlanPayload {
   sourcePlanId?: string;
   /** The week already has a draft: replace its content with the copy (else 409 plan_week_has_draft). */
   replaceDraft?: boolean;
+  /** 1 (default) = a weekly plan; 2–8 = a multi-week plan starting this week (every week must be free). */
+  lengthWeeks?: number;
+  /** A multi-week plan: its last week is a "שבוע קל" when weeks are copied. */
+  deloadLastWeek?: boolean;
 }
 
 /** One plan the coach can duplicate from: her published plans only, newest week first. */
@@ -564,6 +641,8 @@ export interface PlanIssue {
   message: string;
   workoutIndex?: number;
   exerciseIndex?: number;
+  /** A multi-week plan's publish: the week (1-based) the problem is in. */
+  blockWeek?: number;
 }
 
 /** 400 body of the plan save / publish endpoints. */
@@ -1268,7 +1347,8 @@ export type NotificationType =
   | 'nutrition_plan_published'
   | 'coach_note_thanks'
   | 'coaching_ended'
-  | 'trainee_ended_coaching';
+  | 'trainee_ended_coaching'
+  | 'plan_block_ending';
 
 /** A coach note the trainee can thank for on Home: this week's plan notes / her nutrition intro. */
 export type CoachNoteId = 'plan' | 'nutrition';
@@ -1308,7 +1388,9 @@ export type AppNotification =
   /** To the trainee: her coach ended the coaching. coachName is a snapshot from that moment. */
   | (NotificationBase & { type: 'coaching_ended'; data: { coachingId: string; coachName: string } })
   /** To the coach: the trainee ended the coaching herself. traineeName is a snapshot from that moment. */
-  | (NotificationBase & { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } });
+  | (NotificationBase & { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } })
+  /** To the coach: a multi-week plan is in its last week (created when she opens Today / notifications). */
+  | (NotificationBase & { type: 'plan_block_ending'; data: { traineeId: string; traineeName: string; blockId: string; weekStartDate: string } });
 
 /** PATCH /me/coaching/end (trainee) → she ended her own coaching. */
 export interface EndMyCoachingResponse {

@@ -16,7 +16,9 @@ export type NotificationPayload =
   // coachName is a snapshot taken when the coaching ended.
   | { type: 'coaching_ended'; data: { coachingId: string; coachName: string } }
   // traineeName is a snapshot taken when she ended the coaching herself.
-  | { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } };
+  | { type: 'trainee_ended_coaching'; data: { coachingId: string; traineeId: string; traineeName: string } }
+  // A multi-week plan's last week (traineeName is a snapshot from that moment).
+  | { type: 'plan_block_ending'; data: { traineeId: string; traineeName: string; blockId: string; weekStartDate: string } };
 
 export interface NotificationDocument {
   userId: Types.ObjectId;

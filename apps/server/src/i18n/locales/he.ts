@@ -389,6 +389,13 @@ export const he = {
   training_settings_invalid: 'הגדרות אימון לא תקינות: {detail}',
   plan_workout_type_unknown: 'סוג אימון לא מוכר.',
   plan_slot_unknown: 'המשבצת הזו אינה חלק מסוג האימון.',
+  // Multi-week plans (DRAFT copy)
+  plan_progression_unknown: 'סוג ההתקדמות לא מוכר.',
+  plan_block_length_invalid: 'תוכנית חודשית יכולה להיות בין {min} ל־{max} שבועות.',
+  plan_block_week_taken: 'לשבוע {n} של התוכנית כבר יש תוכנית. בחרי שבוע התחלה אחר או תוכנית קצרה יותר.',
+  plan_block_published: 'אי אפשר לשנות את אורך התוכנית אחרי שפורסמה. בטלי את הפרסום קודם.',
+  plan_not_in_block: 'התוכנית הזו היא שבועית, לא חלק מתוכנית חודשית.',
+  plan_block_nothing_after: 'זה השבוע האחרון בתוכנית: אין שבועות אחריו להעתיק אליהם.',
   plan_slot_needs_type: 'משבצת תרגיל צריכה סוג אימון באימון שלה.',
   plan_split_unknown: 'חלוקה לא מוכרת.',
   family_invalid_id: 'מזהה משפחת תרגילים לא תקין.',

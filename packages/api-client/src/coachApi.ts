@@ -2,6 +2,8 @@ import axios from 'axios';
 import type { AxiosInstance } from 'axios';
 import type {
   PublishPlanNote,
+  CopyForwardResponse,
+  UpdatePlanBlockPayload,
   AchievementOverview,
   AiRecommendation,
   AiRecommendationLatest,
@@ -288,6 +290,26 @@ export function createCoachApi(client: AxiosInstance) {
     }
   }
 
+  /** Multi-week plans: this week into every later week of its block (progression / light week applied by the server). */
+  async function copyPlanForward(traineeId: string, planId: string): Promise<CopyForwardResponse> {
+    try {
+      const { data } = await client.post<CopyForwardResponse>(`${plansPath(traineeId)}/${planId}/copy-forward`);
+      return data;
+    } catch (error) {
+      throw toPlanRequestError(error, "Couldn't copy the week. Please try again.");
+    }
+  }
+
+  /** A draft block's length / its light-week switch. The plan answered may be week 1 (this week was removed). */
+  async function updatePlanBlock(traineeId: string, planId: string, payload: UpdatePlanBlockPayload): Promise<CoachPlan> {
+    try {
+      const { data } = await client.patch<{ plan: CoachPlan }>(`${plansPath(traineeId)}/${planId}/block`, payload);
+      return data.plan;
+    } catch (error) {
+      throw toPlanRequestError(error, "Couldn't change the plan. Please try again.");
+    }
+  }
+
   async function unpublishPlan(traineeId: string, planId: string): Promise<CoachPlan> {
     try {
       const { data } = await client.post<{ plan: CoachPlan }>(`${plansPath(traineeId)}/${planId}/unpublish`);
@@ -486,6 +508,8 @@ export function createCoachApi(client: AxiosInstance) {
     publishPlan,
     unpublishPlan,
     deletePlan,
+    copyPlanForward,
+    updatePlanBlock,
     getLatestAiRecommendation,
     getAiRecommendation,
     generateAiRecommendation,

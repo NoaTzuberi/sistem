@@ -20,8 +20,10 @@ import {
   PlanConflictError,
   PlanWeekHasDraftError,
   listDuplicateSources,
+  copyCoachPlanForward,
+  updateCoachPlanBlock,
 } from '../plans/planBuilder.service';
-import { validatePlanIdParam, parseCreatePlanPayload, parsePublishNotePayload, parseSavePlanPayload, type PlanProblem } from '../plans/plan.validation';
+import { validatePlanIdParam, parseCreatePlanPayload, parsePublishNotePayload, parseSavePlanPayload, parseUpdateBlockPayload, type PlanProblem } from '../plans/plan.validation';
 import { listWorkoutLogsForCoaching } from '../workoutLogs/workoutLog.service';
 import { listBodyMetricsForTrainee } from '../bodyMetrics/bodyMetric.service';
 import { getAchievementOverview } from '../achievements/achievement.service';
@@ -30,6 +32,7 @@ import type { ListCoachExercisesParams } from '../exercises/exercise.service';
 import { validateExerciseListQuery } from '../exercises/exercise.validation';
 import type { Muscle, Equipment, Difficulty } from '../exercises/exercise.constants';
 import { listPlanWeekOptions } from '../plans/planWeekOptions.service';
+import { announceEndingBlocksSafely } from '../plans/planBlockEnding.service';
 import { localizeIssues, requestLanguage, sendError } from '../../i18n';
 
 export async function getTrainees(req: AuthenticatedRequest, res: Response) {
@@ -45,6 +48,8 @@ export async function getStats(req: AuthenticatedRequest, res: Response) {
 
 /** Coach mode Today: scoreboard, waiting trainees and the attention cards. */
 export async function getToday(req: AuthenticatedRequest, res: Response) {
+  // No scheduler: a multi-week plan's "ends this week" notification is made when she opens Today.
+  await announceEndingBlocksSafely(req.userId!);
   res.status(200).json(await getCoachToday(req.userId!));
 }
 
@@ -238,5 +243,35 @@ export async function deleteTraineePlan(req: AuthenticatedRequest, res: Response
     res.status(204).end();
   } catch (error) {
     sendPlanError(res, error);
+  }
+}
+
+/** "העתקה לשבועות הבאים" (multi-week plans): this week into every later week of its block. */
+export async function copyTraineePlanForward(req: AuthenticatedRequest, res: Response) {
+  const planId = readPlanId(req, res);
+  if (!planId) return;
+
+  try {
+    res.status(200).json(await copyCoachPlanForward(req.traineeId!, req.coachingId!, planId));
+  } catch (error) {
+    sendPlanError(res, error);
+  }
+}
+
+/** A draft block's length (2–8) / the "שבוע קל" switch. */
+export async function updateTraineePlanBlock(req: AuthenticatedRequest, res: Response) {
+  const planId = readPlanId(req, res);
+  if (!planId) return;
+
+  const { value, error } = parseUpdateBlockPayload(req.body);
+  if (!value) {
+    sendError(res, 400, error);
+    return;
+  }
+
+  try {
+    res.status(200).json({ plan: await updateCoachPlanBlock(req.traineeId!, req.coachingId!, planId, value) });
+  } catch (updateError) {
+    sendPlanError(res, updateError);
   }
 }

@@ -23,3 +23,18 @@ export const MAX_WORKOUT_TITLE_LENGTH = 40;
 /** What goes out with a published plan (same limits as the nutrition plan's note + tip). */
 export const MAX_PLAN_INTRO_MESSAGE_LENGTH = 1500;
 export const MAX_PLAN_INTRO_TIP_LENGTH = 300;
+
+// Multi-week plans (blocks, 2026-11-09): one Plan per week, grouped by a PlanBlock.
+export const MIN_BLOCK_WEEKS = 2;
+export const MAX_BLOCK_WEEKS = 8;
+export const DEFAULT_BLOCK_WEEKS = 4;
+/** A per-exercise progression rule, applied when a week is copied into the weeks after it. */
+export const PROGRESSION_IDS = ['weight', 'reps'] as const;
+export const BLOCK_PROGRESSION = {
+  /** "+2.5 ק״ג" per week. */
+  weightStepKg: 2.5,
+  /** "+1 חזרה" per week. */
+  repsStep: 1,
+  /** "שבוע קל": sets × 0.7, rounded, at least one; weights and reps stay as the week before. */
+  deloadSetsFactor: 0.7,
+} as const;

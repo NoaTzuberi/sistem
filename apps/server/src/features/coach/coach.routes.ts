@@ -20,6 +20,8 @@ import {
   publishTraineePlan,
   unpublishTraineePlan,
   deleteTraineePlan,
+  copyTraineePlanForward,
+  updateTraineePlanBlock,
 } from './coach.controller';
 import {
   getLatestTraineeRecommendation,
@@ -151,6 +153,9 @@ coachRouter.put('/trainees/:traineeId/plans/:planId', loadCoachTrainee, saveTrai
 coachRouter.delete('/trainees/:traineeId/plans/:planId', loadCoachTrainee, deleteTraineePlan);
 coachRouter.post('/trainees/:traineeId/plans/:planId/publish', loadCoachTrainee, publishTraineePlan);
 coachRouter.post('/trainees/:traineeId/plans/:planId/unpublish', loadCoachTrainee, unpublishTraineePlan);
+// Multi-week plans: copy a week forward, change a draft block's length / its light week.
+coachRouter.post('/trainees/:traineeId/plans/:planId/copy-forward', loadCoachTrainee, copyTraineePlanForward);
+coachRouter.patch('/trainees/:traineeId/plans/:planId/block', loadCoachTrainee, updateTraineePlanBlock);
 
 // AI recommendations (Phase 12): coach-only drafts, never sent to the trainee.
 coachRouter.get('/trainees/:traineeId/ai-recommendations/latest', loadCoachTrainee, getLatestTraineeRecommendation);

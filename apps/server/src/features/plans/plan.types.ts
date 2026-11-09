@@ -1,5 +1,5 @@
 import type { Types } from 'mongoose';
-import type { CardioMetric, CardioSport, PlanStatus, SetType, WorkoutKind } from '@sistem/types';
+import type { CardioMetric, CardioSport, PlanProgression, PlanStatus, SetType, WorkoutKind } from '@sistem/types';
 import type { CardioStepFields } from '../cardio/cardio.types';
 
 // Units: weights kg, durations and rest seconds.
@@ -27,6 +27,8 @@ export interface PlanExerciseFields {
   interval?: boolean;
   /** Phase 12b, coach-only: the slot of its workout's type. */
   slotId?: string;
+  /** Coach-only: how it grows when its week is copied into the next weeks of a block. */
+  progression?: PlanProgression;
 }
 
 export interface PlanWorkoutFields {
@@ -65,6 +67,9 @@ export interface PlanDocument {
   aiRecommendationId?: Types.ObjectId | null;
   /** Phase 12b, coach-only. */
   splitId?: string | null;
+  /** A week of a multi-week plan (null / missing = weekly). */
+  blockId?: Types.ObjectId | null;
+  blockWeek?: number | null;
   createdAt: Date;
   updatedAt: Date;
 }

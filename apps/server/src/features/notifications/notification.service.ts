@@ -29,6 +29,9 @@ function dedupeKeyFor(payload: NotificationPayload): string {
       return `coaching_ended:${payload.data.coachingId}`;
     case 'trainee_ended_coaching':
       return `trainee_ended_coaching:${payload.data.coachingId}`;
+    case 'plan_block_ending':
+      // Per block: "ends this week" is said once.
+      return `block_ending:${payload.data.blockId}`;
   }
 }
 

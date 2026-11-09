@@ -33,6 +33,9 @@ const planSchema = new Schema<PlanDocument>(
     aiRecommendationId: { type: Schema.Types.ObjectId, ref: 'AiRecommendation', default: undefined },
     // Phase 12b (coach-only): the split the plan follows.
     splitId: { type: String, trim: true, default: undefined },
+    // A week of a multi-week plan (PlanBlock); missing = a weekly plan, as before 2026-11-09.
+    blockId: { type: Schema.Types.ObjectId, ref: 'PlanBlock', default: undefined },
+    blockWeek: { type: Number, min: 1, default: undefined },
   },
   { timestamps: true },
 );
@@ -44,5 +47,6 @@ fillCoachingFromPair(planSchema);
 planSchema.index({ coachingId: 1, weekStartDate: 1 }, { unique: true });
 planSchema.index({ traineeId: 1, status: 1, weekStartDate: -1 });
 planSchema.index({ coachId: 1, status: 1, weekStartDate: -1 });
+planSchema.index({ blockId: 1, blockWeek: 1 }, { sparse: true });
 
 export const Plan = model<PlanDocument>('Plan', planSchema);

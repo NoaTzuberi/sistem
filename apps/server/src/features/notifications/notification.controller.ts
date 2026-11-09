@@ -10,6 +10,7 @@ import {
   NotificationNotFoundError,
 } from './notification.service';
 import { sendError } from '../../i18n';
+import { announceEndingBlocksSafely } from '../plans/planBlockEnding.service';
 
 export async function getMyNotifications(req: AuthenticatedRequest, res: Response) {
   const parsed = parseNotificationListQuery(req.query as Record<string, unknown>);
@@ -18,11 +19,14 @@ export async function getMyNotifications(req: AuthenticatedRequest, res: Respons
     return;
   }
 
+  // A coach's multi-week plan in its last week: its notification is made now (no scheduler).
+  if (!parsed.value.before) await announceEndingBlocksSafely(req.userId!);
   const list = await listNotifications(req.userId!, parsed.value);
   res.status(200).json(list);
 }
 
 export async function getMyUnreadCount(req: AuthenticatedRequest, res: Response) {
+  await announceEndingBlocksSafely(req.userId!);
   const unreadCount = await countUnreadNotifications(req.userId!);
   res.status(200).json({ unreadCount });
 }

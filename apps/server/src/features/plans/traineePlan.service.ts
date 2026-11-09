@@ -1,4 +1,8 @@
-import type { Plan as PublicPlan, TraineePlan, TraineePlanList, TraineeWeek } from '@sistem/types';
+import type { Types } from 'mongoose';
+import type { Plan as PublicPlan, TraineeLockedWeek, TraineePlan, TraineePlanBlock, TraineePlanList, TraineeWeek } from '@sistem/types';
+import { PlanBlock } from './planBlock.model';
+import type { PlanBlockDocument } from './planBlock.model';
+import { countWeightIncreases } from './planBlockCopy';
 import { User } from '../users/user.model';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
 import { WorkoutLog } from '../workoutLogs/workoutLog.model';
@@ -21,9 +25,46 @@ export async function todayFor(traineeId: string, now: Date): Promise<string> {
   return localDateString(now, user?.timezone ?? DEFAULT_TIMEZONE);
 }
 
+type LeanBlock = PlanBlockDocument & { _id: Types.ObjectId };
+
+async function blocksOf(plans: Pick<LeanPlan, 'blockId'>[]): Promise<Map<string, LeanBlock>> {
+  const ids = [...new Set(plans.flatMap((plan) => (plan.blockId ? [String(plan.blockId)] : [])))];
+  if (ids.length === 0) return new Map();
+  return new Map((await PlanBlock.find({ _id: { $in: ids } }).lean<LeanBlock[]>()).map((block) => [String(block._id), block]));
+}
+
+/** "שבוע 2 מתוך 4" + how many exercises got heavier than the week before (her Workouts stage). */
+async function blockViews(plans: LeanPlan[]): Promise<Map<string, TraineePlanBlock>> {
+  const inBlocks = plans.filter((plan) => plan.blockId && plan.blockWeek);
+  if (inBlocks.length === 0) return new Map();
+  // Each week's previous week (week 1 has none).
+  const wanted = inBlocks.filter((plan) => plan.blockWeek! > 1).map((plan) => ({ blockId: plan.blockId, blockWeek: plan.blockWeek! - 1 }));
+  const [blocks, previous] = await Promise.all([
+    blocksOf(inBlocks),
+    wanted.length > 0 ? Plan.find({ $or: wanted }).select('blockId blockWeek workouts').lean<LeanPlan[]>() : Promise.resolve([] as LeanPlan[]),
+  ]);
+  const views = new Map<string, TraineePlanBlock>();
+  for (const plan of inBlocks) {
+    const block = blocks.get(String(plan.blockId));
+    if (!block) continue;
+    const before = previous.find((row) => String(row.blockId) === String(plan.blockId) && row.blockWeek === plan.blockWeek! - 1);
+    views.set(String(plan._id), {
+      week: plan.blockWeek!,
+      lengthWeeks: block.lengthWeeks,
+      isDeload: block.deloadLastWeek && plan.blockWeek === block.lengthWeeks,
+      weightIncreases: before ? countWeightIncreases(sortedWorkouts(before), sortedWorkouts(plan)) : 0,
+    });
+  }
+  return views;
+}
+
+function sortedWorkouts(plan: LeanPlan) {
+  return [...plan.workouts].sort((a, b) => a.order - b.order);
+}
+
 async function toTraineePlans(traineeId: string, plans: LeanPlan[], today: string): Promise<TraineePlan[]> {
   const publicPlans: PublicPlan[] = await fillPlanIntros(traineeId, plans.map((plan) => toPublicPlan(plan)));
-  const [logs, cardioLogs] = await Promise.all([
+  const [logs, cardioLogs, , blocks] = await Promise.all([
     WorkoutLog.find({ traineeId, planId: { $in: plans.map((plan) => plan._id) } })
       .sort({ startedAt: -1 })
       .select('planId workoutId status')
@@ -31,6 +72,7 @@ async function toTraineePlans(traineeId: string, plans: LeanPlan[], today: strin
     // A cardio workout is done by its cardio log (its logId then points at that log).
     cardioLogRefs(traineeId, plans.map((plan) => plan._id)),
     attachExerciseFacts(publicPlans),
+    blockViews(plans),
   ]);
 
   const logRefs: WorkoutLogRef[] = [
@@ -42,7 +84,16 @@ async function toTraineePlans(traineeId: string, plans: LeanPlan[], today: strin
     })),
     ...cardioLogs,
   ];
-  return publicPlans.map((plan) => toTraineePlan(plan, logRefs, today));
+  return publicPlans.map((plan) => {
+    const traineePlan = toTraineePlan(plan, logRefs, today);
+    const block = blocks.get(plan.id);
+    return block ? { ...traineePlan, block } : traineePlan;
+  });
+}
+
+/** A later week of a multi-week plan: hidden from her until its Sunday (her zone). */
+function isLockedBlockWeek(plan: Pick<LeanPlan, 'blockId' | 'weekStartDate'>, thisWeek: string): boolean {
+  return Boolean(plan.blockId) && plan.weekStartDate > thisWeek;
 }
 
 /**
@@ -55,10 +106,27 @@ export async function listTraineePlans(traineeId: string, now: Date = new Date()
     ? { coachingId }
     : { $or: [{ coachingId: { $in: liveIds } }, { weekStartDate: { $lt: weekStartOf(today) } }] };
   const plans = await Plan.find({ traineeId, status: 'published', ...scope }).sort({ weekStartDate: -1 }).lean<LeanPlan[]>();
+  const thisWeek = weekStartOf(today);
+  const locked = plans.filter((plan) => isLockedBlockWeek(plan, thisWeek));
+  const blocks = await blocksOf(locked);
+  const lockedWeeks: TraineeLockedWeek[] = locked
+    .flatMap((plan) => {
+      const block = blocks.get(String(plan.blockId));
+      if (!block || !plan.blockWeek) return [];
+      return [{
+        weekStartDate: plan.weekStartDate,
+        week: plan.blockWeek,
+        lengthWeeks: block.lengthWeeks,
+        workoutCount: plan.workouts.length,
+        isDeload: block.deloadLastWeek && plan.blockWeek === block.lengthWeeks,
+      }];
+    })
+    .sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
   return {
-    items: await toTraineePlans(traineeId, plans, today),
+    items: await toTraineePlans(traineeId, plans.filter((plan) => !isLockedBlockWeek(plan, thisWeek)), today),
     today,
-    nextWeekStartDate: addDays(weekStartOf(today), 7),
+    nextWeekStartDate: addDays(thisWeek, 7),
+    lockedWeeks,
     serverTime: now.toISOString(),
   };
 }
@@ -69,7 +137,8 @@ export async function getTraineePlan(planId: string, traineeId: string, now: Dat
     todayFor(traineeId, now),
     Plan.findOne({ _id: planId, traineeId, status: 'published' }).lean<LeanPlan>(),
   ]);
-  if (!plan) {
+  // A later week of a multi-week plan stays hidden until its week starts.
+  if (!plan || isLockedBlockWeek(plan, weekStartOf(today))) {
     throw new PlanNotFoundError('plan_not_found');
   }
   const [traineePlan] = await toTraineePlans(traineeId, [plan], today);

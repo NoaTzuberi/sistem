@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import type { SetType, TrainingConfig } from '@sistem/types';
+import type { PlanProgression, SetType, TrainingConfig } from '@sistem/types';
 import { msg, type ServerMessage } from '../../i18n';
 import {
   SET_TYPE_IDS,
@@ -13,6 +13,9 @@ import {
   MAX_WORKOUT_TITLE_LENGTH,
   MAX_PLAN_INTRO_MESSAGE_LENGTH,
   MAX_PLAN_INTRO_TIP_LENGTH,
+  MIN_BLOCK_WEEKS,
+  MAX_BLOCK_WEEKS,
+  PROGRESSION_IDS,
 } from './plan.constants';
 import { isSunday } from './planWeek';
 import { parsePlanCardio } from '../cardio/cardio.validation';
@@ -59,6 +62,7 @@ export interface PlanExerciseInputFields {
   setTargets?: SetTargetInput[];
   interval?: boolean;
   slotId?: string;
+  progression?: PlanProgression;
 }
 
 export interface PlanWorkoutInputFields {
@@ -83,7 +87,7 @@ export interface SavePlanInput {
 }
 
 /** One problem with the row it belongs to; worded per response (localizeIssues). */
-export type PlanProblem = ServerMessage & { workoutIndex?: number; exerciseIndex?: number };
+export type PlanProblem = ServerMessage & { workoutIndex?: number; exerciseIndex?: number; blockWeek?: number };
 
 type ParseResult<T> = { value: T; issues: [] } | { value: null; issues: PlanProblem[] };
 
@@ -220,6 +224,13 @@ function parseExercise(raw: unknown, problems: ServerMessage[]): PlanExerciseInp
     else problems.push(msg('plan_slot_unknown'));
   }
 
+  // Multi-week plans: how it grows when copied forward ('weight' / 'reps'; missing = none).
+  let progression: PlanProgression | undefined;
+  if (!isMissing(raw.progression) && raw.progression !== '') {
+    if ((PROGRESSION_IDS as readonly unknown[]).includes(raw.progression)) progression = raw.progression as PlanProgression;
+    else problems.push(msg('plan_progression_unknown'));
+  }
+
   if (problems.length > before) return null;
 
   const exercise = { exerciseId: raw.exerciseId, sets, ...targets, setTargets, interval };
@@ -229,7 +240,7 @@ function parseExercise(raw: unknown, problems: ServerMessage[]): PlanExerciseInp
     return null;
   }
 
-  return { ...exercise, sets, id: optionalId(raw.id), notes, supersetGroup, slotId };
+  return { ...exercise, sets, id: optionalId(raw.id), notes, supersetGroup, slotId, progression };
 }
 
 /** Structure and per-exercise rules — what even a draft must satisfy to be saved. */
@@ -421,6 +432,9 @@ export interface CreatePlanInput {
   sourcePlanId?: string;
   /** The week already has a draft: overwrite it with the copy (the coach chose "replace"). */
   replaceDraft: boolean;
+  /** 1 = weekly; 2–8 = a multi-week plan starting at weekStartDate. */
+  lengthWeeks: number;
+  deloadLastWeek: boolean;
 }
 
 export function parseCreatePlanPayload(body: unknown): { value: CreatePlanInput; error: null } | { value: null; error: ServerMessage } {
@@ -436,15 +450,52 @@ export function parseCreatePlanPayload(body: unknown): { value: CreatePlanInput;
   if (!isMissing(body.sourcePlanId) && (typeof body.sourcePlanId !== 'string' || !mongoose.Types.ObjectId.isValid(body.sourcePlanId))) {
     return { value: null, error: msg('plan_source_not_found') };
   }
+  // 1 = weekly (as before); 2–8 = a multi-week plan.
+  const lengthWeeks = isMissing(body.lengthWeeks) ? 1 : body.lengthWeeks;
+  if (!isBlockLength(lengthWeeks) && lengthWeeks !== 1) {
+    return { value: null, error: msg('plan_block_length_invalid', { min: MIN_BLOCK_WEEKS, max: MAX_BLOCK_WEEKS }) };
+  }
+  if (!isMissing(body.deloadLastWeek) && typeof body.deloadLastWeek !== 'boolean') {
+    return { value: null, error: msg('invalid_body') };
+  }
   return {
     value: {
       weekStartDate: body.weekStartDate,
       duplicatePrevious: body.duplicatePrevious === true,
       ...(typeof body.sourcePlanId === 'string' ? { sourcePlanId: body.sourcePlanId } : {}),
       replaceDraft: body.replaceDraft === true,
+      lengthWeeks: lengthWeeks as number,
+      deloadLastWeek: body.deloadLastWeek === true,
     },
     error: null,
   };
+}
+
+function isBlockLength(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= MIN_BLOCK_WEEKS && value <= MAX_BLOCK_WEEKS;
+}
+
+export interface UpdateBlockInput {
+  lengthWeeks?: number;
+  deloadLastWeek?: boolean;
+}
+
+/** PATCH …/plans/:planId/block: the length (2–8) and / or the "שבוע קל" switch. */
+export function parseUpdateBlockPayload(body: unknown): { value: UpdateBlockInput; error: null } | { value: null; error: ServerMessage } {
+  if (!isRecord(body)) return { value: null, error: msg('invalid_body') };
+  const value: UpdateBlockInput = {};
+  if (body.lengthWeeks !== undefined) {
+    if (!isBlockLength(body.lengthWeeks)) {
+      return { value: null, error: msg('plan_block_length_invalid', { min: MIN_BLOCK_WEEKS, max: MAX_BLOCK_WEEKS }) };
+    }
+    value.lengthWeeks = body.lengthWeeks;
+  }
+  if (body.deloadLastWeek !== undefined) {
+    if (typeof body.deloadLastWeek !== 'boolean') return { value: null, error: msg('invalid_body') };
+    value.deloadLastWeek = body.deloadLastWeek;
+  }
+  if (value.lengthWeeks === undefined && value.deloadLastWeek === undefined) return { value: null, error: msg('invalid_body') };
+  return { value, error: null };
 }
 
 export interface PublishNoteInput {

@@ -392,6 +392,13 @@ export const en: Record<keyof typeof he, string> = {
   training_settings_invalid: 'Invalid training settings: {detail}',
   plan_workout_type_unknown: 'Unknown workout type.',
   plan_slot_unknown: 'This slot is not part of the workout type.',
+  // Multi-week plans (DRAFT copy)
+  plan_progression_unknown: 'Unknown progression.',
+  plan_block_length_invalid: 'A multi-week plan can be {min} to {max} weeks long.',
+  plan_block_week_taken: 'Week {n} of the plan already has a plan. Pick another start week or a shorter plan.',
+  plan_block_published: "The plan's length can't change after it is published. Unpublish it first.",
+  plan_not_in_block: 'This is a weekly plan, not part of a multi-week plan.',
+  plan_block_nothing_after: 'This is the last week of the plan: there are no weeks after it to copy into.',
   plan_slot_needs_type: 'An exercise slot needs a workout type on its workout.',
   plan_split_unknown: 'Unknown split.',
   family_invalid_id: 'Invalid exercise family id.',
