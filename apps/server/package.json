@@ -14,6 +14,7 @@
     "clean:exercise-names": "tsx src/features/exercises/scripts/cleanExerciseNames.ts",
     "group:exercises": "tsx src/features/exerciseFamilies/scripts/groupExercises.ts",
     "seed:knowledge": "tsx src/features/knowledge/scripts/seedKnowledge.ts",
+    "dev:reset-tour": "tsx src/features/coachProfiles/scripts/resetTour.ts",
     "promote:coach": "tsx src/features/users/scripts/promoteCoach.ts",
     "create:admin": "tsx src/features/admin/scripts/createAdmin.ts",
     "seed:dev": "tsx src/features/users/scripts/seedDev.ts",
