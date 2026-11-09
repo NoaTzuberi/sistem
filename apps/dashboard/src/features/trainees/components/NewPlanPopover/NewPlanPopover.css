@@ -198,7 +198,17 @@
 }
 
 .new-plan-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin: 10px 0 0;
+}
+
+.new-plan-error-text {
+  flex: 1 1 200px;
+  margin: 0;
   font-size: var(--text-sm);
   color: var(--color-error);
 }

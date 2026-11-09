@@ -23,13 +23,16 @@ interface ConfirmDialogProps {
   busy?: boolean;
   /** A failed action's line, shown above the buttons. */
   error?: string | null;
+  /** An optional middle answer (e.g. "open the existing draft"), between Cancel and the confirm button. */
+  altLabel?: string;
+  onAlt?: () => void;
 }
 
 /**
  * A small centered question (instead of window.confirm): Esc and the scrim cancel, Tab stays on its
- * two buttons, the focus starts on Cancel (the safe answer) and goes back to what opened it.
+ * its buttons, the focus starts on Cancel (the safe answer) and goes back to what opened it.
  */
-export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, onConfirm, onCancel, confirmVariant = 'primary', busy = false, error = null }: ConfirmDialogProps) {
+export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, onConfirm, onCancel, confirmVariant = 'primary', busy = false, error = null, altLabel, onAlt }: ConfirmDialogProps) {
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   const cardRef = useRef<HTMLDivElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -102,6 +105,11 @@ export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, 
           <PillButton ref={cancelRef} variant="fill" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </PillButton>
+          {altLabel && onAlt && (
+            <PillButton variant="soft" onClick={onAlt} disabled={busy}>
+              {altLabel}
+            </PillButton>
+          )}
           <PillButton variant={confirmVariant} onClick={onConfirm} disabled={busy} aria-busy={busy || undefined}>
             {confirmLabel}
           </PillButton>

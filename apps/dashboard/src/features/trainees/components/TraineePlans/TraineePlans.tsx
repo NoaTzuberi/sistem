@@ -154,6 +154,7 @@ export function TraineePlans({ trainee, plansLoad, wantsNewPlan, onNewPlanHandle
         {hasPlans && <PlansToolbar onStart={(method) => void openNewPlan({ method })} />}
         <NewPlanPopover
           popover={popover}
+          traineeId={trainee.id}
           aiWorkoutCount={ai.ready?.output?.workouts.length}
           onOpenAiOptions={() => {
             popover.close();

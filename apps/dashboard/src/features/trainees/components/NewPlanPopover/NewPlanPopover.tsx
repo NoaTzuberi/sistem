@@ -2,15 +2,19 @@ import { useEffect, useId, useRef } from 'react';
 import { fill, formatWeekSpan, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
+import { ConfirmDialog } from '../../../../components/common/ConfirmDialog/ConfirmDialog';
+import { DuplicateSources } from '../DuplicateSources/DuplicateSources';
 import { aiDraftCopy } from '../../../aiDraft/copy';
 import { weekTileLabel } from '../../data/planWeeks';
 import type { NewPlanPopoverState, PlanStartMethod } from '../../hooks/useNewPlanPopover';
 import { useRadioGroupKeys } from '../../hooks/useRadioGroupKeys';
+import { startActionFor } from '../../data/newPlanStart';
 import { traineesCopy } from '../../copy';
 import './NewPlanPopover.css';
 
 interface NewPlanPopoverProps {
   popover: NewPlanPopoverState;
+  traineeId: string;
   /** How many workouts the AI draft that would be loaded has; undefined = there is no ready draft. */
   aiWorkoutCount: number | undefined;
   /** "Other split options": the AI draft sheet (split cards, regenerate). */
@@ -22,7 +26,7 @@ interface NewPlanPopoverProps {
  * from its corner, closes on Esc / a press outside / ✕, and gives the focus back to what opened
  * it. A week that already has a plan cannot be started again: the button opens that plan.
  */
-export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: NewPlanPopoverProps) {
+export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOptions }: NewPlanPopoverProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(traineesCopy);
@@ -32,11 +36,22 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
   const titleId = useId();
   const { isOpen, close, week, weeks, method } = popover;
   const hasWeeks = weeks.length > 0;
+  const d = copy.duplicate;
+  // While the draft question is up, Esc / a press belong to it, not to the popover.
+  const isAsking = popover.draftConflict !== null;
 
-  // Esc and a press outside close it; the focus returns to whatever opened it.
+  // The focus returns to whatever opened it.
   useEffect(() => {
     if (!isOpen) return;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    return () => {
+      if (opener?.isConnected) opener.focus();
+    };
+  }, [isOpen]);
+
+  // Esc and a press outside close it — not while the draft question is up (those belong to it).
+  useEffect(() => {
+    if (!isOpen || isAsking) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') close();
     };
@@ -48,9 +63,8 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('pointerdown', onPointerDown);
-      if (opener?.isConnected) opener.focus();
     };
-  }, [isOpen, close]);
+  }, [isOpen, isAsking, close]);
 
   // Once the weeks are in, the selected week takes the focus.
   useEffect(() => {
@@ -59,14 +73,20 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
 
   if (!isOpen) return null;
 
-  const isTaken = Boolean(week?.plan);
+  // A week with a plan opens it — except a draft week when duplicating (she is asked replace / open).
+  const isPublishedWeek = week?.plan?.status === 'published';
+  const action = startActionFor(week, method);
+  const isTaken = action === 'open';
+  const isDuplicating = action === 'duplicate';
+  const sources = popover.sources ?? [];
   const methods: { id: PlanStartMethod; label: string; hint: string; disabled: boolean }[] = [
     { id: 'scratch', label: copy.startScratch, hint: copy.fromScratchHint, disabled: false },
     {
       id: 'duplicate',
       label: copy.duplicateLastWeek,
-      hint: week?.copiesFromWeek ? fill(copy.copiesFrom, { week: formatWeekSpan(week.copiesFromWeek, language) }) : copy.nothingToCopy,
-      disabled: !popover.canDuplicate,
+      hint: popover.source ? fill(copy.copiesFrom, { week: formatWeekSpan(popover.source.weekStartDate, language) }) : copy.nothingToCopy,
+      // Never disabled: with nothing published it shows the empty state (with the way forward).
+      disabled: false,
     },
     {
       id: 'ai',
@@ -125,7 +145,7 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
           </p>
           <div className="new-plan-methods" role="radiogroup" aria-labelledby={`${titleId}-how`} onKeyDown={handleRadioKeys}>
             {methods.map((entry) => {
-              const isSelected = !isTaken && entry.id === method;
+              const isSelected = !isPublishedWeek && entry.id === method;
               return (
                 <button
                   key={entry.id}
@@ -133,8 +153,8 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
-                  // A taken week opens its plan: there is nothing to start.
-                  disabled={isTaken || entry.disabled}
+                  // A published week opens its plan: there is nothing to start.
+                  disabled={isPublishedWeek || entry.disabled}
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => popover.selectMethod(entry.id)}
                 >
@@ -144,6 +164,17 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
               );
             })}
           </div>
+
+          {isDuplicating && (
+            <DuplicateSources
+              traineeId={traineeId}
+              sources={sources}
+              selectedId={popover.source?.id}
+              onSelect={popover.selectSource}
+              onBuildNew={() => void popover.confirm('scratch')}
+              disabled={popover.isCreating}
+            />
+          )}
 
           <button className="new-plan-link" type="button" onClick={onOpenAiOptions}>
             {copy.otherSplits}
@@ -157,19 +188,45 @@ export function NewPlanPopover({ popover, aiWorkoutCount, onOpenAiOptions }: New
         </p>
       )}
       {popover.error && (
-        <p className="new-plan-error" role="alert">
-          {popover.error}
-        </p>
+        <div className="new-plan-error" role="alert">
+          <p className="new-plan-error-text">{popover.error}</p>
+          <PillButton variant="soft" size="sm" disabled={popover.isCreating} onClick={popover.retry}>
+            {d.retry}
+          </PillButton>
+        </div>
       )}
 
       <div className="new-plan-actions">
-        <PillButton variant="primary" className="new-plan-confirm" disabled={!week || popover.isCreating} onClick={() => void popover.confirm()}>
-          {isTaken ? copy.openExisting : week ? fill(copy.createFor, { range: formatWeekSpan(week.weekStartDate, language) }) : copy.newPlan}
+        <PillButton
+          variant="primary"
+          className="new-plan-confirm"
+          disabled={!week || popover.isCreating || (isDuplicating && !popover.source)}
+          onClick={() => void popover.confirm()}
+        >
+          {isTaken
+            ? copy.openExisting
+            : !week
+              ? copy.newPlan
+              : fill(isDuplicating ? d.confirm : copy.createFor, { range: formatWeekSpan(week.weekStartDate, language) })}
         </PillButton>
         <PillButton variant="fill" disabled={popover.isCreating} onClick={close}>
           {shared.common.cancel}
         </PillButton>
       </div>
+
+      <ConfirmDialog
+        isOpen={isAsking}
+        title={d.draftTitle}
+        text={d.draftText}
+        confirmLabel={d.draftReplace}
+        confirmVariant="cherry"
+        altLabel={d.draftOpen}
+        onAlt={popover.openDraft}
+        cancelLabel={shared.common.cancel}
+        onConfirm={popover.replaceDraft}
+        onCancel={popover.cancelDraftConflict}
+        busy={popover.isCreating}
+      />
     </div>
   );
 }

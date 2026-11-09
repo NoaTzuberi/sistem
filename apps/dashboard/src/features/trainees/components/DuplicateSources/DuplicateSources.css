@@ -1,0 +1,119 @@
+.dup-label {
+  margin: 14px 0 8px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* At most ~4 rows tall; the rest scrolls inside the popover. */
+.dup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 232px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.dup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: var(--border-width-medium) solid transparent;
+  border-radius: var(--radius-row);
+  color: var(--color-text);
+  text-align: start;
+  background-color: var(--color-fill-soft);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    border-color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease;
+}
+
+.dup-row[aria-checked='true'] {
+  border-color: var(--color-primary);
+  background-color: var(--color-card);
+  box-shadow: var(--shadow-selected);
+}
+
+.dup-row-week {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.dup-row-meta {
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+/* Nothing published yet: a quiet note with the way forward. */
+.dup-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 20px 16px;
+  border-radius: var(--radius-tile);
+  text-align: center;
+  background-color: var(--color-fill-soft);
+}
+
+.dup-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-round);
+  color: var(--color-primary-deep);
+  background-color: var(--color-primary-soft);
+}
+
+.dup-empty-title {
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dup-empty-text {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dup-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dup-row:hover:not([aria-checked='true']) {
+    border-color: var(--color-dash-outline);
+  }
+}
+
+.dup-row:active {
+  transform: scale(0.97);
+}
+
+.dup-row:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dup-row {
+    transition: none;
+  }
+
+  .dup-row:active {
+    transform: none;
+  }
+}

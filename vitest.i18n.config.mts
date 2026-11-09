@@ -6,6 +6,6 @@ export default defineConfig({
     environment: 'node',
     // + the api-client base URL check and the plan builder's state / CSS guards (no client test
     // setup yet — they run here).
-    include: ['scripts/i18n-parity.test.ts', 'scripts/api-client.test.ts', 'scripts/plan-builder.test.ts'],
+    include: ['scripts/i18n-parity.test.ts', 'scripts/api-client.test.ts', 'scripts/plan-builder.test.ts', 'scripts/duplicate-plan.test.ts'],
   },
 });
