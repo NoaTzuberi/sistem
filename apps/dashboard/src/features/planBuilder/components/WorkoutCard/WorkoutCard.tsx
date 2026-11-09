@@ -4,6 +4,7 @@ import type { AiPlanExercise, PlanIssue, TrainingConfig, TrainingSlot } from '@s
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { changeWorkoutType, moveItem, newExercise, orderBySlots, removeExercise, setIntervalFlag, supersetWarnings } from '../../planDraft';
 import type { DraftExercise, DraftWorkout } from '../../types';
+import type { ProgressChip } from '../../data/blockWeeks';
 import { workoutLetter } from '../../data/workoutLetters';
 import { ExerciseRow } from '../ExerciseRow/ExerciseRow';
 import { SlotSection } from '../SlotSection/SlotSection';
@@ -35,6 +36,8 @@ interface WorkoutCardProps {
   onExerciseRemoved: (name: string) => void;
   /** Open the exercise library for this workout — for one slot ("+ Add" on it), or for all exercises. */
   onAddExercise: (slot?: TrainingSlot) => void;
+  /** Multi-week plans: each exercise's change vs the week before, and whether its rule shows. */
+  block?: { chipFor: (exercise: DraftExercise, exerciseIndex: number) => ProgressChip | null; showRule: boolean };
 }
 
 /**
@@ -57,6 +60,7 @@ export function WorkoutCard({
   onRemove,
   onExerciseRemoved,
   onAddExercise,
+  block,
 }: WorkoutCardProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
@@ -121,6 +125,7 @@ export function WorkoutCard({
         onIntervalChange={(interval) => setExercises(setIntervalFlag(exercises, exercise.key, interval))}
         onMove={(direction) => setExercises(moveItem(exercises, exerciseIndex, exerciseIndex + direction))}
         onRemove={() => handleRemoveExercise(exercise)}
+        block={block ? { chip: block.chipFor(exercise, exerciseIndex), showRule: block.showRule } : undefined}
       />
     );
   }

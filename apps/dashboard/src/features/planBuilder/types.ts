@@ -1,4 +1,4 @@
-import type { ExerciseFacts, PlanCardio, SetType } from '@sistem/types';
+import type { ExerciseFacts, PlanCardio, PlanProgression, SetType } from '@sistem/types';
 
 // The plan as it is being edited. Every item has a client `key` (stable across
 // renders, drags and saves); `id` appears once the server has stored the item.
@@ -35,6 +35,8 @@ export interface DraftExercise extends DraftTargets {
   interval: boolean;
   /** Phase 12b: the slot of the workout's type it fills; undefined = "Other". */
   slotId?: string;
+  /** Multi-week plans: how it grows when its week is copied forward; undefined = none. */
+  progression?: PlanProgression;
 }
 
 export interface DraftWorkout {

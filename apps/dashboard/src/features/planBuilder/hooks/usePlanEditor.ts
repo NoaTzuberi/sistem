@@ -161,5 +161,6 @@ export function usePlanEditor(traineeId: string, initialPlan: CoachPlan) {
   if (isSaving) saveStatus = 'saving';
   else if (isDirty) saveStatus = payloadJson === failedJson ? 'error' : 'unsaved';
 
-  return { plan, draft, updateDraft, saveStatus, isDirty, issues, error, save, publish, unpublish, remove };
+  /** `applyPlan`: a fresh read of this plan from another call (its block's weeks after a copy) — the draft stays. */
+  return { plan, draft, updateDraft, saveStatus, isDirty, issues, error, save, publish, unpublish, remove, applyPlan };
 }

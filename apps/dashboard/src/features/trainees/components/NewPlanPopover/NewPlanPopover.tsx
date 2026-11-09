@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef } from 'react';
-import { fill, formatWeekSpan, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { fill, formatPlural, formatWeekSpan, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { ConfirmDialog } from '../../../../components/common/ConfirmDialog/ConfirmDialog';
 import { DuplicateSources } from '../DuplicateSources/DuplicateSources';
+import { PlanLengthPicker } from '../PlanLengthPicker/PlanLengthPicker';
 import { aiDraftCopy } from '../../../aiDraft/copy';
 import { weekTileLabel } from '../../data/planWeeks';
 import type { NewPlanPopoverState, PlanStartMethod } from '../../hooks/useNewPlanPopover';
@@ -75,7 +76,8 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
 
   // A week with a plan opens it — except a draft week when duplicating (she is asked replace / open).
   const isPublishedWeek = week?.plan?.status === 'published';
-  const action = startActionFor(week, method);
+  const isBlock = popover.length === 'block';
+  const action = startActionFor(week, method, popover.length);
   const isTaken = action === 'open';
   const isDuplicating = action === 'duplicate';
   const sources = popover.sources ?? [];
@@ -109,6 +111,15 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
           <Icon name="close" size="sm" />
         </button>
       </header>
+
+      {/* The first choice: weekly or a multi-week plan (owner, 2026-11-09). */}
+      <PlanLengthPicker
+        length={popover.length}
+        weeks={popover.blockWeeks}
+        onLengthChange={popover.selectLength}
+        onWeeksChange={popover.selectBlockWeeks}
+        disabled={popover.isCreating}
+      />
 
       {popover.isLoading && <p className="new-plan-loading">{shared.common.loading}</p>}
 
@@ -182,6 +193,11 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
         </>
       )}
 
+      {isBlock && !isTaken && popover.blockTakenWeek !== null && (
+        <p className="new-plan-note" role="status">
+          {fill(copy.length.blockTakenNote, { n: popover.blockTakenWeek })}
+        </p>
+      )}
       {isTaken && week?.plan && (
         <p className="new-plan-note" role="status">
           {fill(copy.weekTakenNote, { status: shared.coach.planStatus[week.plan.status] })}
@@ -200,14 +216,19 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
         <PillButton
           variant="primary"
           className="new-plan-confirm"
-          disabled={!week || popover.isCreating || (isDuplicating && !popover.source)}
+          disabled={!week || popover.isCreating || (isDuplicating && !popover.source) || (isBlock && !isTaken && popover.blockTakenWeek !== null)}
           onClick={() => void popover.confirm()}
         >
           {isTaken
             ? copy.openExisting
             : !week
               ? copy.newPlan
-              : fill(isDuplicating ? d.confirm : copy.createFor, { range: formatWeekSpan(week.weekStartDate, language) })}
+              : isBlock
+                ? fill(copy.length.createBlockFor, {
+                    weeks: formatPlural(language, copy.length.weeks, popover.blockWeeks),
+                    range: formatWeekSpan(week.weekStartDate, language),
+                  })
+                : fill(isDuplicating ? d.confirm : copy.createFor, { range: formatWeekSpan(week.weekStartDate, language) })}
         </PillButton>
         <PillButton variant="fill" disabled={popover.isCreating} onClick={close}>
           {shared.common.cancel}

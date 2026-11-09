@@ -29,6 +29,8 @@ export const {
   savePlan,
   publishPlan,
   unpublishPlan,
+  copyPlanForward,
+  updatePlanBlock,
   deletePlan,
   getLatestAiRecommendation,
   getAiRecommendation,

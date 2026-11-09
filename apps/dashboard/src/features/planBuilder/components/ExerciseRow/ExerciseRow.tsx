@@ -4,7 +4,8 @@ import { Select } from '../../../../components/common/Select/Select';
 import { Switch } from '../../../../components/common/Switch/Switch';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { fill, humanizeId, isolateLtr, useCopy, useLanguage, variantLabel } from '@sistem/shared';
-import type { ExerciseFacts } from '@sistem/types';
+import type { ExerciseFacts, PlanProgression } from '@sistem/types';
+import type { ProgressChip } from '../../data/blockWeeks';
 import { exerciseSpec } from '../../data/planStats';
 import { SUPERSET_LABELS } from '../../data/planDefaults';
 import { isTimedExercise, toPerSetTargets, toSimpleTargets } from '../../planDraft';
@@ -32,6 +33,11 @@ interface ExerciseRowProps {
   onIntervalChange: (interval: boolean) => void;
   onMove: (direction: -1 | 1) => void;
   onRemove: () => void;
+  /**
+   * Multi-week plans only: `chip` = what changed vs the week before ("+2.5 ק״ג ↑"); `showRule` = this
+   * week is the one copied forward, so its rule shows on the row and can be changed in the editor.
+   */
+  block?: { chip: ProgressChip | null; showRule: boolean };
 }
 
 /**
@@ -52,6 +58,7 @@ export function ExerciseRow({
   onIntervalChange,
   onMove,
   onRemove,
+  block,
 }: ExerciseRowProps) {
   const copy = useCopy(planBuilderCopy);
   const language = useLanguage();
@@ -65,6 +72,19 @@ export function ExerciseRow({
   const isPerSet = exercise.setTargets !== null;
   const hasProblem = issues.length > 0;
   const spec = exerciseSpec(exercise);
+  const blockText = copy.block;
+  const ruleLabel = (rule: PlanProgression | undefined) =>
+    rule === 'weight'
+      ? fill(blockText.progressionWeight, { amount: isolateLtr('+2.5') })
+      : rule === 'reps'
+        ? fill(blockText.progressionReps, { amount: isolateLtr('+1') })
+        : blockText.progressionNone;
+  const chip = block?.chip;
+  const chipText = !chip
+    ? null
+    : chip.kind === 'deload'
+      ? fill(blockText.chipDeload, { amount: isolateLtr('−30%') })
+      : fill(chip.kind === 'weight' ? blockText.chipWeight : blockText.chipReps, { amount: isolateLtr(`+${chip.amount}`) });
   // Under the name: the first muscle it works, and its weight when one is set.
   const underName = [
     exercise.facts?.primaryMuscles[0] ? humanizeId(exercise.facts.primaryMuscles[0]) : undefined,
@@ -109,6 +129,8 @@ export function ExerciseRow({
               ))}
             </span>
           )}
+          {chipText && <span className="exercise-progress">{chipText}</span>}
+          {block?.showRule && exercise.progression && <span className="exercise-progress-rule">{ruleLabel(exercise.progression)}</span>}
         </span>
         <span className="exercise-spec">
           <span className="exercise-spec-main">
@@ -219,6 +241,22 @@ export function ExerciseRow({
                 )}
               </Select>
             </label>
+
+            {/* Multi-week plans: how it grows when this week is copied forward. */}
+            {block?.showRule && (
+              <label className="exercise-superset">
+                <span className="exercise-option-label">{blockText.progressionLabel}</span>
+                <Select
+                  className="exercise-progression-select"
+                  value={exercise.progression ?? ''}
+                  onChange={(event) => onChange({ ...exercise, progression: (event.target.value || undefined) as PlanProgression | undefined })}
+                >
+                  <option value="">{ruleLabel(undefined)}</option>
+                  <option value="weight">{ruleLabel('weight')}</option>
+                  <option value="reps">{ruleLabel('reps')}</option>
+                </Select>
+              </label>
+            )}
 
             {/* Shown for timed exercises (and to switch off a flag that no longer fits). */}
             {(isTimedExercise(exercise) || exercise.interval) && (

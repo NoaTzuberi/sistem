@@ -43,6 +43,7 @@ export function draftFromPlan(plan: CoachPlan): PlanDraft {
         setTargets: exercise.setTargets?.map((target) => ({ key: newKey(), ...target })) ?? null,
         interval: exercise.interval ?? false,
         slotId: exercise.slotId,
+        progression: exercise.progression,
       })),
     })),
   };
@@ -56,6 +57,7 @@ function exerciseToInput(exercise: DraftExercise): PlanExerciseInput {
     supersetGroup: exercise.supersetGroup || undefined,
     interval: exercise.interval || undefined,
     slotId: exercise.slotId,
+    progression: exercise.progression,
   };
 
   if (exercise.setTargets) {

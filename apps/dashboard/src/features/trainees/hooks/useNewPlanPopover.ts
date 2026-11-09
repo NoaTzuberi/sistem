@@ -8,11 +8,11 @@ import { createPlan, listPlanSources, listPlanWeeks } from '../../../services/co
 import type { SplitOnlyRequest } from '../../planBuilder/types';
 import { NEW_PLAN_WEEK_COUNT } from '../data/planWeeks';
 import { describePlanCreateError, isStaleListError } from '../data/planCreateErrors';
-import { defaultSourceFor, startActionFor } from '../data/newPlanStart';
-import type { PlanStartMethod } from '../data/newPlanStart';
+import { DEFAULT_BLOCK_WEEKS, defaultSourceFor, firstTakenBlockWeek, startActionFor } from '../data/newPlanStart';
+import type { PlanLength, PlanStartMethod } from '../data/newPlanStart';
 import { traineesCopy } from '../copy';
 
-export type { PlanStartMethod };
+export type { PlanLength, PlanStartMethod };
 
 /** What the builder is told to load into the new plan (its router state). */
 export type PlanStart = { loadAiDraftId: string } | { splitOnly: SplitOnlyRequest };
@@ -47,6 +47,9 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
   const [selectedWeek, setSelectedWeek] = useState<string>();
   const [pickedSourceId, setPickedSourceId] = useState<string>();
   const [method, setMethod] = useState<PlanStartMethod>('scratch');
+  // The FIRST choice (owner, 2026-11-09): weekly, or a multi-week plan of 2–8 weeks.
+  const [length, setLength] = useState<PlanLength>('weekly');
+  const [blockWeeks, setBlockWeeks] = useState(DEFAULT_BLOCK_WEEKS);
   const [aiStart, setAiStart] = useState<PlanStart>();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string>();
@@ -65,6 +68,8 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
   const effectiveMethod: PlanStartMethod = method === 'ai' && !canUseAi ? 'scratch' : method;
   // Preselected: her own latest plan before the chosen week, else the newest of any trainee.
   const source = sources?.find((entry) => entry.id === pickedSourceId) ?? defaultSourceFor(sources ?? [], traineeId, week?.weekStartDate);
+  // A multi-week plan needs every one of its weeks free: the first taken one the picker can see.
+  const blockTakenWeek = length === 'block' && week ? firstTakenBlockWeek(options?.weeks ?? [], week.weekStartDate, blockWeeks) : null;
 
   /** Weeks + sources. `keepState` = a refresh after a failure: the error and the choices stay. */
   const loadLists = useCallback(
@@ -98,6 +103,8 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
       lastOpen.current = wanted;
       setIsOpen(true);
       setMethod(wanted.method ?? 'scratch');
+      setLength('weekly');
+      setBlockWeeks(DEFAULT_BLOCK_WEEKS);
       setAiStart(wanted.aiStart);
       setPickedSourceId(undefined);
       setDraftConflict(null);
@@ -124,6 +131,8 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
         weekStartDate: week.weekStartDate,
         ...(chosen === 'duplicate' && source ? { sourcePlanId: source.id } : {}),
         ...(replaceDraft ? { replaceDraft: true } : {}),
+        // A multi-week plan starts with its light last week on (the builder's switch turns it off).
+        ...(length === 'block' ? { lengthWeeks: blockWeeks, deloadLastWeek: true } : {}),
       });
       setDraftConflict(null);
       onCreated();
@@ -154,7 +163,7 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
     const chosen = override ?? effectiveMethod;
     if (!week) return;
     if (override) setMethod(override);
-    if (startActionFor(week, chosen) === 'open' && week.plan) {
+    if (startActionFor(week, chosen, length) === 'open' && week.plan) {
       navigate(planPath(traineeId, week.plan.id));
       return;
     }
@@ -175,6 +184,12 @@ export function useNewPlanPopover(traineeId: string, latestAiDraftId: string | u
     weeks,
     week,
     method: effectiveMethod,
+    length,
+    selectLength: setLength,
+    blockWeeks,
+    selectBlockWeeks: setBlockWeeks,
+    /** The first week of the chosen block that is already taken (null = all free, as far as the picker sees). */
+    blockTakenWeek,
     canUseAi,
     /** Published plans she can copy (null = loading). */
     sources,

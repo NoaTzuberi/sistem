@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import type { AiPlanExercise, AiSplitOption, AiTrainingRecommendation, CoachPlan, ExerciseFacts, TrainingSlot } from '@sistem/types';
+import type { AiPlanExercise, AiSplitOption, AiTrainingRecommendation, CoachPlan, ExerciseFacts, PlanIssue, TrainingSlot } from '@sistem/types';
 import { DUPLICATE_WEEK_STATE, traineePath } from '../../../../app/config/routes';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Toast } from '../../../../components/common/Toast/Toast';
@@ -20,6 +20,10 @@ import { workoutTabId } from '../../data/workoutTabs';
 import { addExerciseToWorkout, moveItem } from '../../planDraft';
 import type { DraftWorkout } from '../../types';
 import { BuilderHeader } from '../BuilderHeader/BuilderHeader';
+import { BlockRibbon } from '../BlockRibbon/BlockRibbon';
+import { BlockControls } from '../BlockControls/BlockControls';
+import { usePlanBlock } from '../../hooks/usePlanBlock';
+import { progressChipFor, weekColorClass } from '../../data/blockWeeks';
 import { LibrarySheet } from '../LibrarySheet/LibrarySheet';
 import { StartCards } from '../StartCards/StartCards';
 import { WorkoutCard } from '../WorkoutCard/WorkoutCard';
@@ -56,7 +60,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   const navigate = useNavigate();
   const location = useLocation();
   const ai = useLatestAiDraft(traineeId);
-  const { plan, draft, updateDraft, saveStatus, isDirty, issues, error, save, publish, unpublish, remove } = usePlanEditor(
+  const { plan, draft, updateDraft, saveStatus, isDirty, issues, error, save, publish, unpublish, remove, applyPlan } = usePlanEditor(
     traineeId,
     initialPlan,
   );
@@ -88,7 +92,16 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       }),
   });
   const { selected, selectedIndex } = planWorkouts;
-  const planIssues = issues.filter((issue) => issue.workoutIndex === undefined);
+  // A multi-week plan: the ribbon, its controls, and each exercise's change vs the week before.
+  const planBlock = usePlanBlock({ traineeId, plan, save, applyPlan, notify: showToast });
+  const block = planBlock.block;
+  const blockText = copy.block;
+  // A block's publish checks every week: problems of OTHER weeks are listed by week, never pinned on this week's rows.
+  const isOtherWeek = (issue: PlanIssue) => block !== undefined && issue.blockWeek !== undefined && issue.blockWeek !== block.week;
+  const weekIssues = issues.filter((issue) => !isOtherWeek(issue));
+  const planIssues = issues
+    .filter((issue) => issue.workoutIndex === undefined || isOtherWeek(issue))
+    .map((issue) => (isOtherWeek(issue) ? { ...issue, message: fill(blockText.issueInWeek, { n: issue.blockWeek!, message: issue.message }) } : issue));
   const plansTab = traineePath(traineeId, 'plans');
   const sharedText = useCopy(sharedCopy);
   const appText = useCopy(appCopy);
@@ -111,8 +124,8 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   };
   // Only one workout is on screen, so the tabs mark the ones the server found a problem in.
   const issueKeys = useMemo(
-    () => new Set(issues.flatMap((issue) => (issue.workoutIndex !== undefined && workouts[issue.workoutIndex] ? [workouts[issue.workoutIndex].key] : []))),
-    [issues, workouts],
+    () => new Set(weekIssues.flatMap((issue) => (issue.workoutIndex !== undefined && workouts[issue.workoutIndex] ? [workouts[issue.workoutIndex].key] : []))),
+    [weekIssues, workouts],
   );
 
   function setWorkouts(update: (current: DraftWorkout[]) => DraftWorkout[]) {
@@ -225,12 +238,15 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
 
   function handleUnpublish() {
     if (isDirty && !window.confirm(copy.unpublishDirtyConfirm)) return;
-    if (!isDirty && !window.confirm(fill(copy.unpublishConfirm, { name: traineeName }))) return;
+    const confirmText = block
+      ? fill(blockText.unpublishConfirm, { count: block.lengthWeeks, name: traineeName })
+      : fill(copy.unpublishConfirm, { name: traineeName });
+    if (!isDirty && !window.confirm(confirmText)) return;
     void runAction(unpublish);
   }
 
   async function handleDelete() {
-    if (!window.confirm(copy.deleteConfirm)) return;
+    if (!window.confirm(block ? fill(blockText.deleteConfirm, { count: block.lengthWeeks }) : copy.deleteConfirm)) return;
     if (await runAction(remove)) navigate(plansTab, { replace: true });
   }
 
@@ -250,7 +266,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   ];
 
   return (
-    <div className="plan-editor">
+    <div className={block ? `plan-editor ${weekColorClass(block.week)}` : 'plan-editor'}>
       <Link className="plan-back" to={plansTab}>
         {fill(copy.backToName, { name: traineeName })}
       </Link>
@@ -266,7 +282,22 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
         menuItems={menuItems}
         onSave={() => void save()}
         onPublish={() => void handlePublish()}
+        blockLabel={block ? fill(blockText.weekOf, { n: block.week, total: block.lengthWeeks }) : undefined}
+        publishLabel={block ? fill(blockText.publishAll, { count: block.lengthWeeks }) : undefined}
       />
+
+      {block && (
+        <>
+          <BlockRibbon weeks={planBlock.weeks} selectedWeek={block.week} fill={planBlock.ribbonFill} onSelect={planBlock.goToWeek} />
+          <BlockControls
+            block={block}
+            isBusy={planBlock.isBusy || isBusy}
+            onLengthChange={planBlock.changeLength}
+            onDeloadChange={planBlock.changeDeload}
+            onCopyForward={planBlock.copyForward}
+          />
+        </>
+      )}
 
       {/* Only what she must know: a published plan is live, so its changes wait for "Save changes". */}
       {(isPublished || plan.locked) && (
@@ -305,6 +336,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
             onSelect={(key) => planWorkouts.select(workouts.find((workout) => workout.key === key))}
             onAddStrength={planWorkouts.addStrength}
             onAddCardio={planWorkouts.addCardio}
+            neutral={block !== undefined}
           />
           <div ref={planWorkouts.panelRef} className={planWorkouts.leavingKey ? 'plan-workout-panel plan-workout-panel-leaving' : 'plan-workout-panel'} id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
             {/* Keyed by workout: another workout starts with its rows closed. A cardio workout has its own body. */}
@@ -315,7 +347,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
                 index={selectedIndex}
                 count={workouts.length}
                 autoFocusTitle={selected.key === planWorkouts.addedKey}
-                issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
+                issues={weekIssues.filter((issue) => issue.workoutIndex === selectedIndex)}
                 onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
                 onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}
                 onDuplicate={() => planWorkouts.duplicate(selectedIndex)}
@@ -326,19 +358,28 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
               key={selected.key}
               traineeId={traineeId}
               workout={selected}
-              colorClass={workoutColorClass(selectedIndex)}
+              colorClass={block ? 'workout-color-neutral' : workoutColorClass(selectedIndex)}
               config={config}
               suggestions={suggestionsFor(selectedIndex)}
               index={selectedIndex}
               count={workouts.length}
               autoFocusTitle={selected.key === planWorkouts.addedKey}
-              issues={issues.filter((issue) => issue.workoutIndex === selectedIndex)}
+              issues={weekIssues.filter((issue) => issue.workoutIndex === selectedIndex)}
               onChange={(next) => setWorkouts((current) => current.map((other) => (other.key === next.key ? next : other)))}
               onMove={(direction) => setWorkouts((current) => moveItem(current, selectedIndex, selectedIndex + direction))}
               onDuplicate={() => planWorkouts.duplicate(selectedIndex)}
               onRemove={() => planWorkouts.remove(selected)}
               onExerciseRemoved={(name) => showToast(fill(copy.toastRemoved, { name }))}
               onAddExercise={openLibrary}
+              block={
+                block
+                  ? {
+                      chipFor: (exercise, exerciseIndex) => progressChipFor(planBlock.previousWeek, selectedIndex, exerciseIndex, exercise),
+                      // The rule is set on the week that is copied forward (any week but the last).
+                      showRule: block.week < block.lengthWeeks,
+                    }
+                  : undefined
+              }
             />
             )}
           </div>

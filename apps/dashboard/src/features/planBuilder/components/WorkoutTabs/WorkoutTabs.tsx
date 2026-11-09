@@ -20,6 +20,8 @@ interface WorkoutTabsProps {
   onSelect: (workoutKey: string) => void;
   onAddStrength: () => void;
   onAddCardio: () => void;
+  /** A multi-week plan: the week carries the color, so the workouts stay neutral. */
+  neutral?: boolean;
 }
 
 /**
@@ -27,7 +29,7 @@ interface WorkoutTabsProps {
  * the cardio purple, a small pulse icon and its minutes); the selected one is filled. Switching is
  * instant — it is used all the time. A workout's day is only a label here; it is chosen inside it.
  */
-export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAddStrength, onAddCardio }: WorkoutTabsProps) {
+export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAddStrength, onAddCardio, neutral = false }: WorkoutTabsProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   const handleKeyDown = useTabListKeys();
@@ -46,7 +48,7 @@ export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelec
             <button
               key={workout.key}
               id={workoutTabId(workout.key)}
-              className={`workout-tab ${isCardio ? 'workout-kind-cardio' : workoutColorClass(index)}`}
+              className={`workout-tab ${neutral ? 'workout-color-neutral' : isCardio ? 'workout-kind-cardio' : workoutColorClass(index)}`}
               type="button"
               role="tab"
               data-selects=""

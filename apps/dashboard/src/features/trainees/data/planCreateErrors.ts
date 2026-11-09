@@ -18,5 +18,5 @@ export function describePlanCreateError(error: unknown, language: Language): str
 
 /** After these, the weeks / sources on screen are out of date: they are fetched again. */
 export function isStaleListError(error: unknown): boolean {
-  return error instanceof PlanRequestError && (error.code === 'plan_week_taken' || error.code === 'plan_source_not_found');
+  return error instanceof PlanRequestError && (error.code === 'plan_week_taken' || error.code === 'plan_source_not_found' || error.code === 'plan_block_week_taken');
 }

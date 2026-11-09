@@ -10,8 +10,9 @@ export interface CoachNotificationView {
   /**
    * The trainee section to open; null = her default section. Both apps call it 'logs'.
    * 'archive' = her coaching ended: open her read-only archived page instead.
+   * 'plans' = her plans (a multi-week plan ends this week: time for the next one).
    */
-  section: 'logs' | 'archive' | null;
+  section: 'logs' | 'archive' | 'plans' | null;
 }
 
 /**
@@ -45,6 +46,13 @@ export function describeCoachNotification(notification: AppNotification, languag
       text: fill(copy.noteThanks, { name: isolateAuto(notification.data.traineeName) }),
       traineeId: notification.data.traineeId,
       section: null,
+    };
+  }
+  if (notification.type === 'plan_block_ending') {
+    return {
+      text: fill(copy.planBlockEnding, { name: isolateAuto(notification.data.traineeName) }),
+      traineeId: notification.data.traineeId,
+      section: 'plans',
     };
   }
   if (notification.type === 'trainee_ended_coaching') {

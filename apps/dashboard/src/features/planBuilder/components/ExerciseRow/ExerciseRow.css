@@ -361,3 +361,30 @@
     transition: none;
   }
 }
+
+/* Multi-week plans: what changed vs the week before, in the week's tint + its dark tone. */
+.exercise-progress,
+.exercise-progress-rule {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  min-height: 22px;
+  margin-top: 4px;
+  padding: 0 8px;
+  border-radius: var(--radius-round);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.exercise-progress {
+  color: var(--week-text);
+  background-color: var(--week-soft);
+}
+
+/* This week's own rule (the week that is copied forward): quiet. */
+.exercise-progress-rule {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background-color: var(--color-fill-soft);
+}

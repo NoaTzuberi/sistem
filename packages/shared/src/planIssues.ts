@@ -6,6 +6,7 @@ import { fill } from './i18n/copy';
 export function describeIssue(issue: PlanIssue, language: Language): string {
   const copy = sharedCopy[language].coach;
   const where = [
+    ...(issue.blockWeek !== undefined ? [fill(copy.issueWeek, { n: issue.blockWeek })] : []),
     ...(issue.workoutIndex !== undefined ? [fill(copy.issueWorkout, { n: issue.workoutIndex + 1 })] : []),
     ...(issue.exerciseIndex !== undefined ? [fill(copy.issueExercise, { n: issue.exerciseIndex + 1 })] : []),
   ].join(sharedCopy[language].common.listSeparator);

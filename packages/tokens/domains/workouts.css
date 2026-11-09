@@ -30,6 +30,36 @@
   --color-workout-4-text: var(--ink-blue);
   --color-workout-5-text: var(--color-workout-5);
 
+  /* Multi-week plans (owner, 2026-11-09): one color per week of a block, cycling 1–4 for 5–8 weeks —
+     the same values as the workout identity colors. -on = text on the week's FILL: white on pink and
+     purple, ink on orange and blue (white fails contrast there; owner approved). */
+  --color-week-1: var(--color-workout-1);
+  --color-week-1-soft: var(--color-workout-1-soft);
+  --color-week-1-text: var(--color-workout-1-text);
+  --color-week-1-on: var(--color-on-primary);
+  --color-week-2: var(--color-workout-2);
+  --color-week-2-soft: var(--color-workout-2-soft);
+  --color-week-2-text: var(--color-workout-2-text);
+  --color-week-2-on: var(--color-on-primary);
+  --color-week-3: var(--color-workout-3);
+  --color-week-3-soft: var(--color-workout-3-soft);
+  --color-week-3-text: var(--color-workout-3-text);
+  --color-week-3-on: var(--color-ink);
+  --color-week-4: var(--color-workout-4);
+  --color-week-4-soft: var(--color-workout-4-soft);
+  --color-week-4-text: var(--color-workout-4-text);
+  --color-week-4-on: var(--color-ink);
+  --shadow-week-selected: 0 14px 30px color-mix(in srgb, var(--week-color, var(--color-ink)) 38%, transparent);
+  --shadow-week-hover: 0 8px 18px color-mix(in srgb, var(--week-color, var(--color-ink)) 22%, transparent);
+  --text-week-name: 34px;            /* "שבוע 1" on a ribbon card (Karantina) */
+  --text-block-week: 64px;           /* "02" on her Workouts block card (Barlow Condensed) */
+  --size-week-bar-height: 64px;      /* A ribbon card's volume bar */
+  --size-week-bar-width: 14px;
+  --size-block-segment: 8px;         /* Her block progress segments */
+  --duration-week-fill: 260ms;       /* "העתקה לשבועות הבאים": each card's fill */
+  --duration-week-stagger: 60ms;     /* …one card after another */
+  --color-block-segment-future: color-mix(in srgb, var(--color-on-primary) 25%, transparent);
+
   /* Rating dots. */
   --color-rating-on: #ff7a00;           /* A filled rating dot (not text) */
   --color-rating-off: #e2dee5;

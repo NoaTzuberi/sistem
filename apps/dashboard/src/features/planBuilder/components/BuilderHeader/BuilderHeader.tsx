@@ -24,6 +24,9 @@ interface BuilderHeaderProps {
   menuItems: ActionMenuItem[];
   onSave: () => void;
   onPublish: () => void;
+  /** A multi-week plan: "שבוע 2 מתוך 4" next to the status, and its own publish label. */
+  blockLabel?: string;
+  publishLabel?: string;
 }
 
 /**
@@ -31,7 +34,7 @@ interface BuilderHeaderProps {
  * "⋯" menu and ONE primary pill (publish a draft; save the changes of a published plan, which
  * is live for the trainee and therefore never autosaved).
  */
-export function BuilderHeader({ traineeId, traineeName, currentWeekStart, plan, saveStatus, isDirty, isBusy, menuItems, onSave, onPublish }: BuilderHeaderProps) {
+export function BuilderHeader({ traineeId, traineeName, currentWeekStart, plan, saveStatus, isDirty, isBusy, menuItems, onSave, onPublish, blockLabel, publishLabel }: BuilderHeaderProps) {
   const language = useLanguage();
   const shared = useCopy(sharedCopy);
   const copy = useCopy(planBuilderCopy);
@@ -47,6 +50,7 @@ export function BuilderHeader({ traineeId, traineeName, currentWeekStart, plan, 
         <h1 className="builder-title">{title}</h1>
         <p className="builder-subline">
           <span className="builder-dates">{formatWeekSpanWithDays(plan.weekStartDate, language)}</span>
+          {blockLabel && <Tag>{blockLabel}</Tag>}
           <StatusPill planStatus={plan.status} saveStatus={saveStatus} />
           {plan.locked && <Tag>{shared.coach.startedByTrainee}</Tag>}
         </p>
@@ -60,7 +64,7 @@ export function BuilderHeader({ traineeId, traineeName, currentWeekStart, plan, 
           </PillButton>
         ) : (
           <PillButton variant="primary" disabled={isBusy} onClick={onPublish}>
-            {fill(copy.publishTo, { name: traineeName })}
+            {publishLabel ?? fill(copy.publishTo, { name: traineeName })}
           </PillButton>
         )}
       </div>

@@ -159,6 +159,7 @@ export const en: CopyShape<typeof he> = {
     planStatus: { published: 'Published', draft: 'Draft' },
     exerciseCount: plural({ one: '{count} exercise', other: '{count} exercises' }),
     issueWorkout: 'Workout {n}',
+    issueWeek: 'Week {n}',
     issueExercise: 'exercise {n}',
     issueAt: '{where}: {message}',
   },
@@ -168,6 +169,7 @@ export const en: CopyShape<typeof he> = {
     // PLACEHOLDER — the owner sends the final text.
     noteThanks: '{name} said thanks for your note',
     traineeEndedCoaching: '{name} ended the coaching',
+    planBlockEnding: "{name}'s plan ends this week",
   },
   onboardingSections: {
     basicProfile: 'Basic profile',

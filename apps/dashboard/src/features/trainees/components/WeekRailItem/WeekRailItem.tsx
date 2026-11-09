@@ -1,6 +1,7 @@
 import { fill, formatNumber, formatWeekSpan, isolateLtr, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { workoutColorClass } from '../../../planBuilder/data/workoutColors';
+import { weekColorClass } from '../../../planBuilder/data/blockWeeks';
 import { traineesCopy } from '../../copy';
 import type { ProgramWeek } from '../../hooks/useTraineeWeeks';
 import './WeekRailItem.css';
@@ -61,6 +62,12 @@ export function WeekRailItem({ week, isSelected, onSelect }: WeekRailItemProps) 
       <span className="pw-rail-dates">
         <bdi>{formatWeekSpan(week.weekStartDate, language)}</bdi>
       </span>
+      {/* A week of a multi-week plan: "שבוע 2/4" in that week's color (the block reads as one run). */}
+      {week.plan?.block && (
+        <span className={`pw-rail-block ${weekColorClass(week.plan.block.week)}`}>
+          {fill(copy.length.weekOf, { n: week.plan.block.week, total: week.plan.block.lengthWeeks })}
+        </span>
+      )}
       <span className="pw-rail-bars" aria-hidden="true">
         {week.plan?.workouts.map((workout, index) => (
           <span key={workout.id} className={`pw-rail-bar ${workoutColorClass(index)}`} data-state={week.progress?.statuses[workout.id] ?? 'planned'} />

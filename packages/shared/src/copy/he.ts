@@ -164,6 +164,8 @@ export const he = {
     planStatus: { published: 'פורסמה', draft: 'טיוטה' },
     exerciseCount: plural({ one: 'תרגיל אחד', two: '2 תרגילים', other: '{count} תרגילים' }),
     issueWorkout: 'אימון {n}',
+    // DRAFT — a multi-week plan's publish: the week the problem is in.
+    issueWeek: 'שבוע {n}',
     issueExercise: 'תרגיל {n}',
     issueAt: '{where}: {message}',
   },
@@ -173,6 +175,8 @@ export const he = {
     // PLACEHOLDER — the owner sends the final text.
     noteThanks: '{name} אמרה תודה על ההערה שלך',
     traineeEndedCoaching: '{name} סיימה את הליווי',
+    // DRAFT — multi-week plans.
+    planBlockEnding: 'התוכנית של {name} מסתיימת השבוע',
   },
   onboardingSections: {
     basicProfile: 'פרטים בסיסיים',

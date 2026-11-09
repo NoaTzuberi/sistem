@@ -139,3 +139,15 @@
     transform: none;
   }
 }
+
+/* A week of a multi-week plan: its week number in the block, in that week's tint + dark tone. */
+.pw-rail-block {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-round);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--week-text);
+  background-color: var(--week-soft);
+}

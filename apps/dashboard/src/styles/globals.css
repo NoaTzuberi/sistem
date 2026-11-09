@@ -108,6 +108,46 @@ button {
   --workout-text: var(--color-workout-5-text);
   }
 
+/* Inside a multi-week plan the WEEK carries the color (the ribbon); its workouts stay neutral
+   (owner, 2026-11-09), so the two never compete. */
+.workout-color-neutral {
+  --workout-color: var(--color-ink);
+  --workout-color-soft: var(--color-fill-soft);
+  --workout-text: var(--color-ink);
+  }
+
+/*
+ * A week's color in a multi-week plan (weekColorClass), cycling 1–4. --week-on = text on its fill
+ * (white on pink / purple, ink on orange / blue); --week-text = its dark tone on its tint or on white.
+ */
+.week-color-1 {
+  --week-color: var(--color-week-1);
+  --week-soft: var(--color-week-1-soft);
+  --week-text: var(--color-week-1-text);
+  --week-on: var(--color-week-1-on);
+  }
+
+.week-color-2 {
+  --week-color: var(--color-week-2);
+  --week-soft: var(--color-week-2-soft);
+  --week-text: var(--color-week-2-text);
+  --week-on: var(--color-week-2-on);
+  }
+
+.week-color-3 {
+  --week-color: var(--color-week-3);
+  --week-soft: var(--color-week-3-soft);
+  --week-text: var(--color-week-3-text);
+  --week-on: var(--color-week-3-on);
+  }
+
+.week-color-4 {
+  --week-color: var(--color-week-4);
+  --week-soft: var(--color-week-4-soft);
+  --week-text: var(--color-week-4-text);
+  --week-on: var(--color-week-4-on);
+  }
+
 /* A cardio workout, whatever its place: the cardio purple (its solid keeps white text at 6.2:1). */
 .workout-kind-cardio {
   --workout-color: var(--color-zone-2);
