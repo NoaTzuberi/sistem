@@ -145,15 +145,56 @@ Progression / deload are applied when copying (targets written into each week), 
   coach's Today / notifications load during the block's last week (dedupe key `block_ending:<blockId>`). Adding a cron
   job would be a new architecture piece — your call.
 
+## Owner decisions so far (2026-11-09)
+
+- "בחירת תבנית" is dropped and "תבנית" leaves the empty-state text (training templates = a later feature). Not changed in
+  code yet; it lands with the build.
+- Approved: the PlanBlock model above, and the lazy "מסתיימת השבוע" notification (no scheduled job).
+- Required: the length choice ("שבועית" / "חודשית") is the FIRST control of "תוכנית חדשה", in the dashboard and in mobile
+  coach mode, with the click path in the build report.
+
+## Preview v2: "alive" builder + trainee stage (still preview only)
+
+Builder (`docs/design-preview/plan-block-builder.html`, interactive: weeks, workouts, stepper 2–8, שבוע קל, copy):
+- Length first: segmented "שבועית / חודשית" + stepper (2–8). Weekly hides everything block-related.
+- **Block ribbon**: one card per week: "שבוע N" (Karantina), dates, volume number + a vertical volume bar. The bars' bottoms
+  line up, so the rise (4,190 → 4,425 → 4,660 ק״ג) and the deload dip (3,320) read across the row.
+  Volume = Σ sets × reps × kg; a week with no weights = total sets.
+- **One color per week**: 1 pink, 2 purple, 3 orange, 4 blue (the existing `--color-workout-1…4` values, exactly the
+  colors you named), cycling for 5–8. Selected = its fill, scale 1.02 + a shadow in its color; others = its soft tint;
+  not copied yet = white with a faint outline in its color + "עדיין ריק"; deload = its soft tint + "שבוע קל" chip (also
+  when selected: outlined + lifted instead of filled).
+- **Progression chips** vs the previous week, in the week's tint with its dark text tone: "+2.5 ק״ג ↑", "+1 חזרה ↑",
+  deload "−30% נפח ↓" (numbers in `<bdi dir="ltr">`). Week 1 shows each exercise's rule as a small menu button instead.
+- **"העתקה לשבועות הבאים"**: a pink pill. The later cards start white and fill with their tint one after another
+  (60 ms apart, 260 ms each, transform only), each bar grows after its card, then the toast "הועתק לשבועות 2–4".
+  Reduced motion: instant. Disabled on the last week.
+
+Trainee Workouts (`docs/design-preview/plan-block-trainee.html`):
+- Pink stage: "שבוע" (Karantina) + "02" (Barlow Condensed 64px) + "מתוך 4", dates, 4 segments (done = white, current =
+  half white, future = white 25%).
+- "השבוע: משקלים עולים ב־3 תרגילים" as a white chip with pink ink text (white text on a light tint is not allowed).
+  Shown only when this week raises a weight vs last week.
+- Future weeks: locked cards (lock icon, muted, no tap): "נפתח ביום א׳" for next week, the date for later ones.
+
+Decisions in v2 worth a look:
+1. **Text on a week's fill**: white on pink and purple; **ink** on orange and blue (white on #ff7a00 / #0094ff fails
+   contrast for the small dates). Proposed tokens `--color-week-N`, `-soft`, `-text`, `-on` (aliases of the workout colors).
+2. **Fill direction**: the cards fill in week order. You wrote "left→right". In Hebrew, week 1 is on the right, so
+   they fill right→left; in English, left→right. Tell me if you want physical left→right in both.
+3. Week colors reuse the workout identity colors, so a week card and a workout tab can show the same pink. The builder
+   keeps workouts as neutral ink / soft pills under the ribbon, so they never compete.
+
 ## Screenshots (`docs/phase-reports/duplicate-fix-and-blocks/`)
 
-| Before | After / preview |
+| Before | After |
 | --- | --- |
-| `before-1-builder.jpg`: the weekly builder today | `preview-1-builder-1440.jpg`, `preview-2-builder-390.jpg`: length selector, week tabs, copy-to-weeks, progression, שבוע קל |
-| `before-2-trainee-workouts.jpg`: her Workouts tab today | `preview-3-trainee-workouts.jpg`: "שבוע 2 מתוך 4", next week "נפתח ביום א׳", past week in history |
+| `before-1-builder.jpg`: the weekly builder today | |
+| `v1-preview-1-builder-1440.jpg`, `v1-preview-2-builder-390.jpg`: preview v1 (flat tabs) | `v2-1-builder-before-copy-1440.jpg`: ribbon, weeks 2–4 empty · `v2-2-builder-copy-animating-1440.jpg`: mid-copy (week 4 filling) · `v2-3-builder-copied-toast-1440.jpg`: week 2 selected, chips, toast · `v2-4-builder-deload-week-1440.jpg`: deload week · `v2-5-builder-6-weeks-colors-cycle-1440.jpg`: 6 weeks, colors cycling · `v2-6-builder-390.jpg`: phone width · `v2-7-builder-weekly-1440.jpg`: "שבועית" |
+| `before-2-trainee-workouts.jpg`: her Workouts tab today · `v1-preview-3-trainee-workouts.jpg`: preview v1 | `v2-8-trainee-workouts-390.jpg`: pink stage "שבוע 02 מתוך 4", segments, progression line, locked weeks |
 | | `after-1 … after-6`: the duplicate fix (see How to test) |
 
-Preview copy is DRAFT and not in the code yet.
+Preview copy is DRAFT and not in the code yet. No sideways scroll at 390 / 1440 in any shot.
 
 **Waiting for "approved" (and answers to the questions above) before building the multi-week feature.**
 
