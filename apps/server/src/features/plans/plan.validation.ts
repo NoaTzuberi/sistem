@@ -417,6 +417,10 @@ export function findPublishIssues(workouts: PublishableWorkout[]): PlanProblem[]
 export interface CreatePlanInput {
   weekStartDate: string;
   duplicatePrevious: boolean;
+  /** Copy this published plan of hers (any of her trainees, any week). */
+  sourcePlanId?: string;
+  /** The week already has a draft: overwrite it with the copy (the coach chose "replace"). */
+  replaceDraft: boolean;
 }
 
 export function parseCreatePlanPayload(body: unknown): { value: CreatePlanInput; error: null } | { value: null; error: ServerMessage } {
@@ -426,7 +430,21 @@ export function parseCreatePlanPayload(body: unknown): { value: CreatePlanInput;
   if (!isMissing(body.duplicatePrevious) && typeof body.duplicatePrevious !== 'boolean') {
     return { value: null, error: msg('plan_duplicate_flag_invalid') };
   }
-  return { value: { weekStartDate: body.weekStartDate, duplicatePrevious: body.duplicatePrevious === true }, error: null };
+  if (!isMissing(body.replaceDraft) && typeof body.replaceDraft !== 'boolean') {
+    return { value: null, error: msg('plan_duplicate_flag_invalid') };
+  }
+  if (!isMissing(body.sourcePlanId) && (typeof body.sourcePlanId !== 'string' || !mongoose.Types.ObjectId.isValid(body.sourcePlanId))) {
+    return { value: null, error: msg('plan_source_not_found') };
+  }
+  return {
+    value: {
+      weekStartDate: body.weekStartDate,
+      duplicatePrevious: body.duplicatePrevious === true,
+      ...(typeof body.sourcePlanId === 'string' ? { sourcePlanId: body.sourcePlanId } : {}),
+      replaceDraft: body.replaceDraft === true,
+    },
+    error: null,
+  };
 }
 
 export interface PublishNoteInput {

@@ -40,6 +40,7 @@ import type {
   NutritionSettingsResponse,
   NutritionTemplate,
   RenameNutritionTemplatePayload,
+  PlanDuplicateSource,
   PlanIssue,
   PlanWeekOptions,
   SaveNutritionPlanPayload,
@@ -57,16 +58,29 @@ import { extractErrorMessage } from './createApiClient';
  */
 export class PlanRequestError extends Error {
   readonly issues: PlanIssue[];
+  /** The server's error code (e.g. plan_week_has_draft); undefined = no answer (network). */
+  readonly code: string | undefined;
+  readonly status: number | undefined;
+  /** plan_week_has_draft: the draft already in that week. */
+  readonly planId: string | undefined;
 
-  constructor(message: string, issues: PlanIssue[] = []) {
+  constructor(message: string, issues: PlanIssue[] = [], details: { code?: string; status?: number; planId?: string } = {}) {
     super(message);
     this.issues = issues;
+    this.code = details.code;
+    this.status = details.status;
+    this.planId = details.planId;
   }
 }
 
 function toPlanRequestError(error: unknown, fallback: string): PlanRequestError {
-  const issues: unknown = axios.isAxiosError(error) ? error.response?.data?.issues : undefined;
-  return new PlanRequestError(extractErrorMessage(error, fallback), Array.isArray(issues) ? (issues as PlanIssue[]) : []);
+  const response = axios.isAxiosError(error) ? error.response : undefined;
+  const data: { issues?: unknown; code?: unknown; planId?: unknown } | undefined = response?.data;
+  return new PlanRequestError(extractErrorMessage(error, fallback), Array.isArray(data?.issues) ? (data.issues as PlanIssue[]) : [], {
+    code: typeof data?.code === 'string' ? data.code : undefined,
+    status: response?.status,
+    planId: typeof data?.planId === 'string' ? data.planId : undefined,
+  });
 }
 
 /**
@@ -233,6 +247,12 @@ export function createCoachApi(client: AxiosInstance) {
   async function listPlanWeeks(traineeId: string): Promise<PlanWeekOptions> {
     const { data } = await client.get<PlanWeekOptions>(`/coach/trainees/${traineeId}/plan-weeks`);
     return data;
+  }
+
+  /** "Duplicate from": the coach's published plans (any trainee, past weeks too), newest first. */
+  async function listPlanSources(traineeId: string): Promise<PlanDuplicateSource[]> {
+    const { data } = await client.get<{ items: PlanDuplicateSource[] }>(`/coach/trainees/${traineeId}/plan-sources`);
+    return data.items;
   }
 
   async function getPlan(traineeId: string, planId: string): Promise<CoachPlan> {
@@ -461,6 +481,7 @@ export function createCoachApi(client: AxiosInstance) {
     listPlanWeeks,
     getPlan,
     createPlan,
+    listPlanSources,
     savePlan,
     publishPlan,
     unpublishPlan,

@@ -2,7 +2,7 @@ import { cardioLogRefs } from '../cardio/cardio.service';
 import { markCoachingActive } from '../coachings/coaching.service';
 import { CardioLog } from '../cardio/cardio.model';
 import { Types } from 'mongoose';
-import type { CoachPlan, CoachPlanProgress } from '@sistem/types';
+import type { CoachPlan, CoachPlanProgress, PlanDuplicateSource } from '@sistem/types';
 import { emitAppEvent } from '../../events/appEvents';
 import { User } from '../users/user.model';
 import { WorkoutLog } from '../workoutLogs/workoutLog.model';
@@ -124,10 +124,50 @@ export async function getCoachPlan(traineeId: string, coachingId: string, planId
   return plan;
 }
 
+/** The week already has a draft and the coach did not say to replace it: she chooses (replace / open / cancel). */
+export class PlanWeekHasDraftError extends PlanConflictError {
+  constructor(public readonly planId: string) {
+    super('plan_week_has_draft');
+  }
+}
+
+/** What a copy takes from its source: content only, with fresh workout / exercise ids (logs never mix). */
+function copiedContent(source: LeanPlan) {
+  return {
+    notes: source.notes,
+    // Workout types and slots are copied with the workouts (coach structure); the AI link is not.
+    splitId: source.splitId ?? undefined,
+    workouts: source.workouts.map(({ _id: _workoutId, exercises, ...workout }) => ({
+      ...workout,
+      exercises: exercises.map(({ _id: _exerciseId, ...exercise }) => exercise),
+    })),
+  };
+}
+
 /**
- * A new draft for one week: empty, or a copy of the trainee's most recent earlier
- * plan ("duplicate last week"). The copy gets fresh workout / exercise ids, so its
- * workout logs never mix with the original's.
+ * The plan a duplicate copies. Only PUBLISHED plans are copied: a draft may be empty or
+ * half-built, and copying one led to an endless "duplicate → empty draft → duplicate" loop.
+ * `sourcePlanId` = any published plan of this coach (another trainee, an ended week);
+ * otherwise "duplicate last week" = the trainee's most recent earlier published plan.
+ */
+async function findDuplicateSource(coachingId: string, coachId: string, input: CreatePlanInput): Promise<LeanPlan | null> {
+  if (input.sourcePlanId) {
+    const source = await Plan.findOne({ _id: input.sourcePlanId, coachId, status: 'published' }).lean<LeanPlan>();
+    if (!source) throw new PlanNotFoundError('plan_source_not_found');
+    return source;
+  }
+  if (!input.duplicatePrevious) return null;
+  const previous = await Plan.findOne({ coachingId, status: 'published', weekStartDate: { $lt: input.weekStartDate } })
+    .sort({ weekStartDate: -1 })
+    .lean<LeanPlan>();
+  if (!previous) throw new PlanConflictError('plan_nothing_to_duplicate');
+  return previous;
+}
+
+/**
+ * A new draft for one week: empty, or a copy of a published plan. When the week already
+ * has a draft, a copy never fails silently: 409 plan_week_has_draft (with its id), or —
+ * when the coach chose "replace" — the draft's content is replaced in place.
  */
 export async function createCoachPlan(traineeId: string, coachingId: string, coachId: string, input: CreatePlanInput): Promise<CoachPlan> {
   const trainee = await User.findById(traineeId).select('timezone').lean();
@@ -137,32 +177,23 @@ export async function createCoachPlan(traineeId: string, coachingId: string, coa
   if (input.weekStartDate < currentWeekStart(trainee.timezone)) {
     throw new PlanConflictError('plan_week_too_early');
   }
-  if (await Plan.exists({ coachingId, weekStartDate: input.weekStartDate })) {
-    throw new PlanConflictError('plan_week_taken');
-  }
+  const source = await findDuplicateSource(coachingId, coachId, input);
+  const content = source ? copiedContent(source) : { notes: undefined, splitId: undefined, workouts: [] };
 
-  let notes: string | undefined;
-  let splitId: string | undefined;
-  let workouts: unknown[] = [];
-  if (input.duplicatePrevious) {
-    const previous = await Plan.findOne({ coachingId, weekStartDate: { $lt: input.weekStartDate } })
-      .sort({ weekStartDate: -1 })
-      .lean<LeanPlan>();
-    if (!previous) {
-      throw new PlanConflictError('plan_nothing_to_duplicate');
-    }
-    notes = previous.notes;
-    // Workout types and slots are copied with the workouts (coach structure); the AI link is not.
-    splitId = previous.splitId ?? undefined;
-    workouts = previous.workouts.map(({ _id: _workoutId, exercises, ...workout }) => ({
-      ...workout,
-      exercises: exercises.map(({ _id: _exerciseId, ...exercise }) => exercise),
-    }));
+  const existing = await Plan.findOne({ coachingId, weekStartDate: input.weekStartDate });
+  if (existing) {
+    if (existing.status !== 'draft' || !source) throw new PlanConflictError('plan_week_taken');
+    if (!input.replaceDraft) throw new PlanWeekHasDraftError(String(existing._id));
+    if (await isLocked(String(existing._id))) throw new PlanConflictError('plan_locked');
+    existing.set({ notes: content.notes, splitId: content.splitId, aiRecommendationId: undefined });
+    existing.set('workouts', content.workouts);
+    await existing.save();
+    return getCoachPlan(traineeId, coachingId, String(existing._id));
   }
 
   try {
-    const created = new Plan({ traineeId, coachId, coachingId, weekStartDate: input.weekStartDate, notes, splitId });
-    created.set('workouts', workouts);
+    const created = new Plan({ traineeId, coachId, coachingId, weekStartDate: input.weekStartDate, notes: content.notes, splitId: content.splitId });
+    created.set('workouts', content.workouts);
     await created.save();
     return getCoachPlan(traineeId, coachingId, String(created._id));
   } catch (error) {
@@ -172,6 +203,31 @@ export async function createCoachPlan(traineeId: string, coachingId: string, coa
     }
     throw error;
   }
+}
+
+const DUPLICATE_SOURCES_LIMIT = 40;
+
+/**
+ * The "duplicate from" list: every PUBLISHED plan of this coach (this trainee's and her other
+ * trainees', past weeks and ended coachings included), newest week first. Drafts never appear.
+ */
+export async function listDuplicateSources(coachId: string): Promise<PlanDuplicateSource[]> {
+  const plans = await Plan.find({ coachId, status: 'published' })
+    .sort({ weekStartDate: -1, publishedAt: -1 })
+    .limit(DUPLICATE_SOURCES_LIMIT)
+    .select('traineeId weekStartDate workouts._id')
+    .lean<{ _id: Types.ObjectId; traineeId: Types.ObjectId; weekStartDate: string; workouts: { _id: Types.ObjectId }[] }[]>();
+  const trainees = await User.find({ _id: { $in: [...new Set(plans.map((plan) => String(plan.traineeId)))] } })
+    .select('name')
+    .lean<{ _id: Types.ObjectId; name?: string }[]>();
+  const names = new Map(trainees.map((trainee) => [String(trainee._id), trainee.name ?? '']));
+  return plans.map((plan) => ({
+    id: String(plan._id),
+    traineeId: String(plan.traineeId),
+    traineeName: names.get(String(plan.traineeId)) ?? '',
+    weekStartDate: plan.weekStartDate,
+    workoutCount: plan.workouts.length,
+  }));
 }
 
 /**

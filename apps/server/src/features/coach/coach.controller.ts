@@ -18,6 +18,8 @@ import {
   deleteCoachPlan,
   PlanValidationError,
   PlanConflictError,
+  PlanWeekHasDraftError,
+  listDuplicateSources,
 } from '../plans/planBuilder.service';
 import { validatePlanIdParam, parseCreatePlanPayload, parsePublishNotePayload, parseSavePlanPayload, type PlanProblem } from '../plans/plan.validation';
 import { listWorkoutLogsForCoaching } from '../workoutLogs/workoutLog.service';
@@ -96,6 +98,11 @@ export async function getTraineePlanWeeks(req: AuthenticatedRequest, res: Respon
   res.status(200).json(await listPlanWeekOptions(req.traineeId!, req.coachingId!));
 }
 
+/** "Duplicate from": her published plans (any trainee, past weeks too), newest first. Drafts never. */
+export async function getTraineePlanSources(req: AuthenticatedRequest, res: Response) {
+  res.status(200).json({ items: await listDuplicateSources(req.userId!) });
+}
+
 export async function getTraineeWorkoutLogs(req: AuthenticatedRequest, res: Response) {
   const logs = await listWorkoutLogsForCoaching(req.coachingId!, req.traineeId!);
   res.status(200).json({ items: logs });
@@ -128,6 +135,10 @@ function sendPlanError(res: Response, error: unknown): void {
   }
   if (error instanceof PlanValidationError) {
     sendPlanIssues(res, error.issues);
+    return;
+  }
+  if (error instanceof PlanWeekHasDraftError) {
+    sendError(res, 409, error.serverMessage, { planId: error.planId });
     return;
   }
   if (error instanceof PlanConflictError) {

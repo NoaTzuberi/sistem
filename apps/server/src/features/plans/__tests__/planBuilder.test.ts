@@ -216,6 +216,81 @@ describe('plan builder (coach)', () => {
     });
   });
 
+  describe('duplicate from (2026-11-09 loop fix)', () => {
+    // Bug: with only drafts, "duplicate last week" copied the (empty) draft and opened it in the
+    // builder, whose "duplicate last week" sent her back — a loop with no message.
+    function sourcesPath(traineeId = trainee.id) {
+      return `/coach/trainees/${traineeId}/plan-sources`;
+    }
+
+    it('drafts are never offered or copied: only drafts = empty list and 409 nothing to duplicate', async () => {
+      const draft = await createDraft(THIS_WEEK);
+      await savePlan(draft.id, validWorkouts());
+
+      const sources = await api.request('GET', sourcesPath(), { token: coach.token });
+      expect(sources.status).toBe(200);
+      expect(sources.body.items).toEqual([]);
+
+      const previous = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, duplicatePrevious: true } });
+      expect(previous.status).toBe(409);
+      expect(previous.body.code).toBe('plan_nothing_to_duplicate');
+
+      const fromDraft = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: draft.id } });
+      expect(fromDraft.status).toBe(404);
+      expect(fromDraft.body.code).toBe('plan_source_not_found');
+      expect(await Plan.countDocuments({ weekStartDate: NEXT_WEEK })).toBe(0);
+    });
+
+    it('lists her published plans of every trainee, newest first, with name and workout count — never another coach’s', async () => {
+      const second = await createTestUser('noa@example.com', { coachId: coach.user._id, onboardingStatus: 'completed', timezone: TIMEZONE });
+      const mine = await createPublishedPlan(THIS_WEEK);
+      const draftSecond = await api.request('POST', plansPath(second.id), { token: coach.token, body: { weekStartDate: NEXT_WEEK } });
+      await api.request('PUT', `${plansPath(second.id)}/${draftSecond.body.plan.id}`, { token: coach.token, body: { workouts: validWorkouts() } });
+      await api.request('POST', `${plansPath(second.id)}/${draftSecond.body.plan.id}/publish`, { token: coach.token });
+      await Plan.create({ traineeId: otherTrainee.user._id, coachId: otherCoach.user._id, weekStartDate: THIS_WEEK, status: 'published', workouts: [] });
+
+      const res = await api.request('GET', sourcesPath(), { token: coach.token });
+      expect(res.body.items).toEqual([
+        { id: draftSecond.body.plan.id, traineeId: second.id, traineeName: second.user.name, weekStartDate: NEXT_WEEK, workoutCount: 2 },
+        { id: mine.id, traineeId: trainee.id, traineeName: trainee.user.name, weekStartDate: THIS_WEEK, workoutCount: 2 },
+      ]);
+
+      // Another trainee's plan copies into this trainee's week.
+      const copy = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: draftSecond.body.plan.id } });
+      expect(copy.status).toBe(201);
+      expect(copy.body.plan.workouts.map((workout: { title: string }) => workout.title)).toEqual(['Lower body', 'Core']);
+
+      // Another coach's plan id is not hers to copy.
+      const foreign = await Plan.findOne({ coachId: otherCoach.user._id });
+      const refused = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: addDays(NEXT_WEEK, 7), sourcePlanId: String(foreign!._id) } });
+      expect(refused.status).toBe(404);
+    });
+
+    it('a week with a draft: 409 plan_week_has_draft with its id, then replaceDraft overwrites it in place', async () => {
+      const source = await createPublishedPlan(THIS_WEEK);
+      const draft = await createDraft(NEXT_WEEK);
+
+      const conflict = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: source.id } });
+      expect(conflict.status).toBe(409);
+      expect(conflict.body).toMatchObject({ code: 'plan_week_has_draft', planId: draft.id });
+      expect(typeof conflict.body.message).toBe('string');
+
+      const replaced = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: source.id, replaceDraft: true } });
+      expect(replaced.status).toBe(201);
+      expect(replaced.body.plan).toMatchObject({ id: draft.id, status: 'draft', weekStartDate: NEXT_WEEK });
+      expect(replaced.body.plan.workouts).toHaveLength(2);
+      expect(await Plan.countDocuments({ weekStartDate: NEXT_WEEK })).toBe(1);
+    });
+
+    it('a published week is never replaced', async () => {
+      const source = await createPublishedPlan(THIS_WEEK);
+      await createPublishedPlan(NEXT_WEEK);
+      const res = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: source.id, replaceDraft: true } });
+      expect(res.status).toBe(409);
+      expect(res.body.code).toBe('plan_week_taken');
+    });
+  });
+
   describe('save', () => {
     it('stores workouts in order with exercise facts and resolved sets', async () => {
       const draft = await createDraft();
@@ -436,6 +511,8 @@ describe('plan builder (coach)', () => {
       ]);
       expect(res.status).toBe(200);
       expect(res.body.plan.workouts[0].exercises[0]).toMatchObject({ interval: true, sets: 8, durationSec: 20, restSec: 10 });
+      // Only a published plan is duplicated.
+      expect((await api.request('POST', `${plansPath()}/${draft.id}/publish`, { token: coach.token })).status).toBe(200);
 
       const copy = await api.request('POST', plansPath(), {
         token: coach.token,

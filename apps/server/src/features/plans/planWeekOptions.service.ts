@@ -24,7 +24,7 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
   const lastWeek = addDays(thisWeek, (PLAN_WEEKS_OFFERED - 1) * WEEK_DAYS);
 
   // Every plan up to the last offered week: the offered ones, and the earlier ones a
-  // duplicate would copy from (same rule as createCoachPlan: the most recent earlier plan).
+  // duplicate would copy from (same rule as createCoachPlan: the most recent earlier published plan).
   const plans = await Plan.find({ coachingId, weekStartDate: { $lte: lastWeek } })
     .select('weekStartDate status')
     .sort({ weekStartDate: -1 })
@@ -33,7 +33,8 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
   const weeks = Array.from({ length: PLAN_WEEKS_OFFERED }, (_, index): PlanWeekOption => {
     const weekStartDate = addDays(thisWeek, index * WEEK_DAYS);
     const plan = plans.find((candidate) => candidate.weekStartDate === weekStartDate);
-    const earlier = plans.find((candidate) => candidate.weekStartDate < weekStartDate);
+    // Only a published plan is copied (a draft may be empty: copying it looped).
+    const earlier = plans.find((candidate) => candidate.status === 'published' && candidate.weekStartDate < weekStartDate);
     return {
       weekStartDate,
       relation: relationOf(index),

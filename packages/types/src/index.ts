@@ -508,8 +508,29 @@ export interface SavePlanPayload {
 export interface CreatePlanPayload {
   /** 'YYYY-MM-DD' Sunday, this week or later in the trainee's time zone. */
   weekStartDate: string;
-  /** Start from a copy of the trainee's most recent earlier plan instead of empty. */
+  /** Start from a copy of the trainee's most recent earlier PUBLISHED plan instead of empty. */
   duplicatePrevious?: boolean;
+  /** Start from a copy of this published plan of the coach's (any trainee, any week). */
+  sourcePlanId?: string;
+  /** The week already has a draft: replace its content with the copy (else 409 plan_week_has_draft). */
+  replaceDraft?: boolean;
+}
+
+/** One plan the coach can duplicate from: her published plans only, newest week first. */
+export interface PlanDuplicateSource {
+  id: string;
+  traineeId: string;
+  traineeName: string;
+  /** 'YYYY-MM-DD' Sunday. */
+  weekStartDate: string;
+  workoutCount: number;
+}
+
+/** 409 body of POST …/plans when the week already has a draft and replaceDraft was not sent. */
+export interface PlanWeekHasDraftBody {
+  code: 'plan_week_has_draft';
+  message: string;
+  planId: string;
 }
 
 /** How a week sits relative to the trainee's current week (her time zone). */
