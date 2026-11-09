@@ -1,0 +1,15 @@
+/* The dashboard's display font: Karantina 700 (@fontsource, imported in main.tsx), self-hosted like the
+   mobile app. Only the tour card and the welcome title use it (--font-display in Hebrew).
+
+   Size-adjusted fallback, the same values as apps/mobile/src/styles/fonts.css: until the face has loaded
+   (font-display: swap) the title is drawn in a local font scaled to Karantina's width and line metrics,
+   so the swap doesn't move the layout. */
+
+@font-face {
+  font-family: 'Karantina Fallback';
+  src: local('Arial'), local('ArialMT'), local('Roboto');
+  size-adjust: 70.4%;
+  ascent-override: 122%;
+  descent-override: 21.7%;
+  line-gap-override: 0%;
+}
