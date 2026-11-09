@@ -13,6 +13,8 @@ async function loadWeekPlan(coachingId?: string) {
       weekStartDate: plans.nextWeekStartDate,
       plan: plans.items.find((plan) => plan.weekStartDate === plans.nextWeekStartDate) ?? null,
     },
+    // Later weeks of a multi-week plan: shown locked (the server hides their content until their Sunday).
+    lockedWeeks: plans.lockedWeeks ?? [],
   };
 }
 
@@ -24,6 +26,6 @@ export function useWeekPlan(coachingId?: string) {
   const copy = useCopy(workoutCopy);
   const load = useCallback(() => loadWeekPlan(coachingId), [coachingId]);
   const { data, error, isLoading, reload } = useLoad(load, copy.list.loadError);
-  const weekPlan = useMemo(() => (data ? buildWeekPlan(data.week, data.nextWeek) : null), [data]);
+  const weekPlan = useMemo(() => (data ? buildWeekPlan(data.week, data.nextWeek, data.lockedWeeks) : null), [data]);
   return { weekPlan, activeLog: data?.week.activeLog ?? null, coachName: data?.week.coach?.name ?? null, error, isLoading, reload };
 }

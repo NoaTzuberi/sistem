@@ -1,15 +1,17 @@
 import { useCallback, useState } from 'react';
 import type { CoachPlan, CoachTraineeDetail, PlanIssue } from '@sistem/types';
 import { PlanRequestError } from '@sistem/api-client';
-import { addDaysToDate, describeIssue, fill, formatWeekRange, sharedCopy, useCopy, useLanguage, useLoad } from '@sistem/shared';
+import { addDaysToDate, describeIssue, fill, formatWeekRange, sharedCopy, useCopy, useI18n, useLanguage, useLoad } from '@sistem/shared';
 import { IconCopy, IconInfoCircle, IconSend } from '@tabler/icons-react';
-import { createPlan, listPlans, publishPlan } from '../../../../services/coach/coachService';
+import { copyPlanForward, createPlan, listPlans, publishPlan } from '../../../../services/coach/coachService';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { SendNoteFields } from '../SendNoteFields/SendNoteFields';
 import { useWorkoutSendNote } from '../../hooks/useWorkoutSendNote';
 import { PlanCard } from '../PlanCard/PlanCard';
+import { DEFAULT_BLOCK_WEEKS, PlanLengthChoice } from '../PlanLengthChoice/PlanLengthChoice';
+import type { PlanLength } from '../PlanLengthChoice/PlanLengthChoice';
 import { coachCopy } from '../../copy';
 import './TraineePlan.css';
 
@@ -46,6 +48,10 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   const [pending, setPending] = useState<PendingAction>();
   const [isWorking, setIsWorking] = useState(false);
   const [failure, setFailure] = useState<ActionFailure>();
+  // "תוכנית חדשה" starts with the length (owner, 2026-11-09): weekly, or a multi-week plan.
+  const [length, setLength] = useState<PlanLength>('weekly');
+  const [blockWeeks, setBlockWeeks] = useState(DEFAULT_BLOCK_WEEKS);
+  const { plural } = useI18n();
   // Both actions publish, so both sheets carry the message + tip that go out with it.
   const sendNote = useWorkoutSendNote();
 
@@ -67,6 +73,8 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
 
   function ask(action: PendingAction) {
     sendNote.reset();
+    setLength('weekly');
+    setBlockWeeks(DEFAULT_BLOCK_WEEKS);
     setPending(action);
   }
 
@@ -79,7 +87,14 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
     setFailure(undefined);
     try {
       let planId: string;
-      if (pending.kind === 'duplicate') {
+      if (pending.kind === 'duplicate' && length === 'block') {
+        // A multi-week plan: week 1 = her latest published plan, copied into the later weeks (with the
+        // exercises' progression), then all weeks published together.
+        const first = await createPlan(trainee.id, { weekStartDate: week, duplicatePrevious: true, lengthWeeks: blockWeeks });
+        planId = first.id;
+        copyWasSaved = true;
+        await copyPlanForward(trainee.id, first.id);
+      } else if (pending.kind === 'duplicate') {
         const duplicate = await createPlan(trainee.id, { weekStartDate: week, duplicatePrevious: true });
         planId = duplicate.id;
         copyWasSaved = true;
@@ -129,7 +144,7 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
                 <p className="trainee-plan-none">{copy.noPlanThisWeek}</p>
                 {canDuplicate && week.start === duplicateWeek && (
                   <PillButton className="trainee-plan-action" onClick={() => ask({ kind: 'duplicate', week: week.start })}>
-                    {copy.duplicateLastWeek}
+                    {copy.newPlan}
                   </PillButton>
                 )}
               </>
@@ -160,17 +175,30 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
       <ConfirmSheet
         isOpen={pending !== undefined}
         icon={pending?.kind === 'duplicate' ? <IconCopy size={22} /> : <IconSend size={22} />}
-        title={pending?.kind === 'duplicate' ? copy.confirmDuplicateTitle : copy.confirmPublishTitle}
-        message={
-          pending?.kind === 'duplicate'
-            ? fill(copy.confirmDuplicateMessage, { name: trainee.name, week: pendingWeek })
-            : fill(copy.confirmPublishMessage, { name: trainee.name, week: pendingWeek })
+        title={pending?.kind === 'duplicate' ? copy.newPlan : copy.confirmPublishTitle}
+        // "תוכנית חדשה": the length comes first, so its message is drawn under it (children).
+        message={pending?.kind === 'duplicate' ? undefined : fill(copy.confirmPublishMessage, { name: trainee.name, week: pendingWeek })}
+        confirmLabel={
+          pending?.kind !== 'duplicate'
+            ? copy.publishConfirm
+            : length === 'block'
+              ? fill(copy.newPlanBlockConfirm, { weeks: plural(copy.length.weeks, blockWeeks) })
+              : copy.duplicateConfirm
         }
-        confirmLabel={pending?.kind === 'duplicate' ? copy.duplicateConfirm : copy.publishConfirm}
         isWorking={isWorking}
         onConfirm={handleConfirm}
         onCancel={() => setPending(undefined)}
       >
+        {pending?.kind === 'duplicate' && (
+          <>
+            <PlanLengthChoice length={length} weeks={blockWeeks} onLengthChange={setLength} onWeeksChange={setBlockWeeks} disabled={isWorking} />
+            <p className="trainee-plan-sheet-message">
+              {length === 'block'
+                ? fill(copy.newPlanBlockMessage, { name: trainee.name, weeks: plural(copy.length.weeks, blockWeeks), week: pendingWeek })
+                : fill(copy.confirmDuplicateMessage, { name: trainee.name, week: pendingWeek })}
+            </p>
+          </>
+        )}
         <SendNoteFields note={sendNote} />
       </ConfirmSheet>
     </div>

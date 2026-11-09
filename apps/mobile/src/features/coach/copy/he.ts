@@ -16,6 +16,19 @@ export const he = {
   confirmDuplicateMessage: 'התוכנית האחרונה של {name} תועתק ל־{week} ותפורסם. המתאמנת תקבל התראה.',
   confirmPublishMessage: '{name} תראה את התוכנית של {week}. המתאמנת תקבל התראה.',
   duplicateConfirm: 'שכפול ופרסום',
+  // DRAFT — multi-week plans: "תוכנית חדשה" starts with the length.
+  newPlan: 'תוכנית חדשה',
+  length: {
+    label: 'אורך התוכנית',
+    weekly: 'שבועית',
+    block: 'חודשית',
+    weeks: plural({ one: 'שבוע אחד', two: 'שבועיים', other: '{count} שבועות' }),
+    fewer: 'פחות שבועות',
+    more: 'עוד שבועות',
+  },
+  newPlanBlockMessage: 'התוכנית האחרונה של {name} תועתק ל־{weeks} מ־{week}, וכל השבועות יפורסמו יחד. המתאמנת תקבל התראה אחת.',
+  newPlanBlockConfirm: 'שכפול ופרסום {weeks}',
+  blockWeekOf: 'שבוע {n} מתוך {total}',
   publishConfirm: 'פרסום',
   nutritionLoadError: 'לא הצלחנו לטעון את תוכנית התזונה.',
   // Owner's wording (docs/phase-reports/design-coach-link.md).

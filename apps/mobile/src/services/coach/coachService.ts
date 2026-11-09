@@ -17,6 +17,7 @@ export const {
   savePlan,
   deletePlan,
   publishPlan,
+  copyPlanForward,
   getExerciseFamily,
   searchExerciseFamilies,
   getNutritionPlan,

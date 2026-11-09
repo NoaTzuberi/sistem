@@ -192,6 +192,20 @@ export const he = {
     moreToMove: 'רוצה לזוז עוד?',
     freeEntryText: 'מאפס, חזרה על אימון קודם או לפי שריר. נשמר בהיסטוריה שלך',
   },
+  // DRAFT — multi-week plans (preview v2, approved 2026-11-09).
+  block: {
+    word: 'שבוע',
+    of: 'מתוך {total}',
+    weekOf: 'שבוע {n} מתוך {total}',
+    weightUps: plural({ one: 'השבוע: משקל עולה בתרגיל אחד', two: 'השבוע: משקלים עולים ב־2 תרגילים', other: 'השבוע: משקלים עולים ב־{count} תרגילים' }),
+    lightWeek: 'השבוע: שבוע קל, פחות סטים',
+    nextWeeks: 'השבועות הבאים',
+    lockedWeek: 'שבוע {n} · {range}',
+    lightWeekTag: 'שבוע קל',
+    workouts: plural({ one: 'אימון אחד', two: '2 אימונים', other: '{count} אימונים' }),
+    opensSunday: 'נפתח ביום א׳',
+    opensOn: 'נפתח ב־{date}',
+  },
   preview: {
     bodyweight: 'משקל גוף',
   },

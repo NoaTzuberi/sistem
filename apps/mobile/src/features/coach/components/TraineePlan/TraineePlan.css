@@ -71,3 +71,11 @@
   flex-shrink: 0;
   color: var(--ink-purple);
 }
+
+/* "תוכנית חדשה": its message sits under the length choice (the sheet's own message slot is above it). */
+.trainee-plan-sheet-message {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}

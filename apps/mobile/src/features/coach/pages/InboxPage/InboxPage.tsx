@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { AppNotification } from '@sistem/types';
 import { describeCoachNotification, formatDateTime, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import type { CoachNotificationView } from '@sistem/shared';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Button } from '../../../../components/common/Button/Button';
@@ -64,7 +65,7 @@ export function InboxPage() {
     }
   }
 
-  function handleOpen(notification: AppNotification, traineeId: string, section: 'logs' | 'archive' | null) {
+  function handleOpen(notification: AppNotification, traineeId: string, section: CoachNotificationView['section']) {
     navigate(
       section === 'archive'
         ? coachArchivedTraineePath(traineeId)

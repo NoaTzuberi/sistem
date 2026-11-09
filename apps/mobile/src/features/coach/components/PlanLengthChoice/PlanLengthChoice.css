@@ -1,0 +1,99 @@
+.plan-length-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+
+.plan-length-choice-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* The segmented choice: a soft track, the chosen side in ink. */
+.plan-length-choice-segments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.plan-length-choice-segment {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-round);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+  background: transparent;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+}
+
+.plan-length-choice-segment[aria-checked='true'] {
+  color: var(--color-on-ink);
+  background-color: var(--color-ink);
+}
+
+.plan-length-choice-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 4px;
+  border-radius: var(--radius-round);
+  background-color: var(--color-fill-soft);
+}
+
+.plan-length-choice-step {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-round);
+  font: inherit;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+  background-color: var(--color-card);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.plan-length-choice-step:disabled,
+.plan-length-choice-segment:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+.plan-length-choice-weeks {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-length-choice-segment:active:not(:disabled),
+.plan-length-choice-step:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.plan-length-choice-segment:focus-visible,
+.plan-length-choice-step:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-length-choice-segment,
+  .plan-length-choice-step {
+    transition: none;
+  }
+
+  .plan-length-choice-segment:active:not(:disabled),
+  .plan-length-choice-step:active:not(:disabled) {
+    transform: none;
+  }
+}

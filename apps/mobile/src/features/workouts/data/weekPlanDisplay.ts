@@ -1,4 +1,4 @@
-import type { Language, PlanExercise, TraineePlan, TraineePlanWorkout, TraineeWeek } from '@sistem/types';
+import type { Language, PlanExercise, TraineeLockedWeek, TraineePlan, TraineePlanWorkout, TraineeWeek } from '@sistem/types';
 import { fill, sharedCopy, weekdayName } from '@sistem/shared';
 import { isHebrewText, workoutColorClass } from '../../home/data/homeDisplay';
 import type { workoutCopy } from '../copy';
@@ -27,6 +27,8 @@ export interface WeekPlan {
   next: PlannedWorkout | null;
   doneCount: number;
   nextWeek: { weekStartDate: string; plan: TraineePlan | null };
+  /** Later weeks of her multi-week plan: locked until their Sunday. */
+  lockedWeeks: TraineeLockedWeek[];
 }
 
 export function letterOf(index: number): string {
@@ -42,7 +44,7 @@ export function toPlannedWorkouts(plan: TraineePlan | null): PlannedWorkout[] {
   }));
 }
 
-export function buildWeekPlan(week: TraineeWeek, nextWeek: WeekPlan['nextWeek']): WeekPlan {
+export function buildWeekPlan(week: TraineeWeek, nextWeek: WeekPlan['nextWeek'], lockedWeeks: TraineeLockedWeek[] = []): WeekPlan {
   const workouts = toPlannedWorkouts(week.plan);
   return {
     weekStartDate: week.weekStartDate,
@@ -51,6 +53,7 @@ export function buildWeekPlan(week: TraineeWeek, nextWeek: WeekPlan['nextWeek'])
     next: workouts.find(({ workout }) => workout.id === week.nextWorkoutId) ?? null,
     doneCount: workouts.filter(({ workout }) => workout.status === 'done').length,
     nextWeek,
+    lockedWeeks,
   };
 }
 

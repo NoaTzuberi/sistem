@@ -25,6 +25,8 @@ import { PlanCoachMessage } from '../PlanCoachMessage/PlanCoachMessage';
 import { UpNextCard } from '../UpNextCard/UpNextCard';
 import { WorkoutTicketCarousel } from '../WorkoutTicketCarousel/WorkoutTicketCarousel';
 import { NextWeekLock } from '../NextWeekLock/NextWeekLock';
+import { BlockWeekStage } from '../BlockWeekStage/BlockWeekStage';
+import { LockedBlockWeeks } from '../LockedBlockWeeks/LockedBlockWeeks';
 import { FreeWorkoutEntry } from '../FreeWorkoutEntry/FreeWorkoutEntry';
 import { WorkoutPreviewSheet } from '../WorkoutPreviewSheet/WorkoutPreviewSheet';
 import { FreeWorkoutSheet } from '../FreeWorkoutSheet/FreeWorkoutSheet';
@@ -143,7 +145,12 @@ export function WorkoutsScreen() {
       {error && !weekPlan && <StateMessage onRetry={reload}>{error}</StateMessage>}
       {weekPlan && (
         <>
-          <WeekHeader weekStartDate={weekPlan.weekStartDate} workouts={weekPlan.workouts} doneCount={weekPlan.doneCount} />
+          {/* A week of a multi-week plan: "שבוע 02 מתוך 4" on the pink stage, else the week's header. */}
+          {weekPlan.plan?.block ? (
+            <BlockWeekStage weekStartDate={weekPlan.weekStartDate} block={weekPlan.plan.block} />
+          ) : (
+            <WeekHeader weekStartDate={weekPlan.weekStartDate} workouts={weekPlan.workouts} doneCount={weekPlan.doneCount} />
+          )}
           {weekPlan.plan && <PlanCoachMessage plan={weekPlan.plan} coachName={coachName} />}
 
           {!weekPlan.plan && selfGuided ? (
@@ -217,7 +224,20 @@ export function WorkoutsScreen() {
           )}
 
           {/* Next week comes from a coach: nothing to lock for a self-guided trainee. */}
-          {!selfGuided && (
+          {/* The later weeks of her multi-week plan: locked until their Sunday. */}
+          {weekPlan.lockedWeeks.length > 0 && (
+            <>
+              <div className="workouts-section-head">
+                <h2 className="workouts-section-title">
+                  <Eyebrow>{eyebrow.nextWeek}</Eyebrow>
+                  {copy.block.nextWeeks}
+                </h2>
+              </div>
+              <LockedBlockWeeks weeks={weekPlan.lockedWeeks} nextWeekStartDate={weekPlan.nextWeek.weekStartDate} />
+            </>
+          )}
+
+          {!selfGuided && weekPlan.lockedWeeks.length === 0 && (
             <>
               <div className="workouts-section-head">
                 <h2 className="workouts-section-title">

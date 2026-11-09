@@ -15,6 +15,18 @@ export const en: CopyShape<typeof he> = {
   confirmDuplicateMessage: "{name}'s most recent plan will be copied to {week} and published. The trainee will be notified.",
   confirmPublishMessage: '{name} will see the plan for {week}. The trainee will be notified.',
   duplicateConfirm: 'Duplicate and publish',
+  newPlan: 'New plan',
+  length: {
+    label: 'Plan length',
+    weekly: 'Weekly',
+    block: 'Multi-week',
+    weeks: plural({ one: '1 week', two: '2 weeks', other: '{count} weeks' }),
+    fewer: 'Fewer weeks',
+    more: 'More weeks',
+  },
+  newPlanBlockMessage: "{name}'s latest plan is copied into {weeks} from {week}, and all weeks are published together. She gets one notification.",
+  newPlanBlockConfirm: 'Duplicate and publish {weeks}',
+  blockWeekOf: 'Week {n} of {total}',
   publishConfirm: 'Publish',
   nutritionLoadError: "Couldn't load the nutrition plan.",
   // PLACEHOLDER English of the owner's Hebrew line.

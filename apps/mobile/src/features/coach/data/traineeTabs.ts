@@ -14,6 +14,7 @@ const OLD_TABS: Record<string, TraineeTab> = {
   onboarding: 'body',
   plan: 'workouts',
   logs: 'workouts',
+  plans: 'workouts',
   tracking: 'nutrition',
   achievements: 'overview',
 };

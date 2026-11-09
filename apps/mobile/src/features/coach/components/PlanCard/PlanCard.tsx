@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { CoachPlan, WorkoutStatus } from '@sistem/types';
 import { IconCheck, IconChevronDown } from '@tabler/icons-react';
-import { cardioMinutesLabel, cardioTotals, dayName, sharedCopy, useCopy, useI18n } from '@sistem/shared';
+import { cardioMinutesLabel, cardioTotals, dayName, fill, sharedCopy, useCopy, useI18n } from '@sistem/shared';
 import { workoutColorClass } from '../../../home/data/homeDisplay';
 import { PlanExerciseList } from '../../../workouts/components/PlanExerciseList/PlanExerciseList';
 import { letterOf, nameScript } from '../../../workouts/data/weekPlanDisplay';
@@ -19,7 +19,8 @@ interface PlanCardProps {
 /** One weekly plan, read-only (plans are edited on the web dashboard, PRD §6): status chips, then a card per workout. */
 export function PlanCard({ plan, statuses, children }: PlanCardProps) {
   const shared = useCopy(sharedCopy);
-  const lane = useCopy(coachCopy).detail.lane;
+  const coach = useCopy(coachCopy);
+  const lane = coach.detail.lane;
   const copy = shared.coach;
   const { language, plural } = useI18n();
   return (
@@ -27,6 +28,7 @@ export function PlanCard({ plan, statuses, children }: PlanCardProps) {
       <div className="plan-card-chips">
         <span className={'plan-card-chip' + (plan.status === 'published' ? ' plan-card-chip-published' : '')}>{copy.planStatus[plan.status]}</span>
         {plan.locked && <span className="plan-card-chip">{copy.startedByTrainee}</span>}
+        {plan.block && <span className="plan-card-chip">{fill(coach.blockWeekOf, { n: plan.block.week, total: plan.block.lengthWeeks })}</span>}
       </div>
 
       {plan.notes && (
