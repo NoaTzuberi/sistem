@@ -65,23 +65,27 @@ export class PlanRequestError extends Error {
   readonly status: number | undefined;
   /** plan_week_has_draft: the draft already in that week. */
   readonly planId: string | undefined;
+  /** plan_block_has_drafts: the weeks ('YYYY-MM-DD') of the drafts a multi-week plan would replace. */
+  readonly weeks: string[];
 
-  constructor(message: string, issues: PlanIssue[] = [], details: { code?: string; status?: number; planId?: string } = {}) {
+  constructor(message: string, issues: PlanIssue[] = [], details: { code?: string; status?: number; planId?: string; weeks?: string[] } = {}) {
     super(message);
     this.issues = issues;
     this.code = details.code;
     this.status = details.status;
     this.planId = details.planId;
+    this.weeks = details.weeks ?? [];
   }
 }
 
 function toPlanRequestError(error: unknown, fallback: string): PlanRequestError {
   const response = axios.isAxiosError(error) ? error.response : undefined;
-  const data: { issues?: unknown; code?: unknown; planId?: unknown } | undefined = response?.data;
+  const data: { issues?: unknown; code?: unknown; planId?: unknown; weeks?: unknown } | undefined = response?.data;
   return new PlanRequestError(extractErrorMessage(error, fallback), Array.isArray(data?.issues) ? (data.issues as PlanIssue[]) : [], {
     code: typeof data?.code === 'string' ? data.code : undefined,
     status: response?.status,
     planId: typeof data?.planId === 'string' ? data.planId : undefined,
+    weeks: Array.isArray(data?.weeks) ? data.weeks.filter((week): week is string => typeof week === 'string') : undefined,
   });
 }
 
@@ -319,9 +323,10 @@ export function createCoachApi(client: AxiosInstance) {
     }
   }
 
-  async function deletePlan(traineeId: string, planId: string): Promise<void> {
+  /** `draftOnly`: "מחיקת הטיוטה" — the server refuses a published plan (409 plan_not_draft). */
+  async function deletePlan(traineeId: string, planId: string, options: { draftOnly?: boolean } = {}): Promise<void> {
     try {
-      await client.delete(`${plansPath(traineeId)}/${planId}`);
+      await client.delete(`${plansPath(traineeId)}/${planId}`, options.draftOnly ? { params: { draftOnly: 'true' } } : undefined);
     } catch (error) {
       throw toPlanRequestError(error, "Couldn't delete the plan. Please try again.");
     }

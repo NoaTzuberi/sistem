@@ -125,6 +125,36 @@ describe('multi-week plans (blocks)', () => {
     expect(tooLong.body.code).toBe('plan_block_length_invalid');
   });
 
+  it('a new block over drafts: empty ones go silently, ones with content ask (their weeks), published refuses', async () => {
+    const weekly = async (weekStartDate: string, workouts: unknown[] = []) => {
+      const res = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate } });
+      expect(res.status).toBe(201);
+      if (workouts.length > 0) await api.request('PUT', `${plansPath()}/${res.body.plan.id}`, { token: coach.token, body: { workouts } });
+      return res.body.plan as CoachPlan;
+    };
+    await weekly(week(1));
+    await weekly(week(2), blockWorkouts());
+    await weekly(week(3), blockWorkouts());
+
+    const asked = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: week(1), lengthWeeks: 4 } });
+    expect(asked.status).toBe(409);
+    expect(asked.body).toMatchObject({ code: 'plan_block_has_drafts', weeks: [week(2), week(3)] });
+    expect(await PlanBlock.countDocuments()).toBe(0);
+    expect(await Plan.countDocuments()).toBe(3);
+
+    const replaced = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: week(1), lengthWeeks: 4, replaceDraft: true } });
+    expect(replaced.status).toBe(201);
+    expect(await Plan.countDocuments()).toBe(4);
+    expect(await Plan.countDocuments({ blockId: { $ne: null } })).toBe(4);
+
+    // A published week in the range: refused, even with replaceDraft.
+    const published = await weekly(week(6), blockWorkouts());
+    expect((await api.request('POST', `${plansPath()}/${published.id}/publish`, { token: coach.token })).status).toBe(200);
+    const blocked = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: week(5), lengthWeeks: 3, replaceDraft: true } });
+    expect(blocked.status).toBe(409);
+    expect(blocked.body.code).toBe('plan_block_week_taken');
+  });
+
   it('a weekly plan is unchanged: no block, no blockWeeks', async () => {
     const res = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: THIS_WEEK } });
     expect(res.status).toBe(201);

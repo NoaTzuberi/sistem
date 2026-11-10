@@ -20,13 +20,14 @@ import type { CreatePlanInput, PlanProblem, PublishNoteInput, SavePlanInput, Upd
 import { msg } from '../../i18n';
 import { PlanConflictError, PlanValidationError, PlanWeekHasDraftError } from './planBuilder.errors';
 import { copiedContent } from './planBlockCopy';
+import { isEmptyDraft } from './planDraftContent';
 import { blockInfoFor, blockOfPlan, blockWeeksOf, copyForward, createBlock, deleteBlock, publishBlock, unpublishBlock, updateBlock } from './planBlock.service';
 
 // The coach's side of plans (PRD §6 plan builder). Every function takes the trainee
 // id that loadCoachTrainee already checked, and scopes its queries by it — a plan id
 // from another trainee is simply not found.
 
-export { PlanConflictError, PlanValidationError, PlanWeekHasDraftError } from './planBuilder.errors';
+export { PlanBlockHasDraftsError, PlanConflictError, PlanValidationError, PlanWeekHasDraftError } from './planBuilder.errors';
 
 const DUPLICATE_KEY_ERROR = 11000;
 
@@ -152,9 +153,12 @@ async function findDuplicateSource(coachingId: string, coachId: string, input: C
 }
 
 /**
- * A new draft for one week: empty, or a copy of a published plan. When the week already
- * has a draft, a copy never fails silently: 409 plan_week_has_draft (with its id), or —
- * when the coach chose "replace" — the draft's content is replaced in place.
+ * A new draft for one week: empty, or a copy of a published plan. A week that already has a
+ * draft (standalone, not locked):
+ * - an EMPTY draft (planDraftContent.ts) is no conflict: it is replaced silently;
+ * - a draft with content: 409 plan_week_has_draft (with its id), or — when the coach chose
+ *   "replace" — its content is replaced in place (by the copy, or emptied for scratch / AI).
+ * A published week, a week of a multi-week plan and a locked draft are never replaced.
  */
 export async function createCoachPlan(traineeId: string, coachingId: string, coachId: string, input: CreatePlanInput): Promise<CoachPlan> {
   const trainee = await User.findById(traineeId).select('timezone').lean();
@@ -175,9 +179,9 @@ export async function createCoachPlan(traineeId: string, coachingId: string, coa
 
   const existing = await Plan.findOne({ coachingId, weekStartDate: input.weekStartDate });
   if (existing) {
-    if (existing.status !== 'draft' || !source) throw new PlanConflictError('plan_week_taken');
-    if (!input.replaceDraft) throw new PlanWeekHasDraftError(String(existing._id));
+    if (existing.status !== 'draft' || existing.blockId) throw new PlanConflictError('plan_week_taken');
     if (await isLocked(String(existing._id))) throw new PlanConflictError('plan_locked');
+    if (!isEmptyDraft(existing) && !input.replaceDraft) throw new PlanWeekHasDraftError(String(existing._id));
     existing.set({ notes: content.notes, splitId: content.splitId, aiRecommendationId: undefined });
     existing.set('workouts', content.workouts);
     await existing.save();
@@ -375,8 +379,10 @@ export async function unpublishCoachPlan(traineeId: string, coachingId: string, 
 }
 
 /** Drafts, and published plans the trainee has not started yet. */
-export async function deleteCoachPlan(traineeId: string, coachingId: string, planId: string): Promise<void> {
+export async function deleteCoachPlan(traineeId: string, coachingId: string, planId: string, options: { draftOnly?: boolean } = {}): Promise<void> {
   const plan = await findPlan(traineeId, coachingId, planId);
+  // "מחיקת הטיוטה" (the new-plan popover, the builder's ⋯ on a draft): never a published plan.
+  if (options.draftOnly && plan.status !== 'draft') throw new PlanConflictError('plan_not_draft');
   // A week of a multi-week plan: the whole block goes.
   const block = await blockOfPlan(plan);
   if (block) {

@@ -13,7 +13,8 @@ import { User } from '../users/user.model';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
 import { findPublishIssues } from './plan.validation';
 import type { PlanProblem, PublishNoteInput, UpdateBlockInput } from './plan.validation';
-import { PlanConflictError, PlanValidationError } from './planBuilder.errors';
+import { PlanBlockHasDraftsError, PlanConflictError, PlanValidationError } from './planBuilder.errors';
+import { isEmptyDraft } from './planDraftContent';
 import { copiedContent, copyStepsFor, progressWorkouts, weekVolume } from './planBlockCopy';
 import type { CopiedWorkout } from './planBlockCopy';
 
@@ -77,18 +78,53 @@ interface BlockContent {
 }
 
 /**
+ * What already sits in the weeks a new multi-week plan would cover:
+ * - `taken`: the first week (1-based) that can never be replaced — published, a week of another
+ *   multi-week plan, or a locked draft;
+ * - `drafts`: the standalone drafts in its weeks (`empty` ones are no conflict).
+ */
+async function newBlockConflicts(coachingId: string, startWeek: string, lengthWeeks: number) {
+  const dates = Array.from({ length: lengthWeeks }, (_, index) => blockWeekStart(startWeek, index + 1));
+  const plans = await Plan.find({ coachingId, weekStartDate: { $in: dates } })
+    .select('weekStartDate status blockId workouts.kind workouts.exercises._id')
+    .lean<(Pick<LeanPlan, '_id' | 'weekStartDate' | 'status' | 'blockId'> & { workouts: { kind?: string; exercises: unknown[] }[] })[]>();
+  const locked = await lockedPlanIds(plans.map((plan) => plan._id));
+  const byDate = new Map(plans.map((plan) => [plan.weekStartDate, plan]));
+  let taken: number | null = null;
+  const drafts: { id: Types.ObjectId; weekStartDate: string; empty: boolean }[] = [];
+  dates.forEach((date, index) => {
+    const plan = byDate.get(date);
+    if (!plan) return;
+    if (plan.status !== 'draft' || plan.blockId || locked.has(String(plan._id))) {
+      taken ??= index + 1;
+      return;
+    }
+    drafts.push({ id: plan._id, weekStartDate: date, empty: isEmptyDraft(plan) });
+  });
+  return { taken, drafts };
+}
+
+/**
  * A new multi-week plan: week 1 holds `content` (empty, a copy, …), the other weeks start empty
- * ("העתקה לשבועות הבאים" fills them). Every week must be free. Returns week 1's plan id.
+ * ("העתקה לשבועות הבאים" fills them). A published / locked / other-block week refuses it; drafts
+ * with content ask first (409 plan_block_has_drafts + their weeks) unless `replaceDraft`; empty
+ * drafts are removed silently. Returns week 1's plan id.
  */
 export async function createBlock(
   traineeId: string,
   coachingId: string,
   coachId: string,
-  input: { weekStartDate: string; lengthWeeks: number; deloadLastWeek: boolean },
+  input: { weekStartDate: string; lengthWeeks: number; deloadLastWeek: boolean; replaceDraft?: boolean },
   content: BlockContent,
 ): Promise<string> {
-  const taken = await firstTakenWeek(coachingId, input.weekStartDate, 1, input.lengthWeeks);
+  const { taken, drafts } = await newBlockConflicts(coachingId, input.weekStartDate, input.lengthWeeks);
   if (taken !== null) throw new PlanConflictError('plan_block_week_taken', { n: taken });
+  const withContent = drafts.filter((draft) => !draft.empty);
+  if (withContent.length > 0 && !input.replaceDraft) throw new PlanBlockHasDraftsError(withContent.map((draft) => draft.weekStartDate));
+  // Only these drafts, and only while they are still standalone drafts.
+  if (drafts.length > 0) {
+    await Plan.deleteMany({ _id: { $in: drafts.map((draft) => draft.id) }, coachingId, status: 'draft', blockId: null });
+  }
 
   const block = await PlanBlock.create({
     coachingId,

@@ -113,6 +113,8 @@ export const en: Record<keyof typeof he, string> = {
   plan_week_taken: 'This trainee already has a plan for that week.',
   plan_nothing_to_duplicate: 'There is no earlier published plan to duplicate.',
   plan_source_not_found: 'The plan to copy was not found, or it is not published.',
+  plan_not_draft: 'Only a draft can be deleted here. A published plan stays.',
+  plan_block_has_drafts: 'Some weeks of the plan already have drafts.',
   plan_week_has_draft: 'There is already a draft for this week.',
   plan_locked: 'The trainee already started a workout from this plan, so it can only be edited.',
   plan_exercise_not_in_library: 'This exercise is not in the library.',

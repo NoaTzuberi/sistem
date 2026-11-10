@@ -17,3 +17,10 @@ export class PlanWeekHasDraftError extends PlanConflictError {
     super('plan_week_has_draft');
   }
 }
+
+/** A multi-week plan would cover weeks that hold drafts with content: she chooses (replace them / another start week). */
+export class PlanBlockHasDraftsError extends PlanConflictError {
+  constructor(public readonly weeks: string[]) {
+    super('plan_block_has_drafts');
+  }
+}

@@ -1,7 +1,9 @@
 import type { PlanWeekOption, PlanWeekOptions, PlanWeekRelation } from '@sistem/types';
 import { User } from '../users/user.model';
 import { DEFAULT_TIMEZONE } from '../users/users.constants';
+import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 import { Plan } from './plan.model';
+import { isEmptyDraft } from './planDraftContent';
 import { addDays, currentWeekStart } from './planWeek';
 
 // The week picker of the coach's "New plan" / "Duplicate last week" (dashboard).
@@ -26,9 +28,11 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
   // Every plan up to the last offered week: the offered ones, and the earlier ones a
   // duplicate would copy from (same rule as createCoachPlan: the most recent earlier published plan).
   const plans = await Plan.find({ coachingId, weekStartDate: { $lte: lastWeek } })
-    .select('weekStartDate status')
+    .select('weekStartDate status blockId workouts.kind workouts.exercises._id')
     .sort({ weekStartDate: -1 })
     .lean();
+  const offeredIds = plans.filter((plan) => plan.weekStartDate >= thisWeek).map((plan) => plan._id);
+  const locked = new Set((offeredIds.length > 0 ? await WorkoutLog.distinct('planId', { planId: { $in: offeredIds } }) : []).map(String));
 
   const weeks = Array.from({ length: PLAN_WEEKS_OFFERED }, (_, index): PlanWeekOption => {
     const weekStartDate = addDays(thisWeek, index * WEEK_DAYS);
@@ -38,7 +42,16 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
     return {
       weekStartDate,
       relation: relationOf(index),
-      plan: plan ? { id: String(plan._id), status: plan.status } : null,
+      plan: plan
+        ? {
+            id: String(plan._id),
+            status: plan.status,
+            workoutCount: plan.workouts.length,
+            isEmpty: isEmptyDraft(plan) && !locked.has(String(plan._id)),
+            inBlock: Boolean(plan.blockId),
+            locked: locked.has(String(plan._id)),
+          }
+        : null,
       copiesFromWeek: earlier?.weekStartDate ?? null,
     };
   });

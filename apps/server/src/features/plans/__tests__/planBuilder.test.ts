@@ -187,9 +187,61 @@ describe('plan builder (coach)', () => {
       expect(notSunday.status).toBe(400);
       const past = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: addDays(THIS_WEEK, -7) } });
       expect(past.status).toBe(409);
-      await createDraft();
+      const draft = await createDraft();
+      await savePlan(draft.id, validWorkouts());
       const again = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: THIS_WEEK } });
       expect(again.status).toBe(409);
+      expect(again.body).toMatchObject({ code: 'plan_week_has_draft', planId: draft.id });
+    });
+
+    it('an empty draft is no conflict: a new plan replaces it silently (any start)', async () => {
+      const empty = await createDraft(NEXT_WEEK);
+      const again = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK } });
+      expect(again.status).toBe(201);
+      expect(again.body.plan.id).toBe(empty.id);
+
+      // Only empty strength workouts = still empty; the copy lands in it without a question.
+      await savePlan(empty.id, [{ title: 'Nothing yet', exercises: [] }]);
+      const source = await createPublishedPlan(THIS_WEEK);
+      const copied = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: source.id } });
+      expect(copied.status).toBe(201);
+      expect(copied.body.plan.workouts).toHaveLength(2);
+      expect(await Plan.countDocuments({ weekStartDate: NEXT_WEEK })).toBe(1);
+    });
+
+    it('scratch over a draft with content: asks, then replaceDraft empties it in place', async () => {
+      const draft = await createDraft(NEXT_WEEK);
+      await savePlan(draft.id, validWorkouts());
+      const asked = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK } });
+      expect(asked.status).toBe(409);
+      expect(asked.body.code).toBe('plan_week_has_draft');
+      const replaced = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, replaceDraft: true } });
+      expect(replaced.status).toBe(201);
+      expect(replaced.body.plan).toMatchObject({ id: draft.id, status: 'draft' });
+      expect(replaced.body.plan.workouts).toEqual([]);
+    });
+
+    it('the week picker tells empty drafts, their workout count and published weeks apart', async () => {
+      const empty = await createDraft(THIS_WEEK);
+      const full = await createDraft(NEXT_WEEK);
+      await savePlan(full.id, validWorkouts());
+      const res = await api.request('GET', `/coach/trainees/${trainee.id}/plan-weeks`, { token: coach.token });
+      expect(res.status).toBe(200);
+      expect(res.body.weeks[0].plan).toEqual({ id: empty.id, status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false });
+      expect(res.body.weeks[1].plan).toEqual({ id: full.id, status: 'draft', workoutCount: 2, isEmpty: false, inBlock: false, locked: false });
+    });
+
+    it('?draftOnly=true deletes a draft, never a published plan', async () => {
+      const published = await createPublishedPlan(THIS_WEEK);
+      const refused = await api.request('DELETE', `${plansPath()}/${published.id}?draftOnly=true`, { token: coach.token });
+      expect(refused.status).toBe(409);
+      expect(refused.body.code).toBe('plan_not_draft');
+      expect(await Plan.exists({ _id: published.id })).not.toBeNull();
+
+      const draft = await createDraft(NEXT_WEEK);
+      const deleted = await api.request('DELETE', `${plansPath()}/${draft.id}?draftOnly=true`, { token: coach.token });
+      expect(deleted.status).toBe(204);
+      expect(await Plan.exists({ _id: draft.id })).toBeNull();
     });
 
     it('duplicates the most recent earlier plan as a draft with new ids', async () => {
@@ -269,6 +321,7 @@ describe('plan builder (coach)', () => {
     it('a week with a draft: 409 plan_week_has_draft with its id, then replaceDraft overwrites it in place', async () => {
       const source = await createPublishedPlan(THIS_WEEK);
       const draft = await createDraft(NEXT_WEEK);
+      await savePlan(draft.id, [{ title: 'Mine', exercises: [{ exerciseId: plank, sets: 3, durationSec: 45 }] }]);
 
       const conflict = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: NEXT_WEEK, sourcePlanId: source.id } });
       expect(conflict.status).toBe(409);

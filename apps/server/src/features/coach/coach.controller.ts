@@ -19,6 +19,7 @@ import {
   PlanValidationError,
   PlanConflictError,
   PlanWeekHasDraftError,
+  PlanBlockHasDraftsError,
   listDuplicateSources,
   copyCoachPlanForward,
   updateCoachPlanBlock,
@@ -146,6 +147,10 @@ function sendPlanError(res: Response, error: unknown): void {
     sendError(res, 409, error.serverMessage, { planId: error.planId });
     return;
   }
+  if (error instanceof PlanBlockHasDraftsError) {
+    sendError(res, 409, error.serverMessage, { weeks: error.weeks });
+    return;
+  }
   if (error instanceof PlanConflictError) {
     sendError(res, 409, error.serverMessage);
     return;
@@ -239,7 +244,8 @@ export async function deleteTraineePlan(req: AuthenticatedRequest, res: Response
   if (!planId) return;
 
   try {
-    await deleteCoachPlan(req.traineeId!, req.coachingId!, planId);
+    // ?draftOnly=true: "מחיקת הטיוטה" — refused (409 plan_not_draft) for a published plan.
+    await deleteCoachPlan(req.traineeId!, req.coachingId!, planId, { draftOnly: req.query.draftOnly === 'true' });
     res.status(204).end();
   } catch (error) {
     sendPlanError(res, error);

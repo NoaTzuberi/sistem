@@ -112,6 +112,8 @@ export const he = {
   plan_week_taken: 'למתאמנת כבר יש תוכנית לשבוע הזה.',
   plan_nothing_to_duplicate: 'אין תוכנית קודמת שפורסמה לשכפול.',
   plan_source_not_found: 'התוכנית להעתקה לא נמצאה, או שהיא לא פורסמה.',
+  plan_not_draft: 'אפשר למחוק כאן רק טיוטה. תוכנית שפורסמה נשארת.',
+  plan_block_has_drafts: 'בחלק משבועות התוכנית כבר יש טיוטות.',
   plan_week_has_draft: 'כבר יש טיוטה לשבוע הזה.',
   plan_locked: 'המתאמנת כבר התחילה אימון מהתוכנית הזו, ולכן אפשר רק לערוך אותה.',
   plan_exercise_not_in_library: 'התרגיל הזה לא נמצא בספרייה.',

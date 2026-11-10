@@ -585,7 +585,10 @@ export interface CreatePlanPayload {
   duplicatePrevious?: boolean;
   /** Start from a copy of this published plan of the coach's (any trainee, any week). */
   sourcePlanId?: string;
-  /** The week already has a draft: replace its content with the copy (else 409 plan_week_has_draft). */
+  /**
+   * The week(s) already have a draft with content: replace it (else 409 plan_week_has_draft, or
+   * plan_block_has_drafts with `weeks` for a multi-week plan). Empty drafts are replaced without it.
+   */
   replaceDraft?: boolean;
   /** 1 (default) = a weekly plan; 2–8 = a multi-week plan starting this week (every week must be free). */
   lengthWeeks?: number;
@@ -618,10 +621,23 @@ export interface PlanWeekOption {
   /** 'YYYY-MM-DD', a Sunday in the trainee's time zone. */
   weekStartDate: string;
   relation: PlanWeekRelation;
-  /** The plan already in this week (draft or published): open it instead of creating. */
-  plan: { id: string; status: PlanStatus } | null;
+  /** The plan already in this week (draft or published). */
+  plan: PlanWeekPlanSummary | null;
   /** The week "Duplicate last week" would copy into this one; null when there is none. */
   copiesFromWeek: string | null;
+}
+
+/** The plan a week of the "new plan" picker already holds — enough to decide open / replace / delete. */
+export interface PlanWeekPlanSummary {
+  id: string;
+  status: PlanStatus;
+  workoutCount: number;
+  /** A standalone draft without content: no conflict — a new plan replaces it silently. */
+  isEmpty: boolean;
+  /** A week of a multi-week plan: opened, never replaced or deleted from the picker. */
+  inBlock: boolean;
+  /** A workout was logged from it: never replaced or deleted. */
+  locked: boolean;
 }
 
 /** GET …/plan-weeks — the week picker of "New plan" and "Duplicate last week". */
