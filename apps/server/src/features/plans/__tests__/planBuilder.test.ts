@@ -227,8 +227,8 @@ describe('plan builder (coach)', () => {
       await savePlan(full.id, validWorkouts());
       const res = await api.request('GET', `/coach/trainees/${trainee.id}/plan-weeks`, { token: coach.token });
       expect(res.status).toBe(200);
-      expect(res.body.weeks[0].plan).toEqual({ id: empty.id, status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false });
-      expect(res.body.weeks[1].plan).toEqual({ id: full.id, status: 'draft', workoutCount: 2, isEmpty: false, inBlock: false, locked: false });
+      expect(res.body.weeks[0].plan).toEqual({ id: empty.id, status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false, updatedAt: expect.any(String) });
+      expect(res.body.weeks[1].plan).toEqual({ id: full.id, status: 'draft', workoutCount: 2, isEmpty: false, inBlock: false, locked: false, updatedAt: expect.any(String) });
     });
 
     it('?draftOnly=true deletes a draft, never a published plan', async () => {

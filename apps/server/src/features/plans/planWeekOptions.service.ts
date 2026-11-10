@@ -28,7 +28,7 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
   // Every plan up to the last offered week: the offered ones, and the earlier ones a
   // duplicate would copy from (same rule as createCoachPlan: the most recent earlier published plan).
   const plans = await Plan.find({ coachingId, weekStartDate: { $lte: lastWeek } })
-    .select('weekStartDate status blockId workouts.kind workouts.exercises._id')
+    .select('weekStartDate status blockId updatedAt workouts.kind workouts.exercises._id')
     .sort({ weekStartDate: -1 })
     .lean();
   const offeredIds = plans.filter((plan) => plan.weekStartDate >= thisWeek).map((plan) => plan._id);
@@ -50,6 +50,8 @@ export async function listPlanWeekOptions(traineeId: string, coachingId: string,
             isEmpty: isEmptyDraft(plan) && !locked.has(String(plan._id)),
             inBlock: Boolean(plan.blockId),
             locked: locked.has(String(plan._id)),
+            // "נערכה לאחרונה" on the draft card (Mongoose timestamps; autosave bumps it).
+            updatedAt: plan.updatedAt.toISOString(),
           }
         : null,
       copiesFromWeek: earlier?.weekStartDate ?? null,

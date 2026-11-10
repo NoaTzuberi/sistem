@@ -638,6 +638,8 @@ export interface PlanWeekPlanSummary {
   inBlock: boolean;
   /** A workout was logged from it: never replaced or deleted. */
   locked: boolean;
+  /** ISO time of the last save ("last edited" on the new-plan draft card). */
+  updatedAt: string;
 }
 
 /** GET …/plan-weeks — the week picker of "New plan" and "Duplicate last week". */

@@ -64,9 +64,9 @@ describe('plan week options', () => {
     expect(options.defaultNewWeek).toBe('2026-10-04');
     expect(options.defaultDuplicateWeek).toBe('2026-10-11');
     expect(options.weeks.slice(0, 4)).toEqual([
-      { weekStartDate: '2026-10-04', relation: 'this', plan: { id: String(oct4._id), status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false }, copiesFromWeek: '2026-09-27' },
+      { weekStartDate: '2026-10-04', relation: 'this', plan: { id: String(oct4._id), status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false, updatedAt: oct4.updatedAt.toISOString() }, copiesFromWeek: '2026-09-27' },
       // Drafts are never copied (2026-11-09: copying an empty draft looped): the latest PUBLISHED earlier week.
-      { weekStartDate: '2026-10-11', relation: 'next', plan: { id: String(oct11._id), status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false }, copiesFromWeek: '2026-09-27' },
+      { weekStartDate: '2026-10-11', relation: 'next', plan: { id: String(oct11._id), status: 'draft', workoutCount: 0, isEmpty: true, inBlock: false, locked: false, updatedAt: oct11.updatedAt.toISOString() }, copiesFromWeek: '2026-09-27' },
       { weekStartDate: '2026-10-18', relation: 'later', plan: expect.objectContaining({ status: 'published' }), copiesFromWeek: '2026-09-27' },
       { weekStartDate: '2026-10-25', relation: 'later', plan: null, copiesFromWeek: '2026-10-18' },
     ]);
