@@ -256,6 +256,8 @@ export const en: CopyShape<typeof he> = {
     draftText: 'You can replace it with a copy of the plan you picked, or open it and continue from there.',
     draftReplace: 'Replace the draft',
     draftOpen: 'Open the existing draft',
+    draftOpenHint: 'Continue where you left off',
+    draftReplaceHint: 'The draft is replaced with a copy of the plan you picked',
     retry: 'Try again',
     errors: {
       plan_week_taken: 'This week already has a published plan. Pick another week, or open it.',

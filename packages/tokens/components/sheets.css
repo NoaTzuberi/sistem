@@ -24,4 +24,16 @@
   --text-confirm-title: 30px;          /* Karantina */
   --text-confirm-body: 15px;
   --size-confirm-button: 54px;
+
+  /* The dashboard confirm dialog (components/common/ConfirmDialog): the modal, its header and the choice cards. */
+  --size-confirm-dialog: 480px;
+  --radius-confirm-dialog: 28px;
+  --space-confirm-dialog: 28px;
+  --text-confirm-dialog-title: 34px;  /* Karantina */
+  --radius-confirm-choice: 18px;
+  --space-confirm-choice: 16px;
+  --size-confirm-choice-icon: 40px;
+  --radius-confirm-choice-icon: 12px;
+  --shadow-confirm-choice-hover: 0 10px 24px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --border-confirm-choice-danger: color-mix(in srgb, var(--color-primary-deep) 35%, transparent);
 }

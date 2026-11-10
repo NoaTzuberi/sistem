@@ -1,7 +1,9 @@
-import { useEffect, useId, useRef } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useDialogFocus } from '../../../hooks/useDialogFocus';
 import { useDrawerTransition } from '../../../hooks/useDrawerTransition';
+import { Icon } from '../Icon/Icon';
+import type { IconName } from '../Icon/iconPaths';
 import { PillButton } from '../PillButton/PillButton';
 import type { PillButtonVariant } from '../PillButton/PillButton';
 import './ConfirmDialog.css';
@@ -9,71 +11,55 @@ import './ConfirmDialog.css';
 // = --transition-drawer-out: the dialog leaves the page once its fade-out is over.
 const CLOSE_MS = 200;
 
-interface ConfirmDialogProps {
+/** One answer of a 3+ option question: a card with an icon, a bold label and a one-line description. */
+export interface ConfirmChoice {
+  label: string;
+  description: string;
+  icon: IconName;
+  /** 'danger' = it overwrites something (cherry label, icon and border). */
+  tone?: 'default' | 'danger';
+  onSelect: () => void;
+}
+
+interface BaseProps {
   isOpen: boolean;
   title: string;
   text: string;
-  confirmLabel: string;
   cancelLabel: string;
-  onConfirm: () => void;
   onCancel: () => void;
-  /** The confirm button's look (default primary pink). */
-  confirmVariant?: PillButtonVariant;
-  /** The action is running: both buttons wait. */
+  /** The header's icon tile (soft pink). */
+  icon?: IconName;
+  /** The action is running: every button waits. */
   busy?: boolean;
   /** A failed action's line, shown above the buttons. */
   error?: string | null;
-  /** An optional middle answer (e.g. "open the existing draft"), between Cancel and the confirm button. */
-  altLabel?: string;
-  onAlt?: () => void;
 }
 
-/**
- * A small centered question (instead of window.confirm): Esc and the scrim cancel, Tab stays on its
- * its buttons, the focus starts on Cancel (the safe answer) and goes back to what opened it.
- */
-export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, onConfirm, onCancel, confirmVariant = 'primary', busy = false, error = null, altLabel, onAlt }: ConfirmDialogProps) {
+/** Two answers: the confirm pill over a soft Cancel pill; the focus starts on Cancel. */
+interface TwoOptionProps extends BaseProps {
+  confirmLabel: string;
+  onConfirm: () => void;
+  /** The confirm button's look (default primary pink). */
+  confirmVariant?: PillButtonVariant;
+  choices?: undefined;
+}
+
+/** Three or more answers: stacked choice cards (the first = the safe default, focused) and a small Cancel. */
+interface ChoicesProps extends BaseProps {
+  choices: ConfirmChoice[];
+}
+
+type ConfirmDialogProps = TwoOptionProps | ChoicesProps;
+
+/** A small centered question (instead of window.confirm): Esc and the scrim cancel, Tab stays inside. */
+export function ConfirmDialog(props: ConfirmDialogProps) {
+  const { isOpen, title, text, cancelLabel, onCancel, icon, busy = false, error = null } = props;
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   const cardRef = useRef<HTMLDivElement>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
+  const initialFocusRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const textId = useId();
-  // The latest handler, so a parent re-render never re-runs the effect (and moves the focus).
-  const cancelHandler = useRef(onCancel);
-  useEffect(() => {
-    cancelHandler.current = onCancel;
-  }, [onCancel]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') cancelHandler.current();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      if (opener?.isConnected) opener.focus();
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen && isMounted) cancelRef.current?.focus();
-  }, [isOpen, isMounted]);
-
-  function keepFocusInside(event: ReactKeyboardEvent) {
-    if (event.key !== 'Tab' || !cardRef.current) return;
-    const buttons = [...cardRef.current.querySelectorAll<HTMLElement>('button:not([disabled])')];
-    const first = buttons[0];
-    const last = buttons.at(-1);
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last?.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first?.focus();
-    }
-  }
+  const keepFocusInside = useDialogFocus(isOpen, isMounted, onCancel, cardRef, initialFocusRef);
 
   if (!isMounted) return null;
 
@@ -90,6 +76,11 @@ export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, 
         onClick={(event) => event.stopPropagation()}
         onKeyDown={keepFocusInside}
       >
+        {icon && (
+          <span className="confirm-dialog-icon" aria-hidden="true">
+            <Icon name={icon} />
+          </span>
+        )}
         <h2 className="confirm-dialog-title" id={titleId}>
           {title}
         </h2>
@@ -101,19 +92,43 @@ export function ConfirmDialog({ isOpen, title, text, confirmLabel, cancelLabel, 
             {error}
           </p>
         )}
-        <div className="confirm-dialog-actions">
-          <PillButton ref={cancelRef} variant="fill" onClick={onCancel} disabled={busy}>
-            {cancelLabel}
-          </PillButton>
-          {altLabel && onAlt && (
-            <PillButton variant="soft" onClick={onAlt} disabled={busy}>
-              {altLabel}
+        {props.choices ? (
+          <>
+            <div className="confirm-dialog-choices">
+              {props.choices.map((choice, index) => (
+                <button
+                  key={choice.label}
+                  ref={index === 0 ? initialFocusRef : undefined}
+                  className={choice.tone === 'danger' ? 'confirm-choice confirm-choice-danger' : 'confirm-choice'}
+                  type="button"
+                  disabled={busy}
+                  aria-busy={busy || undefined}
+                  onClick={choice.onSelect}
+                >
+                  <span className="confirm-choice-icon" aria-hidden="true">
+                    <Icon name={choice.icon} />
+                  </span>
+                  <span className="confirm-choice-text">
+                    <span className="confirm-choice-label">{choice.label}</span>
+                    <span className="confirm-choice-description">{choice.description}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <button className="confirm-dialog-cancel" type="button" onClick={onCancel} disabled={busy}>
+              {cancelLabel}
+            </button>
+          </>
+        ) : (
+          <div className="confirm-dialog-actions">
+            <PillButton variant={props.confirmVariant ?? 'primary'} onClick={props.onConfirm} disabled={busy} aria-busy={busy || undefined}>
+              {props.confirmLabel}
             </PillButton>
-          )}
-          <PillButton variant={confirmVariant} onClick={onConfirm} disabled={busy} aria-busy={busy || undefined}>
-            {confirmLabel}
-          </PillButton>
-        </div>
+            <PillButton ref={initialFocusRef} variant="soft" onClick={onCancel} disabled={busy}>
+              {cancelLabel}
+            </PillButton>
+          </div>
+        )}
       </div>
     </div>,
     document.body,

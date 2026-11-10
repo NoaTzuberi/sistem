@@ -239,12 +239,12 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
         isOpen={isAsking}
         title={d.draftTitle}
         text={d.draftText}
-        confirmLabel={d.draftReplace}
-        confirmVariant="cherry"
-        altLabel={d.draftOpen}
-        onAlt={popover.openDraft}
+        icon="clipboard"
+        choices={[
+          { label: d.draftOpen, description: d.draftOpenHint, icon: 'pencil', onSelect: popover.openDraft },
+          { label: d.draftReplace, description: d.draftReplaceHint, icon: 'swap', tone: 'danger', onSelect: popover.replaceDraft },
+        ]}
         cancelLabel={shared.common.cancel}
-        onConfirm={popover.replaceDraft}
         onCancel={popover.cancelDraftConflict}
         busy={popover.isCreating}
       />

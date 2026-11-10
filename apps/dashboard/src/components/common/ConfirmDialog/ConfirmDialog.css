@@ -1,4 +1,4 @@
-/* The scrim fades (opacity) with its blur; the card settles in on the drawer curve and leaves faster. */
+/* The scrim fades with its blur; the card scales 0.96 → 1 as it fades in (300ms ease-out) and leaves in 200ms. */
 .confirm-dialog-scrim {
   position: fixed;
   inset: 0;
@@ -11,7 +11,7 @@
   -webkit-backdrop-filter: var(--blur-notice-scrim);
   backdrop-filter: var(--blur-notice-scrim);
   opacity: 0;
-  transition: opacity var(--transition-drawer-out) ease;
+  transition: opacity var(--transition-drawer-out) var(--ease-out);
 }
 
 .confirm-dialog-shown {
@@ -23,31 +23,50 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: min(380px, 100%);
-  padding: 24px 22px 18px;
-  border-radius: var(--radius-dialog);
+  width: min(var(--size-confirm-dialog), 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: var(--space-confirm-dialog);
+  border-radius: var(--radius-confirm-dialog);
   background-color: var(--color-card);
   box-shadow: var(--shadow-float);
-  transform: translateY(10px) scale(0.96);
-  transition: transform var(--transition-drawer-out) var(--ease-drawer-out);
+  transform: scale(0.96);
+  transition: transform var(--transition-drawer-out) var(--ease-out);
 }
 
 .confirm-dialog-shown .confirm-dialog {
   transform: none;
-  transition: transform var(--transition-drawer-in) var(--ease-drawer);
+  transition-duration: var(--transition-drawer-in);
+}
+
+.confirm-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  width: var(--size-confirm-icon);
+  height: var(--size-confirm-icon);
+  margin-block-end: 6px;
+  border-radius: var(--radius-confirm-icon);
+  color: var(--color-primary-deep);
+  background-color: var(--color-primary-tint);
 }
 
 .confirm-dialog-title {
   margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-display);
+  font-size: var(--text-confirm-dialog-title);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  color: var(--color-text);
 }
 
 .confirm-dialog-text {
   margin: 0;
-  font-size: var(--text-sm);
+  font-family: var(--font-family-body);
+  font-size: var(--text-confirm-body);
   line-height: 1.5;
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
 
 .confirm-dialog-error {
@@ -57,21 +76,160 @@
   color: var(--color-error);
 }
 
+/* Two answers: the confirm pill over the soft Cancel, both full width. */
 .confirm-dialog-actions {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-direction: column;
   gap: 8px;
-  margin-block-start: 12px;
+  margin-block-start: 14px;
+}
+
+.confirm-dialog-actions > * {
+  width: 100%;
+}
+
+/* Three or more answers: stacked choice cards. */
+.confirm-dialog-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-block-start: 14px;
+}
+
+.confirm-choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: var(--space-confirm-choice);
+  border: var(--border-width-thin) solid var(--color-hairline);
+  border-radius: var(--radius-confirm-choice);
+  color: var(--color-text);
+  text-align: start;
+  background-color: var(--color-card);
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    box-shadow var(--transition-hover) var(--ease-out),
+    border-color var(--transition-hover) var(--ease-out);
+}
+
+.confirm-choice:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.confirm-choice:disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled);
+}
+
+.confirm-choice-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-confirm-choice-icon);
+  height: var(--size-confirm-choice-icon);
+  border-radius: var(--radius-confirm-choice-icon);
+  color: var(--color-ink);
+  background-color: var(--color-fill-soft);
+}
+
+.confirm-choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.confirm-choice-label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.confirm-choice-description {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Overwrites something: cherry label and icon; a cherry-tint border on hover / focus. */
+.confirm-choice-danger .confirm-choice-label,
+.confirm-choice-danger .confirm-choice-icon {
+  color: var(--color-primary-deep);
+}
+
+.confirm-choice-danger .confirm-choice-icon {
+  background-color: var(--color-primary-tint);
+}
+
+.confirm-choice:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-text);
+  outline-offset: 2px;
+}
+
+.confirm-choice-danger:focus-visible {
+  border-color: var(--border-confirm-choice-danger);
+  outline-color: var(--color-primary-deep);
+}
+
+/* Cancel: a small muted text button, centered. Its press area still reaches 44px. */
+.confirm-dialog-cancel {
+  align-self: center;
+  min-height: 44px;
+  margin-block-start: 6px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-round);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background: none;
+  cursor: pointer;
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    color var(--transition-hover) var(--ease-out);
+}
+
+.confirm-dialog-cancel:active {
+  transform: scale(0.97);
+}
+
+.confirm-dialog-cancel:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-text);
+  outline-offset: 1px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .confirm-choice:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-confirm-choice-hover);
+  }
+
+  .confirm-choice:hover:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .confirm-choice-danger:hover:not(:disabled) {
+    border-color: var(--border-confirm-choice-danger);
+  }
+
+  .confirm-dialog-cancel:hover {
+    color: var(--color-text);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .confirm-dialog-scrim,
-  .confirm-dialog {
+  .confirm-dialog,
+  .confirm-choice,
+  .confirm-dialog-cancel {
     transition: none;
   }
 
   .confirm-dialog {
+    transform: none;
+  }
+
+  .confirm-choice:hover:not(:disabled) {
     transform: none;
   }
 }

@@ -269,6 +269,9 @@ export const he = {
     draftText: 'אפשר להחליף אותה בעותק של התוכנית שבחרת, או לפתוח אותה ולהמשיך ממנה.',
     draftReplace: 'להחליף את הטיוטה',
     draftOpen: 'לפתוח את הטיוטה הקיימת',
+    // DRAFT (2026-11-10): one line under each choice of the draft question.
+    draftOpenHint: 'להמשיך מאיפה שהפסקת',
+    draftReplaceHint: 'הטיוטה תוחלף בעותק של התוכנית שבחרת',
     retry: 'נסי שוב',
     errors: {
       plan_week_taken: 'לשבוע הזה כבר יש תוכנית שפורסמה. בחרי שבוע אחר, או פתחי אותה.',
