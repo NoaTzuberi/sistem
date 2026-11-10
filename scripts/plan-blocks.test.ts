@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlanBlockWeek, PlanWorkout } from '@sistem/types';
-import { firstTakenBlockWeek, startActionFor } from '../apps/dashboard/src/features/trainees/data/newPlanStart';
+import { newPlanSituation, rangeWeeks } from '../apps/dashboard/src/features/trainees/data/newPlanConflicts';
 import { laterWeeksRange, progressChipFor, volumeShares, weekColorClass } from '../apps/dashboard/src/features/planBuilder/data/blockWeeks';
 import type { DraftExercise } from '../apps/dashboard/src/features/planBuilder/types';
 
@@ -55,17 +55,20 @@ describe('multi-week plans (dashboard rules)', () => {
     expect(progressChipFor(previousWeek, 0, 0, draftExercise({ exerciseId: 'row', sets: 4, reps: 8, targetWeight: 50 }))).toBeNull();
   });
 
-  it('a block never starts on a taken week, and finds the first taken week inside it', () => {
+  it('a block checks every week it covers: drafts ask, a published week blocks the start', () => {
+    const plan = (status: 'draft' | 'published', isEmpty = false) => ({ id: status, status, workoutCount: isEmpty ? 0 : 2, isEmpty, inBlock: false, locked: false });
+    expect(rangeWeeks('2026-11-15', 'block', 3)).toEqual(['2026-11-15', '2026-11-22', '2026-11-29']);
+    expect(rangeWeeks('2026-11-15', 'weekly', 3)).toEqual(['2026-11-15']);
     const weeks = [
-      { weekStartDate: 'w1', plan: null },
-      { weekStartDate: 'w2', plan: null },
-      { weekStartDate: 'w3', plan: { id: 'x', status: 'draft' as const } },
+      { weekStartDate: '2026-11-15', plan: null },
+      { weekStartDate: '2026-11-22', plan: plan('draft') },
+      { weekStartDate: '2026-11-29', plan: plan('draft', true) },
+      { weekStartDate: '2026-12-06', plan: plan('published') },
     ];
-    expect(firstTakenBlockWeek(weeks, 'w1', 2)).toBeNull();
-    expect(firstTakenBlockWeek(weeks, 'w1', 3)).toBe(3);
-    // A draft week: a weekly duplicate asks replace / open, a block just opens it.
-    expect(startActionFor(weeks[2], 'duplicate', 'weekly')).toBe('duplicate');
-    expect(startActionFor(weeks[2], 'duplicate', 'block')).toBe('open');
-    expect(startActionFor(weeks[0], 'scratch', 'block')).toBe('create');
+    expect(newPlanSituation(weeks, '2026-11-15', 'block', 1 + 2)).toEqual({ kind: 'blockDrafts', weeks: ['2026-11-22'] });
+    expect(newPlanSituation(weeks.slice(0, 1), '2026-11-15', 'block', 2)).toEqual({ kind: 'create' });
+    expect(newPlanSituation(weeks, '2026-11-15', 'block', 4)).toEqual({ kind: 'blockTaken', weekStartDate: '2026-12-06', isPublished: true });
+    // An empty draft never asks.
+    expect(newPlanSituation(weeks, '2026-11-29', 'weekly', 4)).toEqual({ kind: 'create' });
   });
 });

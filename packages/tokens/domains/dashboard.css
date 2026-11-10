@@ -180,4 +180,10 @@
   --text-tour-welcome-note: 13px;
   --scale-tour-welcome-from: 0.96;
   --transition-tour-welcome: 300ms;
+  /* The "new plan" popover (2026-11-10): the orange notice (#c75a00 text ON its tint only), the outline of the
+     weeks a multi-week plan covers, and the brief mark on the week cards after "בחירת שבוע התחלה אחר". */
+  --color-new-plan-notice-soft: var(--color-stat-orange-mist);  /* #ffebd6 */
+  --color-new-plan-notice-ink: var(--ink-orange);               /* #c75a00 — text only */
+  --color-new-plan-range: color-mix(in srgb, var(--color-primary) 40%, var(--color-card));
+  --color-new-plan-weeks-mark: color-mix(in srgb, var(--color-primary) 10%, transparent);
 }

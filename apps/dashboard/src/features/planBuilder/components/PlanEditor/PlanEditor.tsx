@@ -4,6 +4,7 @@ import type { AiPlanExercise, AiSplitOption, AiTrainingRecommendation, CoachPlan
 import { DUPLICATE_WEEK_STATE, traineePath } from '../../../../app/config/routes';
 import type { ActionMenuItem } from '../../../../components/common/ActionMenu/ActionMenu';
 import { Toast } from '../../../../components/common/Toast/Toast';
+import { ConfirmDialog } from '../../../../components/common/ConfirmDialog/ConfirmDialog';
 import { useToast } from '../../../../hooks/useToast';
 import { useUndoToast } from '../../../../hooks/useUndoToast';
 import { WORKOUT_UNDO_MS } from '../../data/planDefaults';
@@ -65,6 +66,8 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     initialPlan,
   );
   const [isBusy, setIsBusy] = useState(false);
+  /** "מחיקת הטיוטה" (a standalone draft): the confirm sheet is up. */
+  const [isDeleteDraftAsked, setIsDeleteDraftAsked] = useState(false);
   const config = useTrainingConfig();
   // The two side sheets. At most one is open; closed, neither is in the page.
   const [openSheet, setOpenSheet] = useState<'library' | 'ai' | null>(null);
@@ -245,9 +248,22 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
     void runAction(unpublish);
   }
 
+  // A standalone draft = the same "מחיקת הטיוטה" sheet as the new-plan popover's week card.
+  const isStandaloneDraft = plan.status === 'draft' && !block;
+
   async function handleDelete() {
+    if (isStandaloneDraft) {
+      setIsDeleteDraftAsked(true);
+      return;
+    }
     if (!window.confirm(block ? fill(blockText.deleteConfirm, { count: block.lengthWeeks }) : copy.deleteConfirm)) return;
     if (await runAction(remove)) navigate(plansTab, { replace: true });
+  }
+
+  async function confirmDeleteDraft() {
+    const deleted = await runAction(remove);
+    setIsDeleteDraftAsked(false);
+    if (deleted) navigate(plansTab, { replace: true });
   }
 
   // "Duplicate last week" is the server's own flow: the trainee's week picker, in duplicate mode.
@@ -262,7 +278,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       ? [{ id: 'unpublish', label: copy.unpublish, disabled: plan.locked || isBusy, onSelect: handleUnpublish }]
       : [{ id: 'save', label: copy.saveDraft, disabled: !isDirty || isBusy || saveStatus === 'saving', onSelect: () => void save() }]),
     { id: 'clear', label: copy.clearWeek, disabled: workouts.length === 0, onSelect: handleClearWeek },
-    { id: 'delete', label: copy.delete, danger: true, disabled: plan.locked || isBusy, onSelect: () => void handleDelete() },
+    { id: 'delete', label: isStandaloneDraft ? traineeText.deleteDraft.action : copy.delete, danger: true, disabled: plan.locked || isBusy, onSelect: () => void handleDelete() },
   ];
 
   return (
@@ -433,6 +449,18 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       >
         <SendNoteSection note={sendNote} />
       </PublishModal>
+      <ConfirmDialog
+        isOpen={isDeleteDraftAsked}
+        title={fill(traineeText.deleteDraft.title, { range: formatWeekSpan(plan.weekStartDate, language) })}
+        text={traineeText.deleteDraft.text}
+        icon="trash"
+        confirmLabel={traineeText.deleteDraft.action}
+        confirmVariant="cherry"
+        onConfirm={() => void confirmDeleteDraft()}
+        cancelLabel={sharedText.common.cancel}
+        onCancel={() => setIsDeleteDraftAsked(false)}
+        busy={isBusy}
+      />
     </div>
   );
 }

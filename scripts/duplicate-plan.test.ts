@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { PlanRequestError } from '@sistem/api-client';
 import type { PlanDuplicateSource } from '@sistem/types';
-import { defaultSourceFor, startActionFor } from '../apps/dashboard/src/features/trainees/data/newPlanStart';
+import { defaultSourceFor } from '../apps/dashboard/src/features/trainees/data/newPlanStart';
+import { canDeleteDraft, defaultWeekOf, newPlanSituation, weekConflictOf } from '../apps/dashboard/src/features/trainees/data/newPlanConflicts';
 import { describePlanCreateError, isStaleListError } from '../apps/dashboard/src/features/trainees/data/planCreateErrors';
 import { traineesCopy } from '../apps/dashboard/src/features/trainees/copy';
 
@@ -17,15 +18,29 @@ const source = (id: string, traineeId: string, weekStartDate: string): PlanDupli
 });
 
 describe('new plan popover rules', () => {
-  it('a draft week asks (duplicate) instead of opening it; a published week always opens', () => {
-    const draftWeek = { plan: { id: 'p1', status: 'draft' as const } };
-    const publishedWeek = { plan: { id: 'p2', status: 'published' as const } };
-    expect(startActionFor(draftWeek, 'duplicate')).toBe('duplicate');
-    expect(startActionFor(draftWeek, 'scratch')).toBe('open');
-    expect(startActionFor(publishedWeek, 'duplicate')).toBe('open');
-    expect(startActionFor({ plan: null }, 'duplicate')).toBe('duplicate');
-    expect(startActionFor({ plan: null }, 'scratch')).toBe('create');
-    expect(startActionFor(undefined, 'scratch')).toBe('none');
+  it('a draft week opens or starts over; an empty draft is free; a published week only opens', () => {
+    const summary = (status: 'draft' | 'published', extra: Partial<{ isEmpty: boolean; inBlock: boolean; locked: boolean; workoutCount: number }> = {}) => ({
+      id: `${status}-plan`,
+      status,
+      workoutCount: 3,
+      isEmpty: false,
+      inBlock: false,
+      locked: false,
+      ...extra,
+    });
+    const weeks = (plan: ReturnType<typeof summary> | null) => [{ weekStartDate: '2026-11-15', plan }];
+    expect(newPlanSituation(weeks(null), '2026-11-15', 'weekly', 4)).toEqual({ kind: 'create' });
+    expect(newPlanSituation(weeks(summary('draft', { isEmpty: true, workoutCount: 0 })), '2026-11-15', 'weekly', 4)).toEqual({ kind: 'create' });
+    expect(newPlanSituation(weeks(summary('draft')), '2026-11-15', 'weekly', 4)).toMatchObject({ kind: 'draft', canReplace: true });
+    expect(newPlanSituation(weeks(summary('draft', { inBlock: true })), '2026-11-15', 'weekly', 4)).toMatchObject({ kind: 'draft', canReplace: false });
+    expect(newPlanSituation(weeks(summary('published')), '2026-11-15', 'weekly', 4)).toMatchObject({ kind: 'published' });
+    expect(newPlanSituation(weeks(null), undefined, 'weekly', 4)).toEqual({ kind: 'none' });
+    expect(weekConflictOf(summary('draft', { locked: true }))).toBe('fixed');
+    expect(canDeleteDraft(summary('draft'))).toBe(true);
+    expect(canDeleteDraft(summary('draft', { inBlock: true }))).toBe(false);
+    expect(canDeleteDraft(summary('published'))).toBe(false);
+    // The preselected week: an empty draft counts as free.
+    expect(defaultWeekOf([{ weekStartDate: 'a', relation: 'this', plan: summary('draft'), copiesFromWeek: null }, { weekStartDate: 'b', relation: 'next', plan: summary('draft', { isEmpty: true }), copiesFromWeek: null }], undefined)).toBe('b');
   });
 
   it('no published plans = no source (the empty state); otherwise her own latest earlier plan first', () => {

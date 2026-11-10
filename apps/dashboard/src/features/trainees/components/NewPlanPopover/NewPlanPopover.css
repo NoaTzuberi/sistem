@@ -92,6 +92,27 @@
   gap: 8px;
 }
 
+/* "בחירת שבוע התחלה אחר": the week cards light up once (a color fade — it stays under reduced motion). */
+.new-plan-weeks-marked {
+  border-radius: var(--radius-tile);
+  animation: new-plan-weeks-mark 1200ms ease-out;
+}
+
+@keyframes new-plan-weeks-mark {
+  from,
+  40% {
+    background-color: var(--color-new-plan-weeks-mark);
+    box-shadow: 0 0 0 6px var(--color-new-plan-weeks-mark);
+  }
+}
+
+/* A draft week: the start method only counts if she starts over. */
+.new-plan-choice-hint {
+  margin: 8px 0 0;
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
 .new-plan-methods {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -187,16 +208,6 @@
   color: var(--color-primary-deep);
 }
 
-/* The selected week already has a plan: amber, the one warning color. */
-.new-plan-note {
-  margin: 10px 0 0;
-  padding: 8px 10px;
-  border-radius: var(--radius-field);
-  font-size: var(--text-xs);
-  color: var(--color-flag);
-  background-color: var(--color-flag-soft);
-}
-
 .new-plan-error {
   display: flex;
   flex-wrap: wrap;
@@ -211,17 +222,6 @@
   margin: 0;
   font-size: var(--text-sm);
   color: var(--color-error);
-}
-
-.new-plan-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.new-plan-actions .new-plan-confirm {
-  flex: 1;
-  min-width: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {

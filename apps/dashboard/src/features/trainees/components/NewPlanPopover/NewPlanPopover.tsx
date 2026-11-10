@@ -1,15 +1,16 @@
 import { useEffect, useId, useRef } from 'react';
-import { fill, formatPlural, formatWeekSpan, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
+import { fill, formatWeekSpan, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { ConfirmDialog } from '../../../../components/common/ConfirmDialog/ConfirmDialog';
 import { DuplicateSources } from '../DuplicateSources/DuplicateSources';
 import { PlanLengthPicker } from '../PlanLengthPicker/PlanLengthPicker';
+import { NewPlanWeekCard } from '../NewPlanWeekCard/NewPlanWeekCard';
+import { NewPlanFooter } from '../NewPlanFooter/NewPlanFooter';
 import { aiDraftCopy } from '../../../aiDraft/copy';
-import { weekTileLabel } from '../../data/planWeeks';
 import type { NewPlanPopoverState, PlanStartMethod } from '../../hooks/useNewPlanPopover';
+import { listWeekSpans, useNewPlanFooter } from '../../hooks/useNewPlanFooter';
 import { useRadioGroupKeys } from '../../hooks/useRadioGroupKeys';
-import { startActionFor } from '../../data/newPlanStart';
 import { traineesCopy } from '../../copy';
 import './NewPlanPopover.css';
 
@@ -25,7 +26,8 @@ interface NewPlanPopoverProps {
 /**
  * "New plan": for which week, and how to start. A popover under the Plans toolbar — it grows
  * from its corner, closes on Esc / a press outside / ✕, and gives the focus back to what opened
- * it. A week that already has a plan cannot be started again: the button opens that plan.
+ * it. A week with a draft opens it, or starts over after a question; a published week only opens
+ * (useNewPlanFooter). A draft week's ⋯ deletes it.
  */
 export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOptions }: NewPlanPopoverProps) {
   const language = useLanguage();
@@ -34,12 +36,18 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
   const ai = useCopy(aiDraftCopy);
   const handleRadioKeys = useRadioGroupKeys();
   const panelRef = useRef<HTMLDivElement>(null);
+  const weeksRef = useRef<HTMLDivElement>(null);
+  const footer = useNewPlanFooter(popover);
   const titleId = useId();
   const { isOpen, close, week, weeks, method } = popover;
   const hasWeeks = weeks.length > 0;
   const d = copy.duplicate;
-  // While the draft question is up, Esc / a press belong to it, not to the popover.
-  const isAsking = popover.draftConflict !== null;
+  const f = copy.newPlanFooter;
+  // While a question is up (replace the draft / delete it), Esc / a press belong to it, not to the popover.
+  const isAsking = popover.draftConflict !== null || popover.deleteTarget !== null;
+  const { weeksFocusRequest } = popover;
+  const lastQuestion = useRef(popover.draftConflict);
+  if (popover.draftConflict) lastQuestion.current = popover.draftConflict;
 
   // The focus returns to whatever opened it.
   useEffect(() => {
@@ -72,14 +80,26 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
     if (isOpen && hasWeeks) panelRef.current?.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]')?.focus();
   }, [isOpen, hasWeeks]);
 
+  // "בחירת שבוע התחלה אחר": the week cards come into view, take the focus and light up once.
+  useEffect(() => {
+    if (weeksFocusRequest === 0) return;
+    const cards = weeksRef.current;
+    if (!cards) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    cards.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+    cards.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]')?.focus({ preventScroll: true });
+    cards.classList.remove('new-plan-weeks-marked');
+    void cards.offsetWidth; // restarts the mark when asked again
+    cards.classList.add('new-plan-weeks-marked');
+  }, [weeksFocusRequest]);
+
   if (!isOpen) return null;
 
-  // A week with a plan opens it — except a draft week when duplicating (she is asked replace / open).
-  const isPublishedWeek = week?.plan?.status === 'published';
-  const isBlock = popover.length === 'block';
-  const action = startActionFor(week, method, popover.length);
-  const isTaken = action === 'open';
-  const isDuplicating = action === 'duplicate';
+  const { methodsDisabled } = footer;
+  const isDuplicating = method === 'duplicate' && !methodsDisabled;
+  const conflict = popover.draftConflict;
+  // The question keeps its words while it fades out.
+  const question = conflict ?? lastQuestion.current;
   const sources = popover.sources ?? [];
   const methods: { id: PlanStartMethod; label: string; hint: string; disabled: boolean }[] = [
     { id: 'scratch', label: copy.startScratch, hint: copy.fromScratchHint, disabled: false },
@@ -128,27 +148,25 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
           <p className="new-plan-label" id={`${titleId}-week`}>
             {copy.weekGroup}
           </p>
-          <div className="new-plan-weeks" role="radiogroup" aria-labelledby={`${titleId}-week`} onKeyDown={handleRadioKeys}>
-            {weeks.map((entry) => {
-              const isSelected = entry.weekStartDate === week?.weekStartDate;
-              return (
-                <button
-                  key={entry.weekStartDate}
-                  className="week-tile"
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  tabIndex={isSelected ? 0 : -1}
-                  onClick={() => popover.selectWeek(entry.weekStartDate)}
-                >
-                  <span className="week-tile-label">{weekTileLabel(entry, popover.currentWeekStart!, language)}</span>
-                  <span className="week-tile-dates">{formatWeekSpan(entry.weekStartDate, language)}</span>
-                  <span className={`week-tile-status week-tile-status-${entry.plan?.status ?? 'free'}`}>
-                    {entry.plan ? shared.coach.planStatus[entry.plan.status] : copy.weekFree}
-                  </span>
-                </button>
-              );
-            })}
+          <div
+            className="new-plan-weeks"
+            ref={weeksRef}
+            role="radiogroup"
+            aria-labelledby={`${titleId}-week`}
+            onKeyDown={handleRadioKeys}
+            onAnimationEnd={(event) => event.currentTarget.classList.remove('new-plan-weeks-marked')}
+          >
+            {weeks.map((entry) => (
+              <NewPlanWeekCard
+                key={entry.weekStartDate}
+                entry={entry}
+                currentWeekStart={popover.currentWeekStart!}
+                isSelected={entry.weekStartDate === week?.weekStartDate}
+                isInRange={footer.rangeWeeks.has(entry.weekStartDate)}
+                onSelect={() => popover.selectWeek(entry.weekStartDate)}
+                onDeleteDraft={(planId) => popover.askDelete(planId, entry.weekStartDate)}
+              />
+            ))}
           </div>
 
           <p className="new-plan-label" id={`${titleId}-how`}>
@@ -156,7 +174,7 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
           </p>
           <div className="new-plan-methods" role="radiogroup" aria-labelledby={`${titleId}-how`} onKeyDown={handleRadioKeys}>
             {methods.map((entry) => {
-              const isSelected = !isPublishedWeek && entry.id === method;
+              const isSelected = !methodsDisabled && entry.id === method;
               return (
                 <button
                   key={entry.id}
@@ -164,8 +182,8 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
-                  // A published week opens its plan: there is nothing to start.
-                  disabled={isPublishedWeek || entry.disabled}
+                  // A week that only opens its plan (published, …): there is nothing to start.
+                  disabled={methodsDisabled || entry.disabled}
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => popover.selectMethod(entry.id)}
                 >
@@ -175,6 +193,8 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
               );
             })}
           </div>
+
+          {footer.showChoiceHint && <p className="new-plan-choice-hint">{f.choiceHint}</p>}
 
           {isDuplicating && (
             <DuplicateSources
@@ -193,16 +213,6 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
         </>
       )}
 
-      {isBlock && !isTaken && popover.blockTakenWeek !== null && (
-        <p className="new-plan-note" role="status">
-          {fill(copy.length.blockTakenNote, { n: popover.blockTakenWeek })}
-        </p>
-      )}
-      {isTaken && week?.plan && (
-        <p className="new-plan-note" role="status">
-          {fill(copy.weekTakenNote, { status: shared.coach.planStatus[week.plan.status] })}
-        </p>
-      )}
       {popover.error && (
         <div className="new-plan-error" role="alert">
           <p className="new-plan-error-text">{popover.error}</p>
@@ -212,41 +222,42 @@ export function NewPlanPopover({ popover, traineeId, aiWorkoutCount, onOpenAiOpt
         </div>
       )}
 
-      <div className="new-plan-actions">
-        <PillButton
-          variant="primary"
-          className="new-plan-confirm"
-          disabled={!week || popover.isCreating || (isDuplicating && !popover.source) || (isBlock && !isTaken && popover.blockTakenWeek !== null)}
-          onClick={() => void popover.confirm()}
-        >
-          {isTaken
-            ? copy.openExisting
-            : !week
-              ? copy.newPlan
-              : isBlock
-                ? fill(copy.length.createBlockFor, {
-                    weeks: formatPlural(language, copy.length.weeks, popover.blockWeeks),
-                    range: formatWeekSpan(week.weekStartDate, language),
-                  })
-                : fill(isDuplicating ? d.confirm : copy.createFor, { range: formatWeekSpan(week.weekStartDate, language) })}
-        </PillButton>
-        <PillButton variant="fill" disabled={popover.isCreating} onClick={close}>
-          {shared.common.cancel}
-        </PillButton>
-      </div>
+      <NewPlanFooter footer={footer} cancelLabel={shared.common.cancel} onCancel={close} busy={popover.isCreating} />
 
+      {/* Start over instead of the draft (one week), or create over several weeks' drafts. */}
       <ConfirmDialog
-        isOpen={isAsking}
-        title={d.draftTitle}
-        text={d.draftText}
+        isOpen={conflict !== null}
+        title={question?.planId ? d.draftTitle : f.draftsTitle}
+        text={question?.planId ? f.draftText[question.method] : fill(f.draftsText, { weeks: listWeekSpans(question?.weeks ?? [], language) })}
         icon="clipboard"
-        choices={[
-          { label: d.draftOpen, description: d.draftOpenHint, icon: 'pencil', onSelect: popover.openDraft },
-          { label: d.draftReplace, description: d.draftReplaceHint, icon: 'swap', tone: 'danger', onSelect: popover.replaceDraft },
-        ]}
+        choices={
+          question?.planId
+            ? [
+                { label: d.draftOpen, description: d.draftOpenHint, icon: 'pencil', onSelect: popover.openDraft },
+                { label: d.draftReplace, description: f.replaceHint[question.method], icon: 'swap', tone: 'danger', onSelect: popover.replaceDraft },
+              ]
+            : [
+                { label: f.draftsKeep, description: f.draftsKeepHint, icon: 'calendar', onSelect: popover.focusWeeks },
+                { label: f.draftsReplace, description: f.draftsReplaceHint, icon: 'swap', tone: 'danger', onSelect: popover.replaceDraft },
+              ]
+        }
         cancelLabel={shared.common.cancel}
         onCancel={popover.cancelDraftConflict}
         busy={popover.isCreating}
+      />
+
+      <ConfirmDialog
+        isOpen={popover.deleteTarget !== null}
+        title={fill(copy.deleteDraft.title, { range: popover.deleteTarget ? formatWeekSpan(popover.deleteTarget.weekStartDate, language) : '' })}
+        text={copy.deleteDraft.text}
+        icon="trash"
+        confirmLabel={copy.deleteDraft.action}
+        confirmVariant="cherry"
+        onConfirm={popover.confirmDelete}
+        cancelLabel={shared.common.cancel}
+        onCancel={popover.cancelDelete}
+        busy={popover.isDeleting}
+        error={popover.deleteError}
       />
     </div>
   );
