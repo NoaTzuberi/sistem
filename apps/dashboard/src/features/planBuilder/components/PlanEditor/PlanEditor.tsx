@@ -336,7 +336,6 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
             onSelect={(key) => planWorkouts.select(workouts.find((workout) => workout.key === key))}
             onAddStrength={planWorkouts.addStrength}
             onAddCardio={planWorkouts.addCardio}
-            neutral={block !== undefined}
           />
           <div ref={planWorkouts.panelRef} className={planWorkouts.leavingKey ? 'plan-workout-panel plan-workout-panel-leaving' : 'plan-workout-panel'} id={panelId} role="tabpanel" aria-labelledby={workoutTabId(selected.key)}>
             {/* Keyed by workout: another workout starts with its rows closed. A cardio workout has its own body. */}
@@ -358,7 +357,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
               key={selected.key}
               traineeId={traineeId}
               workout={selected}
-              colorClass={block ? 'workout-color-neutral' : workoutColorClass(selectedIndex)}
+              colorClass="workout-color-week"
               config={config}
               suggestions={suggestionsFor(selectedIndex)}
               index={selectedIndex}

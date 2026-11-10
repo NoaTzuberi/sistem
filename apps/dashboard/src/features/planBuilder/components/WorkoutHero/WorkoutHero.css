@@ -8,26 +8,18 @@
 }
 
 /*
- * The cloud: the workout's color as two blurred blobs over its soft variant, like the dashboard
- * hero cards. Clipped to the card's top corners here, so the band itself does not clip its menu.
+ * The band's header: a very light tint of the week color (pink in a weekly plan) under a 4px top
+ * accent — no blobs, no dark gradient. Clipped to the card's top corners here, so the band itself
+ * does not clip its menu.
  */
 .workout-hero-cloud {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  border-block-start: var(--border-width-heavy) solid var(--workout-color);
   border-start-start-radius: var(--radius-panel);
   border-start-end-radius: var(--radius-panel);
-  background-color: var(--workout-color-soft);
-}
-
-.workout-hero-cloud::before {
-  content: '';
-  position: absolute;
-  inset: -40% -10% -10%;
-  background:
-    radial-gradient(35% 60% at 92% 20%, color-mix(in srgb, var(--workout-color) 55%, transparent), transparent 70%),
-    radial-gradient(40% 60% at 20% 90%, color-mix(in srgb, var(--workout-color) 28%, transparent), transparent 70%);
-  filter: var(--blur-hero);
+  background-color: color-mix(in srgb, var(--workout-color-soft) 55%, var(--color-card));
 }
 
 /* Everything else sits on the cloud. */
@@ -64,7 +56,7 @@
   font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
   line-height: 1;
-  color: var(--color-on-primary); /* contrast-ignore: owner — the fill is the exact workout color (2026-10-21) */
+  color: var(--workout-on, var(--color-on-primary)); /* contrast-ignore: owner — the fill is the exact week / workout color (2026-11-10) */
   background-color: var(--workout-color);
 }
 

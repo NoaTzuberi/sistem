@@ -4,6 +4,36 @@
   gap: var(--space-2);
 }
 
+/* The plan's accent: its week's color in a multi-week plan, pink in a weekly plan (owner, 2026-11-10).
+   --plan-on = text on the solid color (white on pink / purple, ink on orange / blue). */
+.plan-card-week-1 {
+  --plan-color: var(--color-week-1);
+  --plan-soft: var(--color-week-1-soft);
+  --plan-text: var(--color-week-1-text);
+  --plan-on: var(--color-week-1-on);
+}
+
+.plan-card-week-2 {
+  --plan-color: var(--color-week-2);
+  --plan-soft: var(--color-week-2-soft);
+  --plan-text: var(--color-week-2-text);
+  --plan-on: var(--color-week-2-on);
+}
+
+.plan-card-week-3 {
+  --plan-color: var(--color-week-3);
+  --plan-soft: var(--color-week-3-soft);
+  --plan-text: var(--color-week-3-text);
+  --plan-on: var(--color-week-3-on);
+}
+
+.plan-card-week-4 {
+  --plan-color: var(--color-week-4);
+  --plan-soft: var(--color-week-4-soft);
+  --plan-text: var(--color-week-4-text);
+  --plan-on: var(--color-week-4-on);
+}
+
 .plan-card-chips {
   display: flex;
   flex-wrap: wrap;
@@ -35,11 +65,40 @@
   overflow-wrap: anywhere;
 }
 
-/* A workout: a compact white card (letter tile in its Workouts-tab tint, name, day · exercises, status chip). */
+/* A workout: a compact white card with a soft border (letter tile in the plan's tint, name, day · exercises,
+   status chip). Open = "selected": its header in the tint with the letter filled, and a 4px top accent. */
 .plan-workout {
+  overflow: hidden;
+  border: var(--border-width-thin) solid var(--color-hairline);
   border-radius: var(--radius-coach-row);
   background-color: var(--color-card);
+}
+
+.plan-workout[open] {
+  border-color: transparent;
+  border-block-start: var(--border-width-heavy) solid var(--plan-color);
   box-shadow: var(--shadow-profile-card);
+}
+
+.plan-workout[open] > .plan-workout-summary {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  color: var(--plan-text);
+  background-color: var(--plan-soft);
+}
+
+.plan-workout[open] .plan-workout-meta,
+.plan-workout[open] .plan-workout-chevron {
+  color: var(--plan-text);
+}
+
+.plan-workout[open] .plan-workout-letter {
+  color: var(--plan-on); /* contrast-ignore: owner — white on the exact pink / purple, ink on orange / blue (2026-11-10) */
+  background-color: var(--plan-color);
+}
+
+.plan-workout[open] > .plan-exercises {
+  padding-block-start: var(--space-2);
 }
 
 .plan-workout > .plan-card-notes {
@@ -74,8 +133,8 @@
   width: var(--size-coach-icon-tile);
   height: var(--size-coach-icon-tile);
   border-radius: var(--radius-coach-icon-tile);
-  background-color: var(--workout-color-soft);
-  color: var(--workout-color-text);
+  background-color: var(--plan-soft);
+  color: var(--plan-text);
   font-family: var(--font-num);
   font-size: var(--text-xl);
   font-style: italic;

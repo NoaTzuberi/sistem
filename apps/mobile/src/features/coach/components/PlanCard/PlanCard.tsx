@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import type { CoachPlan, WorkoutStatus } from '@sistem/types';
 import { IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { cardioMinutesLabel, cardioTotals, dayName, fill, sharedCopy, useCopy, useI18n } from '@sistem/shared';
-import { workoutColorClass } from '../../../home/data/homeDisplay';
 import { PlanExerciseList } from '../../../workouts/components/PlanExerciseList/PlanExerciseList';
 import { letterOf, nameScript } from '../../../workouts/data/weekPlanDisplay';
 import { coachCopy } from '../../copy';
@@ -16,6 +15,13 @@ interface PlanCardProps {
   children?: ReactNode;
 }
 
+/** The week colors cycle 1–4 (packages/tokens --color-week-N); a weekly plan uses week 1's pink. */
+const WEEK_COLOR_COUNT = 4;
+
+function accentClass(plan: CoachPlan): string {
+  return `plan-card-week-${plan.block ? ((plan.block.week - 1) % WEEK_COLOR_COUNT) + 1 : 1}`;
+}
+
 /** One weekly plan, read-only (plans are edited on the web dashboard, PRD §6): status chips, then a card per workout. */
 export function PlanCard({ plan, statuses, children }: PlanCardProps) {
   const shared = useCopy(sharedCopy);
@@ -24,7 +30,7 @@ export function PlanCard({ plan, statuses, children }: PlanCardProps) {
   const copy = shared.coach;
   const { language, plural } = useI18n();
   return (
-    <div className="plan-card">
+    <div className={`plan-card ${accentClass(plan)}`}>
       <div className="plan-card-chips">
         <span className={'plan-card-chip' + (plan.status === 'published' ? ' plan-card-chip-published' : '')}>{copy.planStatus[plan.status]}</span>
         {plan.locked && <span className="plan-card-chip">{copy.startedByTrainee}</span>}
@@ -41,7 +47,7 @@ export function PlanCard({ plan, statuses, children }: PlanCardProps) {
       {plan.workouts.map((workout, index) => {
         const status = statuses?.[workout.id];
         return (
-          <details key={workout.id} className={`plan-workout ${workoutColorClass(index)}`}>
+          <details key={workout.id} className="plan-workout">
             <summary className="plan-workout-summary">
               <span className="plan-workout-letter" aria-hidden="true">
                 {letterOf(index)}

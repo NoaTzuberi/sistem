@@ -1,7 +1,6 @@
 import { cardioMinutesLabel, cardioTotals, dayName, fill, useCopy, useLanguage } from '@sistem/shared';
 import { Icon } from '../../../../components/common/Icon/Icon';
 import { workoutSetCount } from '../../data/planStats';
-import { workoutColorClass } from '../../data/workoutColors';
 import { workoutTabId } from '../../data/workoutTabs';
 import { useTabListKeys } from '../../hooks/useTabListKeys';
 import type { DraftWorkout } from '../../types';
@@ -20,16 +19,14 @@ interface WorkoutTabsProps {
   onSelect: (workoutKey: string) => void;
   onAddStrength: () => void;
   onAddCardio: () => void;
-  /** A multi-week plan: the week carries the color, so the workouts stay neutral. */
-  neutral?: boolean;
 }
 
 /**
- * The week's workouts in plan order, one pill each, in the workout's own color (a cardio workout:
- * the cardio purple, a small pulse icon and its minutes); the selected one is filled. Switching is
+ * The week's workouts in plan order, one pill each, in the week's color (pink in a weekly plan; a
+ * cardio workout adds a small pulse icon and its minutes); the selected one is tinted. Switching is
  * instant — it is used all the time. A workout's day is only a label here; it is chosen inside it.
  */
-export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAddStrength, onAddCardio, neutral = false }: WorkoutTabsProps) {
+export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelect, onAddStrength, onAddCardio }: WorkoutTabsProps) {
   const language = useLanguage();
   const copy = useCopy(planBuilderCopy);
   const handleKeyDown = useTabListKeys();
@@ -48,7 +45,7 @@ export function WorkoutTabs({ workouts, selectedKey, issueKeys, panelId, onSelec
             <button
               key={workout.key}
               id={workoutTabId(workout.key)}
-              className={`workout-tab ${neutral ? 'workout-color-neutral' : isCardio ? 'workout-kind-cardio' : workoutColorClass(index)}`}
+              className="workout-tab workout-color-week"
               type="button"
               role="tab"
               data-selects=""

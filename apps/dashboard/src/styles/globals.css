@@ -108,12 +108,13 @@ button {
   --workout-text: var(--color-workout-5-text);
   }
 
-/* Inside a multi-week plan the WEEK carries the color (the ribbon); its workouts stay neutral
-   (owner, 2026-11-09), so the two never compete. */
-.workout-color-neutral {
-  --workout-color: var(--color-ink);
-  --workout-color-soft: var(--color-fill-soft);
-  --workout-text: var(--color-ink);
+/* The plan builder's tabs + selected workout: the WEEK's color in a multi-week plan (the plan editor
+   carries week-color-N), pink in a weekly plan (owner, 2026-11-10). --workout-on = text on its fill. */
+.workout-color-week {
+  --workout-color: var(--week-color, var(--color-week-1));
+  --workout-color-soft: var(--week-soft, var(--color-week-1-soft));
+  --workout-text: var(--week-text, var(--color-week-1-text));
+  --workout-on: var(--week-on, var(--color-week-1-on));
   }
 
 /*
