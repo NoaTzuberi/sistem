@@ -1,0 +1,93 @@
+/* Under the chosen week: purple = a draft, Cherry = published / blocking. The inks sit on their own tints only. */
+.new-plan-notice {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--radius-tile);
+}
+
+.new-plan-notice-draft {
+  background-color: var(--color-new-plan-draft-soft);
+}
+
+.new-plan-notice-live {
+  background-color: var(--color-new-plan-live-soft);
+}
+
+.new-plan-notice-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.new-plan-notice-draft .new-plan-notice-title {
+  color: var(--color-new-plan-draft-ink);
+}
+
+.new-plan-notice-live .new-plan-notice-title {
+  color: var(--color-new-plan-live-ink);
+}
+
+.new-plan-notice-meta {
+  margin: 2px 0 0;
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+.new-plan-notice-list {
+  margin: 6px 0 0;
+  padding-inline-start: 18px;
+  font-size: var(--text-xs);
+  line-height: var(--line-height-snug);
+}
+
+.new-plan-notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.new-plan-notice-actions > * {
+  flex: 1 1 140px;
+}
+
+/* The soft pill on a tint: the white card look, so it reads as a button. */
+.new-plan-notice-soft {
+  background-color: var(--color-card);
+}
+
+/* "מחיקת הטיוטה": a text link, tall enough to press. */
+.new-plan-notice-link {
+  min-height: 36px;
+  margin-top: 6px;
+  padding: 0 2px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-deep);
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.new-plan-notice-link:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.new-plan-notice-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .new-plan-notice-link:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-plan-notice-link {
+    transition: none;
+  }
+
+  .new-plan-notice-link:active:not(:disabled) {
+    transform: none;
+  }
+}

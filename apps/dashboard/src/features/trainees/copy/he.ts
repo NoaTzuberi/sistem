@@ -34,7 +34,6 @@ export const he = {
   streakRule: 'שבוע נספר ברצף כש־{percent}% מהאימונים המתוכננים בו בוצעו. שבועות בלי תוכנית לא נספרים.',
   status: 'סטטוס',
   plansLoadError: 'לא הצלחנו לטעון את התוכניות.',
-  weeksLoadError: 'לא הצלחנו לטעון את השבועות. נסי שוב.',
   createError: 'לא הצלחנו ליצור את התוכנית.',
   newPlan: 'תוכנית חדשה',
   duplicateLastWeek: 'שכפול השבוע שעבר',
@@ -106,13 +105,8 @@ export const he = {
   notPublishedNote: 'עוד לא פורסם. {name} לא תראה אותו עד שתפרסמי.',
   continueAndPublish: 'המשך עריכה ופרסום',
   noPlanNextWeek: 'עוד אין תוכנית לשבוע הבא.', // PLACEHOLDER
-  startsIn: plural({ one: 'עוד יום אחד', two: 'עוד יומיים', other: 'עוד {count} ימים' }),
-  newPlanSubtitle: 'לאיזה שבוע, ואיך להתחיל?',
-  weekGroup: 'שבוע',
-  howToStart: 'איך להתחיל',
-  inWeeks: plural({ one: 'בעוד שבוע', two: 'בעוד שבועיים', other: 'בעוד {count} שבועות' }),
-  weekFree: 'פנוי',
   startScratch: 'מאפס',
+  startsIn: plural({ one: 'עוד יום אחד', two: 'עוד יומיים', other: 'עוד {count} ימים' }),
   // The quick-view drawer (coach dashboard design, round 2). Wording from the approved design.
   quickView: {
     windowLeftText: 'לבניית התוכנית הראשונה, מתוך חלון של 48 שעות',
@@ -253,69 +247,12 @@ export const he = {
     hint: '2–8 שבועות',
     weekOf: 'שבוע {n}/{total}',
   },
-  // DRAFT (2026-11-10): the new-plan popover's footer when the week(s) already hold a plan.
-  newPlanFooter: {
-    create: 'יצירת התוכנית',
-    createBlock: plural({ one: 'יצירת תוכנית לשבוע אחד', two: 'יצירת תוכנית לשבועיים', other: 'יצירת תוכנית ל־{count} שבועות' }),
-    openDraft: 'פתיחת הטיוטה הקיימת',
-    openPublished: 'פתיחת התוכנית שפורסמה',
-    replaceWith: {
-      scratch: 'בניית תוכנית חדשה',
-      duplicate: 'שכפול השבוע שעבר במקום הטיוטה',
-      ai: 'טיוטת AI במקום הטיוטה',
-    },
-    choiceHint: 'הבחירה תשמש אם תבחרי להתחיל מחדש',
-    draftNote: 'לשבוע הזה כבר יש טיוטה. אפשר להמשיך ממנה או להתחיל מחדש.',
-    // A draft that is a week of a multi-week plan, or one she already logged from: open only.
-    fixedDraftNote: 'לשבוע הזה כבר יש טיוטה שאי אפשר להחליף מכאן. אפשר לפתוח אותה ולערוך.',
-    publishedNote: 'לשבוע הזה כבר יש תוכנית שפורסמה. כדי לבנות מחדש, אפשר לשכפל אותה לשבוע אחר.',
-    blockDraftsNote: plural({ one: 'בשבוע {weeks} יש טיוטה', two: 'בשבועות {weeks} יש טיוטות', other: 'בשבועות {weeks} יש טיוטות' }),
-    replaceDrafts: plural({ one: 'יצירה והחלפת הטיוטה', two: 'יצירה והחלפת הטיוטות', other: 'יצירה והחלפת הטיוטות' }),
-    pickOtherStart: 'בחירת שבוע התחלה אחר',
-    blockPublishedNote: 'בשבוע {week} כבר יש תוכנית שפורסמה — בחרי שבוע התחלה אחר או קצרי את התוכנית',
-    blockTakenNote: 'שבוע {week} כבר שייך לתוכנית אחרת — בחרי שבוע התחלה אחר או קצרי את התוכנית',
-    // The replace question, per start method (one week) and for several weeks.
-    draftText: {
-      scratch: 'אפשר להתחיל מאפס במקומה, או לפתוח אותה ולהמשיך ממנה.',
-      duplicate: 'אפשר להחליף אותה בעותק של התוכנית שבחרת, או לפתוח אותה ולהמשיך ממנה.',
-      ai: 'אפשר להחליף אותה בטיוטת ה־AI, או לפתוח אותה ולהמשיך ממנה.',
-    },
-    replaceHint: {
-      scratch: 'הטיוטה תוחלף בתוכנית ריקה',
-      duplicate: 'הטיוטה תוחלף בעותק של התוכנית שבחרת',
-      ai: 'הטיוטה תוחלף בטיוטת ה־AI',
-    },
-    draftsTitle: 'בחלק מהשבועות כבר יש טיוטות',
-    draftsText: 'התוכנית החדשה תחליף את הטיוטות בשבועות {weeks}.',
-    draftsKeep: 'לבחור שבוע התחלה אחר',
-    draftsKeepHint: 'הטיוטות יישארו כמו שהן',
-    draftsReplace: 'להחליף את הטיוטות',
-    draftsReplaceHint: 'הטיוטות יימחקו, והתוכנית תיווצר במקומן',
-  },
-  // DRAFT (2026-11-10): the week cards and "מחיקת הטיוטה" (popover + builder ⋯).
-  weekCard: {
-    draftWorkouts: plural({ one: 'טיוטה · אימון אחד', two: 'טיוטה · 2 אימונים', other: 'טיוטה · {count} אימונים' }),
-    draftEmpty: 'טיוטה ריקה',
-    inRange: 'חלק מהתוכנית', // screen readers
-    menu: 'פעולות לשבוע {range}', // screen readers
-  },
-  deleteDraft: {
-    action: 'מחיקת הטיוטה',
-    title: 'למחוק את הטיוטה של {range}?',
-    text: 'התוכנית שלא פורסמה תימחק. אי אפשר לבטל.',
-    error: 'לא הצלחנו למחוק את הטיוטה. נסי שוב.',
-    notDraft: 'אפשר למחוק כאן רק טיוטה. תוכנית שפורסמה נשארת.',
-  },
   duplicate: {
     sourcesLabel: 'לשכפל מתוכנית',
     sourceOf: 'של {name}',
     emptyTitle: 'עדיין אין תוכניות שפורסמו לשכפול',
     emptyText: 'אפשר לבנות תוכנית חדשה מאפס.',
     emptyBuild: 'בניית תוכנית חדשה',
-    draftTitle: 'כבר יש טיוטה לשבוע הזה',
-    draftReplace: 'להחליף את הטיוטה',
-    draftOpen: 'לפתוח את הטיוטה הקיימת',
-    draftOpenHint: 'להמשיך מאיפה שהפסקת',
     retry: 'נסי שוב',
     errors: {
       plan_week_taken: 'לשבוע הזה כבר יש תוכנית שפורסמה. בחרי שבוע אחר, או פתחי אותה.',

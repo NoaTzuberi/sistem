@@ -58,6 +58,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
   const aiText = useCopy(aiDraftCopy);
   const copy = useCopy(planBuilderCopy);
   const traineeText = useCopy(traineesCopy);
+  const flowText = useCopy(sharedCopy).newPlanFlow;
   const navigate = useNavigate();
   const location = useLocation();
   const ai = useLatestAiDraft(traineeId);
@@ -278,7 +279,7 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       ? [{ id: 'unpublish', label: copy.unpublish, disabled: plan.locked || isBusy, onSelect: handleUnpublish }]
       : [{ id: 'save', label: copy.saveDraft, disabled: !isDirty || isBusy || saveStatus === 'saving', onSelect: () => void save() }]),
     { id: 'clear', label: copy.clearWeek, disabled: workouts.length === 0, onSelect: handleClearWeek },
-    { id: 'delete', label: isStandaloneDraft ? traineeText.deleteDraft.action : copy.delete, danger: true, disabled: plan.locked || isBusy, onSelect: () => void handleDelete() },
+    { id: 'delete', label: isStandaloneDraft ? flowText.deleteAction : copy.delete, danger: true, disabled: plan.locked || isBusy, onSelect: () => void handleDelete() },
   ];
 
   return (
@@ -451,10 +452,10 @@ export function PlanEditor({ traineeId, traineeName, currentWeekStart, initialPl
       </PublishModal>
       <ConfirmDialog
         isOpen={isDeleteDraftAsked}
-        title={fill(traineeText.deleteDraft.title, { range: formatWeekSpan(plan.weekStartDate, language) })}
-        text={traineeText.deleteDraft.text}
+        title={fill(flowText.deleteTitle, { range: formatWeekSpan(plan.weekStartDate, language) })}
+        text={flowText.deleteText}
         icon="trash"
-        confirmLabel={traineeText.deleteDraft.action}
+        confirmLabel={flowText.deleteAction}
         confirmVariant="cherry"
         onConfirm={() => void confirmDeleteDraft()}
         cancelLabel={sharedText.common.cancel}
