@@ -24,6 +24,7 @@
     "seed:nutrition": "tsx src/features/nutrition/scripts/seedNutrition.ts",
     "reset:nutrition": "tsx src/features/nutrition/scripts/resetNutrition.ts",
     "migrate:food-bank": "tsx src/features/nutrition/scripts/migrateFoodBank.ts",
+    "cleanup:empty-drafts": "tsx src/features/plans/scripts/cleanupEmptyDrafts.ts",
     "status:food-bank": "tsx src/features/nutrition/scripts/foodBankStatus.ts"
   },
   "dependencies": {
