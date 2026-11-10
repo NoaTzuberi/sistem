@@ -29,6 +29,7 @@
   --transition-notice: 200ms;       /* Its scrim, a card changing state, a card leaving */
   --transition-segment: 220ms;      /* The segmented control's thumb sliding */
   --transition-popover: 180ms;   /* The "new plan" popover growing from its corner */
+  --transition-new-plan-step: 240ms; /* "תוכנית חדשה": step 1 ↔ step 2 sliding in (ease-out) */
   --transition-hover: 180ms;     /* A pill lifting / changing shade under a fine pointer */
   --transition-chevron: 200ms;
   --transition-modal-in: 360ms;  /* A modal settling in (on --ease-drawer) */

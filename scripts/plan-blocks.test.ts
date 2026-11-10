@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlanBlockWeek, PlanWorkout } from '@sistem/types';
-import { newPlanSituation, rangeWeeks } from '../apps/dashboard/src/features/trainees/data/newPlanConflicts';
+import { newPlanSituation, rangeWeeks } from '../packages/shared/src/newPlanFlow';
 import { laterWeeksRange, progressChipFor, volumeShares, weekColorClass } from '../apps/dashboard/src/features/planBuilder/data/blockWeeks';
 import type { DraftExercise } from '../apps/dashboard/src/features/planBuilder/types';
 

@@ -17,4 +17,12 @@
   /* A disabled pink button: soft pink with Cherry text — never a faded white label. */
   --disabled-bg: var(--tint-pink);
   --disabled-ink: var(--ink-pink);
+
+  /* "תוכנית חדשה" in both coach apps (2026-11-10): purple = a draft, Cherry Rose = published (inks on their tints
+     only), and the ONE selected look of a week row / start option (2px pink border + this tint + a pink dot). */
+  --color-new-plan-draft-soft: var(--tint-purple);   /* #efe7ff */
+  --color-new-plan-draft-ink: var(--ink-purple);     /* #5b2fd6 — on the tint only */
+  --color-new-plan-live-soft: var(--color-primary-soft);
+  --color-new-plan-live-ink: var(--color-primary-deep);
+  --color-new-plan-select-tint: color-mix(in srgb, var(--color-primary) 5%, var(--color-card));
 }

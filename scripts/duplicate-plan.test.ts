@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { addDaysToDate } from '../packages/shared/src/format';
 import { PlanRequestError } from '@sistem/api-client';
 import type { PlanDuplicateSource } from '@sistem/types';
-import { defaultSourceFor } from '../apps/dashboard/src/features/trainees/data/newPlanStart';
-import { canDeleteDraft, defaultWeekOf, newPlanSituation, weekConflictOf } from '../apps/dashboard/src/features/trainees/data/newPlanConflicts';
+import type { PlanWeekOption } from '@sistem/types';
+import { canDeleteDraft, defaultSourceFor, defaultWeekOf, newPlanSituation, replacesDrafts, visibleWeekRows, weekConflictOf, weekRowLabel } from '../packages/shared/src/newPlanFlow';
 import { describePlanCreateError, isStaleListError } from '../apps/dashboard/src/features/trainees/data/planCreateErrors';
 import { traineesCopy } from '../apps/dashboard/src/features/trainees/copy';
 
@@ -26,6 +27,7 @@ describe('new plan popover rules', () => {
       isEmpty: false,
       inBlock: false,
       locked: false,
+      updatedAt: '2026-11-09T10:00:00.000Z',
       ...extra,
     });
     const weeks = (plan: ReturnType<typeof summary> | null) => [{ weekStartDate: '2026-11-15', plan }];
@@ -60,5 +62,27 @@ describe('new plan popover rules', () => {
     expect(describePlanCreateError(new PlanRequestError('x'), 'he')).toBe(errors.network);
     expect(isStaleListError(failure('plan_week_taken'))).toBe(true);
     expect(isStaleListError(failure('plan_locked'))).toBe(false);
+  });
+
+  it('two steps (2026-11-10): only replaceable drafts go on to "start over"; the rows reach the end of the range', () => {
+    const draft = { id: 'd', status: 'draft' as const, workoutCount: 3, isEmpty: false, inBlock: false, locked: false, updatedAt: '2026-11-09T10:00:00.000Z' };
+    expect(replacesDrafts({ kind: 'draft', plan: draft, canReplace: true })).toBe(true);
+    expect(replacesDrafts({ kind: 'draft', plan: { ...draft, inBlock: true }, canReplace: false })).toBe(false);
+    expect(replacesDrafts({ kind: 'blockDrafts', weeks: ['2026-11-15'] })).toBe(true);
+    expect(replacesDrafts({ kind: 'published', plan: { ...draft, status: 'published' } })).toBe(false);
+    expect(replacesDrafts({ kind: 'create' })).toBe(false);
+
+    const offered: PlanWeekOption[] = Array.from({ length: 8 }, (_, index) => ({
+      weekStartDate: addDaysToDate('2026-11-08', index * 7),
+      relation: index === 0 ? 'this' : index === 1 ? 'next' : 'later',
+      plan: null,
+      copiesFromWeek: null,
+    }));
+    expect(visibleWeekRows(offered, ['2026-11-15'])).toHaveLength(4);
+    // A 4-week plan from next week ends on Dec 6: the fifth row shows.
+    expect(visibleWeekRows(offered, ['2026-11-15', '2026-11-22', '2026-11-29', '2026-12-06'])).toHaveLength(5);
+    expect(weekRowLabel(offered[0], '2026-11-08', 'he')).toBe('השבוע');
+    expect(weekRowLabel(offered[2], '2026-11-08', 'he')).toBe('בעוד שבועיים');
+    expect(weekRowLabel(offered[3], '2026-11-08', 'en')).toBe('In 3 weeks');
   });
 });

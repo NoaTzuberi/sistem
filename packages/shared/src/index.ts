@@ -21,11 +21,14 @@ export * from './trainingSlots';
 export * from './cardioDisplay';
 export * from './planPayload';
 export * from './sendNote';
+export * from './newPlanFlow';
 export { useLoad } from './hooks/useLoad';
 export { useServerNow } from './hooks/useServerNow';
 export { useEndCoaching } from './hooks/useEndCoaching';
 export { useSendNote } from './hooks/useSendNote';
 export type { SendDefaultsApi, SendNote } from './hooks/useSendNote';
+export { useNewPlanFlow } from './hooks/useNewPlanFlow';
+export type { NewPlanFlowApi, NewPlanFlowState, NewPlanStep, OpenNewPlanFlow } from './hooks/useNewPlanFlow';
 // Phase 15 — languages, copy files, Intl, bidi.
 export * from './i18n/copy';
 export * from './i18n/language';
