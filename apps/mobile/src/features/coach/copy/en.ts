@@ -12,7 +12,7 @@ export const en: CopyShape<typeof he> = {
   plansOnDashboard: 'Plans are built and edited on the dashboard, on a computer.',
   confirmDuplicateTitle: 'Duplicate and publish?',
   confirmPublishTitle: 'Publish this plan?',
-  confirmDuplicateMessage: "{name}'s most recent plan will be copied to {week} and published. The trainee will be notified.",
+  confirmDuplicateMessage: 'The plan of {source} will be copied to {week} and published. {name} will be notified.', // DRAFT
   confirmPublishMessage: '{name} will see the plan for {week}. The trainee will be notified.',
   duplicateConfirm: 'Duplicate and publish',
   newPlan: 'New plan',
@@ -24,7 +24,8 @@ export const en: CopyShape<typeof he> = {
     fewer: 'Fewer weeks',
     more: 'More weeks',
   },
-  newPlanBlockMessage: "{name}'s latest plan is copied into {weeks} from {week}, and all weeks are published together. She gets one notification.",
+  newPlanBlockMessage: 'The plan of {source} is copied into {weeks} from {week}, and all weeks are published together. {name} gets one notification.', // DRAFT
+  newPlanSources: { label: 'Duplicate from', of: "{week}, {name}'s" },
   newPlanBlockConfirm: 'Duplicate and publish {weeks}',
   blockWeekOf: 'Week {n} of {total}',
   publishConfirm: 'Publish',

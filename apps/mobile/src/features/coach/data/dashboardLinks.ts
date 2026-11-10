@@ -13,6 +13,8 @@ export const dashboardLinks = {
   home: () => dashboardUrl('/'),
   /** Her plans in the dashboard (the plan builder starts there). */
   traineePlans: (traineeId: string) => dashboardUrl(`/trainees/${encodeURIComponent(traineeId)}?tab=plans`),
+  /** One plan in the dashboard's plan builder. */
+  plan: (traineeId: string, planId: string) => dashboardUrl(`/trainees/${encodeURIComponent(traineeId)}/plans/${encodeURIComponent(planId)}`),
   traineeNutrition: (traineeId: string) => dashboardUrl(`/trainees/${encodeURIComponent(traineeId)}/nutrition`),
   /** Payment details (the dashboard's Settings page). */
   settings: () => dashboardUrl('/settings'),

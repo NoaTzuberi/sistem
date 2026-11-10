@@ -1,17 +1,17 @@
 import { useCallback, useState } from 'react';
 import type { CoachPlan, CoachTraineeDetail, PlanIssue } from '@sistem/types';
 import { PlanRequestError } from '@sistem/api-client';
-import { addDaysToDate, describeIssue, fill, formatWeekRange, sharedCopy, useCopy, useI18n, useLanguage, useLoad } from '@sistem/shared';
-import { IconCopy, IconInfoCircle, IconSend } from '@tabler/icons-react';
-import { copyPlanForward, createPlan, listPlans, publishPlan } from '../../../../services/coach/coachService';
+import { addDaysToDate, describeIssue, fill, formatWeekRange, formatWeekSpan, sharedCopy, useCopy, useI18n, useLanguage, useLoad, useNewPlanFlow } from '@sistem/shared';
+import { IconCopy, IconInfoCircle, IconPlus, IconSend } from '@tabler/icons-react';
+import { copyPlanForward, createPlan, deletePlan, listPlanSources, listPlanWeeks, listPlans, publishPlan } from '../../../../services/coach/coachService';
 import { PillButton } from '../../../../components/common/PillButton/PillButton';
 import { StateMessage } from '../../../../components/common/StateMessage/StateMessage';
 import { ConfirmSheet } from '../../../../components/common/ConfirmSheet/ConfirmSheet';
 import { SendNoteFields } from '../SendNoteFields/SendNoteFields';
 import { useWorkoutSendNote } from '../../hooks/useWorkoutSendNote';
 import { PlanCard } from '../PlanCard/PlanCard';
-import { DEFAULT_BLOCK_WEEKS, PlanLengthChoice } from '../PlanLengthChoice/PlanLengthChoice';
-import type { PlanLength } from '../PlanLengthChoice/PlanLengthChoice';
+import { NewPlanSheet } from '../NewPlanSheet/NewPlanSheet';
+import type { DuplicateRequest } from '../NewPlanSheet/NewPlanSheet';
 import { coachCopy } from '../../copy';
 import './TraineePlan.css';
 
@@ -24,7 +24,9 @@ interface TraineePlanProps {
 }
 
 /** The light action waiting for a "yes" in the confirm sheet. */
-type PendingAction = { kind: 'publish'; plan: CoachPlan } | { kind: 'duplicate'; week: string };
+type PendingAction = { kind: 'publish'; plan: CoachPlan } | { kind: 'duplicate'; request: DuplicateRequest };
+
+const FLOW_API = { listPlanWeeks, listPlanSources, deletePlan };
 
 interface ActionFailure {
   week: string;
@@ -34,8 +36,8 @@ interface ActionFailure {
 
 /**
  * This week's and next week's plan, read-only, with the two light actions of coach
- * mode (PRD §6): publish a ready draft, and duplicate last week and publish. Both
- * use the dashboard's plan calls; every plan rule stays on the server.
+ * mode (PRD §6): publish a ready draft, and "תוכנית חדשה" — the dashboard's two steps (NewPlanSheet, 2026-11-10)
+ * whose duplicate copies and publishes here. Every plan rule stays on the server.
  */
 export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: TraineePlanProps) {
   const copy = useCopy(coachCopy);
@@ -48,10 +50,11 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   const [pending, setPending] = useState<PendingAction>();
   const [isWorking, setIsWorking] = useState(false);
   const [failure, setFailure] = useState<ActionFailure>();
-  // "תוכנית חדשה" starts with the length (owner, 2026-11-09): weekly, or a multi-week plan.
-  const [length, setLength] = useState<PlanLength>('weekly');
-  const [blockWeeks, setBlockWeeks] = useState(DEFAULT_BLOCK_WEEKS);
   const { plural } = useI18n();
+  const flow = useNewPlanFlow(trainee.id, FLOW_API, () => {
+    reload();
+    onPlansChanged();
+  });
   // Both actions publish, so both sheets carry the message + tip that go out with it.
   const sendNote = useWorkoutSendNote();
 
@@ -66,38 +69,40 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   // The server's statuses for this week's workouts (done / missed / upcoming in her zone).
   const thisWeekStatuses = Object.fromEntries((trainee.thisWeek?.workouts ?? []).map((workout) => [workout.id, workout.status]));
   const planFor = (week: string) => plans.find((plan) => plan.weekStartDate === week);
-  // "Duplicate last week" fills the first of the two weeks that has no plan, from
-  // the most recent earlier plan (the server picks it).
-  const duplicateWeek = weeks.find((week) => !planFor(week.start))?.start;
-  const canDuplicate = duplicateWeek !== undefined && plans.some((plan) => plan.weekStartDate < duplicateWeek);
 
   function ask(action: PendingAction) {
     sendNote.reset();
-    setLength('weekly');
-    setBlockWeeks(DEFAULT_BLOCK_WEEKS);
     setPending(action);
+  }
+
+  function duplicateFromFlow(request: DuplicateRequest) {
+    flow.close();
+    ask({ kind: 'duplicate', request });
   }
 
   async function handleConfirm() {
     if (!pending) return;
-    const week = pending.kind === 'publish' ? pending.plan.weekStartDate : pending.week;
+    const week = pending.kind === 'publish' ? pending.plan.weekStartDate : pending.request.weekStartDate;
     let copyWasSaved = false;
 
     setIsWorking(true);
     setFailure(undefined);
     try {
       let planId: string;
-      if (pending.kind === 'duplicate' && length === 'block') {
-        // A multi-week plan: week 1 = her latest published plan, copied into the later weeks (with the
-        // exercises' progression), then all weeks published together.
-        const first = await createPlan(trainee.id, { weekStartDate: week, duplicatePrevious: true, lengthWeeks: blockWeeks });
+      if (pending.kind === 'duplicate') {
+        const { request } = pending;
+        const isBlock = request.length === 'block';
+        const first = await createPlan(trainee.id, {
+          weekStartDate: week,
+          sourcePlanId: request.sourcePlanId,
+          ...(request.replaceDraft ? { replaceDraft: true } : {}),
+          ...(isBlock ? { lengthWeeks: request.blockWeeks } : {}),
+        });
         planId = first.id;
         copyWasSaved = true;
-        await copyPlanForward(trainee.id, first.id);
-      } else if (pending.kind === 'duplicate') {
-        const duplicate = await createPlan(trainee.id, { weekStartDate: week, duplicatePrevious: true });
-        planId = duplicate.id;
-        copyWasSaved = true;
+        // A multi-week plan: week 1 = the copy, copied into the later weeks (with the exercises' progression),
+        // then all weeks published together.
+        if (isBlock) await copyPlanForward(trainee.id, first.id);
       } else {
         planId = pending.plan.id;
       }
@@ -117,7 +122,17 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
     }
   }
 
-  const pendingWeek = pending ? formatWeekRange(pending.kind === 'publish' ? pending.plan.weekStartDate : pending.week, language) : '';
+  const pendingWeek = pending ? formatWeekRange(pending.kind === 'publish' ? pending.plan.weekStartDate : pending.request.weekStartDate, language) : '';
+  const request = pending?.kind === 'duplicate' ? pending.request : undefined;
+  const flowText = shared.newPlanFlow;
+  const replaceLine = !request?.replaceDraft
+    ? ''
+    : request.replacedWeeks.length > 1
+      ? fill(flowText.replaceDraftsText, {
+          weeks: new Intl.ListFormat(language, { type: 'conjunction' }).format(request.replacedWeeks.map((date) => formatWeekSpan(date, language))),
+        })
+      : flowText.replaceText.duplicate;
+  const shownWeeks = new Set(weeks.map((week) => week.start));
 
   return (
     <div className="trainee-plan">
@@ -142,11 +157,6 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
             ) : (
               <>
                 <p className="trainee-plan-none">{copy.noPlanThisWeek}</p>
-                {canDuplicate && week.start === duplicateWeek && (
-                  <PillButton className="trainee-plan-action" onClick={() => ask({ kind: 'duplicate', week: week.start })}>
-                    {copy.newPlan}
-                  </PillButton>
-                )}
               </>
             )}
 
@@ -167,38 +177,50 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
         );
       })}
 
+      {/* A failed copy for a later week (the two shown weeks show theirs under them). */}
+      {failure && !shownWeeks.has(failure.week) && (
+        <div className="trainee-plan-failure" role="alert">
+          <p className="trainee-plan-failure-message">{failure.message}</p>
+          <p className="trainee-plan-failure-message">{copy.fixOnDashboard}</p>
+        </div>
+      )}
+
+      <PillButton className="trainee-plan-action" icon={<IconPlus size={18} stroke={2.4} aria-hidden="true" />} onClick={() => void flow.open({ method: 'duplicate' })}>
+        {copy.newPlan}
+      </PillButton>
+
       <p className="trainee-plan-hint">
         <IconInfoCircle className="trainee-plan-hint-icon" size={20} aria-hidden="true" />
         {copy.plansOnDashboard}
       </p>
 
+      <NewPlanSheet flow={flow} traineeId={trainee.id} onDuplicate={duplicateFromFlow} />
+
       <ConfirmSheet
         isOpen={pending !== undefined}
         icon={pending?.kind === 'duplicate' ? <IconCopy size={22} /> : <IconSend size={22} />}
         title={pending?.kind === 'duplicate' ? copy.newPlan : copy.confirmPublishTitle}
-        // "תוכנית חדשה": the length comes first, so its message is drawn under it (children).
-        message={pending?.kind === 'duplicate' ? undefined : fill(copy.confirmPublishMessage, { name: trainee.name, week: pendingWeek })}
+        message={
+          !request
+            ? fill(copy.confirmPublishMessage, { name: trainee.name, week: pendingWeek })
+            : request.length === 'block'
+              ? fill(copy.newPlanBlockMessage, { source: request.sourceLabel, name: trainee.name, weeks: plural(copy.length.weeks, request.blockWeeks), week: pendingWeek })
+              : fill(copy.confirmDuplicateMessage, { source: request.sourceLabel, name: trainee.name, week: pendingWeek })
+        }
         confirmLabel={
-          pending?.kind !== 'duplicate'
+          !request
             ? copy.publishConfirm
-            : length === 'block'
-              ? fill(copy.newPlanBlockConfirm, { weeks: plural(copy.length.weeks, blockWeeks) })
+            : request.length === 'block'
+              ? fill(copy.newPlanBlockConfirm, { weeks: plural(copy.length.weeks, request.blockWeeks) })
               : copy.duplicateConfirm
         }
+        tone={request?.replaceDraft ? 'destructive' : 'default'}
         isWorking={isWorking}
         onConfirm={handleConfirm}
         onCancel={() => setPending(undefined)}
       >
-        {pending?.kind === 'duplicate' && (
-          <>
-            <PlanLengthChoice length={length} weeks={blockWeeks} onLengthChange={setLength} onWeeksChange={setBlockWeeks} disabled={isWorking} />
-            <p className="trainee-plan-sheet-message">
-              {length === 'block'
-                ? fill(copy.newPlanBlockMessage, { name: trainee.name, weeks: plural(copy.length.weeks, blockWeeks), week: pendingWeek })
-                : fill(copy.confirmDuplicateMessage, { name: trainee.name, week: pendingWeek })}
-            </p>
-          </>
-        )}
+        {/* Over draft(s): what is replaced, said once more before it happens. */}
+        {replaceLine && <p className="trainee-plan-sheet-message">{replaceLine}</p>}
         <SendNoteFields note={sendNote} />
       </ConfirmSheet>
     </div>

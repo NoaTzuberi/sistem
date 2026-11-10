@@ -13,7 +13,8 @@ export const he = {
   plansOnDashboard: 'בונים ועורכים תוכניות בדשבורד, במחשב.',
   confirmDuplicateTitle: 'לשכפל ולפרסם?',
   confirmPublishTitle: 'לפרסם את התוכנית הזו?',
-  confirmDuplicateMessage: 'התוכנית האחרונה של {name} תועתק ל־{week} ותפורסם. המתאמנת תקבל התראה.',
+  // DRAFT (2026-11-10): the copy is the plan she picked in "תוכנית חדשה" ({source} = its week, + another trainee's name).
+  confirmDuplicateMessage: 'התוכנית של {source} תועתק ל־{week} ותפורסם. {name} תקבל התראה.',
   confirmPublishMessage: '{name} תראה את התוכנית של {week}. המתאמנת תקבל התראה.',
   duplicateConfirm: 'שכפול ופרסום',
   // DRAFT — multi-week plans: "תוכנית חדשה" starts with the length.
@@ -26,7 +27,8 @@ export const he = {
     fewer: 'פחות שבועות',
     more: 'עוד שבועות',
   },
-  newPlanBlockMessage: 'התוכנית האחרונה של {name} תועתק ל־{weeks} מ־{week}, וכל השבועות יפורסמו יחד. המתאמנת תקבל התראה אחת.',
+  newPlanBlockMessage: 'התוכנית של {source} תועתק ל־{weeks} מ־{week}, וכל השבועות יפורסמו יחד. {name} תקבל התראה אחת.',
+  newPlanSources: { label: 'לשכפל מתוכנית', of: '{week} של {name}' },
   newPlanBlockConfirm: 'שכפול ופרסום {weeks}',
   blockWeekOf: 'שבוע {n} מתוך {total}',
   publishConfirm: 'פרסום',

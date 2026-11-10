@@ -13,6 +13,8 @@ export const {
   listTraineeBodyMetrics,
   getTraineeAchievements,
   listPlans,
+  listPlanWeeks,
+  listPlanSources,
   createPlan,
   savePlan,
   deletePlan,

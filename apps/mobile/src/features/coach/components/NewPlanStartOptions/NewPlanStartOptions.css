@@ -1,0 +1,128 @@
+/* Step 2's start options (and the plans to copy): the same selected look as the week rows. */
+.new-plan-options,
+.new-plan-sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.new-plan-sources {
+  margin-top: var(--space-2);
+}
+
+.new-plan-option-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-plan-option,
+.new-plan-source {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  border: var(--border-width-medium) solid transparent;
+  border-radius: var(--radius-coach-row);
+  font: inherit;
+  color: var(--color-text);
+  text-align: start;
+  background-color: var(--color-fill-soft);
+  transition:
+    transform var(--transition-press) var(--ease-press),
+    border-color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.new-plan-option {
+  align-items: flex-start;
+  padding: var(--space-3);
+}
+
+.new-plan-source {
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+}
+
+.new-plan-option[aria-checked='true'],
+.new-plan-source[aria-checked='true'] {
+  border-color: var(--color-primary);
+  background-color: var(--color-new-plan-select-tint);
+}
+
+.new-plan-option:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+.new-plan-option-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-coach-icon-tile);
+  height: var(--size-coach-icon-tile);
+  border-radius: var(--radius-coach-icon-tile);
+  color: var(--color-primary-deep);
+  background-color: var(--color-card);
+}
+
+.new-plan-option-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.new-plan-option-label,
+.new-plan-source-week {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.new-plan-option-hint,
+.new-plan-source-meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.new-plan-option-link {
+  align-self: flex-start;
+  min-height: var(--touch-target-min);
+  padding: 0 2px;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-deep);
+  background: none;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.new-plan-option:active:not(:disabled),
+.new-plan-source:active,
+.new-plan-option-link:active {
+  transform: scale(var(--press-scale));
+}
+
+.new-plan-option:focus-visible,
+.new-plan-source:focus-visible,
+.new-plan-option-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-plan-option,
+  .new-plan-source,
+  .new-plan-option-link {
+    transition: none;
+  }
+
+  .new-plan-option:active:not(:disabled),
+  .new-plan-source:active,
+  .new-plan-option-link:active {
+    transform: none;
+  }
+}

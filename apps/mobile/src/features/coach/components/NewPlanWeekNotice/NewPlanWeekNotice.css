@@ -1,0 +1,89 @@
+/* Under the chosen week: purple = a draft, Cherry = published / blocking. The inks sit on their own tints only. */
+.new-plan-notice {
+  padding: var(--space-3) var(--pad-coach-tile);
+  border-radius: var(--radius-coach-row);
+}
+
+.new-plan-notice-draft {
+  background-color: var(--color-new-plan-draft-soft);
+}
+
+.new-plan-notice-live {
+  background-color: var(--color-new-plan-live-soft);
+}
+
+.new-plan-notice-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.new-plan-notice-draft .new-plan-notice-title {
+  color: var(--color-new-plan-draft-ink);
+}
+
+.new-plan-notice-live .new-plan-notice-title {
+  color: var(--color-new-plan-live-ink);
+}
+
+.new-plan-notice-meta {
+  margin: 2px 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.new-plan-notice-list {
+  margin: var(--space-1) 0 0;
+  padding-inline-start: var(--space-4);
+  font-size: var(--text-sm);
+  list-style: disc;
+}
+
+.new-plan-notice-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.new-plan-notice-actions:empty {
+  display: none;
+}
+
+/* The soft pill on a tint: the white card look, so it reads as a button. */
+.new-plan-notice-soft {
+  background-color: var(--color-card);
+}
+
+/* "מחיקת הטיוטה": a text link with a full touch target. */
+.new-plan-notice-link {
+  min-height: var(--touch-target-min);
+  margin-top: var(--space-1);
+  padding: 0 2px;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-deep);
+  background: none;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.new-plan-notice-link:active {
+  transform: scale(var(--press-scale));
+}
+
+.new-plan-notice-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary-deep);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-plan-notice-link {
+    transition: none;
+  }
+
+  .new-plan-notice-link:active {
+    transform: none;
+  }
+}

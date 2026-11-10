@@ -1,13 +1,9 @@
 import { useId } from 'react';
-import { useCopy, useI18n } from '@sistem/shared';
+import { MAX_BLOCK_WEEKS, MIN_BLOCK_WEEKS, useCopy, useI18n } from '@sistem/shared';
+import type { PlanLength } from '@sistem/shared';
 import { coachCopy } from '../../copy';
 import './PlanLengthChoice.css';
 
-export type PlanLength = 'weekly' | 'block';
-
-export const MIN_BLOCK_WEEKS = 2;
-export const MAX_BLOCK_WEEKS = 8;
-export const DEFAULT_BLOCK_WEEKS = 4;
 
 interface PlanLengthChoiceProps {
   length: PlanLength;
@@ -17,7 +13,7 @@ interface PlanLengthChoiceProps {
   disabled?: boolean;
 }
 
-/** The first choice of "תוכנית חדשה" in coach mode: weekly, or a multi-week plan of 2–8 weeks. */
+/** Step 1 of "תוכנית חדשה" in coach mode: weekly, or a multi-week plan of 2–8 weeks. */
 export function PlanLengthChoice({ length, weeks, onLengthChange, onWeeksChange, disabled }: PlanLengthChoiceProps) {
   const copy = useCopy(coachCopy).length;
   const { plural } = useI18n();
