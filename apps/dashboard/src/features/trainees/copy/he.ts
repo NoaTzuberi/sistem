@@ -260,7 +260,7 @@ export const he = {
     openDraft: 'פתיחת הטיוטה הקיימת',
     openPublished: 'פתיחת התוכנית שפורסמה',
     replaceWith: {
-      scratch: 'התחלה מאפס במקום הטיוטה',
+      scratch: 'בניית תוכנית חדשה',
       duplicate: 'שכפול השבוע שעבר במקום הטיוטה',
       ai: 'טיוטת AI במקום הטיוטה',
     },

@@ -5,7 +5,7 @@
 - **Weekly, free week** (an empty draft counts as free): one pink "יצירת התוכנית" + "ביטול".
 - **Weekly, a draft with content**:
   - pink "פתיחת הטיוטה הקיימת" (full width);
-  - under it, a soft pill that follows the start option ("התחלה מאפס / שכפול השבוע שעבר / טיוטת AI במקום הטיוטה"). It opens the existing-draft dialog with wording for that option, and "replace" starts over with that option;
+  - under it, a soft pill that follows the start option ("בניית תוכנית חדשה" / "שכפול השבוע שעבר במקום הטיוטה" / "טיוטת AI במקום הטיוטה"). It opens the existing-draft dialog with wording for that option, and "replace" starts over with that option;
   - a small text "ביטול".
   - The start options stay enabled, with the hint "הבחירה תשמש אם תבחרי להתחיל מחדש".
 - **Weekly, a published plan**: "פתיחת התוכנית שפורסמה", no replace option, and the note about duplicating it to another week.
@@ -30,7 +30,7 @@
 | newPlanFooter.createBlock | יצירת תוכנית ל־{count} שבועות (שבועיים / שבוע אחד) | Create a {count}-week plan |
 | newPlanFooter.openDraft | פתיחת הטיוטה הקיימת | Open the existing draft |
 | newPlanFooter.openPublished | פתיחת התוכנית שפורסמה | Open the published plan |
-| newPlanFooter.replaceWith.scratch | התחלה מאפס במקום הטיוטה | Start from scratch instead |
+| newPlanFooter.replaceWith.scratch | בניית תוכנית חדשה | Start from scratch instead |
 | newPlanFooter.replaceWith.duplicate | שכפול השבוע שעבר במקום הטיוטה | Duplicate last week instead |
 | newPlanFooter.replaceWith.ai | טיוטת AI במקום הטיוטה | Use the AI draft instead |
 | newPlanFooter.choiceHint | הבחירה תשמש אם תבחרי להתחיל מחדש | Used if you choose to start over |
