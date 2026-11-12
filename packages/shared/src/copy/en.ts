@@ -144,17 +144,20 @@ export const en: CopyShape<typeof he> = {
     noLogs: 'No workout logs yet.',
     logsLoadError: "Couldn't load the workout logs.",
     inbox: {
-      title: 'Inbox',
       markAllRead: 'Mark all read',
       empty: 'No notifications yet.',
       unread: ' (unread)',
       loadMore: 'Load more',
-      loadError: "Couldn't load your inbox.",
       loadMoreError: "Couldn't load more notifications.",
       notificationsTitle: 'Notifications',
       bellUnread: 'Notifications, {count} unread',
       bellLoadError: "Couldn't load notifications.",
       markReadError: "Couldn't mark notifications as read.",
+      // Coach mode's notifications list, by day (DRAFT).
+      groupToday: 'Today',
+      groupYesterday: 'Yesterday',
+      groupEarlier: 'Earlier',
+      now: 'Now',
     },
     planStatus: { published: 'Published', draft: 'Draft' },
     exerciseCount: plural({ one: '{count} exercise', other: '{count} exercises' }),
@@ -170,6 +173,9 @@ export const en: CopyShape<typeof he> = {
     noteThanks: '{name} said thanks for your note',
     traineeEndedCoaching: '{name} ended the coaching',
     planBlockEnding: "{name}'s plan ends this week",
+    // The line under a notification (both apps' notification lists).
+    waitingForPlan: 'Filled in the questionnaire and is waiting for a plan',
+    weekSummary: '{done} of {planned} workouts done.',
   },
   onboardingSections: {
     basicProfile: 'Basic profile',

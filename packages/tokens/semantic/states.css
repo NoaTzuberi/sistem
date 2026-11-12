@@ -25,4 +25,16 @@
   --color-new-plan-live-soft: var(--color-primary-soft);
   --color-new-plan-live-ink: var(--color-primary-deep);
   --color-new-plan-select-tint: color-mix(in srgb, var(--color-primary) 5%, var(--color-card));
+
+  /* Notification types (dashboard bell + coach-mode list): icon, unread dot and action take the color; the
+     dashboard's unread card glow is the same color at a low alpha; the mobile icon tile is the soft tint.
+     Kinds of news, not statuses — no green. "late" is the only red: a 48h window that has passed. */
+  --color-notice-warn: var(--ink-orange);           /* the icon / text */
+  --color-notice-warn-fill: #ff7a00;                /* the dot, the action button */
+  --color-notice-late: #d70015;
+  --color-notice-new: var(--color-workout-2);
+  --color-notice-done: var(--color-primary-deep);
+  --color-notice-new-soft: var(--tint-purple);      /* #efe7ff — under the purple icon */
+  --color-notice-done-soft: var(--color-primary-soft); /* under the Cherry icon */
+  --surface-notice-quiet: color-mix(in srgb, var(--color-text-muted) 12%, transparent); /* segmented track, read icon tile, dismiss */
 }

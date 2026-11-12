@@ -57,7 +57,6 @@ export const en: CopyShape<typeof he> = {
   plan: 'Plan',
   daysPerWeek: '{days} days a week',
   weekProgress: '{done} of {planned}',
-  weekSummary: '{done} of {planned} workouts done.',
   timeLeft: 'Time left',
   buildPlan: 'Build the plan',
   openWeekPlan: "Open this week's plan",

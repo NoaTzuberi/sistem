@@ -149,17 +149,20 @@ export const he = {
     noLogs: 'עדיין אין תיעודי אימונים.',
     logsLoadError: 'לא הצלחנו לטעון את תיעודי האימונים.',
     inbox: {
-      title: 'הודעות',
       markAllRead: 'סימון הכול כנקרא',
       empty: 'עדיין אין התראות.',
       unread: ' (לא נקראה)',
       loadMore: 'טעינת עוד',
-      loadError: 'לא הצלחנו לטעון את ההודעות שלך.',
       loadMoreError: 'לא הצלחנו לטעון עוד התראות.',
       notificationsTitle: 'התראות',
       bellUnread: 'התראות, {count} שלא נקראו',
       bellLoadError: 'לא הצלחנו לטעון את ההתראות.',
       markReadError: 'לא הצלחנו לסמן את ההתראות כנקראו.',
+      // Coach mode's notifications list, by day (DRAFT).
+      groupToday: 'היום',
+      groupYesterday: 'אתמול',
+      groupEarlier: 'מוקדם יותר',
+      now: 'עכשיו',
     },
     planStatus: { published: 'פורסמה', draft: 'טיוטה' },
     exerciseCount: plural({ one: 'תרגיל אחד', two: '2 תרגילים', other: '{count} תרגילים' }),
@@ -177,6 +180,9 @@ export const he = {
     traineeEndedCoaching: '{name} סיימה את הליווי',
     // DRAFT — multi-week plans.
     planBlockEnding: 'התוכנית של {name} מסתיימת השבוע',
+    // The line under a notification (both apps' notification lists).
+    waitingForPlan: 'מילאה שאלון ומחכה לתוכנית',
+    weekSummary: '{done} מתוך {planned} אימונים הושלמו.',
   },
   onboardingSections: {
     basicProfile: 'פרטים בסיסיים',

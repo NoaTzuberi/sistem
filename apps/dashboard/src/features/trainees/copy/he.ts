@@ -58,7 +58,6 @@ export const he = {
   plan: 'תוכנית',
   daysPerWeek: '{days} ימים בשבוע',
   weekProgress: '{done} מתוך {planned}',
-  weekSummary: '{done} מתוך {planned} אימונים הושלמו.',
   timeLeft: 'זמן שנותר',
   buildPlan: 'לבניית התוכנית',
   openWeekPlan: 'לתוכנית של השבוע',

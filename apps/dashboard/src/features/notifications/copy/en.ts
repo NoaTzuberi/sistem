@@ -18,6 +18,5 @@ export const en: CopyShape<typeof he> = {
   now: 'Now',
   windowTitle: '{time} · {name}',
   windowCloses: 'The 48-hour window closes at {time}',
-  waitingForPlan: 'Filled in the questionnaire and is waiting for a plan',
   dismiss: 'Remove the notification: {title}',
 };

@@ -1,5 +1,6 @@
 import type { AppNotification, CoachTraineeSummary, CoachTraineeWeek, Language } from '@sistem/types';
-import { dateFormat, describeCoachNotification, fill, formatTimeAgo, formatTimeLeft, isolateAuto } from '@sistem/shared';
+import { dateFormat, describeCoachNotification, describeCoachNotificationSub, fill, formatTimeAgo, formatTimeLeft, isolateAuto } from '@sistem/shared';
+import type { CoachNotificationIcon } from '@sistem/shared';
 import { NEW_PLAN_STATE, archivedTraineePath, traineePath } from '../../../app/config/routes';
 import type { IconName } from '../../../components/common/Icon/iconPaths';
 import { traineesCopy } from '../../trainees/copy';
@@ -95,6 +96,9 @@ export function buildWindowAlerts(trainees: CoachTraineeSummary[], nowMs: number
     });
 }
 
+/** The shared icon ids in the dashboard's icon set. */
+const NOTICE_ICONS: Record<CoachNotificationIcon, IconName> = { person: 'person', heart: 'heart', calendar: 'calendar', check: 'check' };
+
 interface ServerNoticeContext {
   nowMs: number;
   language: Language;
@@ -109,26 +113,20 @@ export function buildServerNotice(notification: AppNotification, { nowMs, langua
   const described = describeCoachNotification(notification, language);
   const shown = ['trainee_onboarded', 'workout_completed', 'coach_note_thanks', 'trainee_ended_coaching', 'plan_block_ending'];
   if (!described || !shown.includes(notification.type)) return null;
-  const copy = notificationsCopy[language];
-  const createdAt = new Date(notification.createdAt);
-  const isToday = isSameLocalDay(createdAt, new Date(nowMs));
-  const week = weekOf(described.traineeId)?.currentPlan;
-
-  let body: string | undefined;
-  if (notification.type === 'trainee_onboarded') {
-    if (isWaiting(described.traineeId)) body = copy.waitingForPlan;
-  } else if (isToday && week && week.planned > 0) {
-    // Her week as it stands now — only next to a workout finished today, when it still describes it.
-    body = fill(traineesCopy[language].weekSummary, { done: week.completed, planned: week.planned });
-  }
+  const isToday = isSameLocalDay(new Date(notification.createdAt), new Date(nowMs));
+  // The sub line, icon and color are shared with the mobile list.
+  const body = describeCoachNotificationSub(
+    notification,
+    described.traineeId,
+    { nowMs, isWaiting, weekOf: (traineeId) => weekOf(traineeId)?.currentPlan },
+    language,
+  );
 
   return {
     id: notification.id,
     serverId: notification.id,
-    type: notification.type === 'workout_completed' ? 'done' : 'new',
-    icon: notification.type === 'trainee_onboarded' || notification.type === 'trainee_ended_coaching'
-      ? 'person'
-      : notification.type === 'coach_note_thanks' ? 'heart' : notification.type === 'plan_block_ending' ? 'calendar' : 'check',
+    type: described.tone,
+    icon: NOTICE_ICONS[described.icon],
     title: described.text,
     body,
     time: noticeTime(notification.createdAt, nowMs, language),

@@ -18,6 +18,5 @@ export const he = {
   now: 'עכשיו',
   windowTitle: '{time} · {name}',
   windowCloses: 'חלון 48 השעות נסגר ב־{time}',
-  waitingForPlan: 'מילאה שאלון ומחכה לתוכנית',
   dismiss: 'הסרת ההתראה: {title}', // PLACEHOLDER
 } as const;

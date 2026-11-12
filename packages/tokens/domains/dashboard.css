@@ -122,17 +122,9 @@
     radial-gradient(35% 35% at 30% 70%, color-mix(in srgb, var(--color-peach) 35%, transparent), transparent 70%);
   --surface-timeline: color-mix(in srgb, var(--color-card) 55%, transparent);   /* the past-weeks timeline */
 
-  /* Notification types (the bell's panel): icon, unread dot and action take the color; the unread
-     card's glow is the same color at a low alpha. Kinds of news, not statuses — no green.
-     "late" is the only red: a 48h window that has passed. */
-  --color-notice-warn: var(--ink-orange);           /* the icon / text */
-  --color-notice-warn-fill: #ff7a00;                /* the dot, the action button */
-  --color-notice-late: #d70015;
-  --color-notice-new: var(--color-workout-2);
-  --color-notice-done: var(--color-primary-deep);
+  /* The notification type colors live in semantic/states.css (the mobile list uses them too). */
   --surface-notice-panel: color-mix(in srgb, var(--color-bg) 86%, transparent);       /* the frosted panel */
   --surface-notice-read: color-mix(in srgb, var(--color-card) 45%, transparent);      /* a read notification */
-  --surface-notice-quiet: color-mix(in srgb, var(--color-text-muted) 12%, transparent); /* segmented track, read icon tile, dismiss */
   --color-notice-scrim: color-mix(in srgb, var(--color-text) 10%, transparent);
   --blur-notice-scrim: blur(6px) saturate(120%);
   --blur-notice-panel: blur(30px) saturate(180%);

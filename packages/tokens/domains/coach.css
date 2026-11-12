@@ -138,6 +138,13 @@
   --size-coach-header-action: 48px;                          /* a round icon action on the stage */
   --radius-coach-tab-track: 18px;
   --radius-coach-tab-thumb: 14px;
+  /* Her details sheet (the name / ⋯ on her page). */
+  --size-coach-avatar-sheet: 72px;
+  --radius-coach-details-group: 18px;                        /* a soft grouped list */
+  --size-coach-details-tile: var(--size-qn-tile);            /* a row's icon tile (36px) */
+  /* The notifications list (same look as the dashboard bell). */
+  --size-coach-notice-tile: 40px;                            /* a notification's icon tile */
+  --size-coach-notice-dot: 8px;                              /* the unread dot */
   --text-coach-tab-label: 15px;
   --color-coach-attention-soft: var(--color-portion-fat-soft); /* #ffebd6 — the attention card */
   --color-coach-attention-ink: var(--ink-orange);              /* #c75a00 */
