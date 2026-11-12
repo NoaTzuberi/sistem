@@ -243,6 +243,20 @@ describe('multi-week plans (blocks)', () => {
 
     const home = await api.request('GET', '/plans/week', { token: trainee.token });
     expect(home.body.plan.block).toEqual({ week: 2, lengthWeeks: 2, isDeload: false, weightIncreases: 1 });
+
+    // Her details sheet in coach mode reads "week 2 of 2" too.
+    const detail = await api.request('GET', `/coach/trainees/${trainee.id}`, { token: coach.token });
+    expect(detail.body.trainee.planBlock).toEqual({ week: 2, lengthWeeks: 2 });
+    expect(detail.body.trainee.discipline).toBeNull();
+  });
+
+  it('a weekly plan has no planBlock in the coach detail', async () => {
+    const res = await api.request('POST', plansPath(), { token: coach.token, body: { weekStartDate: THIS_WEEK } });
+    await api.request('PUT', `${plansPath()}/${res.body.plan.id}`, { token: coach.token, body: { workouts: blockWorkouts() } });
+    await api.request('POST', `${plansPath()}/${res.body.plan.id}/publish`, { token: coach.token });
+    const detail = await api.request('GET', `/coach/trainees/${trainee.id}`, { token: coach.token });
+    expect(detail.body.trainee.thisWeek).not.toBeNull();
+    expect(detail.body.trainee.planBlock).toBeNull();
   });
 
   it('a draft block changes length; a published one does not', async () => {

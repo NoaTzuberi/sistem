@@ -1167,6 +1167,10 @@ export interface CoachActivityPage {
 
 export interface CoachTraineeDetail extends CoachTraineeSummary {
   onboarding: MyOnboarding | null;
+  /** The coaching's discipline ("pilates"), when the coach set one; null = none. */
+  discipline: string | null;
+  /** This week's published plan is a week of a multi-week plan ("שבוע 2 מתוך 4"); null = weekly or no plan. */
+  planBlock: { week: number; lengthWeeks: number } | null;
 }
 
 /** GET /coach/trainees. serverTime is the clock the 48h countdowns count against. */

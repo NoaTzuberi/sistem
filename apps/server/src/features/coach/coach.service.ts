@@ -7,6 +7,7 @@ import { OnboardingResponse } from '../onboarding/onboardingResponse.model';
 import { toMyOnboarding } from '../onboarding/onboarding.service';
 import { PLAN_WAIT_MS } from '../onboarding/onboarding.constants';
 import { Plan } from '../plans/plan.model';
+import { blockInfoFor } from '../plans/planBlock.service';
 import { addDays, currentWeekStart, localDateString } from '../plans/planWeek';
 import { WorkoutLog } from '../workoutLogs/workoutLog.model';
 import { CardioLog } from '../cardio/cardio.model';
@@ -208,8 +209,17 @@ export async function getCoachTraineeDetail(traineeId: string, coachingId: strin
     toTraineeSummaries([{ user: trainee, coaching }], now),
     OnboardingResponse.findOne({ userId: traineeId }).lean(),
   ]);
+  // Her details sheet in coach mode: where this week sits in a multi-week plan.
+  let planBlock: CoachTraineeDetail['planBlock'] = null;
+  if (summary.thisWeek) {
+    const plan = await Plan.findById(summary.thisWeek.planId).select('blockId blockWeek').lean<{ _id: Types.ObjectId; blockId?: Types.ObjectId; blockWeek?: number }>();
+    const info = plan ? (await blockInfoFor([plan])).get(String(plan._id)) : undefined;
+    if (info) planBlock = { week: info.week, lengthWeeks: info.lengthWeeks };
+  }
   return {
     ...summary,
     onboarding: response || trainee.onboardingStatus !== 'not_started' ? toMyOnboarding(trainee, response) : null,
+    discipline: coaching.discipline ?? null,
+    planBlock,
   };
 }
