@@ -33,6 +33,13 @@
   font-size: var(--text-2xl);
 }
 
+/* Her details sheet header. */
+.coach-avatar-sheet {
+  width: var(--size-coach-avatar-sheet);
+  height: var(--size-coach-avatar-sheet);
+  font-size: var(--text-3xl);
+}
+
 /* A trainee's own color (data/coachMode traineeColorClass): the workout colors without orange, which is too
    light under white initials; Cherry takes its place. */
 .trainee-color-1 { --trainee-color: var(--color-workout-1); }

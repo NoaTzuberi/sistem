@@ -190,3 +190,44 @@
 .coach-trainee-panel > .coach-card {
   margin-block-start: 0;
 }
+
+/* Her photo and name open her details sheet: plain buttons that look like the header. */
+.coach-trainee-avatar-button,
+.coach-trainee-name-button {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.coach-trainee-name-button {
+  border-radius: var(--radius-coach-chip);
+}
+
+.coach-trainee-avatar-button:active,
+.coach-trainee-name-button:active {
+  transform: scale(var(--press-scale));
+}
+
+.coach-trainee-name-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-on-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-trainee-avatar-button,
+  .coach-trainee-name-button {
+    transition: none;
+  }
+
+  .coach-trainee-avatar-button:active,
+  .coach-trainee-name-button:active {
+    transform: none;
+  }
+}

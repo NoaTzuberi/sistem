@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { IconBarbell, IconChevronLeft, IconMessageCircle, IconSalad } from '@tabler/icons-react';
+import { IconBarbell, IconChevronLeft, IconDots, IconMessageCircle, IconSalad } from '@tabler/icons-react';
 import { fill, formatPlural, sharedCopy, splitLabel, traineeStatusLabel, useCopy, useLanguage, useLoad, useServerNow } from '@sistem/shared';
 import { ROUTES, coachThreadPath } from '../../../../app/config/routes';
 import { Toast } from '../../../../components/common/Toast/Toast';
@@ -24,7 +24,8 @@ import { QuickMessageSheet } from '../../components/QuickMessageSheet/QuickMessa
 import { PlanQuickEditSheet } from '../../components/PlanQuickEditSheet/PlanQuickEditSheet';
 import { useQuickMessage } from '../../hooks/useQuickMessage';
 import { usePlanQuickEdit } from '../../hooks/usePlanQuickEdit';
-import { TraineeMoreMenu } from '../../components/TraineeMoreMenu/TraineeMoreMenu';
+import { TraineeDetailsSheet } from '../../components/TraineeDetailsSheet/TraineeDetailsSheet';
+import { useTraineeDetailsSheet } from '../../hooks/useTraineeDetailsSheet';
 import { EndCoachingSheet } from '../../components/EndCoachingSheet/EndCoachingSheet';
 import { useTraineeEndCoaching } from '../../hooks/useTraineeEndCoaching';
 import './TraineeDetailPage.css';
@@ -46,6 +47,9 @@ export function TraineeDetailPage() {
   const ending = useTraineeEndCoaching(traineeId);
   const navigate = useNavigate();
   const { toastMessage, toastAction, showToast } = useToast();
+  const details = useTraineeDetailsSheet(showToast);
+  // Bumped by "לשאלון המלא": the Body tab opens her questionnaire and scrolls to it.
+  const [questionnaireRequest, setQuestionnaireRequest] = useState(0);
   // Bumped after a light edit: the plan lists below load again.
   const [plansVersion, setPlansVersion] = useState(0);
   const onPlansChanged = useCallback(() => {
@@ -85,15 +89,25 @@ export function TraineeDetailPage() {
             <Eyebrow keepInEnglish>
               {trainee?.coachingWeek ? `${eyebrow.trainee} · ${weekEyebrow(eyebrow.week, trainee.coachingWeek)}` : eyebrow.trainee}
             </Eyebrow>
-            {trainee && <TraineeMoreMenu onEndCoaching={ending.ask} />}
+            {trainee && (
+              <button type="button" className="coach-stage-round" aria-label={copy.details.open} aria-haspopup="dialog" onClick={details.open}>
+                <IconDots size={18} stroke={2.2} aria-hidden="true" />
+              </button>
+            )}
           </div>
           {trainee && (
             <>
+              {/* Her name and photo open her details too (the ⋯ is the same sheet). */}
               <div className="coach-trainee-id">
-                <CoachAvatar name={trainee.name} seed={trainee.id} photoUrl={trainee.avatar?.url} size="xl" />
+                {/* The photo is a second, pointer-only way in; the name button below is the one for keyboard and screen readers. */}
+                <button type="button" className="coach-trainee-avatar-button" tabIndex={-1} aria-hidden="true" onClick={details.open}>
+                  <CoachAvatar name={trainee.name} seed={trainee.id} photoUrl={trainee.avatar?.url} size="xl" />
+                </button>
                 <div className="coach-trainee-id-text">
                   <h1 className="coach-trainee-name display-title" id="coach-trainee-name">
-                    <bdi>{trainee.name}</bdi>
+                    <button type="button" className="coach-trainee-name-button" aria-haspopup="dialog" onClick={details.open}>
+                      <bdi>{trainee.name}</bdi>
+                    </button>
                   </h1>
                   <span className={`coach-trainee-status coach-trainee-status-${trainee.status}`}>
                     <span className="coach-trainee-status-dot" aria-hidden="true" />
@@ -158,9 +172,19 @@ export function TraineeDetailPage() {
               />
             )}
             {tab === 'nutrition' && <TraineeNutritionTab traineeId={trainee.id} />}
-            {tab === 'body' && <TraineeBody trainee={trainee} />}
+            {tab === 'body' && <TraineeBody trainee={trainee} questionnaireRequest={questionnaireRequest} />}
           </section>
           <PlanQuickEditSheet edit={edit} />
+          <TraineeDetailsSheet
+            trainee={trainee}
+            today={localDateOf(nowMs, trainee.timezone)}
+            sheet={details}
+            onOpenQuestionnaire={() => {
+              selectTab('body');
+              setQuestionnaireRequest((request) => request + 1);
+            }}
+            onEndCoaching={ending.ask}
+          />
           <EndCoachingSheet
             name={trainee.name}
             isOpen={ending.isConfirming}

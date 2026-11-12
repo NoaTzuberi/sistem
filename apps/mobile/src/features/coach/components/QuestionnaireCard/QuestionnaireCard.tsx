@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { MyOnboarding } from '@sistem/types';
 import { fill, isolateLtr, labelList, sharedCopy, useCopy, useLanguage } from '@sistem/shared';
 import { coachCopy } from '../../copy';
@@ -6,13 +6,26 @@ import { CoachCard } from '../CoachCard/CoachCard';
 import { OnboardingAnswers } from '../OnboardingAnswers/OnboardingAnswers';
 import './QuestionnaireCard.css';
 
+interface QuestionnaireCardProps {
+  onboarding: MyOnboarding | null;
+  /** Bumped by "לשאלון המלא" in her details sheet: the card opens and scrolls into view. */
+  openRequest?: number;
+}
+
 /** Her questionnaire: a one-line summary (goals · days a week); "פתיחה" shows every answer. */
-export function QuestionnaireCard({ onboarding }: { onboarding: MyOnboarding | null }) {
+export function QuestionnaireCard({ onboarding, openRequest = 0 }: QuestionnaireCardProps) {
   const copy = useCopy(coachCopy).detail;
   const shared = useCopy(sharedCopy);
   const language = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
+  const anchorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (openRequest === 0) return;
+    setIsOpen(true);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    anchorRef.current?.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+  }, [openRequest]);
   const answers = onboarding?.answers;
   const frequency = answers?.trainingFrequency;
   const summary = [
@@ -21,20 +34,22 @@ export function QuestionnaireCard({ onboarding }: { onboarding: MyOnboarding | n
   ].filter(Boolean);
 
   return (
-    <CoachCard
-      title={copy.questionnaire}
-      action={
-        onboarding && (
-          <button type="button" className="coach-link" aria-expanded={isOpen} aria-controls={panelId} onClick={() => setIsOpen((open) => !open)}>
-            {isOpen ? copy.close : copy.open}
-          </button>
-        )
-      }
-    >
-      <p className="coach-card-text">{summary.length > 0 ? summary.join(' · ') : shared.coach.onboardingNotStarted}</p>
-      <div id={panelId} className="questionnaire-card-answers" hidden={!isOpen}>
-        {isOpen && <OnboardingAnswers onboarding={onboarding} />}
-      </div>
-    </CoachCard>
+    <div ref={anchorRef} className="questionnaire-card-anchor">
+      <CoachCard
+        title={copy.questionnaire}
+        action={
+          onboarding && (
+            <button type="button" className="coach-link" aria-expanded={isOpen} aria-controls={panelId} onClick={() => setIsOpen((open) => !open)}>
+              {isOpen ? copy.close : copy.open}
+            </button>
+          )
+        }
+      >
+        <p className="coach-card-text">{summary.length > 0 ? summary.join(' · ') : shared.coach.onboardingNotStarted}</p>
+        <div id={panelId} className="questionnaire-card-answers" hidden={!isOpen}>
+          {isOpen && <OnboardingAnswers onboarding={onboarding} />}
+        </div>
+      </CoachCard>
+    </div>
   );
 }

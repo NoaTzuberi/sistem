@@ -1,0 +1,239 @@
+/* Her details sheet: a centered header, soft grouped lists, "סיום ליווי" set apart at the bottom. */
+.tds-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-end: var(--space-2);
+  text-align: center;
+}
+
+.tds-name {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-coach-sheet-title);
+  line-height: 0.9;
+  overflow-wrap: anywhere;
+}
+
+.tds-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-coach-chip);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-round);
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tds-status-dot {
+  width: var(--size-coach-status-dot);
+  height: var(--size-coach-status-dot);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+}
+
+.tds-status-waiting .tds-status-dot,
+.tds-status-new .tds-status-dot {
+  background-color: var(--color-coach-amber-ink);
+}
+
+.tds-status-inactive .tds-status-dot {
+  background-color: var(--color-text-faint);
+}
+
+.tds-since {
+  margin: 0;
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-label);
+}
+
+.tds-group {
+  margin-block-start: var(--space-4);
+}
+
+.tds-group-title {
+  margin: 0 0 var(--space-2);
+  padding-inline: var(--space-1);
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tds-list {
+  margin: 0;
+  padding: 0 var(--space-3);
+  list-style: none;
+  border-radius: var(--radius-coach-details-group);
+  background-color: var(--color-coach-soft);
+}
+
+.tds-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tds-row + .tds-row {
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+.tds-row-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: var(--size-cp-row);
+  padding-block: var(--space-2);
+  color: var(--color-ink);
+  text-align: start;
+}
+
+.tds-row-link {
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.tds-row-link:active {
+  transform: scale(var(--press-scale));
+}
+
+.tds-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-coach-details-tile);
+  height: var(--size-coach-details-tile);
+  border-radius: var(--radius-cp-icon);
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+
+.tds-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tds-row-label {
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-label);
+}
+
+.tds-row-value {
+  font-size: var(--text-coach-body);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+  /* Sized to its text and placed at the parent's reading side, so an LTR email or a number still
+     lines up under the Hebrew label. */
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.tds-row-sub {
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-caption);
+}
+
+/* "לשאלון המלא": a link row, Cherry text. */
+.tds-row-more .tds-row-label {
+  flex: 1;
+  color: var(--color-primary-deep);
+  font-size: var(--text-coach-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tds-row-chevron {
+  flex: none;
+  color: var(--color-primary-deep);
+}
+
+.tds-row-action {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--color-coach-muted);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press), background-color var(--transition-fast) ease;
+}
+
+.tds-row-action:active {
+  transform: scale(var(--press-scale));
+  background-color: var(--color-card);
+}
+
+.tds-end {
+  margin-block-start: var(--space-5);
+  padding-block-start: var(--space-3);
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}
+
+/* A text row, not a big button: Cherry because it ends something she feels. */
+.tds-end-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--color-primary-deep);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press), background-color var(--transition-fast) ease;
+}
+
+.tds-end-button:active {
+  transform: scale(var(--press-scale));
+  background-color: var(--color-coach-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tds-row-link:hover .tds-row-value,
+  .tds-row-action:hover {
+    color: var(--color-primary-deep);
+  }
+
+  .tds-end-button:hover {
+    background-color: var(--color-coach-soft);
+  }
+}
+
+.tds-row-link:focus-visible,
+.tds-row-action:focus-visible,
+.tds-end-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tds-row-link,
+  .tds-row-action,
+  .tds-end-button {
+    transition: background-color var(--transition-fast) ease;
+  }
+
+  .tds-row-link:active,
+  .tds-row-action:active,
+  .tds-end-button:active {
+    transform: none;
+  }
+}

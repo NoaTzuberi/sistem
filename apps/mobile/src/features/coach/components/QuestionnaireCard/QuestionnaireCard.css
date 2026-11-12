@@ -1,3 +1,8 @@
 .questionnaire-card-answers {
   margin-block-start: var(--space-3);
 }
+
+/* Room above the card when "לשאלון המלא" scrolls to it. */
+.questionnaire-card-anchor {
+  scroll-margin-block-start: var(--space-4);
+}
