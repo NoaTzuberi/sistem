@@ -63,6 +63,9 @@ export const he = {
     height: 'גובה (ס״מ)',
     weight: 'משקל',
     gender: 'מגדר (לא חובה)',
+    // DRAFT (2026-11-12)
+    phone: 'טלפון (לא חובה)',
+    phoneHint: 'כדי שהמאמנת תוכל ליצור איתך קשר',
     preferredUnits: 'יחידות מועדפות',
   },
   goals: {

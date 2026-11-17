@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconChevronLeft, IconClock, IconRuler2, IconScale, IconUserHeart } from '@tabler/icons-react';
+import { IconChevronLeft, IconClock, IconPhone, IconRuler2, IconScale, IconUserHeart } from '@tabler/icons-react';
 import { LANGUAGES, fill, isolateAuto, sharedCopy, unitLabel, useCopy } from '@sistem/shared';
 import { AppShell } from '../../../../components/layout/AppShell/AppShell';
 import { Eyebrow } from '../../../../components/common/Eyebrow/Eyebrow';
@@ -21,6 +21,8 @@ import { useEndMyCoaching } from '../../hooks/useEndMyCoaching';
 import { DeleteAccountButton } from '../../../account/components/DeleteAccountButton/DeleteAccountButton';
 import { useLanguagePreference } from '../../hooks/useLanguagePreference';
 import { useUnitPreferences } from '../../hooks/useUnitPreferences';
+import { usePhoneSetting } from '../../hooks/usePhoneSetting';
+import { PhoneSheet } from '../../components/PhoneSheet/PhoneSheet';
 import { profileCopy } from '../../copy';
 import './SettingsPage.css';
 
@@ -66,6 +68,7 @@ export function SettingsPage() {
   const [confirmLogout, setConfirmLogout] = useState(false);
   const busy = units.isSaving || language.isSaving;
   const { toastMessage, showToast } = useToast();
+  const phone = usePhoneSetting(showToast);
   // Her current coaching (the server sends only her own); self-guided = no row.
   const { coachings } = useActiveCoachings(user?.coachingStatus != null);
   const coaching = user?.coachingStatus != null ? coachings[0] ?? null : null;
@@ -178,6 +181,17 @@ export function SettingsPage() {
               {copy.account}
             </SectionTitle>
             <div className="st-card">
+              {/* Her optional phone: only her coach (a live coaching) sees it. */}
+              <button type="button" className="st-row st-row-button" aria-haspopup="dialog" onClick={phone.open}>
+                <span className="st-row-icon" aria-hidden="true">
+                  <IconPhone size={18} />
+                </span>
+                <span className="st-row-label">{copy.phone.row}</span>
+                <bdi className="st-value" dir={phone.phone ? 'ltr' : 'auto'}>
+                  {phone.phone ?? copy.phone.none}
+                </bdi>
+                <IconChevronLeft className="st-row-chevron flip-rtl" size={18} aria-hidden="true" />
+              </button>
               <SettingsRow icon={<IconClock size={18} />} label={copy.timezone} labelId="st-timezone-label">
                 <bdi className="st-value" dir="ltr">
                   {user?.timezone}
@@ -198,6 +212,7 @@ export function SettingsPage() {
           </p>
         </div>
 
+        <PhoneSheet setting={phone} />
         <LogoutSheet isOpen={confirmLogout} onClose={() => setConfirmLogout(false)} onConfirm={handleLogout} />
         {coaching && (
           <>

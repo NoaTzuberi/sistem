@@ -246,7 +246,7 @@ export function OnboardingPage() {
     getMyOnboarding()
       .then((onboarding) => {
         if (cancelled) return;
-        setFormState(mapOnboardingToFormState(onboarding, user?.name ?? ''));
+        setFormState(mapOnboardingToFormState(onboarding, user?.name ?? '', user?.phone ?? null));
         if (!isEditMode) {
           const resumeStep = onboarding.lastStep
             ? Math.min(STEP_IDS.indexOf(onboarding.lastStep) + 1, STEP_COUNT - 1)

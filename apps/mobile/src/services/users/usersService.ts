@@ -46,7 +46,7 @@ export async function getMyProfile(): Promise<MyProfileResponse> {
 }
 
 // Her display units (Settings, Phase 10), UI language (Phase 15) and profile photo.
-export const { updatePreferences, uploadAvatar, removeAvatar, fetchAvatar } = createAuthApi(apiClient);
+export const { updatePreferences, updatePhone, uploadAvatar, removeAvatar, fetchAvatar } = createAuthApi(apiClient);
 
 // First run: "on my own" (remembered on the server; resumes in the questionnaire).
 export const { chooseSelfGuided } = createTraineeApi(apiClient);

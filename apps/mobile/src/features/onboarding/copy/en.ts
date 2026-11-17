@@ -62,6 +62,9 @@ export const en: CopyShape<typeof he> = {
     height: 'Height (cm)',
     weight: 'Weight',
     gender: 'Gender (optional)',
+    // DRAFT (2026-11-12)
+    phone: 'Phone (optional)',
+    phoneHint: 'So your coach can reach you',
     preferredUnits: 'Preferred units',
   },
   goals: {

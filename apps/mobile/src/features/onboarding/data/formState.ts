@@ -9,11 +9,13 @@ import { fromAnswers } from './nutritionForm';
 
 /** Builds formState from the answers saved on the server, so resuming onboarding
  * and editing one step both start from real answers. */
-export function mapOnboardingToFormState(onboarding: MyOnboarding, fallbackName: string): OnboardingFormState {
+/** `phone` comes from her account (it is not part of the questionnaire answers). */
+export function mapOnboardingToFormState(onboarding: MyOnboarding, fallbackName: string, phone: string | null = null): OnboardingFormState {
   const p = onboarding.answers;
   const weightUnit = onboarding.units?.weight ?? INITIAL_ONBOARDING_STATE.units.weight;
   return {
     name: onboarding.name || fallbackName,
+    phone: phone ?? '',
     birthDate: p?.birthDate ? p.birthDate.slice(0, 10) : '',
     height: p?.height !== undefined ? String(p.height) : '',
     // Stored in kg; shown back in the unit she typed it in (the server converts lb on save).

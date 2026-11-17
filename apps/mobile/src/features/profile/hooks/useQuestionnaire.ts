@@ -36,8 +36,8 @@ export function useQuestionnaire() {
 
   // The edit sheets start from this (her saved answers, weight in her unit).
   const formState = useMemo<OnboardingFormState | null>(
-    () => (onboarding ? mapOnboardingToFormState(onboarding, user?.name ?? '') : null),
-    [onboarding, user?.name],
+    () => (onboarding ? mapOnboardingToFormState(onboarding, user?.name ?? '', user?.phone ?? null) : null),
+    [onboarding, user?.name, user?.phone],
   );
 
   const save = useCallback(

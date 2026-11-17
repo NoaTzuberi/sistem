@@ -16,7 +16,7 @@ import { asksWeightGoal, toPreferencesPayload, toWeightGoalPayload } from '../..
 // Which answers each step saves — mirrors ONBOARDING_STEP_FIELDS on the server.
 const STEP_FIELDS: Record<OnboardingStepId, (keyof OnboardingAnswersPayload)[]> = {
   welcome: [],
-  basic_profile: ['name', 'birthDate', 'height', 'weight', 'gender', 'units'],
+  basic_profile: ['name', 'birthDate', 'height', 'weight', 'gender', 'units', 'phone'],
   goals: ['goals'],
   frequency: ['trainingFrequency', 'trainingExperience'],
   activities: ['preferredActivities'],
@@ -31,6 +31,8 @@ const STEP_FIELDS: Record<OnboardingStepId, (keyof OnboardingAnswersPayload)[]> 
 function toAnswersPayload(formState: OnboardingFormState): OnboardingAnswersPayload {
   return {
     name: formState.name.trim() || undefined,
+    // '' clears it on the server.
+    phone: formState.phone.trim(),
     birthDate: formState.birthDate,
     height: Number(formState.height),
     weight: Number(formState.weight),

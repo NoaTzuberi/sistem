@@ -46,9 +46,20 @@ export function BasicProfileStep({ formState, updateFormState }: BasicProfileSte
           label={copy.weight}
           type="number"
           inputMode="decimal"
-          enterKeyHint="done"
+          enterKeyHint="next"
           value={formState.weight}
           onChange={(event) => updateFormState({ weight: event.target.value })}
+        />
+        <Input
+          label={copy.phone}
+          type="tel"
+          inputMode="tel"
+          dir="ltr"
+          autoComplete="tel"
+          enterKeyHint="done"
+          helperText={copy.phoneHint}
+          value={formState.phone}
+          onChange={(event) => updateFormState({ phone: event.target.value })}
         />
       </div>
 

@@ -2,6 +2,8 @@ import type { AllergyId, DietStyleId, DietType, IntoleranceId, ReligiousId, Trai
 
 export interface OnboardingFormState {
   name: string;
+  /** Optional; saved on her account (the server checks and normalizes it). '' = none. */
+  phone: string;
   birthDate: string;
   height: string;
   weight: string;
@@ -58,6 +60,7 @@ export interface FormPreferenceItem<T extends string> {
 
 export const INITIAL_ONBOARDING_STATE: OnboardingFormState = {
   name: '',
+  phone: '',
   birthDate: '',
   height: '',
   weight: '',
