@@ -98,13 +98,25 @@ function formatHoursMinutes(ms: number, language: Language): string {
   return hours > 0 ? fill(copy.hoursMinutes, { h: hours, m: minutes }) : fill(copy.minutes, { m: minutes });
 }
 
-/** The 48h window: how long is left, or by how much it is overdue. */
+/** 'באיחור של יומיים' / 'באיחור של 5 שע׳' / 'באיחור של 20 דק׳': the largest whole unit, never hours + minutes. */
+export function formatLateness(lateMs: number, language: Language): string {
+  const copy = sharedCopy[language].time;
+  const [entry, count] =
+    lateMs >= DAY_MS
+      ? [copy.lateDays, Math.floor(lateMs / DAY_MS)]
+      : lateMs >= HOUR_MS
+        ? [copy.lateHours, Math.floor(lateMs / HOUR_MS)]
+        : [copy.lateMinutes, Math.max(1, Math.floor(lateMs / MINUTE_MS))];
+  return formatPlural(language, entry, count, { count: isolateLtr(formatNumber(count, language)) });
+}
+
+/** The 48h window: how long is left (hours + minutes, a countdown), or how late it is (one human unit). */
 export function formatTimeLeft(dueAt: string, nowMs: number, language: Language): { text: string; isOverdue: boolean } {
   const leftMs = new Date(dueAt).getTime() - nowMs;
   const copy = sharedCopy[language].time;
   return leftMs >= 0
     ? { text: fill(copy.left, { time: formatHoursMinutes(leftMs, language) }), isOverdue: false }
-    : { text: fill(copy.overdue, { time: formatHoursMinutes(-leftMs, language) }), isOverdue: true };
+    : { text: formatLateness(-leftMs, language), isOverdue: true };
 }
 
 /**
@@ -130,4 +142,11 @@ export function formatDuration(totalSec: number, language: Language): string {
   const copy = sharedCopy[language].duration;
   if (minutes === 0) return fill(copy.seconds, { s: seconds });
   return seconds === 0 ? fill(copy.minutes, { m: minutes }) : fill(copy.minutesSeconds, { m: minutes, s: seconds });
+}
+
+/** Full years between a birth date ('YYYY-MM-DD…') and today ('YYYY-MM-DD', her zone) — her age for the coach. */
+export function ageOn(birthDate: string, today: string): number {
+  const [by, bm, bd] = birthDate.slice(0, 10).split('-').map(Number);
+  const [ty, tm, td] = today.split('-').map(Number);
+  return ty - by - (tm < bm || (tm === bm && td < bd) ? 1 : 0);
 }

@@ -145,6 +145,16 @@
   /* The notifications list (same look as the dashboard bell). */
   --size-coach-notice-tile: 40px;                            /* a notification's icon tile */
   --size-coach-notice-dot: 8px;                              /* the unread dot */
+  /* Coach Today, variant A (owner-approved 2026-11-12): calmer — fewer lines, more air. */
+  --space-coach-today-section: var(--space-4);               /* 24px between the Today sections */
+  --text-coach-section: 28px;                                /* "דורש טיפול" / "פעילות אחרונה" (Karantina) */
+  --size-coach-today-avatar: 36px;                           /* a row's avatar */
+  --size-coach-today-row: 60px;                              /* a row's minimum height */
+  --size-coach-today-action: 34px;                           /* the row's one button (44px hit area) */
+  --size-coach-calm-icon: 44px;                              /* the Cherry check of "הכול בשליטה" */
+  --size-coach-today-chip: 30px;                             /* a number chip on the stage (44px hit area) */
+  --size-coach-invite-action: 48px;                          /* the new coach's invite button */
+  --color-coach-chip-on-stage: color-mix(in srgb, var(--color-on-ink) 85%, transparent); /* a stage chip's label */
   --text-coach-tab-label: 15px;
   --color-coach-attention-soft: var(--color-portion-fat-soft); /* #ffebd6 — the attention card */
   --color-coach-attention-ink: var(--ink-orange);              /* #c75a00 */

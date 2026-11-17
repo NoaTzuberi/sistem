@@ -57,7 +57,10 @@ export const he = {
   },
   time: {
     left: 'נותרו {time}',
-    overdue: 'באיחור של {time}',
+    // Lateness in one human unit (owner, 2026-11-12): never raw hours + minutes.
+    lateDays: plural({ one: 'באיחור של יום', two: 'באיחור של יומיים', other: 'באיחור של {count} ימים' }),
+    lateHours: plural({ one: 'באיחור של שעה', two: 'באיחור של שעתיים', other: 'באיחור של {count} שע׳' }),
+    lateMinutes: plural({ one: 'באיחור של דקה', two: 'באיחור של 2 דק׳', other: 'באיחור של {count} דק׳' }),
     weekRange: '{start} – {end}',
   },
   weekRelation: {
@@ -171,6 +174,21 @@ export const he = {
     issueWeek: 'שבוע {n}',
     issueExercise: 'תרגיל {n}',
     issueAt: '{where}: {message}',
+  },
+  // Coach mode Today, "דורש טיפול" (owner-approved variant A, 2026-11-12). DRAFT wording.
+  coachTodo: {
+    summary: plural({ one: 'מתאמנת אחת צריכה אותך היום', two: '2 מתאמנות צריכות אותך היום', other: '{count} מתאמנות צריכות אותך היום' }),
+    summaryNone: 'הכול בשליטה היום',
+    title: 'דורש טיפול',
+    windowLate: 'חלון 48 השעות עבר',
+    windowSoon: 'נשארו {time} לתוכנית',
+    hoursLeft: plural({ one: 'שעה', two: 'שעתיים', other: '{count} שע׳' }),
+    minutesLeft: plural({ one: 'דקה', two: '2 דק׳', other: '{count} דק׳' }),
+    waiting: 'מחכה לתוכנית',
+    noWorkout: plural({ one: 'לא התאמנה יום', two: 'לא התאמנה יומיים', other: 'לא התאמנה {count} ימים' }),
+    missed: plural({ one: 'דילגה על אימון השבוע', two: 'דילגה על 2 אימונים השבוע', other: 'דילגה על {count} אימונים השבוע' }),
+    buildPlan: 'בניית תוכנית',
+    sendMessage: 'שליחת הודעה',
   },
   coachNotifications: {
     traineeOnboarded: 'מתאמנת חדשה: {name}',

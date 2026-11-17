@@ -8,6 +8,7 @@ export * from './workoutLogDisplay';
 export * from './traineeStatus';
 export * from './onboardingSections';
 export * from './coachNotifications';
+export * from './coachTodo';
 export * from './units';
 export * from './bodyChart';
 export * from './bodyMetricsDisplay';

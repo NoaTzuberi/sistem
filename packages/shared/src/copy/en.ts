@@ -54,7 +54,9 @@ export const en: CopyShape<typeof he> = {
   },
   time: {
     left: '{time} left',
-    overdue: 'Overdue by {time}',
+    lateDays: plural({ one: 'Overdue by 1 day', other: 'Overdue by {count} days' }),
+    lateHours: plural({ one: 'Overdue by 1 hour', other: 'Overdue by {count} hours' }),
+    lateMinutes: plural({ one: 'Overdue by 1 minute', other: 'Overdue by {count} minutes' }),
     weekRange: '{start} – {end}',
   },
   weekRelation: {
@@ -165,6 +167,21 @@ export const en: CopyShape<typeof he> = {
     issueWeek: 'Week {n}',
     issueExercise: 'exercise {n}',
     issueAt: '{where}: {message}',
+  },
+  // Coach mode Today, "Needs you" (owner-approved variant A, 2026-11-12). DRAFT wording.
+  coachTodo: {
+    summary: plural({ one: '1 trainee needs you today', other: '{count} trainees need you today' }),
+    summaryNone: 'All under control today',
+    title: 'Needs you',
+    windowLate: '48-hour window passed',
+    windowSoon: '{time} left for her plan',
+    hoursLeft: plural({ one: '1 hour', other: '{count} hours' }),
+    minutesLeft: plural({ one: '1 minute', other: '{count} minutes' }),
+    waiting: 'Waiting for a plan',
+    noWorkout: plural({ one: 'No workout for 1 day', other: 'No workout for {count} days' }),
+    missed: plural({ one: 'Skipped 1 workout this week', other: 'Skipped {count} workouts this week' }),
+    buildPlan: 'Build plan',
+    sendMessage: 'Send message',
   },
   coachNotifications: {
     traineeOnboarded: 'New trainee: {name}',
