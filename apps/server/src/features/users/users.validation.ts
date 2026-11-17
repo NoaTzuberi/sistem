@@ -1,4 +1,5 @@
-import type { UpdatePreferencesPayload } from '@sistem/types';
+import type { UpdatePhonePayload, UpdatePreferencesPayload } from '@sistem/types';
+import { parsePhoneValue } from './phone';
 import { LANGUAGE_IDS, LENGTH_UNIT_IDS, WEIGHT_UNIT_IDS } from './units';
 import { APP_MODE_IDS } from './appMode';
 import { type ServerMessage, msg } from '../../i18n';
@@ -46,4 +47,13 @@ export function parsePreferencesPayload(body: unknown): Parsed<UpdatePreferences
       ...(appMode !== undefined && { appMode: appMode as (typeof APP_MODE_IDS)[number] }),
     },
   };
+}
+
+/** PATCH /users/me/phone: { phone: string | null } — the value is stored normalized (E.164). */
+export function parsePhonePayload(body: unknown): Parsed<UpdatePhonePayload> {
+  if (!isObject(body)) return { error: msg('invalid_body') };
+  const { phone, ...unknownFields } = body;
+  if (Object.keys(unknownFields).length > 0 || !('phone' in body)) return { error: msg('invalid_body') };
+  const parsed = parsePhoneValue(phone);
+  return parsed ? { value: parsed } : { error: msg('phone_invalid') };
 }

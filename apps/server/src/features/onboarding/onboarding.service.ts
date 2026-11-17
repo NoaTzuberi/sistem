@@ -17,6 +17,7 @@ import { toPublicUser } from '../auth/auth.service';
 import { getAppState } from '../users/appState.service';
 import { emitAppEvent } from '../../events/appEvents';
 import { lbToKg } from '../users/units';
+import { parsePhoneValue } from '../users/phone';
 import { localDateString } from '../plans/planWeek';
 import { recordOnboardingWeight } from '../bodyMetrics/bodyMetric.service';
 import { PLAN_WAIT_MS } from './onboarding.constants';
@@ -179,6 +180,8 @@ async function saveAnswers(user: UserDoc, payload: OnboardingAnswersPayload, ste
   response.lastStep = step;
 
   if (payload.name !== undefined) user.name = payload.name.trim();
+  // Validated already: '' / null clears it.
+  if (payload.phone !== undefined) user.phone = parsePhoneValue(payload.phone)?.phone ?? null;
   // Set one by one: the length unit (Settings) is not part of onboarding and must stay.
   if (payload.units !== undefined) {
     user.set('preferences.units.weight', payload.units.weight);

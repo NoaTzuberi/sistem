@@ -68,6 +68,7 @@ export async function toPublicUser(user: UserDocument & { _id: unknown }): Promi
     units: resolveUnits(user.preferences),
     language: resolveLanguage(user.preferences),
     avatar: toPublicAvatar(user.avatar),
+    phone: user.phone ?? null,
     appMode: resolveAppMode(user.roles, user.preferences?.appMode),
     canSwitchAppMode: hasAppModeChoice(user.roles),
     createdAt: user.createdAt.toISOString(),

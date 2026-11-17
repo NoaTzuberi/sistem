@@ -56,6 +56,8 @@ export interface UserDocument {
   nutritionIntroSeenVersion?: number;
   /** Her profile photo: a private asset (privatePhotos flow) — only the storage id is kept. */
   avatar?: { publicId: string; uploadedAt: Date } | null;
+  /** Optional, E.164 (users/phone.ts). Only she and a coach with a live coaching ever read it. */
+  phone?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,6 +123,7 @@ const userSchema = new Schema<UserDocument>(
       type: new Schema({ publicId: { type: String, required: true }, uploadedAt: { type: Date, required: true } }, { _id: false }),
       default: null,
     },
+    phone: { type: String, default: null },
   },
   { timestamps: true },
 );

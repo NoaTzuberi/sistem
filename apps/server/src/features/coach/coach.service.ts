@@ -219,6 +219,7 @@ export async function getCoachTraineeDetail(traineeId: string, coachingId: strin
   return {
     ...summary,
     onboarding: response || trainee.onboardingStatus !== 'not_started' ? toMyOnboarding(trainee, response) : null,
+    phone: trainee.phone ?? null,
     discipline: coaching.discipline ?? null,
     planBlock,
   };

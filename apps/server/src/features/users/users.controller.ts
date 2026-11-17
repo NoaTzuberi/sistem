@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { AppModeNotAllowedError, chooseSelfGuided, getUserProfileById, updateUserPreferences, UserNotFoundError } from './users.service';
-import { parsePreferencesPayload } from './users.validation';
+import { AppModeNotAllowedError, chooseSelfGuided, getUserProfileById, updateUserPhone, updateUserPreferences, UserNotFoundError } from './users.service';
+import { parsePhonePayload, parsePreferencesPayload } from './users.validation';
 import { sendError } from '../../i18n';
 import { InvalidAvatarError, getAvatar, removeAvatar, setAvatar } from './avatar.service';
 import { PhotoStorageUnavailableError } from '../privatePhotos/privatePhoto.service';
@@ -34,6 +34,24 @@ export async function patchPreferences(req: AuthenticatedRequest, res: Response)
     }
     if (error instanceof AppModeNotAllowedError) {
       sendError(res, 403, error.serverMessage);
+      return;
+    }
+    throw error;
+  }
+}
+
+/** PATCH /users/me/phone — her optional phone from Settings. */
+export async function patchMyPhone(req: AuthenticatedRequest, res: Response) {
+  const parsed = parsePhonePayload(req.body);
+  if (parsed.error !== undefined) {
+    sendError(res, 400, parsed.error);
+    return;
+  }
+  try {
+    res.status(200).json({ user: await updateUserPhone(req.userId!, parsed.value.phone) });
+  } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      sendError(res, 401, error.serverMessage);
       return;
     }
     throw error;

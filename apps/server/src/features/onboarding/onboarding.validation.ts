@@ -1,5 +1,6 @@
 import type { OnboardingStepId, WeightUnit } from '@sistem/types';
 import { KG_PER_LB, lbToKg } from '../users/units';
+import { parsePhoneValue } from '../users/phone';
 import {
   GOAL_IDS,
   ACTIVITY_IDS,
@@ -99,6 +100,10 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 const FIELD_VALIDATORS: Record<OnboardingField, FieldValidator> = {
+  phone(value) {
+    return parsePhoneValue(value) ? null : msg('phone_invalid');
+  },
+
   name(value) {
     if (typeof value !== 'string' || value.trim().length === 0) {
       return msg('onboarding_name_invalid');

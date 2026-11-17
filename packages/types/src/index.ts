@@ -45,6 +45,8 @@ export interface AuthUser {
   language: Language;
   /** Her profile photo (signed, expiring link), or null = initials. */
   avatar: PrivatePhoto | null;
+  /** Her optional phone (E.164), or null. Only she and a coach with a live coaching see it. */
+  phone: string | null;
   /** The side of the app she uses now (server-decided from her roles + stored choice); null = neither (admin only). */
   appMode: AppMode | null;
   /** She holds both the coach and the trainee role: the Profile shows the mode switch. */
@@ -209,6 +211,8 @@ export interface WeightGoal {
  */
 export interface OnboardingAnswersPayload {
   name?: string;
+  /** Optional, any common format (the server stores E.164 on User.phone); '' or null clears it. */
+  phone?: string | null;
   birthDate?: string;
   height?: number;
   weight?: number;
@@ -229,6 +233,12 @@ export interface OnboardingAnswersPayload {
   weightGoal?: { targetWeight: number; timeframe: WeightGoalTimeframe | null } | null;
   /** null clears the answer. */
   trainingExperience?: TrainingExperience | null;
+}
+
+/** PATCH /users/me/phone (Settings) — answers with her updated account. */
+export interface UpdatePhonePayload {
+  /** '' or null clears it. */
+  phone: string | null;
 }
 
 export interface SaveOnboardingStepPayload {
@@ -1167,6 +1177,8 @@ export interface CoachActivityPage {
 
 export interface CoachTraineeDetail extends CoachTraineeSummary {
   onboarding: MyOnboarding | null;
+  /** Her optional phone (E.164), or null. Sent only here (a live coaching), never in the archive. */
+  phone: string | null;
   /** The coaching's discipline ("pilates"), when the coach set one; null = none. */
   discipline: string | null;
   /** This week's published plan is a week of a multi-week plan ("שבוע 2 מתוך 4"); null = weekly or no plan. */

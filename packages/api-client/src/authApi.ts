@@ -8,6 +8,7 @@ import type {
   LoginPayload,
   PrivatePhoto,
   RegisterPayload,
+  UpdatePhonePayload,
   UpdatePreferencesPayload,
 } from '@sistem/types';
 import axios from 'axios';
@@ -123,6 +124,13 @@ export function createAuthApi(client: AxiosInstance) {
     return data.user;
   }
 
+  /** Her optional phone (Settings); '' / null clears it. Answers the updated user (phone in E.164). */
+  async function updatePhone(phone: string | null): Promise<AuthUser> {
+    const payload: UpdatePhonePayload = { phone };
+    const { data } = await client.patch<{ user: AuthUser }>('/users/me/phone', payload);
+    return data.user;
+  }
+
   /** Her profile photo: a cropped JPEG as the raw body. Answers the updated user (avatar = signed link). */
   async function uploadAvatar(photo: Blob): Promise<AuthUser> {
     const { data } = await client.put<AvatarResponse>('/users/me/avatar', photo, {
@@ -152,6 +160,7 @@ export function createAuthApi(client: AxiosInstance) {
     checkResetToken,
     deleteAccount,
     updatePreferences,
+    updatePhone,
     uploadAvatar,
     removeAvatar,
     fetchAvatar,

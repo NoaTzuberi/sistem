@@ -59,6 +59,8 @@ export const he = {
   photo_invalid_image: 'התמונה חייבת להיות בפורמט JPEG, PNG או WebP.',
   // Onboarding
   onboarding_name_invalid: 'יש להזין שם.',
+  // DRAFT
+  phone_invalid: 'מספר הטלפון לא תקין. אפשר להזין מספר ישראלי (050-1234567) או מספר בינלאומי עם +.',
   onboarding_birth_date_invalid: 'תאריך הלידה חייב להתאים לגיל בין {min} ל־{max}.',
   onboarding_height_invalid: 'הגובה חייב להיות מספר בין {min} ל־{max}.',
   onboarding_weight_invalid: 'המשקל חייב להיות מספר בין {min} ל־{max}.',

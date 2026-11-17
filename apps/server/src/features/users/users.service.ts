@@ -61,3 +61,10 @@ export async function chooseSelfGuided(userId: string, now: Date = new Date()): 
   if (!user) throw new UserNotFoundError('user_not_found');
   return toPublicUser(user);
 }
+
+/** Her phone from Settings (already normalized; null clears it). */
+export async function updateUserPhone(userId: string, phone: string | null): Promise<AuthUser> {
+  const user = await User.findByIdAndUpdate(userId, { $set: { phone } }, { returnDocument: 'after' });
+  if (!user) throw new UserNotFoundError('user_not_found');
+  return toPublicUser(user);
+}

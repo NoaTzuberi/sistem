@@ -31,13 +31,15 @@ export const ONBOARDING_FIELDS = [
   'nutritionPreferences',
   'weightGoal',
   'trainingExperience',
+  // Optional (2026-11-12): stored on the User like the name, so Settings can change it.
+  'phone',
 ] as const;
 export type OnboardingField = (typeof ONBOARDING_FIELDS)[number];
 
 /** Which answers each step may save. Bookend and photo steps only record progress. */
 export const ONBOARDING_STEP_FIELDS: Record<OnboardingStepId, readonly OnboardingField[]> = {
   welcome: [],
-  basic_profile: ['name', 'birthDate', 'height', 'weight', 'gender', 'units'],
+  basic_profile: ['name', 'birthDate', 'height', 'weight', 'gender', 'units', 'phone'],
   goals: ['goals'],
   // Phase 12b: the optional experience question sits on the frequency screen (owner, 2026-10-09).
   frequency: ['trainingFrequency', 'trainingExperience'],

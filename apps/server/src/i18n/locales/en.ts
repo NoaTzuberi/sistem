@@ -60,6 +60,7 @@ export const en: Record<keyof typeof he, string> = {
   photo_invalid_image: 'The photo must be a JPEG, PNG or WebP image.',
   // Onboarding
   onboarding_name_invalid: 'Name must be a non-empty string.',
+  phone_invalid: 'This phone number is not valid. Use an Israeli number (050-1234567) or an international one with +.',
   onboarding_birth_date_invalid: 'Birth date must indicate an age between {min} and {max}.',
   onboarding_height_invalid: 'Height must be a number between {min} and {max}.',
   onboarding_weight_invalid: 'Weight must be a number between {min} and {max}.',
