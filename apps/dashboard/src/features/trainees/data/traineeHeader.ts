@@ -1,5 +1,5 @@
 import type { CoachTraineeDetail, Language } from '@sistem/types';
-import { fill, isolateLtr, labelList, sharedCopy } from '@sistem/shared';
+import { ageOn, fill, isolateAuto, isolateLtr, labelList, sharedCopy, todayInTimezone } from '@sistem/shared';
 import { traineesCopy } from '../copy';
 
 /** The 48h window in milliseconds (PRD §4.1) — only to draw how much of it has passed. */
@@ -18,14 +18,19 @@ export interface TraineeHeaderChips {
   flags: string[];
 }
 
-/** The chips under her name. Only what she answered: a missing answer gives no chip. */
-export function traineeHeaderChips(trainee: CoachTraineeDetail, language: Language): TraineeHeaderChips {
+/**
+ * The chips under her name: the coaching's discipline (when set), her age, goals and training days.
+ * Only what exists: a missing answer gives no chip.
+ */
+export function traineeHeaderChips(trainee: CoachTraineeDetail, language: Language, now: Date = new Date()): TraineeHeaderChips {
   const options = sharedCopy[language].onboardingOptions;
   const answers = trainee.onboarding?.answers;
   const frequency = answers?.trainingFrequency;
   const days = frequency ? (frequency.minDays === frequency.maxDays ? String(frequency.minDays) : isolateLtr(`${frequency.minDays}–${frequency.maxDays}`)) : undefined;
   return {
     facts: [
+      trainee.discipline ? isolateAuto(trainee.discipline) : undefined,
+      answers?.birthDate ? fill(traineesCopy[language].ageChip, { age: ageOn(answers.birthDate, todayInTimezone(trainee.timezone, now)) }) : undefined,
       answers?.goals && answers.goals.length > 0 ? labelList(answers.goals, options.goals, language) : undefined,
       days ? fill(traineesCopy[language].daysPerWeek, { days }) : undefined,
     ].filter((chip): chip is string => chip !== undefined),

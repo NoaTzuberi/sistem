@@ -56,6 +56,7 @@ export const en: CopyShape<typeof he> = {
   trainee: 'Trainee',
   plan: 'Plan',
   daysPerWeek: '{days} days a week',
+  ageChip: 'Age {age}', // DRAFT
   weekProgress: '{done} of {planned}',
   timeLeft: 'Time left',
   buildPlan: 'Build the plan',

@@ -57,6 +57,7 @@ export const he = {
   trainee: 'מתאמנת',
   plan: 'תוכנית',
   daysPerWeek: '{days} ימים בשבוע',
+  ageChip: 'גיל {age}', // DRAFT
   weekProgress: '{done} מתוך {planned}',
   timeLeft: 'זמן שנותר',
   buildPlan: 'לבניית התוכנית',

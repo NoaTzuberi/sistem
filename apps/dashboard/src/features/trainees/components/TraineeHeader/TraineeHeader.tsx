@@ -40,7 +40,7 @@ export function TraineeHeader({ trainee, nowMs, onBuildPlan, onEndCoaching }: Tr
   const shared = useCopy(sharedCopy);
   const copy = useCopy(traineesCopy);
   const { weekOf } = useCoachData();
-  const chips = traineeHeaderChips(trainee, language);
+  const chips = traineeHeaderChips(trainee, language, new Date(nowMs));
   const currentPlan = weekOf(trainee.id)?.currentPlan ?? null;
   const planWindow = trainee.planDueAt ? formatTimeLeft(trainee.planDueAt, nowMs, language) : null;
   const isActive = trainee.status === 'active';
