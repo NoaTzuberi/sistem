@@ -1,0 +1,51 @@
+.invite-first {
+  padding: calc(var(--space-4) - 2px) calc(var(--space-4) - var(--space-1));
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+  text-align: center;
+}
+
+.invite-first-title {
+  margin: 0 0 calc(var(--space-1) + 2px);
+  font-size: var(--text-coach-section);
+  line-height: 1;
+}
+
+.invite-first-body {
+  margin: 0 0 var(--space-3);
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-body);
+}
+
+.invite-first-action {
+  width: 100%;
+  min-height: var(--size-coach-invite-action);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.invite-first-action:active {
+  transform: scale(var(--press-scale));
+}
+
+.invite-first-action:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invite-first-action {
+    transition: none;
+  }
+
+  .invite-first-action:active {
+    transform: none;
+  }
+}

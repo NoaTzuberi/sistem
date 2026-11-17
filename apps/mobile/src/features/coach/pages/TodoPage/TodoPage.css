@@ -1,0 +1,27 @@
+.coach-todo-title {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-coach-title);
+  line-height: 0.85;
+}
+
+.coach-todo-summary {
+  margin: var(--space-2) 0 0;
+  color: var(--color-coach-on-stage-muted);
+  font-size: var(--text-coach-body);
+}
+
+.coach-todo-body {
+  padding-block: var(--space-coach-today-section) var(--space-4);
+}
+
+.coach-todo-list {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  list-style: none;
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+}
+
+.coach-todo-list > li + li {
+  border-block-start: var(--border-width-thin) solid var(--color-hairline);
+}

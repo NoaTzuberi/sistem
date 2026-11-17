@@ -56,6 +56,8 @@ import { WorkoutSummaryPage } from '../../features/workouts/pages/WorkoutSummary
 import { IntervalTimerPage } from '../../features/workouts/pages/IntervalTimerPage/IntervalTimerPage';
 import { NutritionPage } from '../../features/nutrition/pages/NutritionPage/NutritionPage';
 import { InboxPage } from '../../features/coach/pages/InboxPage/InboxPage';
+import { ActivityPage } from '../../features/coach/pages/ActivityPage/ActivityPage';
+import { TodoPage } from '../../features/coach/pages/TodoPage/TodoPage';
 import { TodayPage } from '../../features/coach/pages/TodayPage/TodayPage';
 import { TraineesPage } from '../../features/coach/pages/TraineesPage/TraineesPage';
 import { TraineeDetailPage } from '../../features/coach/pages/TraineeDetailPage/TraineeDetailPage';
@@ -137,6 +139,8 @@ function AppRoutes({ location }: { location: Location }) {
           <Route element={<AppStateGuard allow={['coach']} />}>
             <Route path={ROUTES.COACH_TODAY} element={<TodayPage />} />
             <Route path={ROUTES.COACH_INBOX} element={<InboxPage />} />
+            <Route path={ROUTES.COACH_ACTIVITY} element={<ActivityPage />} />
+            <Route path={ROUTES.COACH_TODO} element={<TodoPage />} />
             <Route path={ROUTES.COACH_TRAINEES} element={<TraineesPage />} />
             <Route path={COACH_TRAINEE_PATH} element={<TraineeDetailPage />} />
             <Route path={COACH_ARCHIVED_TRAINEE_PATH} element={<ArchivedTraineePage />} />

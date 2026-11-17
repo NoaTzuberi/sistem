@@ -10,9 +10,17 @@
   line-height: var(--line-height-display);
 }
 
-.coach-today-line {
-  margin: var(--space-2) 0 0;
-  line-height: 1;
+/* The one summary line: what needs her today (or that nothing does). */
+.coach-today-summary {
+  margin: calc(var(--space-2) - 2px) 0 0;
+  color: var(--color-on-ink);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.coach-today-summary-quiet {
+  color: var(--color-coach-on-stage-muted);
+  font-weight: var(--font-weight-medium);
 }
 
 .coach-today-stage-error {
@@ -21,22 +29,10 @@
   color: var(--color-coach-on-stage-muted);
 }
 
-/* A new coach: one card and the invite button. */
-.coach-today-empty {
+/* 24px between the sections, room above the dock. */
+.coach-today-body {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-  margin-block-start: var(--space-4);
-  padding: var(--space-4) calc(var(--space-3) + var(--space-1));
-  border-radius: var(--radius-coach-card);
-  background-color: var(--color-coach-card);
-  box-shadow: var(--shadow-coach-card);
-}
-
-.coach-today-empty-text {
-  margin: 0;
-  font-size: var(--text-base);
-  line-height: var(--line-height-base);
-  color: var(--color-coach-ink-2);
+  gap: var(--space-coach-today-section);
+  padding-block: var(--space-coach-today-section) var(--space-4);
 }

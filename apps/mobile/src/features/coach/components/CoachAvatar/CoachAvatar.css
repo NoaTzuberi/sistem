@@ -33,6 +33,13 @@
   font-size: var(--text-2xl);
 }
 
+/* A row of coach Today (36px). */
+.coach-avatar-today {
+  width: var(--size-coach-today-avatar);
+  height: var(--size-coach-today-avatar);
+  font-size: var(--text-base);
+}
+
 /* Her details sheet header. */
 .coach-avatar-sheet {
   width: var(--size-coach-avatar-sheet);

@@ -1,5 +1,5 @@
 import type { CoachTraineeDetail, Language } from '@sistem/types';
-import { dateFormat, describeNutritionPreferences, fill, formatDateShort, formatNumber, isolateLtr, labelList, sharedCopy } from '@sistem/shared';
+import { ageOn, dateFormat, describeNutritionPreferences, fill, formatDateShort, formatNumber, isolateLtr, labelList, sharedCopy } from '@sistem/shared';
 import type { coachCopy } from '../copy';
 
 type DetailsCopy = (typeof coachCopy)['he']['details'];
@@ -13,11 +13,9 @@ export interface DetailRow {
   sub?: string;
 }
 
-/** Full years between a 'YYYY-MM-DD' birth date and today ('YYYY-MM-DD', her zone). */
-export function ageOn(birthDate: string, today: string): number {
-  const [by, bm, bd] = birthDate.slice(0, 10).split('-').map(Number);
-  const [ty, tm, td] = today.split('-').map(Number);
-  return ty - by - (tm < bm || (tm === bm && td < bd) ? 1 : 0);
+/** wa.me wants the number without "+" or separators (the server stores E.164). */
+export function whatsAppLink(phone: string): string {
+  return `https://wa.me/${phone.replace(/\D/g, '')}`;
 }
 
 /** "פרטים אישיים" without the email (that row has its own actions): age, height, starting weight. */

@@ -1,0 +1,45 @@
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-2) + var(--space-1));
+  min-height: var(--size-coach-today-row);
+  color: var(--color-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.recent-row:active {
+  transform: scale(var(--press-scale));
+}
+
+/* One line: the sentence is cut with an ellipsis, the time always shows. */
+.recent-row-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-coach-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-row-time {
+  flex: none;
+  color: var(--color-coach-faint);
+  font-size: var(--text-coach-caption);
+}
+
+.recent-row:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recent-row {
+    transition: none;
+  }
+
+  .recent-row:active {
+    transform: none;
+  }
+}

@@ -11,6 +11,7 @@ import { SendNoteFields } from '../SendNoteFields/SendNoteFields';
 import { useWorkoutSendNote } from '../../hooks/useWorkoutSendNote';
 import { PlanCard } from '../PlanCard/PlanCard';
 import { NewPlanSheet } from '../NewPlanSheet/NewPlanSheet';
+import { useOpenNewPlanOnArrival } from '../../hooks/useOpenNewPlanOnArrival';
 import type { DuplicateRequest } from '../NewPlanSheet/NewPlanSheet';
 import { coachCopy } from '../../copy';
 import './TraineePlan.css';
@@ -57,6 +58,9 @@ export function TraineePlan({ trainee, onPlansChanged, refreshKey = 0 }: Trainee
   });
   // Both actions publish, so both sheets carry the message + tip that go out with it.
   const sendNote = useWorkoutSendNote();
+  const { open: openFlow } = flow;
+  const openNewPlan = useCallback(() => void openFlow({ method: 'duplicate' }), [openFlow]);
+  useOpenNewPlanOnArrival(plans !== undefined, openNewPlan);
 
   if (isLoading && !plans) return <StateMessage>{shared.common.loading}</StateMessage>;
   if (!plans) return <StateMessage onRetry={reload}>{error}</StateMessage>;

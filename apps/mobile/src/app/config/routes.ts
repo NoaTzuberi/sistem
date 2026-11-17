@@ -31,6 +31,8 @@ export const ROUTES = {
   // Coach mode: Today (feed + stage) is her landing tab; the notifications inbox sits behind its bell.
   COACH_TODAY: '/coach/today',
   COACH_INBOX: '/coach/today/inbox',
+  COACH_ACTIVITY: '/coach/today/activity',
+  COACH_TODO: '/coach/today/todo',
   COACH_TRAINEES: '/coach/trainees',
   COACH_PROFILE: '/coach/profile',
   // Coach mode Phase B: her conversations (a thread is full screen, under the tab's path).
@@ -168,4 +170,11 @@ export function cardioDetailPath(planId: string, workoutId: string): string {
 
 export function cardioRunPath(planId: string, workoutId: string): string {
   return `/workouts/cardio/${planId}/${workoutId}/run`;
+}
+
+/** Router state of "בניית תוכנית" (coach Today): her Workouts tab opens with the "תוכנית חדשה" sheet. */
+export const OPEN_NEW_PLAN_STATE = { openNewPlan: true } as const;
+
+export function hasOpenNewPlanState(state: unknown): boolean {
+  return typeof state === 'object' && state !== null && (state as { openNewPlan?: unknown }).openNewPlan === true;
 }

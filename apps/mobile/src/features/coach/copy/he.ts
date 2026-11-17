@@ -51,20 +51,30 @@ export const he = {
     scoreTrained: 'התאמנו השבוע',
     scoreWaiting: 'מחכות לתוכנית',
     scoreAttention: 'דורשות תשומת לב',
-    waitingTitle: 'מחכות לתוכנית',
-    seeAll: 'הכול',
-    waitingTag: 'ממתינה לתוכנית',
     joined: 'הצטרפה {time}',
     questionnaireDone: 'שאלון מולא',
     questionnaireNotDone: 'שאלון לא מולא',
     feedToday: 'היום',
     feedYesterday: 'אתמול',
-    emptyFeed: 'עוד אין פעילות. הזמיני את המתאמנת הראשונה שלך',
     quietFeed: 'עוד אין פעילות.', // DRAFT: she has trainees, nothing happened yet
     loadError: 'לא הצלחנו לטעון את המסך. נסי שוב.', // DRAFT
     feedLoadError: 'לא הצלחנו לטעון את הפעילות.', // DRAFT
     loadMore: 'עוד פעילות', // DRAFT
     loadMoreError: 'לא הצלחנו לטעון עוד. נסי שוב.', // DRAFT
+    // Variant A (owner-approved 2026-11-12). DRAFT wording.
+    chipsLabel: 'במבט מהיר',
+    chipActive: 'פעילות',
+    chipWaiting: 'מחכות לתוכנית',
+    chipMessages: 'הודעות',
+    todoAll: 'הכול · {count}',
+    recentTitle: 'פעילות אחרונה',
+    allActivity: 'לכל הפעילות',
+    activityTitle: 'כל הפעילות',
+    calmTitle: 'הכול בשליטה',
+    calmBody: 'אין מתאמנות שמחכות לך',
+    inviteTitle: 'הזמיני את המתאמנת הראשונה',
+    inviteBody: 'שלחי לה את הקישור שלך, והיא תופיע כאן',
+    inviteAction: 'שליחת קישור הזמנה',
   },
   feed: {
     workout: '{name} סיימה את {title}',
@@ -156,6 +166,9 @@ export const he = {
     open: 'פרטי המתאמנת',
     traineeSince: 'מתאמנת מ־{date}',
     personal: 'פרטים אישיים',
+    phone: 'טלפון',
+    call: 'התקשרות',
+    whatsapp: 'וואטסאפ',
     email: 'אימייל',
     sendEmail: 'שליחת מייל',
     copyEmail: 'העתקת האימייל',

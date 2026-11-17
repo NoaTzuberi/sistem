@@ -1,0 +1,35 @@
+.calm-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-3) + 2px);
+  border-radius: var(--radius-coach-card);
+  background-color: var(--color-coach-card);
+}
+
+.calm-card-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-coach-calm-icon);
+  height: var(--size-coach-calm-icon);
+  border-radius: var(--radius-round);
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary-deep);
+}
+
+.calm-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calm-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+}
+
+.calm-card-body {
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-label);
+}

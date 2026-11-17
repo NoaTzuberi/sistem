@@ -8,7 +8,9 @@ import {
   IconCalendarWeek,
   IconChevronRight,
   IconCopy,
+  IconBrandWhatsapp,
   IconMail,
+  IconPhone,
   IconRuler2,
   IconSalad,
   IconScale,
@@ -19,7 +21,7 @@ import {
 import { fill, sharedCopy, traineeStatusLabel, useCopy, useLanguage } from '@sistem/shared';
 import { BottomSheet } from '../../../../components/common/BottomSheet/BottomSheet';
 import { coachCopy } from '../../copy';
-import { type DetailRow, coachingRows, formatCoachingDate, goalRows, personalRows } from '../../data/traineeDetails';
+import { type DetailRow, coachingRows, formatCoachingDate, goalRows, personalRows, whatsAppLink } from '../../data/traineeDetails';
 import type { TraineeDetailsSheetState } from '../../hooks/useTraineeDetailsSheet';
 import { CoachAvatar } from '../CoachAvatar/CoachAvatar';
 import './TraineeDetailsSheet.css';
@@ -75,6 +77,24 @@ export function TraineeDetailsSheet({ trainee, today, sheet, onOpenQuestionnaire
       </header>
 
       <DetailsGroup title={copy.personal}>
+        {trainee.phone && (
+          <li className="tds-row">
+            <a className="tds-row-main tds-row-link" href={`tel:${trainee.phone}`} aria-label={`${copy.call}: ${trainee.phone}`}>
+              <span className="tds-tile" aria-hidden="true">
+                <IconPhone size={ICON_SIZE} />
+              </span>
+              <span className="tds-row-text">
+                <span className="tds-row-label">{copy.phone}</span>
+                <span className="tds-row-value" dir="ltr">
+                  {trainee.phone}
+                </span>
+              </span>
+            </a>
+            <a className="tds-row-action" href={whatsAppLink(trainee.phone)} target="_blank" rel="noopener noreferrer" aria-label={copy.whatsapp}>
+              <IconBrandWhatsapp size={ICON_SIZE} aria-hidden="true" />
+            </a>
+          </li>
+        )}
         <li className="tds-row">
           <a className="tds-row-main tds-row-link" href={`mailto:${trainee.email}`} aria-label={`${copy.sendEmail}: ${trainee.email}`}>
             <span className="tds-tile" aria-hidden="true">

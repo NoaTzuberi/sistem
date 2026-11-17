@@ -8,7 +8,7 @@ interface CoachAvatarProps {
   /** Her id: keeps her color the same on every screen. */
   seed: string;
   photoUrl?: string | null;
-  size?: 'md' | 'lg' | 'xl' | 'sheet';
+  size?: 'today' | 'md' | 'lg' | 'xl' | 'sheet';
   /** Ink initials on white (the coach's own avatar on the stage) instead of her color. */
   plain?: boolean;
   onPhotoExpired?: () => void;

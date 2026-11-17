@@ -1,0 +1,116 @@
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-coach-today-row);
+}
+
+.todo-row-who {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: calc(var(--space-2) + var(--space-1));
+  min-width: 0;
+  min-height: var(--touch-target-min);
+  color: var(--color-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.todo-row-who:active {
+  transform: scale(var(--press-scale));
+}
+
+.todo-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.todo-row-name,
+.todo-row-why {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-row-name {
+  /* Sized to the name and placed at the reading side, so a Latin name still lines up with the Hebrew reason. */
+  align-self: flex-start;
+  max-width: 100%;
+  font-size: var(--text-coach-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.todo-row-why {
+  color: var(--color-coach-muted);
+  font-size: var(--text-coach-label);
+}
+
+/* The 48h window: passed = Cherry, closing soon = the amber ink (text on white — never a fill). */
+.todo-row-why-late {
+  color: var(--color-primary-deep);
+}
+
+.todo-row-why-soon {
+  color: var(--color-coach-amber-ink);
+}
+
+/* 34px drawn, 44px of hit area. */
+.todo-row-action {
+  position: relative;
+  flex: none;
+  min-height: var(--size-coach-today-action);
+  padding-inline: calc(var(--space-3) - 2px);
+  border: 0;
+  border-radius: var(--radius-round);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
+  font: inherit;
+  font-size: var(--text-coach-label);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.todo-row-action::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--touch-target-min) - var(--size-coach-today-action)) / -2) 0;
+}
+
+.todo-row-action-soft {
+  background-color: var(--color-coach-soft);
+  color: var(--color-ink);
+}
+
+.todo-row-action:active {
+  transform: scale(var(--press-scale));
+}
+
+.todo-row-who:focus-visible,
+.todo-row-action:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .todo-row-who:hover .todo-row-name {
+    color: var(--color-primary-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-row-who,
+  .todo-row-action {
+    transition: none;
+  }
+
+  .todo-row-who:active,
+  .todo-row-action:active {
+    transform: none;
+  }
+}

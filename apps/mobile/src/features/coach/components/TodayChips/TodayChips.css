@@ -1,0 +1,57 @@
+.today-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: calc(var(--space-3) - 2px);
+}
+
+/* 30px drawn, 44px of hit area. */
+.today-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-1) + 2px);
+  min-height: var(--size-coach-today-chip);
+  padding-inline: calc(var(--space-2) + var(--space-1));
+  border-radius: var(--radius-round);
+  background-color: var(--surface-coach-on-stage);
+  color: var(--color-coach-chip-on-stage);
+  font-size: var(--text-coach-label);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-press) var(--ease-press);
+}
+
+.today-chip::after {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+
+.today-chip-value {
+  color: var(--color-on-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-chip-waiting .today-chip-value {
+  color: var(--color-coach-pink-on-ink);
+}
+
+.today-chip:active {
+  transform: scale(var(--press-scale));
+}
+
+.today-chip:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-on-ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-chip {
+    transition: none;
+  }
+
+  .today-chip:active {
+    transform: none;
+  }
+}
