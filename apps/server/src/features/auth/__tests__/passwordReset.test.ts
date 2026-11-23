@@ -14,6 +14,7 @@ vi.mock('../email.service', () => ({
   }),
   sendPasswordResetEmail: vi.fn(async (_to: string, url: string) => {
     sent.trainee.push(url);
+    return true;
   }),
   sendSetPasswordEmail: vi.fn(async () => false),
 }));
@@ -30,6 +31,10 @@ const tokenOf = (url: string) => new URL(url).searchParams.get('token')!;
 async function nextDashboardLink(): Promise<string> {
   for (let attempt = 0; attempt < 50 && sent.dashboard.length === 0; attempt += 1) await new Promise((r) => setTimeout(r, 10));
   return sent.dashboard.shift()!;
+}
+async function nextTraineeLink(): Promise<string> {
+  for (let attempt = 0; attempt < 50 && sent.trainee.length === 0; attempt += 1) await new Promise((r) => setTimeout(r, 10));
+  return sent.trainee.shift()!;
 }
 
 describe('dashboard password reset', () => {
@@ -98,9 +103,9 @@ describe('dashboard password reset', () => {
   it('a trainee reset (app link) signs out every other session and signs her in fresh', async () => {
     const trainee = await createTestUser('trainee@example.com');
     await api.request('POST', '/auth/forgot-password', { body: { email: 'trainee@example.com', app: 'dashboard' } });
+    const token = tokenOf(await nextTraineeLink());
     expect(sent.dashboard).toHaveLength(0);
-    expect(sent.trainee).toHaveLength(1);
-    const token = tokenOf(sent.trainee[0]);
+    expect(sent.trainee).toHaveLength(0);
     const reset = await api.request('POST', '/auth/reset-password', { body: { token, password: NEW_PASSWORD } });
     expect(reset.status).toBe(200);
     expect(reset.body.user.id).toBe(trainee.id);

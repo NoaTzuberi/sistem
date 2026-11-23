@@ -159,16 +159,21 @@ export async function requestPasswordReset(email: string, app?: PasswordResetApp
     return;
   }
 
-  const rawToken = crypto.randomBytes(32).toString('hex');
-  user.passwordResetTokenHash = hashResetToken(rawToken);
-  user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
-  await user.save();
+  const { url: resetUrl } = await issueAppResetLink(String(user._id));
+  // Not awaited, like the dashboard link: the answer takes the same time whether or not the account exists.
+  void deliverAppResetLink(user.email, resetUrl, resolveLanguage(user.preferences));
+}
 
-  const resetUrl = publicLink(config.clientUrl, `/reset-password?token=${rawToken}`);
+/** The trainee app's email, or — DEV ONLY, when no email went out — the local console. Never logs in production / tests. */
+async function deliverAppResetLink(to: string, url: string, language: Language): Promise<void> {
+  let sent = false;
   try {
-    await sendPasswordResetEmail(user.email, resetUrl, resolveLanguage(user.preferences));
-  } catch (error) {
-    console.error('Failed to send password reset email:', error);
+    sent = await sendPasswordResetEmail(to, url, language);
+  } catch {
+    console.error('Failed to send the password reset email.');
+  }
+  if (!sent && config.nodeEnv === 'development') {
+    console.info(`[dev only] App password reset link for ${to}: ${url}`);
   }
 }
 
@@ -194,6 +199,26 @@ export async function issuePasswordResetLink(userId: string, now: Date = new Dat
   const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_MS);
   await User.updateOne({ _id: userId }, { $set: { passwordResetTokenHash: hashResetToken(rawToken), passwordResetExpires: expiresAt } });
   return { url: publicLink(config.dashboardUrl, `/reset-password?token=${rawToken}`), expiresAt };
+}
+
+/** The trainee app's reset link (CLIENT_URL): same token fields and rules as the dashboard link. */
+async function issueAppResetLink(userId: string, now: Date = new Date()): Promise<{ url: string; expiresAt: Date }> {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_MS);
+  await User.updateOne({ _id: userId }, { $set: { passwordResetTokenHash: hashResetToken(rawToken), passwordResetExpires: expiresAt } });
+  return { url: publicLink(config.clientUrl, `/reset-password?token=${rawToken}`), expiresAt };
+}
+
+/**
+ * The admin's reset link for any account: the dashboard link for coach / admin accounts, else the app
+ * link. Issuing it cancels any older reset / set-password link of hers.
+ */
+export async function issueResetLinkFor(
+  user: Pick<UserDocument, 'roles'> & { _id: unknown },
+): Promise<{ app: 'app' | 'dashboard'; url: string; expiresAt: Date }> {
+  const id = String(user._id);
+  if (isStaffAccount(user)) return { app: 'dashboard', ...(await issuePasswordResetLink(id)) };
+  return { app: 'app', ...(await issueAppResetLink(id)) };
 }
 
 /** Lets the reset screen say "this link no longer works" before she types a password. */

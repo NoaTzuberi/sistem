@@ -5,16 +5,20 @@ import { translate } from '../../i18n';
 
 const resend = config.resendApiKey ? new Resend(config.resendApiKey) : null;
 
-/** In her language (Phase 15): Hebrew right-to-left, or English. */
-export async function sendPasswordResetEmail(to: string, resetUrl: string, language: Language): Promise<void> {
+/**
+ * The trainee app's reset link, in her language (Phase 15): Hebrew right-to-left, or English.
+ * Returns false when it did not go out (no Resend key, or Resend refused it).
+ */
+export async function sendPasswordResetEmail(to: string, resetUrl: string, language: Language): Promise<boolean> {
   if (!resend) {
     console.warn('RESEND_API_KEY is not configured — skipping password reset email send.');
-    return;
+    return false;
   }
 
   const t = (code: Parameters<typeof translate>[1]) => translate(language, code);
   const dir = language === 'he' ? 'rtl' : 'ltr';
-  await resend.emails.send({
+  // Resend reports failures in the result (it does not throw) — e.g. an unverified sending domain.
+  const { error } = await resend.emails.send({
     from: config.emailFrom,
     to,
     subject: t('email_reset_subject'),
@@ -31,6 +35,11 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string, langu
       </div>
     `,
   });
+  if (error) {
+    console.error('Resend refused the password reset email:', error.name, error.message);
+    return false;
+  }
+  return true;
 }
 
 /**
