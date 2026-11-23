@@ -77,13 +77,23 @@ export function isNoConnectionError(error: unknown): boolean {
   return error.response.status >= 500 && !fromApi;
 }
 
-/** The server's message (already in the language on screen), else `fallback` (e.g. no connection). */
 /** The field an error is about, when the server names one (e.g. a body measurement's id). */
 export function extractErrorField(error: unknown): string | null {
   const field: unknown = axios.isAxiosError(error) ? error.response?.data?.field : undefined;
   return typeof field === 'string' ? field : null;
 }
 
+/**
+ * The HTTP status and the server's error code, when the API answered. A 404 WITHOUT a code = no such
+ * route (e.g. a server not yet deployed with it); the API's own "not found" answers always carry one.
+ */
+export function extractErrorStatus(error: unknown): { status: number; code: string | null } | null {
+  if (!axios.isAxiosError(error) || !error.response) return null;
+  const code: unknown = error.response.data?.code;
+  return { status: error.response.status, code: typeof code === 'string' ? code : null };
+}
+
+/** The server's message (already in the language on screen), else `fallback` (e.g. no connection). */
 export function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error) && typeof error.response?.data?.message === 'string') {
     return error.response.data.message;
