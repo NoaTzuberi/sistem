@@ -100,6 +100,7 @@ npm run group:exercises           # movement patterns + equipment-variant famili
 npm run seed:knowledge            # knowledge base embeddings (needs VOYAGE_API_KEY)
 npm run seed:dev                  # DEV ONLY: 1 coach + 2 onboarded trainees (one with a plan)
 npm run promote:coach -- <email>  # DEV ONLY: make an existing user a coach
+npm run dev:set-password -- <email>  # DEV ONLY: new password for a test account (hidden prompt; signs out her sessions)
 npm run create:admin              # create the ADMIN_EMAIL account (or add the admin role)
 ```
 
@@ -113,6 +114,17 @@ non-local database unless `--allow-remote` is added (they print which database t
 will touch). Seed accounts: `coach@sistem.dev`, `trainee1@sistem.dev`,
 `trainee2@sistem.dev`, password `sistem-dev-1234` — or your own with `SEED_PASSWORD=<12+ characters>`
 (always set it for a database a public server uses; it is never printed).
+
+`dev:set-password` asks for the password at a hidden prompt (never an argument, never printed), hashes
+it like sign-up and ends every existing session. It refuses unless `NODE_ENV` is `development`
+(the default when unset), refuses `--env-file` and anything that looks like production, refuses a
+non-local database without `--allow-remote`, and refuses addresses outside `@sistem.dev`,
+`@dev.sistem`, `@example.com` without `--force`.
+
+Password reset emails in development: if Resend has no verified domain (or `EMAIL_FROM` is unset, so
+the test sender `onboarding@resend.dev` is used), Resend delivers only to the Resend account owner's
+address. When an email does not go out, the dev server prints the link in its terminal
+(`[dev only] App password reset link for …`).
 
 Deploying the server: `docs/deploy/render.md` (Render Blueprint `render.yaml`).
 
