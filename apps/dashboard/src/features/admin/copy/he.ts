@@ -46,7 +46,9 @@ export const he = {
   usersSearch: 'שם או אימייל',
   usersSearchButton: 'חיפוש',
   usersSearchShort: 'צריך להקליד לפחות 2 תווים.',
-  usersNone: 'לא נמצא חשבון.',
+  usersNone: 'לא נמצא חשבון עם הפרטים האלה', // owner's wording (2026-11-24)
+  usersNotDeployed: 'השרת עוד לא עודכן', // owner's wording (2026-11-24)
+  usersNoAdmin: 'אין הרשאת אדמין לחשבון הזה', // owner's wording (2026-11-24)
   usersLoadError: 'החיפוש לא הצליח. אפשר לנסות שוב.',
   usersTestAccount: 'חשבון בדיקה',
   roles: { admin: 'מנהלת', coach: 'מאמנת', trainee: 'מתאמנת' },
