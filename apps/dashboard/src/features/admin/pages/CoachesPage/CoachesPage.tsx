@@ -14,6 +14,7 @@ import { useSaveLanguage } from '../../../../hooks/useSaveLanguage';
 import { useAuth } from '../../../../services/auth/AuthContext';
 import { hasRole } from '../../../auth/data/roles';
 import { AdminFoodBank } from '../../components/AdminFoodBank/AdminFoodBank';
+import { AdminUserSearch } from '../../components/AdminUserSearch/AdminUserSearch';
 import { CreateCoachSheet } from '../../components/CreateCoachSheet/CreateCoachSheet';
 import { PasswordLink } from '../../components/PasswordLink/PasswordLink';
 import { adminCopy } from '../../copy';
@@ -21,7 +22,8 @@ import { useAdminCoaches } from '../../hooks/useAdminCoaches';
 import './CoachesPage.css';
 
 /**
- * The platform admin's page: the coach accounts (never trainee data). Its own simple frame — an
+ * The platform admin's page: the coach accounts, the account search (identity only — never trainee data)
+ * and the system food bank. Its own simple frame — an
  * admin-only account has no coach dashboard around it.
  */
 export function CoachesPage() {
@@ -129,6 +131,8 @@ export function CoachesPage() {
             {admin.actionError}
           </p>
         )}
+
+        <AdminUserSearch />
 
         <AdminFoodBank />
       </main>
