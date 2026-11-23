@@ -53,6 +53,23 @@ describe('admin: any account — search, reset link, test-account email', () => 
     expect((await api.request('GET', '/admin/users?q=t', { token: admin.token })).status).toBe(400);
   });
 
+  it('finds by full email, partial email (with . and +) and name, Hebrew too; a non-admin gets 403', async () => {
+    await User.updateOne({ _id: trainee.id }, { $set: { name: 'נועה כהן' } });
+    await createTestUser('me+t1@gmail.com');
+    const search = async (q: string, token = admin.token) => api.request('GET', `/admin/users?q=${encodeURIComponent(q)}`, { token });
+    const ids = async (q: string) => (await search(q)).body.users.map((user: { id: string }) => user.id);
+
+    expect(await ids('trainee@sistem.dev')).toEqual([trainee.id]); // full email
+    expect(await ids('TRAINEE@SISTEM')).toEqual([trainee.id]); // partial, any case
+    expect(await ids('sistem.dev')).toEqual([trainee.id]); // "." is a dot, not "any character"
+    expect((await search('me+t1')).body.users).toHaveLength(1); // "+" is a plus
+    expect(await ids('נועה')).toEqual([trainee.id]); // name, Hebrew
+    expect(await ids('כהן')).toEqual([trainee.id]);
+    expect((await search('nobody-here')).body.users).toEqual([]);
+    expect((await search('trainee', coach.token)).status).toBe(403);
+    expect((await search('trainee', trainee.token)).status).toBe(403);
+  });
+
   it('a trainee link opens the app, works once and signs her out everywhere', async () => {
     const res = await resetLink(trainee.id);
     expect(res.status).toBe(200);

@@ -131,7 +131,8 @@ const USER_SEARCH_LIMIT = 20;
 type LeanUser = { _id: Types.ObjectId; name: string; email: string; roles: AdminUser['roles'] };
 
 function toAdminUser(user: LeanUser): AdminUser {
-  return { id: String(user._id), name: user.name, email: user.email, roles: [...user.roles], isTestAccount: isTestEmail(user.email) };
+  // `?? []` / `?? ''`: one odd record (an old account) must never fail the whole search.
+  return { id: String(user._id), name: user.name ?? '', email: user.email, roles: [...(user.roles ?? [])], isTestAccount: isTestEmail(user.email) };
 }
 
 function escapeRegex(text: string): string {
@@ -157,7 +158,7 @@ async function findUser(userId: string): Promise<LeanUser> {
 /** 60 minutes, single use, cancels her older links; the link is in this answer only (never stored or logged). */
 export async function createUserResetLink(userId: string): Promise<AdminUserResetLinkResponse> {
   const user = await findUser(userId);
-  if (user.roles.includes('admin')) throw new AdminTargetRefusedError('admin_user_is_admin');
+  if ((user.roles ?? []).includes('admin')) throw new AdminTargetRefusedError('admin_user_is_admin');
   const { app, url, expiresAt } = await issueResetLinkFor(user);
   return { user: toAdminUser(user), app, url, expiresAt: expiresAt.toISOString() };
 }
