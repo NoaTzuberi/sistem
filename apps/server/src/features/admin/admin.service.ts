@@ -1,23 +1,28 @@
 import type { Types } from 'mongoose';
-import type { AdminCoach, CoachPasswordLinkResponse, CoachProfileStatus } from '@sistem/types';
+import type { AdminCoach, AdminUser, AdminUserResetLinkResponse, CoachPasswordLinkResponse, CoachProfileStatus } from '@sistem/types';
 import { LocalizedError } from '../../i18n';
 import { User } from '../users/user.model';
 import { CoachProfile } from '../coachProfiles/coachProfile.model';
 import type { CoachProfileDocument } from '../coachProfiles/coachProfile.model';
 import { ensureCoachSetup } from '../coachProfiles/coachProfile.service';
 import { Coaching } from '../coachings/coaching.model';
-import { issuePasswordResetLink, issueSetPasswordLink } from '../auth/auth.service';
+import { issuePasswordResetLink, issueResetLinkFor, issueSetPasswordLink } from '../auth/auth.service';
+import { isTestEmail } from '../users/testEmail';
 import { sendSetPasswordEmail } from '../auth/email.service';
 import { resolveLanguage } from '../users/units';
 import { SET_PASSWORD_LINK_HOURS } from './admin.constants';
 
-// The platform admin manages COACH accounts only. Nothing here reads trainees' private data
-// (plans, logs, answers, body, photos) — only counts.
+// The platform admin manages COACH accounts, and finds any account by name / email for a reset link.
+// Nothing here reads trainees' private data (plans, logs, answers, body, photos) — only identity and counts.
 
 type LeanProfile = CoachProfileDocument & { _id: Types.ObjectId };
 
 export class CoachEmailTakenError extends LocalizedError {}
 export class CoachNotFoundError extends LocalizedError {}
+export class AdminUserNotFoundError extends LocalizedError {}
+/** Admin accounts are never reset from the page (create:admin --reset-password is the way). */
+export class AdminTargetRefusedError extends LocalizedError {}
+export class NotTestAccountError extends LocalizedError {}
 
 async function toAdminCoaches(profiles: LeanProfile[]): Promise<AdminCoach[]> {
   const userIds = profiles.map((profile) => profile.userId);
@@ -115,4 +120,68 @@ export async function setCoachStatus(profileId: string, status: CoachProfileStat
   if (!profile) throw new CoachNotFoundError('coach_not_found');
   const [coach] = await toAdminCoaches([profile]);
   return coach;
+}
+
+// ---------------------------------------------------------------------------
+// Any account (2026-11-17): find one by name / email, give her a one-time reset link to pass on,
+// and point a TEST account at a real inbox. Identity only (name, email, roles) — never her data.
+// ---------------------------------------------------------------------------
+
+const USER_SEARCH_LIMIT = 20;
+type LeanUser = { _id: Types.ObjectId; name: string; email: string; roles: AdminUser['roles'] };
+
+function toAdminUser(user: LeanUser): AdminUser {
+  return { id: String(user._id), name: user.name, email: user.email, roles: [...user.roles], isTestAccount: isTestEmail(user.email) };
+}
+
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export async function searchUsers(query: string): Promise<AdminUser[]> {
+  const pattern = new RegExp(escapeRegex(query), 'i');
+  const users = await User.find({ $or: [{ email: pattern }, { name: pattern }] })
+    .select('name email roles')
+    .sort({ email: 1 })
+    .limit(USER_SEARCH_LIMIT)
+    .lean<LeanUser[]>();
+  return users.map(toAdminUser);
+}
+
+async function findUser(userId: string): Promise<LeanUser> {
+  const user = await User.findById(userId).select('name email roles').lean<LeanUser>();
+  if (!user) throw new AdminUserNotFoundError('admin_user_not_found');
+  return user;
+}
+
+/** 60 minutes, single use, cancels her older links; the link is in this answer only (never stored or logged). */
+export async function createUserResetLink(userId: string): Promise<AdminUserResetLinkResponse> {
+  const user = await findUser(userId);
+  if (user.roles.includes('admin')) throw new AdminTargetRefusedError('admin_user_is_admin');
+  const { app, url, expiresAt } = await issueResetLinkFor(user);
+  return { user: toAdminUser(user), app, url, expiresAt: expiresAt.toISOString() };
+}
+
+/**
+ * Test accounts only (no real inbox): the new address may be anything not taken (e.g. a real +alias).
+ * Her open reset / set-password link is cancelled (it was meant for the old address).
+ */
+export async function changeTestAccountEmail(userId: string, email: string): Promise<AdminUser> {
+  const user = await findUser(userId);
+  if (!isTestEmail(user.email)) throw new NotTestAccountError('admin_user_not_test_account');
+  if (email !== user.email && (await User.exists({ email }))) throw new CoachEmailTakenError('coach_email_taken');
+  try {
+    const updated = await User.findByIdAndUpdate(
+      userId,
+      { $set: { email }, $unset: { passwordResetTokenHash: 1, passwordResetExpires: 1 } },
+      { returnDocument: 'after' },
+    )
+      .select('name email roles')
+      .lean<LeanUser>();
+    if (!updated) throw new AdminUserNotFoundError('admin_user_not_found');
+    return toAdminUser(updated);
+  } catch (error) {
+    if ((error as { code?: number }).code === 11000) throw new CoachEmailTakenError('coach_email_taken');
+    throw error;
+  }
 }
