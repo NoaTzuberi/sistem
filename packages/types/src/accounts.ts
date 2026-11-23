@@ -1,4 +1,4 @@
-import type { AuthUser, PrivatePhoto } from './index';
+import type { AuthUser, PrivatePhoto, UserRole } from './index';
 
 // Accounts & relationships: admin → coach → trainee, invites, communities.
 
@@ -203,6 +203,39 @@ export interface CoachPasswordLinkResponse {
   expiresAt: string;
   /** True when the email went out (Resend configured). */
   emailSent: boolean;
+}
+
+/**
+ * GET /admin/users?q= — the admin's account search (any role): identity only, never her data.
+ * `isTestAccount` = a test address (@sistem.dev, @dev.sistem, @example.com): only those can get a new email.
+ */
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  roles: UserRole[];
+  isTestAccount: boolean;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+}
+
+/**
+ * POST /admin/users/:id/reset-link — a one-time reset link (60 min, single use, cancels older links,
+ * signs her out everywhere when used). Returned only here, once: never stored, emailed or logged.
+ * app = the trainee app (CLIENT_URL); dashboard = coach / admin accounts (DASHBOARD_URL).
+ */
+export interface AdminUserResetLinkResponse {
+  user: AdminUser;
+  app: 'app' | 'dashboard';
+  url: string;
+  expiresAt: string;
+}
+
+/** PATCH /admin/users/:id/email — test accounts only. */
+export interface AdminChangeEmailPayload {
+  email: string;
 }
 
 export interface SetPasswordPayload {

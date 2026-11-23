@@ -3,6 +3,9 @@ import type { AxiosInstance } from 'axios';
 import type {
   AdminCoach,
   AdminCoachesResponse,
+  AdminUser,
+  AdminUserResetLinkResponse,
+  AdminUsersResponse,
   CoachInvite,
   CoachPayment,
   CoachPaymentResponse,
@@ -190,7 +193,33 @@ export function createAdminApi(client: AxiosInstance) {
     return data.coach;
   }
 
-  return { listCoaches, createCoach, resendPasswordLink, createResetLink, setCoachStatus };
+  /** Any account by name / email (2+ characters): identity only. */
+  async function searchUsers(query: string): Promise<AdminUser[]> {
+    const { data } = await client.get<AdminUsersResponse>('/admin/users', { params: { q: query } });
+    return data.users;
+  }
+
+  /** A one-time 60-minute reset link, in this answer only. */
+  async function createUserResetLink(userId: string): Promise<AdminUserResetLinkResponse> {
+    try {
+      const { data } = await client.post<AdminUserResetLinkResponse>(`/admin/users/${userId}/reset-link`);
+      return data;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, ''));
+    }
+  }
+
+  /** Test accounts only (the server refuses a real address). */
+  async function changeUserEmail(userId: string, email: string): Promise<AdminUser> {
+    try {
+      const { data } = await client.patch<{ user: AdminUser }>(`/admin/users/${userId}/email`, { email });
+      return data.user;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, ''));
+    }
+  }
+
+  return { listCoaches, createCoach, resendPasswordLink, createResetLink, setCoachStatus, searchUsers, createUserResetLink, changeUserEmail };
 }
 
 export type JoinApi = ReturnType<typeof createJoinApi>;
