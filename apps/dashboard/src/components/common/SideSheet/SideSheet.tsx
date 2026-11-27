@@ -34,20 +34,26 @@ export function SideSheet({ isOpen, onClose, title, subtitle, footer, children, 
   const panelRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
+  // The latest handler: callers often pass a new function every render (a typed letter re-renders
+  // the form), and re-running the effect below would send the focus back to the opener each time.
+  const closeHandler = useRef(onClose);
+  useEffect(() => {
+    closeHandler.current = onClose;
+  }, [onClose]);
 
-  // Esc closes; the focus returns to whatever opened the sheet.
+  // Esc closes; the focus returns to whatever opened the sheet — only when it closes.
   useEffect(() => {
     if (!isOpen) return;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') closeHandler.current();
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       if (opener?.isConnected) opener.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // The first field of the sheet (a search) takes the focus, else its close button.
   useEffect(() => {

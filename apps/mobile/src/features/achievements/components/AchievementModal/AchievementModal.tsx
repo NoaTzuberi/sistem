@@ -34,6 +34,11 @@ export function AchievementModal({ badge, isOpen, onClose }: AchievementModalPro
   const copy = useCopy(achievementCopy).board;
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   const closeRef = useRef<HTMLButtonElement>(null);
+  // The latest handler, so a parent re-render never re-runs the effect below (it would move the focus).
+  const closeHandler = useRef(onClose);
+  useEffect(() => {
+    closeHandler.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,7 +46,7 @@ export function AchievementModal({ badge, isOpen, onClose }: AchievementModalPro
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') closeHandler.current();
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -49,7 +54,7 @@ export function AchievementModal({ badge, isOpen, onClose }: AchievementModalPro
       document.body.style.overflow = previousOverflow;
       if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && isMounted) closeRef.current?.focus({ preventScroll: true });

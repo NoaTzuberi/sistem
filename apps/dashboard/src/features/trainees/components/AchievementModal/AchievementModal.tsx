@@ -32,19 +32,24 @@ export function AchievementModal({ badge, isOpen, onClose }: AchievementModalPro
   const copy = useCopy(traineesCopy).achievementsTab;
   const { isMounted, isShown } = useDrawerTransition(isOpen, CLOSE_MS);
   const closeRef = useRef<HTMLButtonElement>(null);
+  // The latest handler, so a parent re-render never re-runs the effect below (it would move the focus).
+  const closeHandler = useRef(onClose);
+  useEffect(() => {
+    closeHandler.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') closeHandler.current();
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && isMounted) closeRef.current?.focus({ preventScroll: true });
