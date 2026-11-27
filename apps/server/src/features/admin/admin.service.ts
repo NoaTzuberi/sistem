@@ -1,12 +1,12 @@
 import type { Types } from 'mongoose';
-import type { AdminCoach, AdminUser, AdminUserResetLinkResponse, CoachPasswordLinkResponse, CoachProfileStatus } from '@sistem/types';
+import type { AdminCoach, AdminUser, AdminUserResetLinkResponse, AuthUser, CoachPasswordLinkResponse, CoachProfileStatus } from '@sistem/types';
 import { LocalizedError } from '../../i18n';
 import { User } from '../users/user.model';
 import { CoachProfile } from '../coachProfiles/coachProfile.model';
 import type { CoachProfileDocument } from '../coachProfiles/coachProfile.model';
 import { ensureCoachSetup } from '../coachProfiles/coachProfile.service';
 import { Coaching } from '../coachings/coaching.model';
-import { issuePasswordResetLink, issueResetLinkFor, issueSetPasswordLink } from '../auth/auth.service';
+import { getCurrentUser, issuePasswordResetLink, issueResetLinkFor, issueSetPasswordLink } from '../auth/auth.service';
 import { isTestEmail } from '../users/testEmail';
 import { sendSetPasswordEmail } from '../auth/email.service';
 import { resolveLanguage } from '../users/units';
@@ -104,6 +104,20 @@ export async function createCoach(adminId: string, name: string, email: string):
   }
   const profile = await ensureCoachSetup(user._id, name, adminId);
   return passwordLink(profile);
+}
+
+/**
+ * The admin coaches too (owner 2026-11-27): the coach role on her OWN account (never a second one) +
+ * her coach profile and primary community (profile name = her account name, no photo, empty defaults).
+ * Idempotent: a second call changes nothing and never touches an existing profile (a suspended one
+ * stays suspended — reactivate it in the coach list). Coach routes read only by her own id, like any coach.
+ */
+export async function enableOwnCoachMode(adminId: string): Promise<{ user: AuthUser; alreadyCoach: boolean }> {
+  const before = await User.findByIdAndUpdate(adminId, { $addToSet: { roles: 'coach' } }).select('name roles').lean<LeanUser>();
+  if (!before) throw new AdminUserNotFoundError('admin_user_not_found');
+  const alreadyCoach = (before.roles ?? []).includes('coach') && (await CoachProfile.exists({ userId: adminId })) !== null;
+  await ensureCoachSetup(adminId, before.name ?? '', adminId);
+  return { user: await getCurrentUser(adminId), alreadyCoach };
 }
 
 /** A fresh link (the previous one stops working). */

@@ -1,6 +1,16 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware';
-import { getCoaches, getUsers, patchCoach, patchUserEmail, postCoach, postPasswordLink, postResetLink, postUserResetLink } from './admin.controller';
+import {
+  getCoaches,
+  getUsers,
+  patchCoach,
+  patchUserEmail,
+  postCoach,
+  postOwnCoachMode,
+  postPasswordLink,
+  postResetLink,
+  postUserResetLink,
+} from './admin.controller';
 import {
   deleteSystemFoodItem,
   getSystemFoods,
@@ -19,6 +29,8 @@ adminRouter.post('/coaches', postCoach);
 adminRouter.post('/coaches/:coachId/password-link', postPasswordLink);
 adminRouter.post('/coaches/:coachId/reset-link', postResetLink);
 adminRouter.patch('/coaches/:coachId', patchCoach);
+// The admin coaches too: the coach role + profile on her own account (idempotent).
+adminRouter.post('/me/coach-mode', postOwnCoachMode);
 adminRouter.get('/users', getUsers);
 adminRouter.post('/users/:userId/reset-link', postUserResetLink);
 adminRouter.patch('/users/:userId/email', patchUserEmail);

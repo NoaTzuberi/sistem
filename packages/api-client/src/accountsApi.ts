@@ -4,8 +4,10 @@ import type {
   AdminCoach,
   AdminCoachesResponse,
   AdminUser,
+  AdminOwnCoachModeResponse,
   AdminUserResetLinkResponse,
   AdminUsersResponse,
+  AuthUser,
   CoachInvite,
   CoachPayment,
   CoachPaymentResponse,
@@ -219,7 +221,27 @@ export function createAdminApi(client: AxiosInstance) {
     }
   }
 
-  return { listCoaches, createCoach, resendPasswordLink, createResetLink, setCoachStatus, searchUsers, createUserResetLink, changeUserEmail };
+  /** Coach mode for the admin's OWN account (idempotent): her refreshed user, now with the coach role. */
+  async function enableOwnCoachMode(): Promise<AuthUser> {
+    try {
+      const { data } = await client.post<AdminOwnCoachModeResponse>('/admin/me/coach-mode');
+      return data.user;
+    } catch (error) {
+      throw new Error(extractErrorMessage(error, ''));
+    }
+  }
+
+  return {
+    listCoaches,
+    createCoach,
+    resendPasswordLink,
+    createResetLink,
+    setCoachStatus,
+    searchUsers,
+    createUserResetLink,
+    changeUserEmail,
+    enableOwnCoachMode,
+  };
 }
 
 export type JoinApi = ReturnType<typeof createJoinApi>;

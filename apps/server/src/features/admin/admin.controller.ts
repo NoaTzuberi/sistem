@@ -13,6 +13,7 @@ import {
   createCoach,
   createResetLink,
   createUserResetLink,
+  enableOwnCoachMode,
   listCoaches,
   resendPasswordLink,
   searchUsers,
@@ -126,6 +127,17 @@ export async function patchUserEmail(req: AuthenticatedRequest, res: Response) {
   try {
     const user = await changeTestAccountEmail(id, email);
     logSecurityEvent('admin_action', req, { userId: req.userId, action: 'test_account_email', targetUserId: id });
+    res.status(200).json({ user });
+  } catch (error) {
+    sendAdminError(res, error);
+  }
+}
+
+/** Her OWN account only (req.userId — never a target from the request); logged like every admin action. */
+export async function postOwnCoachMode(req: AuthenticatedRequest, res: Response) {
+  try {
+    const { user, alreadyCoach } = await enableOwnCoachMode(req.userId!);
+    logSecurityEvent('admin_action', req, { userId: req.userId, action: 'own_coach_mode', result: alreadyCoach ? 'unchanged' : 'enabled' });
     res.status(200).json({ user });
   } catch (error) {
     sendAdminError(res, error);

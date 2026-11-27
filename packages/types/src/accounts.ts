@@ -233,6 +233,14 @@ export interface AdminUserResetLinkResponse {
   expiresAt: string;
 }
 
+/**
+ * POST /admin/me/coach-mode — the admin turns on coach mode for her OWN account (adds the coach role +
+ * her coach profile; idempotent). Her refreshed user: the dashboard then shows the coach pages too.
+ */
+export interface AdminOwnCoachModeResponse {
+  user: AuthUser;
+}
+
 /** PATCH /admin/users/:id/email — test accounts only. */
 export interface AdminChangeEmailPayload {
   email: string;
