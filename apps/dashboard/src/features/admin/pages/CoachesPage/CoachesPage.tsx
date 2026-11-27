@@ -19,6 +19,7 @@ import { CreateCoachSheet } from '../../components/CreateCoachSheet/CreateCoachS
 import { PasswordLink } from '../../components/PasswordLink/PasswordLink';
 import { adminCopy } from '../../copy';
 import { useAdminCoaches } from '../../hooks/useAdminCoaches';
+import { useOwnCoachMode } from '../../hooks/useOwnCoachMode';
 import './CoachesPage.css';
 
 /**
@@ -32,6 +33,7 @@ export function CoachesPage() {
   const { user, logout } = useAuth();
   const { saveLanguage } = useSaveLanguage();
   const admin = useAdminCoaches();
+  const ownCoachMode = useOwnCoachMode();
   const [isCreating, setIsCreating] = useState(false);
 
   return (
@@ -56,10 +58,22 @@ export function CoachesPage() {
 
       <main className="coaches-main">
         <PageHeader title={copy.title} subtitle={copy.subtitle}>
-          <PillButton variant="primary" onClick={() => setIsCreating(true)}>
-            {copy.addCoach}
-          </PillButton>
+          <div className="coaches-header-actions">
+            {ownCoachMode.isOffered && (
+              <PillButton disabled={ownCoachMode.isBusy} aria-busy={ownCoachMode.isBusy} onClick={() => void ownCoachMode.enable()}>
+                {copy.ownCoachMode}
+              </PillButton>
+            )}
+            <PillButton variant="primary" onClick={() => setIsCreating(true)}>
+              {copy.addCoach}
+            </PillButton>
+          </div>
         </PageHeader>
+        {ownCoachMode.error && (
+          <p className="coaches-error" role="alert">
+            {ownCoachMode.error}
+          </p>
+        )}
 
         {admin.error ? (
           <StateLine error={admin.error} onRetry={admin.reload} />

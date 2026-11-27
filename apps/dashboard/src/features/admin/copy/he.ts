@@ -37,6 +37,8 @@ export const he = {
   loadError: 'לא הצלחנו לטעון את המאמנות.',
   actionError: 'הפעולה לא הצליחה. אפשר לנסות שוב.',
   createError: 'לא הצלחנו ליצור את החשבון. אפשר לנסות שוב.',
+  // Coach mode on her own account (2026-11-27): the button is the owner's wording.
+  ownCoachMode: 'הפעלת מצב מאמנת לחשבון שלי',
   backToDashboard: 'ללוח הבקרה',
   navGroup: 'ניהול',
   adminRole: 'מנהלת מערכת',

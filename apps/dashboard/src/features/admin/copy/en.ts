@@ -39,6 +39,8 @@ export const en: CopyShape<typeof he> = {
   loadError: "Couldn't load the coaches.",
   actionError: "That didn't work. Try again.",
   createError: "Couldn't create the account. Try again.",
+  // Coach mode on her own account (2026-11-27).
+  ownCoachMode: 'Turn on coach mode for my account',
   backToDashboard: 'To the dashboard',
   navGroup: 'Admin',
   adminRole: 'Sistem admin',
